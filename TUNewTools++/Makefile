@@ -39,58 +39,61 @@ SUFFIX		= .cc:sC .cpp:sC .cu:sC
 EXTHDRS		=
 HDRS		= TU/Array++.h \
 		TU/BandMatrix++.h \
-		TU/Bezier++.h \
 		TU/BlockDiagonalMatrix++.h \
 		TU/BoxFilter.h \
-		TU/CCSImage.h \
 		TU/Camera++.h \
-		TU/ComplexImage.h \
-		TU/CorrectIntensity.h \
 		TU/DP.h \
 		TU/DericheConvolver.h \
 		TU/EdgeDetector.h \
 		TU/FIRFilter.h \
 		TU/FIRGaussianConvolver.h \
-		TU/Feature.h \
-		TU/FeatureMatch.h \
 		TU/Filter2.h \
 		TU/GaussianConvolver.h \
 		TU/Geometry++.h \
 		TU/GraphCuts.h \
 		TU/GuidedFilter.h \
-		TU/Heap.h \
-		TU/ICIA.h \
 		TU/IIRFilter.h \
 		TU/Image++.h \
-		TU/IntegralImage.h \
 		TU/List.h \
 		TU/Manip.h \
-		TU/Mesh++.h \
 		TU/Minimize.h \
-		TU/Movie.h \
 		TU/NDTree++.h \
-		TU/Nurbs++.h \
 		TU/PM16C_04.h \
-		TU/PSTree.h \
 		TU/Profiler.h \
 		TU/Quantizer.h \
 		TU/Random.h \
-		TU/Ransac.h \
-		TU/Rectify.h \
 		TU/SADStereo.h \
 		TU/SHOT602.h \
-		TU/SURFCreator.h \
 		TU/SeparableFilter2.h \
 		TU/Serial.h \
 		TU/SparseMatrix++.h \
-		TU/StereoBase.h \
-		TU/StereoIterators.h \
-		TU/StereoUtility.h \
 		TU/TreeFilter.h \
 		TU/TriggerGenerator.h \
 		TU/Vector++.h \
 		TU/Warp.h \
 		TU/WeightedMedianFilter.h \
+		TU/YetPorted/Bezier++.h \
+		TU/YetPorted/CCSImage.h \
+		TU/YetPorted/ComplexImage.h \
+		TU/YetPorted/CorrectIntensity.h \
+		TU/YetPorted/Feature.h \
+		TU/YetPorted/FeatureMatch.h \
+		TU/YetPorted/GFStereo.h \
+		TU/YetPorted/Heap.h \
+		TU/YetPorted/ICIA.h \
+		TU/YetPorted/IntegralImage.h \
+		TU/YetPorted/Mesh++.h \
+		TU/YetPorted/Movie.h \
+		TU/YetPorted/Nurbs++.h \
+		TU/YetPorted/PSTree.h \
+		TU/YetPorted/Ransac.h \
+		TU/YetPorted/Rectify.h \
+		TU/YetPorted/SADStereo.h \
+		TU/YetPorted/SURFCreator.h \
+		TU/YetPorted/StereoBase.h \
+		TU/YetPorted/StereoIterators.h \
+		TU/YetPorted/StereoUtility.h \
+		TU/YetPorted/Warp.h \
 		TU/algorithm.h \
 		TU/fdstream.h \
 		TU/functional.h \
@@ -135,7 +138,6 @@ HDRS		= TU/Array++.h \
 		TU/simd/lookup.h \
 		TU/simd/misc.h \
 		TU/simd/pack.h \
-		TU/simd/row_vec_iterator.h \
 		TU/simd/select.h \
 		TU/simd/shift.h \
 		TU/simd/shift_iterator.h \
@@ -231,8 +233,7 @@ EdgeDetector.o: TU/EdgeDetector.h TU/Image++.h TU/types.h TU/pair.h \
 	TU/simd/lookup.h TU/simd/x86/lookup.h TU/simd/arm/lookup.h \
 	TU/simd/load_iterator.h TU/simd/store_iterator.h \
 	TU/simd/cvtdown_iterator.h TU/simd/cvtup_iterator.h \
-	TU/simd/shift_iterator.h TU/simd/row_vec_iterator.h \
-	TU/simd/BufTraits.h TU/simd/zero.h
+	TU/simd/shift_iterator.h TU/simd/BufTraits.h TU/simd/zero.h
 FIRGaussianCoefficients.o: TU/FIRGaussianConvolver.h TU/FIRFilter.h \
 	TU/SeparableFilter2.h TU/Array++.h TU/range.h TU/algorithm.h \
 	TU/tuple.h TU/iterator.h
@@ -260,8 +261,8 @@ GaussianCoefficients.o: TU/GaussianConvolver.h TU/Vector++.h TU/Array++.h \
 	TU/simd/lookup.h TU/simd/x86/lookup.h TU/simd/arm/lookup.h \
 	TU/simd/load_iterator.h TU/simd/store_iterator.h \
 	TU/simd/cvtdown_iterator.h TU/simd/cvtup_iterator.h \
-	TU/simd/shift_iterator.h TU/simd/row_vec_iterator.h \
-	TU/simd/BufTraits.h TU/simd/zero.h TU/Minimize.h
+	TU/simd/shift_iterator.h TU/simd/BufTraits.h TU/simd/zero.h \
+	TU/Minimize.h
 GenericImage.o: TU/Image++.h TU/types.h TU/pair.h TU/Vector++.h \
 	TU/Array++.h TU/range.h TU/algorithm.h TU/tuple.h TU/iterator.h
 ImageBase.o: TU/Image++.h TU/types.h TU/pair.h TU/Vector++.h TU/Array++.h \

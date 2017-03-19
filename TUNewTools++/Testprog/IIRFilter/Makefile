@@ -13,21 +13,18 @@ IDLS		=
 MOCHDRS		=
 
 INCDIRS		= -I../..
-CPPFLAGS	= -DNDEBUG -DUSE_TBB
+CPPFLAGS	= -DNDEBUG -DPROFILE -DUSE_TBB
 CFLAGS		= -O3
 NVCCFLAGS	= -g
-ifneq ($(findstring icpc,$(CXX)),)
-  CFLAGS	= -O3
-  NVCCFLAGS	= -O			# must < -O2
-#  CPPFLAGS     += -DSSE3
+ifeq ($(shell arch), armv7l)
+  CPPFLAGS     += -DNEON
+else
+  CPPFLAGS     += -DAVX2
+  CFLAGS       += -march=core-avx2
 endif
 CCFLAGS		= $(CFLAGS)
 
 LIBS		= -lTUNewTools++ -ltbb -ltbbmalloc
-ifneq ($(findstring darwin,$(OSTYPE)),)
-  LIBS	       += -framework IOKit -framework CoreFoundation \
-		  -framework CoreServices
-endif
 
 LINKER		= $(CXX)
 
@@ -85,8 +82,6 @@ EXTHDRS		= ../../TU/Array++.h \
 		../../TU/simd/load_store.h \
 		../../TU/simd/logical.h \
 		../../TU/simd/lookup.h \
-		../../TU/simd/misc.h \
-		../../TU/simd/row_vec_iterator.h \
 		../../TU/simd/select.h \
 		../../TU/simd/shift.h \
 		../../TU/simd/shift_iterator.h \
@@ -110,8 +105,6 @@ EXTHDRS		= ../../TU/Array++.h \
 		../../TU/simd/x86/lookup.h \
 		../../TU/simd/x86/select.h \
 		../../TU/simd/x86/shift.h \
-		../../TU/simd/x86/shuffle.h \
-		../../TU/simd/x86/svml.h \
 		../../TU/simd/x86/type_traits.h \
 		../../TU/simd/x86/unpack.h \
 		../../TU/simd/x86/vec.h \
@@ -159,12 +152,10 @@ main.o: ../../TU/Image++.h ../../TU/types.h ../../TU/pair.h \
 	../../TU/simd/arm/compare.h ../../TU/simd/select.h \
 	../../TU/simd/x86/select.h ../../TU/simd/arm/select.h \
 	../../TU/simd/arithmetic.h ../../TU/simd/x86/arithmetic.h \
-	../../TU/simd/arm/arithmetic.h ../../TU/simd/misc.h \
-	../../TU/simd/x86/shuffle.h ../../TU/simd/x86/svml.h \
-	../../TU/simd/transform.h ../../TU/functional.h \
-	../../TU/simd/lookup.h ../../TU/simd/x86/lookup.h \
-	../../TU/simd/arm/lookup.h ../../TU/simd/load_iterator.h \
-	../../TU/simd/store_iterator.h ../../TU/simd/cvtdown_iterator.h \
-	../../TU/simd/cvtup_iterator.h ../../TU/simd/shift_iterator.h \
-	../../TU/simd/row_vec_iterator.h ../../TU/simd/BufTraits.h \
+	../../TU/simd/arm/arithmetic.h ../../TU/simd/transform.h \
+	../../TU/functional.h ../../TU/simd/lookup.h \
+	../../TU/simd/x86/lookup.h ../../TU/simd/arm/lookup.h \
+	../../TU/simd/load_iterator.h ../../TU/simd/store_iterator.h \
+	../../TU/simd/cvtdown_iterator.h ../../TU/simd/cvtup_iterator.h \
+	../../TU/simd/shift_iterator.h ../../TU/simd/BufTraits.h \
 	../../TU/simd/zero.h ../../TU/GaussianConvolver.h ../../TU/Profiler.h

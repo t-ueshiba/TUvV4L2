@@ -39,7 +39,10 @@ INCDIR		= $(PREFIX)/include
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC .cpp:sC .cu:sC
-EXTHDRS		=
+EXTHDRS		= ../../../TU/PM16C_04.h \
+		../../../TU/Serial.h \
+		../../../TU/fdstream.h \
+		../../../TU/types.h
 HDRS		=
 SRCS		= main.cc
 OBJS		= main.o
@@ -50,3 +53,5 @@ OBJS		= main.o
 #include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
+main.o: ../../../TU/PM16C_04.h ../../../TU/Serial.h ../../../TU/fdstream.h \
+	../../../TU/types.h

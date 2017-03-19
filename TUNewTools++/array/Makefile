@@ -37,6 +37,8 @@ INCDIR		= $(PREFIX)/include
 #########################
 SUFFIX		= .cc:sC .cpp:sC .cu:sC
 EXTHDRS		= ../TU/Array++.h \
+		../TU/Geometry++.h \
+		../TU/Minimize.h \
 		../TU/Vector++.h \
 		../TU/algorithm.h \
 		../TU/iterator.h \
@@ -52,5 +54,6 @@ OBJS		= main.o
 #include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
-main.o: ../TU/Array++.h ../TU/range.h ../TU/algorithm.h ../TU/tuple.h \
-	../TU/iterator.h ../TU/Vector++.h
+main.o: ../TU/Geometry++.h ../TU/Minimize.h ../TU/Vector++.h \
+	../TU/Array++.h ../TU/range.h ../TU/algorithm.h ../TU/tuple.h \
+	../TU/iterator.h

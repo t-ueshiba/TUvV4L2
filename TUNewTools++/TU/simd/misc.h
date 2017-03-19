@@ -13,12 +13,8 @@ namespace simd
 {
 template <class... ITERS> inline auto
 make_iterator_tuple(ITERS... iters)
-    -> decltype(boost::make_tuple(
-		    make_multiplex_iterator<
-			lcm(iterator_value<ITERS>::size...)/
-			iterator_value<ITERS>::size>(iters)...))
 {
-    return boost::make_tuple(
+    return std::make_tuple(
 	make_multiplex_iterator<lcm(iterator_value<ITERS>::size...)/
 				iterator_value<ITERS>::size>(iters)...);
 }

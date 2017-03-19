@@ -21,17 +21,15 @@ namespace TU
 */
 template <size_t D, class COEFF, class ITER, class T=iterator_value<COEFF> >
 class fir_filter_iterator
-    : public boost::iterator_adaptor<
-		fir_filter_iterator<D, COEFF, ITER, T>,		// self
-		ITER,						// base
-		T,						// value_type
-		boost::forward_traversal_tag,			// traversal
-		T>						// reference
+    : public boost::iterator_adaptor<fir_filter_iterator<D, COEFF, ITER, T>,
+				     ITER, T, boost::forward_traversal_tag, T>
 {
   private:
+    template <size_t J>
+    using index	= std::integral_constant<size_t, J>;
     using super	= boost::iterator_adaptor<fir_filter_iterator, ITER, T,
 					  boost::forward_traversal_tag, T>;
-
+    
   public:
     using	typename super::value_type;
     using	typename super::reference;
@@ -39,43 +37,80 @@ class fir_filter_iterator
     friend class	boost::iterator_core_access;
 
   public:
-		fir_filter_iterator(ITER const& iter, COEFF c)
-		    :super(iter), _c(c), _ibuf(), _i(0)
+		fir_filter_iterator(const ITER& iter, COEFF c)
+		    :super(iter), _c(c), _ibuf(), _n(0)
 		{
+		    set_inpro(index<0>());
 		    copy<D-1>(super::base(), D-1, _ibuf.begin());
 		    super::base_reference() += (D-1);
 		}
-		fir_filter_iterator(ITER const& iter)
-		    :super(iter), _c(), _ibuf(), _i(0)
+		fir_filter_iterator(const ITER& iter)
+		    :super(iter), _c(), _ibuf(), _n(0)
 		{
 		}
+		fir_filter_iterator(const fir_filter_iterator& iter)
+		    :super(iter), _c(iter._c), _ibuf(iter._ibuf), _n(iter._n)
+		{
+		    set_inpro(index<0>());
+		}
+    fir_filter_iterator&
+		operator =(const fir_filter_iterator& iter)
+		{
+		    if (this != &iter)
+		    {
+			super::operator =(iter);
+			_c    = iter._c;
+			_ibuf = iter._ibuf;
+			_n    = iter._n;
+			set_inpro(index<0>());
+		    }
 
+		    return *this;
+		}
+    
   private:
     reference	dereference() const
 		{
-		    value_type	val = *super::base();
-		    _ibuf[_i] = val;
-		    val *= _c[D-1];
-		    auto	c  = _c;
-		    const auto	bi = _ibuf.cbegin() + _i;
-		    for (auto p = bi; ++p != _ibuf.cend(); ++c)
-			val += *c * *p;
-		    for (auto p = _ibuf.cbegin(); p != bi; ++p, ++c)
-			val += *c * *p;
-
-		    return val;
+		    _ibuf[_n] = *super::base();
+		    return (this->*_inpro[_n])(index<0>());
 		}
     void	increment()
 		{
 		    ++super::base_reference();
-		    if (++_i == D)
-			_i = 0;
+		    if (++_n == D)
+			_n = 0;
 		}
 
+    void	set_inpro(index<D>)
+		{
+		}
+    template <size_t N>
+    void	set_inpro(index<N>)
+		{
+		    _inpro[N] = &fir_filter_iterator::inpro<N>;
+		    set_inpro(index<N+1>());
+		}
+    
+    template <size_t N>
+    value_type	inpro(index<D-1>) const
+		{
+		    constexpr size_t	J = (N + D - 1)%D;
+		    return _c[D-1]*_ibuf[J];
+		}
+    template <size_t N, size_t I>
+    value_type	inpro(index<I>) const
+		{
+		    constexpr size_t	J = (N + I)%D;
+		    return _c[I]*_ibuf[J] + inpro<N>(index<I+1>());
+		}
+    
   private:
+    using	fptr = value_type (fir_filter_iterator::*)(index<0>) const;
+    
+    std::array<fptr, D>		_inpro;
     const COEFF			_c;	//!< 先頭のフィルタ係数を指す反復子
     mutable std::array<T, D>	_ibuf;	//!< 過去D時点の入力データ
-    size_t			_i;	//!< 最新の入力データへのindex
+    size_t			_n;	//!< 最新の入力データへのindex
 };
 
 //! finite impulse response filter反復子を生成する

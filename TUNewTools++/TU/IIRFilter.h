@@ -32,15 +32,16 @@ class iir_filter_iterator
 		T>						// reference
 {
   private:
+    template <size_t D_, bool FWD_>
+    struct selector	{ enum {dim = D_, fwd = FWD_}; };
+    template <size_t I>
+    using index		= std::integral_constant<size_t, I>;
     using super		= boost::iterator_adaptor<
 			      iir_filter_iterator, ITER, T,
 			      boost::single_pass_traversal_tag, T>;
-    using buf_type	= std::array<T, D>;
+    using buf_type	= Array<T, D>;	// 初期値を0にするためstd::arrayは使わない
     using buf_iterator	= typename buf_type::const_iterator;
 
-    template <size_t D_, bool FWD_>
-    struct selector	{enum {dim = D_, fwd = FWD_};};
-    
   public:
     typedef typename super::value_type	value_type;
     typedef typename super::reference	reference;
@@ -48,214 +49,183 @@ class iir_filter_iterator
     friend class	boost::iterator_core_access;
 
   public:
-		iir_filter_iterator(ITER const& iter, COEFF ci, COEFF co)
-		    :super(iter), _ci(ci), _co(co), _ibuf(), _obuf(), _i(0)
+		iir_filter_iterator(const ITER& iter, COEFF ci, COEFF co)
+		    :super(iter), _ci(ci), _co(co), _ibuf(), _obuf(), _n(0)
 		{
-		    std::fill(_ibuf.begin(), _ibuf.end(), value_type(0));
-		    std::fill(_obuf.begin(), _obuf.end(), value_type(0));
+		    set_inpro(index<0>());
+		}
+		iir_filter_iterator(const iir_filter_iterator& iter)
+		    :super(iter), _ci(iter._ci), _co(iter._co),
+		     _ibuf(iter._ibuf), _obuf(iter._obuf), _n(iter._n)
+		{
+		    set_inpro(index<0>());
+		}
+    iir_filter_iterator&
+		operator =(const iir_filter_iterator& iter)
+		{
+		    if (this != &iter)
+		    {
+			super::operator =(iter);
+			_ci   = iter._ci;
+			_co   = iter._co;
+			_ibuf = iter._ibuf;
+			_obuf = iter._obuf;
+			_n    = iter._n;
+			set_inpro(index<0>());
+		    }
+
+		    return *this;
 		}
 
   private:
-    static value_type	inpro(COEFF c, buf_iterator b, size_t i)
-			{
-			    const auto	bi  = b + i;
-			    value_type	val = *c * *bi;
-			    for (auto p = bi; ++p != b + D; )
-				val += *++c * *p;
-			    for (auto p = b; p != bi; ++p)
-				val += *++c * *p;
-
-			    return val;
-			}
-    static value_type	inpro_2_0(COEFF c, buf_iterator b)
-			{
-			    return *c * *b + *(c+1) * *(b+1);
-			}
-    static value_type	inpro_2_1(COEFF c, buf_iterator b)
-			{
-			    return *c * *(b+1) + *(c+1) * *b;
-			}
-    static value_type	inpro_4_0(COEFF c, buf_iterator b)
-			{
-			    return *c	  * *b	   + *(c+1) * *(b+1)
-				 + *(c+2) * *(b+2) + *(c+3) * *(b+3);
-			}
-    static value_type	inpro_4_1(COEFF c, buf_iterator b)
-			{
-			    return *c	  * *(b+1) + *(c+1) * *(b+2)
-				 + *(c+2) * *(b+3) + *(c+3) * *b;
-			}
-    static value_type	inpro_4_2(COEFF c, buf_iterator b)
-			{
-			    return *c	  * *(b+2) + *(c+1) * *(b+3)
-				 + *(c+2) * *b	   + *(c+3) * *(b+1);
-			}
-    static value_type 	inpro_4_3(COEFF c, buf_iterator b)
-			{
-			    return *c	  * *(b+3) + *(c+1) * *b
-				 + *(c+2) * *(b+1) + *(c+3) * *(b+2);
-			}
-
-    template <size_t D_>
-    value_type	update(selector<D_, true>) const
-		{
-		    const auto	i = _i;
-		    if (++_i == D)
-			_i = 0;
-		    _ibuf[i] = *super::base();
-		    return (_obuf[i] = inpro(_co, _obuf.cbegin(),  i)
-				     + inpro(_ci, _ibuf.cbegin(), _i));
-		}
-    
-    template <size_t D_>
-    value_type	update(selector<D_, false>) const
-		{
-		    const auto	val = inpro(_co, _obuf.cbegin(), _i)
-				    + inpro(_ci, _ibuf.cbegin(), _i);
-		    _obuf[_i] = val;
-		    _ibuf[_i] = *super::base();
-		    if (++_i == D)
-			_i = 0;
-		    return val;
-		}
-
-    value_type	update(selector<2, true>) const
-		{
-		    value_type	val;
-		    
-		    if (_i == 0)
-		    {
-			_i = 1;
-			_ibuf[0] = *super::base();
-			_obuf[0] = val
-				 = inpro_2_0(_co, _obuf.cbegin())
-				 + inpro_2_1(_ci, _ibuf.cbegin());
-		    }
-		    else
-		    {
-			_i = 0;
-			_ibuf[1] = *super::base();
-			_obuf[1] = val
-				 = inpro_2_1(_co, _obuf.cbegin())
-				 + inpro_2_0(_ci, _ibuf.cbegin());
-		    }
-
-		    return val;
-		}
-
-    value_type	update(selector<2, false>) const
-		{
-		    value_type	val;
-		    
-		    if (_i == 0)
-		    {
-			_i = 1;
-			_obuf[0] = val
-				 = inpro_2_0(_co, _obuf.cbegin())
-				 + inpro_2_0(_ci, _ibuf.cbegin());
-			_ibuf[0] = *super::base();
-		    }
-		    else
-		    {
-			_i = 0;
-			_obuf[1] = val
-				 = inpro_2_1(_co, _obuf.cbegin())
-				 + inpro_2_1(_ci, _ibuf.cbegin());
-			_ibuf[1] = *super::base();
-		    }
-
-		    return val;
-		}
-
-    value_type	update(selector<4, true>) const
-		{
-		    value_type	val;
-		    
-		    switch (_i)
-		    {
-		      case 0:
-			_i = 1;
-			_ibuf[0] = *super::base();
-			_obuf[0] = val
-				 = inpro_4_0(_co, _obuf.cbegin())
-				 + inpro_4_1(_ci, _ibuf.cbegin());
-			break;
-		      case 1:
-			_i = 2;
-			_ibuf[1] = *super::base();
-			_obuf[1] = val
-				 = inpro_4_1(_co, _obuf.cbegin())
-				 + inpro_4_2(_ci, _ibuf.cbegin());
-			break;
-		      case 2:
-			_i = 3;
-			_ibuf[2] = *super::base();
-			_obuf[2] = val
-				 = inpro_4_2(_co, _obuf.cbegin())
-				 + inpro_4_3(_ci, _ibuf.cbegin());
-			break;
-		      default:
-			_i = 0;
-			_ibuf[3] = *super::base();
-			_obuf[3] = val
-				 = inpro_4_3(_co, _obuf.cbegin())
-				 + inpro_4_0(_ci, _ibuf.cbegin());
-			break;
-		    }
-
-		    return val;
-		}
-
-    value_type	update(selector<4, false>) const
-		{
-		    value_type	val;
-		    
-		    switch (_i)
-		    {
-		      case 0:
-			_i = 1;
-			_obuf[0] = val
-				 = inpro_4_0(_co, _obuf.cbegin())
-				 + inpro_4_0(_ci, _ibuf.cbegin());
-			_ibuf[0] = *super::base();
-			break;
-		      case 1:
-			_i = 2;
-			_obuf[1] = val
-				 = inpro_4_1(_co, _obuf.cbegin())
-				 + inpro_4_1(_ci, _ibuf.cbegin());
-			_ibuf[1] = *super::base();
-			break;
-		      case 2:
-			_i = 3;
-			_obuf[2] = val
-				 = inpro_4_2(_co, _obuf.cbegin())
-				 + inpro_4_2(_ci, _ibuf.cbegin());
-			_ibuf[2] = *super::base();
-			break;
-		      default:
-			_i = 0;
-			_obuf[3] = val
-				 = inpro_4_3(_co, _obuf.cbegin())
-				 + inpro_4_3(_ci, _ibuf.cbegin());
-			_ibuf[3] = *super::base();
-			break;
-		    }
-
-		    return val;
-		}
-
     reference	dereference() const
 		{
-		    return update(selector<D, FWD>());
+		    return dereference(selector<D, FWD>());
+		}
+    reference	dereference(selector<2, true>) const
+		{
+		    if (_n == 0)
+		    {
+			_n = 1;
+			_ibuf[0] = *super::base();
+			_obuf[0] = inpro<0>(index<0>());
+			return _obuf[0];
+		    }
+		    else
+		    {
+			_n = 0;
+			_ibuf[1] = *super::base();
+			_obuf[1] = inpro<1>(index<0>());
+			return _obuf[1];
+		    }
+		}
+    reference	dereference(selector<2, false>) const
+		{
+		    if (_n == 0)
+		    {
+			_n = 1;
+			_obuf[0] = inpro<0>(index<0>());
+			return _obuf[0];
+		    }
+		    else
+		    {
+			_n = 0;
+			_obuf[1] = inpro<1>(index<0>());
+			_ibuf[1] = *super::base();
+			return _obuf[1];
+		    }
+		}
+    reference	dereference(selector<4, true>) const
+		{
+		    switch (_n)
+		    {
+		      case 0:
+			_n = 1;
+			_ibuf[0] = *super::base();
+			_obuf[0] = inpro<0>(index<0>());
+			return _obuf[0];
+		      case 1:
+			_n = 2;
+			_ibuf[1] = *super::base();
+			_obuf[1] = inpro<1>(index<0>());
+			return _obuf[1];
+		      case 2:
+			_n = 3;
+			_ibuf[2] = *super::base();
+			_obuf[2] = inpro<2>(index<0>());
+			return _obuf[2];
+		      default:
+			_n = 0;
+			_ibuf[3] = *super::base();
+			_obuf[3] = inpro<3>(index<0>());
+			break;
+		    }
+
+		    return _obuf[3];
+		}
+    reference	dereference(selector<4, false>) const
+		{
+		    switch (_n)
+		    {
+		      case 0:
+			_n = 1;
+			_obuf[0] = inpro<0>(index<0>());
+			_ibuf[0] = *super::base();
+			return _obuf[0];
+		      case 1:
+			_n = 2;
+			_obuf[1] = inpro<1>(index<0>());
+			_ibuf[1] = *super::base();
+			return _obuf[1];
+		      case 2:
+			_n = 3;
+			_obuf[2] = inpro<2>(index<0>());
+			_ibuf[2] = *super::base();
+			return _obuf[2];
+		      default:
+			_n = 0;
+			_obuf[3] = inpro<3>(index<0>());
+			_ibuf[3] = *super::base();
+			break;
+		    }
+			    
+		    return _obuf[3];
+		}
+    template <size_t D_>
+    reference	dereference(selector<D_, true>) const
+		{
+		    const auto	n = _n;
+		    if (++_n == D)
+			_n = 0;
+		    _ibuf[n] = *super::base();
+		    return (_obuf[n] = (this->*_inpro[n])(index<0>()));
+		}
+    template <size_t D_>
+    reference	dereference(selector<D_, false>) const
+		{
+		    const auto	n = _n;
+		    _obuf[n] = (this->*_inpro[n])(index<0>());
+		    _ibuf[n] = *super::base();
+		    if (++_n == D)
+			_n = 0;
+		    return _obuf[n];
+		}
+
+    void	set_inpro(index<D>)
+		{
+		}
+    template <size_t N>
+    void	set_inpro(index<N>)
+		{
+		    _inpro[N] = &iir_filter_iterator::inpro<N>;
+		    set_inpro(index<N+1>());
+		}
+    
+    template <size_t N>
+    value_type	inpro(index<D-1>) const
+		{
+		    constexpr size_t	K  = (N + D - 1)%D;
+		    constexpr size_t	Ki = (K + (FWD ? 1 : 0))%D;
+		    return _co[D-1]*_obuf[K] + _ci[D-1]*_ibuf[Ki];
+		}
+    template <size_t N, size_t I>
+    value_type	inpro(index<I>) const
+		{
+		    constexpr size_t	J  = (N + I)%D;
+		    constexpr size_t	Ji = (J + (FWD ? 1 : 0))%D;
+		    return _co[I]*_obuf[J] + _ci[I]*_ibuf[Ji]
+			 + inpro<N>(index<I+1>());
 		}
     
   private:
+    using	fptr = value_type (iir_filter_iterator::*)(index<0>) const;
+
+    std::array<fptr, D>	_inpro;
     const COEFF		_ci;	//!< 先頭の入力フィルタ係数を指す反復子
     const COEFF		_co;	//!< 先頭の出力フィルタ係数を指す反復子
     mutable buf_type	_ibuf;	//!< 過去D時点の入力データ
     mutable buf_type	_obuf;	//!< 過去D時点の出力データ
-    mutable size_t	_i;
+    mutable size_t	_n;
 };
 
 //! infinite impulse response filter反復子を生成する

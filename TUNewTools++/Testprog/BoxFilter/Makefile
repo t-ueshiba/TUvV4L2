@@ -16,10 +16,11 @@ INCDIRS		= -I../..
 CPPFLAGS	= -DNDEBUG -DPROFILE -DUSE_TBB
 CFLAGS		= -O3
 NVCCFLAGS	= -g
-ifneq ($(findstring icpc,$(CXX)),)
-  CFLAGS	= -O3
-  NVCCFLAGS	= -O			# must < -O2
-#  CPPFLAGS     += -DSSE4
+ifeq ($(shell arch), armv7l)
+  CPPFLAGS     += -DNEON
+else
+  CPPFLAGS     += -DAVX2
+  CFLAGS       += -march=core-avx2
 endif
 CCFLAGS		= $(CFLAGS)
 

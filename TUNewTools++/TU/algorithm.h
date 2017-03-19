@@ -144,7 +144,7 @@ namespace detail
   {
       auto	val = init;
       for (; begin0 != end0; ++begin0, ++begin1)
-	  val = std::fma(*begin0, *begin1, val);
+	  val += *begin0 * *begin1;
       return val;
   }
   template <class ITER0, class ITER1, class T> T
@@ -153,21 +153,21 @@ namespace detail
   {
       auto	val = init;
       for (size_t i = 0; i != n; ++i, ++begin0, ++begin1)
-	  val = std::fma(*begin0, *begin1, val);
+	  val += *begin0 * *begin1;
       return val;
   }
   template <class ITER0, class ARG, class ITER1, class T> inline T
   inner_product(ITER0 begin0, ARG, ITER1 begin1, const T& init,
 		std::integral_constant<size_t, 1>)
   {
-      return std::fma(*begin0, *begin1, init);
+      return init + *begin0 * *begin1;
   }
   template <class ITER0, class ARG, class ITER1, class T, size_t N> inline T
   inner_product(ITER0 begin0, ARG arg, ITER1 begin1, const T& init,
 		std::integral_constant<size_t, N>)
   {
       return inner_product(begin0 + 1, arg, begin1 + 1,
-			   std::fma(*begin0, *begin1, init),
+			   init + *begin0 * *begin1,
 			   std::integral_constant<size_t, N-1>());
   }
 

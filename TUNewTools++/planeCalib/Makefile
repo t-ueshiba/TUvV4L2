@@ -58,10 +58,10 @@ OBJS		= CameraCalibrator.o \
 #include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
-CameraCalibrator.o: CameraCalibrator.h ../TU/Geometry++.h ../TU/Vector++.h \
-	../TU/Array++.h ../TU/range.h ../TU/algorithm.h ../TU/tuple.h \
-	../TU/iterator.h ../TU/Minimize.h ../TU/BlockDiagonalMatrix++.h
-main.o: CameraCalibrator.h ../TU/Geometry++.h ../TU/Vector++.h \
-	../TU/Array++.h ../TU/range.h ../TU/algorithm.h ../TU/tuple.h \
-	../TU/iterator.h ../TU/Minimize.h ../TU/BlockDiagonalMatrix++.h \
+CameraCalibrator.o: CameraCalibrator.h ../TU/Geometry++.h ../TU/Minimize.h \
+	../TU/Vector++.h ../TU/Array++.h ../TU/range.h ../TU/algorithm.h \
+	../TU/tuple.h ../TU/iterator.h ../TU/BlockDiagonalMatrix++.h
+main.o: CameraCalibrator.h ../TU/Geometry++.h ../TU/Minimize.h \
+	../TU/Vector++.h ../TU/Array++.h ../TU/range.h ../TU/algorithm.h \
+	../TU/tuple.h ../TU/iterator.h ../TU/BlockDiagonalMatrix++.h \
 	../TU/Camera++.h
