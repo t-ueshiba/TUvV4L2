@@ -34,13 +34,12 @@ class iir_filter_iterator
   private:
     template <size_t D_, bool FWD_>
     struct selector	{ enum {dim = D_, fwd = FWD_}; };
-    template <size_t I>
-    using index		= std::integral_constant<size_t, I>;
+    template <size_t I_>
+    using index		= std::integral_constant<size_t, I_>;
+    using buf_type	= Array<T, D>;	// 初期値を0にするためstd::arrayは使わない
     using super		= boost::iterator_adaptor<
 			      iir_filter_iterator, ITER, T,
 			      boost::single_pass_traversal_tag, T>;
-    using buf_type	= Array<T, D>;	// 初期値を0にするためstd::arrayは使わない
-    using buf_iterator	= typename buf_type::const_iterator;
 
   public:
     typedef typename super::value_type	value_type;
@@ -194,33 +193,33 @@ class iir_filter_iterator
     void	set_inpro(index<D>)
 		{
 		}
-    template <size_t N>
-    void	set_inpro(index<N>)
+    template <size_t N_>
+    void	set_inpro(index<N_>)
 		{
-		    _inpro[N] = &iir_filter_iterator::inpro<N>;
-		    set_inpro(index<N+1>());
+		    _inpro[N_] = &iir_filter_iterator::inpro<N_>;
+		    set_inpro(index<N_+1>());
 		}
     
-    template <size_t N>
+    template <size_t N_>
     value_type	inpro(index<D-1>) const
 		{
-		    constexpr size_t	K  = (N + D - 1)%D;
+		    constexpr size_t	K  = (N_ + D - 1)%D;
 		    constexpr size_t	Ki = (K + (FWD ? 1 : 0))%D;
 		    return _co[D-1]*_obuf[K] + _ci[D-1]*_ibuf[Ki];
 		}
-    template <size_t N, size_t I>
-    value_type	inpro(index<I>) const
+    template <size_t N_, size_t I_>
+    value_type	inpro(index<I_>) const
 		{
-		    constexpr size_t	J  = (N + I)%D;
+		    constexpr size_t	J  = (N_ + I_)%D;
 		    constexpr size_t	Ji = (J + (FWD ? 1 : 0))%D;
-		    return _co[I]*_obuf[J] + _ci[I]*_ibuf[Ji]
-			 + inpro<N>(index<I+1>());
+		    return _co[I_]*_obuf[J] + _ci[I_]*_ibuf[Ji]
+			 + inpro<N_>(index<I_+1>());
 		}
     
   private:
     using	fptr = value_type (iir_filter_iterator::*)(index<0>) const;
 
-    std::array<fptr, D>	_inpro;
+    std::array<fptr, D>	_inpro;	//!< 内積関数へのポインタテーブル
     const COEFF		_ci;	//!< 先頭の入力フィルタ係数を指す反復子
     const COEFF		_co;	//!< 先頭の出力フィルタ係数を指す反復子
     mutable buf_type	_ibuf;	//!< 過去D時点の入力データ

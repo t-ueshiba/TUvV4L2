@@ -25,10 +25,12 @@ class fir_filter_iterator
 				     ITER, T, boost::forward_traversal_tag, T>
 {
   private:
-    template <size_t J>
-    using index	= std::integral_constant<size_t, J>;
-    using super	= boost::iterator_adaptor<fir_filter_iterator, ITER, T,
-					  boost::forward_traversal_tag, T>;
+    template <size_t I_>
+    using index		= std::integral_constant<size_t, I_>;
+    using buf_type	= Array<T, D>;	// 初期値を0にするためstd::arrayは使わない
+    using super		= boost::iterator_adaptor<
+			      fir_filter_iterator, ITER, T,
+			      boost::forward_traversal_tag, T>;
     
   public:
     using	typename super::value_type;
@@ -38,11 +40,11 @@ class fir_filter_iterator
 
   public:
 		fir_filter_iterator(const ITER& iter, COEFF c)
-		    :super(iter), _c(c), _ibuf(), _n(0)
+		    :super(iter), _c(c), _ibuf(), _n(D-1)
 		{
 		    set_inpro(index<0>());
 		    copy<D-1>(super::base(), D-1, _ibuf.begin());
-		    super::base_reference() += (D-1);
+		    std::advance(super::base_reference(), D-1);
 		}
 		fir_filter_iterator(const ITER& iter)
 		    :super(iter), _c(), _ibuf(), _n(0)
@@ -84,33 +86,33 @@ class fir_filter_iterator
     void	set_inpro(index<D>)
 		{
 		}
-    template <size_t N>
-    void	set_inpro(index<N>)
+    template <size_t N_>
+    void	set_inpro(index<N_>)
 		{
-		    _inpro[N] = &fir_filter_iterator::inpro<N>;
-		    set_inpro(index<N+1>());
+		    _inpro[N_] = &fir_filter_iterator::inpro<N_>;
+		    set_inpro(index<N_+1>());
 		}
     
-    template <size_t N>
+    template <size_t N_>
     value_type	inpro(index<D-1>) const
 		{
-		    constexpr size_t	J = (N + D)%D;
+		    constexpr size_t	J = N_%D;
 		    return _c[D-1]*_ibuf[J];
 		}
-    template <size_t N, size_t I>
-    value_type	inpro(index<I>) const
+    template <size_t N_, size_t I_>
+    value_type	inpro(index<I_>) const
 		{
-		    constexpr size_t	J = (N + I + 1)%D;
-		    return _c[I]*_ibuf[J] + inpro<N>(index<I+1>());
+		    constexpr size_t	J = (N_ + I_ + 1)%D;
+		    return _c[I_]*_ibuf[J] + inpro<N_>(index<I_+1>());
 		}
     
   private:
     using	fptr = value_type (fir_filter_iterator::*)(index<0>) const;
     
-    std::array<fptr, D>		_inpro;
-    const COEFF			_c;	//!< 先頭のフィルタ係数を指す反復子
-    mutable std::array<T, D>	_ibuf;	//!< 過去D時点の入力データ
-    size_t			_n;	//!< 最新の入力データへのindex
+    std::array<fptr, D>	_inpro;	//!< 内積関数へのポインタテーブル
+    const COEFF		_c;	//!< 先頭のフィルタ係数を指す反復子
+    mutable buf_type	_ibuf;	//!< 過去D時点の入力データ
+    size_t		_n;	//!< 最新の入力データへのindex
 };
 
 //! finite impulse response filter反復子を生成する
