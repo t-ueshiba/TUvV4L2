@@ -94,13 +94,13 @@ class fir_filter_iterator
     template <size_t N>
     value_type	inpro(index<D-1>) const
 		{
-		    constexpr size_t	J = (N + D - 1)%D;
+		    constexpr size_t	J = (N + D)%D;
 		    return _c[D-1]*_ibuf[J];
 		}
     template <size_t N, size_t I>
     value_type	inpro(index<I>) const
 		{
-		    constexpr size_t	J = (N + I)%D;
+		    constexpr size_t	J = (N + I + 1)%D;
 		    return _c[I]*_ibuf[J] + inpro<N>(index<I+1>());
 		}
     
