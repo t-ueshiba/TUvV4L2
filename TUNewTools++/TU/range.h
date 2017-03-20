@@ -1227,5 +1227,28 @@ normalize(E&& expr)
     return expr /= length(expr);
 }
 
+template <class E, class T>
+inline std::enable_if_t<rank<E>() == 1 && std::is_arithmetic<T>::value,
+			element_t<E> >
+at(const E& expr, T x)
+{
+    const auto	x0 = std::floor(x);
+    const auto	dx = x - x0;
+    const auto	i  = size_t(x0);
+    return (dx ? (1 - dx) * expr[i] + dx * expr[i+1] : expr[i]);
+}
+
+template <class E, class T>
+inline std::enable_if_t<rank<E>() == 2 && std::is_arithmetic<T>::value,
+			element_t<E> >
+at(const E& expr, T x, T y)
+{
+    const auto	y0 = std::floor(y);
+    const auto	dy = y - y0;
+    const auto	i  = size_t(y0);
+    const auto	a0 = at(expr[i], x);
+    return (dy ? (1 - dy) * a0 + dy * at(expr[i+1], x) : a0);
+}
+
 }	// namespace TU
 #endif	// !__TU_RANGE_H

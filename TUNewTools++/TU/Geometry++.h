@@ -324,8 +324,8 @@ Normalize<S, D>::insert(ITER_ begin, ITER_ end)
 		\TUendarray
 		\f$
 */
-template <class S, size_t D> typename Normalize<S, D>::matrix_type
-Normalize<S, D>::T() const
+template <class S, size_t D> auto
+Normalize<S, D>::T() const -> matrix_type
 {
     matrix_type	TT(spaceDim()+1, spaceDim()+1);
     for (size_t i = 0; i < spaceDim(); ++i)
@@ -348,8 +348,8 @@ Normalize<S, D>::T() const
 		\TUendarray
 		\f$
 */
-template <class S, size_t D> typename Normalize<S, D>::matrix_type
-Normalize<S, D>::Tt() const
+template <class S, size_t D> auto
+Normalize<S, D>::Tt() const -> matrix_type
 {
     matrix_type	TTt(spaceDim()+1, spaceDim()+1);
     for (size_t i = 0; i < spaceDim(); ++i)
@@ -372,8 +372,8 @@ Normalize<S, D>::Tt() const
 		\TUendarray
 		\f$
 */
-template <class S, size_t D> typename Normalize<S, D>::matrix_type
-Normalize<S, D>::Tinv() const
+template <class S, size_t D> auto
+Normalize<S, D>::Tinv() const -> matrix_type
 {
     matrix_type	TTinv(spaceDim()+1, spaceDim()+1);
     for (size_t i = 0; i < spaceDim(); ++i)
@@ -396,8 +396,8 @@ Normalize<S, D>::Tinv() const
 		\TUendarray
 		\f$
 */
-template <class S, size_t D> typename Normalize<S, D>::matrix_type
-Normalize<S, D>::Ttinv() const
+template <class S, size_t D> auto
+Normalize<S, D>::Ttinv() const -> matrix_type
 {
     matrix_type	TTtinv(spaceDim()+1, spaceDim()+1);
     for (size_t i = 0; i < spaceDim(); ++i)
@@ -521,9 +521,8 @@ HyperPlane<T, D>::fit(ITER_ begin, ITER_ end)
 		(spaceDim()+1次元)
   \return	点と超平面の距離の2乗
 */
-template <class T, size_t D> template <class T_, size_t D_>
-inline typename HyperPlane<T, D>::element_type
-HyperPlane<T, D>::square_distance(const Array<T_, D_>& x) const
+template <class T, size_t D> template <class T_, size_t D_> inline auto
+HyperPlane<T, D>::square_distance(const Array<T_, D_>& x) const -> element_type
 {
     const auto	d = distance(x);
     return d*d;
@@ -538,9 +537,8 @@ HyperPlane<T, D>::square_distance(const Array<T_, D_>& x) const
 				spaceDim()+1のいずれでもない場合，もしくは
 				この点が無限遠点である場合に送出．
 */
-template <class T, size_t D> template <class T_, size_t D_>
-typename HyperPlane<T, D>::element_type
-HyperPlane<T, D>::distance(const Array<T_, D_>& x) const
+template <class T, size_t D> template <class T_, size_t D_> auto
+HyperPlane<T, D>::distance(const Array<T_, D_>& x) const -> element_type
 {
     const auto	p = (*this)(0, spaceDim());
     if (x.size() == spaceDim())
@@ -577,12 +575,14 @@ using PlaneP3d	= HyperPlane<Vector4d>;		//!< 3次元空間中のdouble型平面
 */
 template <class T, size_t DO=0, size_t DI=0>
 class Projectivity : public std::conditional_t<(DO==0 || DI==0),
-					       Array2<T, 0, 0>,
+					       Array2<T>,
 					       Array2<T, DO+1, DI+1> >
 {
   public:
-    constexpr static size_t	DO1 = (DO == 0 ? 0 : DO + 1);
-    constexpr static size_t	DI1 = (DI == 0 ? 0 : DI + 1);
+    constexpr static size_t	DO1	= (DO == 0	? 0 : DO + 1);
+    constexpr static size_t	DI1	= (DI == 0	? 0 : DI + 1);
+    constexpr static size_t	NPARAMS = DO1*DI1;
+    constexpr static size_t	DOF	= (NPARAMS == 0 ? 0 : NPARAMS - 1);
     
     using base_type		= std::conditional_t<(DO==0 || DI==0),
 						     Array2<T>,
@@ -590,9 +590,10 @@ class Projectivity : public std::conditional_t<(DO==0 || DI==0),
     using			typename base_type::element_type;
     using point_type		= Array<element_type, DO>;
     using ppoint_type		= Array<element_type, DI1>;
-    using derivative_type	= Array2<element_type, DO, DO1*DI1>;
-    using jacobian_type		= Array2<element_type, DO, DI>;
     using vector_type		= Array<element_type>;
+    using derivative_type	= Array2<element_type, DO, NPARAMS>;
+    using derivative0_type	= Array2<element_type, DO, DOF>;
+    using jacobian_type		= Array2<element_type, DO, DI>;
 
   public:
     Projectivity(size_t outDim=DO, size_t inDim=DI)			;
@@ -644,7 +645,7 @@ class Projectivity : public std::conditional_t<(DO==0 || DI==0),
     jacobian_type	jacobian(const Array<T_, D_>& x)	 const	;
     template <class T_, size_t D_>
     derivative_type	derivative(const Array<T_, D_>& x)	 const	;
-    static std::enable_if_t<DO == 2 && DI == 2, derivative_type>
+    static std::enable_if_t<DO == 2 && DI == 2, derivative0_type>
 			derivative0(element_type u, element_type v)
 			{
 			    constexpr element_type	_0 = 0;
@@ -653,10 +654,9 @@ class Projectivity : public std::conditional_t<(DO==0 || DI==0),
 			    return {{ u,  v, _1, _0, _0, _0, -u*u, -u*v},
 				    {_0, _0, _0,  u,  v, _1, -u*v, -v*v}};
 			}
-    template <size_t N_>
-    void		update(const Array<T, N_>& dt)			;
-    template <size_t N_> std::enable_if_t<DO == 2 && DI == 2>
-			compose(const Array<T, N_>& dt)		 	;
+    void		update(const Array<element_type, NPARAMS>& dt)	;
+    std::enable_if_t<DO == 2 && DI == 2>
+			compose(const Array<element_type, DOF>& dt)	;
     template <class ITER_>
     element_type	rmsError(ITER_ begin, ITER_ end)	 const	;
     
@@ -822,8 +822,8 @@ Projectivity<T, DO, DI>::ndataMin() const
   \return	射影変換された点の非同次座標(outDim() 次元)
 */
 template <class T, size_t DO, size_t DI> template <class T_, size_t D_>
-inline typename Projectivity<T, DO, DI>::point_type
-Projectivity<T, DO, DI>::operator ()(const Array<T_, D_>& x) const
+inline auto
+Projectivity<T, DO, DI>::operator ()(const Array<T_, D_>& x) const -> point_type
 {
     if (x.size() == inDim())
 	return inhomogeneous(*this * homogeneous(x));
@@ -848,8 +848,8 @@ Projectivity<T, DO, DI>::operator ()(element_type u, element_type v) const
   \return	射影変換された点の同次座標(outDim()+1 次元)
 */
 template <class T, size_t DO, size_t DI> template <class T_, size_t D_>
-inline typename Projectivity<T, DO, DI>::ppoint_type
-Projectivity<T, DO, DI>::mapP(const Array<T_, D_>& x) const
+inline auto
+Projectivity<T, DO, DI>::mapP(const Array<T_, D_>& x) const -> ppoint_type
 {
     if (x.size() == inDim())
 	return *this * homogeneous(x);
@@ -864,8 +864,9 @@ Projectivity<T, DO, DI>::mapP(const Array<T_, D_>& x) const
   \return	変換された入力点と出力点の距離の2乗
 */
 template <class T, size_t DO, size_t DI> template <class IN, class OUT>
-inline typename Projectivity<T, DO, DI>::element_type
+inline auto
 Projectivity<T, DO, DI>::square_distance(const std::pair<IN, OUT>& pair) const
+    -> element_type
 {
     return square_distance((*this)(pair.first), pair.second);
 }
@@ -877,8 +878,9 @@ Projectivity<T, DO, DI>::square_distance(const std::pair<IN, OUT>& pair) const
   \return	変換された入力点と出力点の距離
 */
 template <class T, size_t DO, size_t DI> template <class IN, class OUT>
-inline typename Projectivity<T, DO, DI>::element_type
+inline auto
 Projectivity<T, DO, DI>::distance(const std::pair<IN, OUT>& pair) const
+    -> element_type
 {
     return sqrt(square_distance(pair));
 }
@@ -888,9 +890,8 @@ Projectivity<T, DO, DI>::distance(const std::pair<IN, OUT>& pair) const
   \param x	点の非同次座標(inDim() 次元)または同次座標(inDim()+1 次元)
   \return	outDim() x inDim() ヤコビ行列
 */
-template <class T, size_t DO, size_t DI> template <class T_, size_t D_>
-typename Projectivity<T, DO, DI>::jacobian_type
-Projectivity<T, DO, DI>::jacobian(const Array<T_, D_>& x) const
+template <class T, size_t DO, size_t DI> template <class T_, size_t D_> auto
+Projectivity<T, DO, DI>::jacobian(const Array<T_, D_>& x) const -> jacobian_type
 {
     const auto		y = mapP(x);
     jacobian_type	J(outDim(), inDim());
@@ -908,9 +909,9 @@ Projectivity<T, DO, DI>::jacobian(const Array<T_, D_>& x) const
   \param x	点の非同次座標(inDim() 次元)または同次座標(inDim()+1 次元)
   \return	outDim() x ((outDim()+1)x(inDim()+1)) ヤコビ行列
 */
-template <class T, size_t DO, size_t DI> template <class T_, size_t D_>
-typename Projectivity<T, DO, DI>::derivative_type
+template <class T, size_t DO, size_t DI> template <class T_, size_t D_> auto
 Projectivity<T, DO, DI>::derivative(const Array<T_, D_>& x) const
+    -> derivative_type
 {
     ppoint_type	xP;
     if (x.size() == inDim())
@@ -933,17 +934,18 @@ Projectivity<T, DO, DI>::derivative(const Array<T_, D_>& x) const
 /*!
   \param dt	修正量を表すベクトル((outDim()+1) x (inDim()+1) 次元)
 */
-template <class T, size_t DO, size_t DI> template <size_t N_> inline void
-Projectivity<T, DO, DI>::update(const Array<T, N_>& dt)
+template <class T, size_t DO, size_t DI> inline void
+Projectivity<T, DO, DI>::update(const Array<element_type, NPARAMS>& dt)
 {
     auto	t = make_range(base_type::data(), nparams());
+    const auto	norm = length(t);
     t -= dt;
-    t *= (length(t) / length(t));	// 修正の前後で射影変換行列のノルムは不変
+    t *= (norm / length(t));	// 修正の前後で射影変換行列のノルムは不変
 }
 
-template <class T, size_t DO, size_t DI> template <size_t N_>
+template <class T, size_t DO, size_t DI>
 inline std::enable_if_t<DO == 2 && DI == 2>
-Projectivity<T, DO, DI>::compose(const Array<T, N_>& dt)
+Projectivity<T, DO, DI>::compose(const Array<element_type, DOF>& dt)
 {
     auto	t0 = (*this)[0][0];
     auto	t1 = (*this)[0][1];
@@ -974,9 +976,8 @@ Projectivity<T, DO, DI>::compose(const Array<T, N_>& dt)
   \param end	点対列の末尾を示す反復子
   \return	平均変換誤差
 */
-template <class T, size_t DO, size_t DI> template <class ITER_>
-typename Projectivity<T, DO, DI>::element_type
-Projectivity<T, DO, DI>::rmsError(ITER_ begin, ITER_ end) const
+template <class T, size_t DO, size_t DI> template <class ITER_> auto
+Projectivity<T, DO, DI>::rmsError(ITER_ begin, ITER_ end) const -> element_type
 {
     element_type	sqrerr_sum = 0;
     size_t		npoints = 0;
@@ -995,9 +996,9 @@ Projectivity<T, DO, DI>::Cost<MAP_, ITER_>::Cost(ITER_ begin, ITER_ end)
 {
 }
     
-template <class T, size_t DO, size_t DI> template <class MAP_, class ITER_>
-typename Projectivity<T, DO, DI>::template Cost<MAP_, ITER_>::vector_type
+template <class T, size_t DO, size_t DI> template <class MAP_, class ITER_> auto
 Projectivity<T, DO, DI>::Cost<MAP_, ITER_>::operator ()(const MAP_& map) const
+    -> vector_type
 {
     const auto	outDim = map.outDim();
     vector_type	val(_npoints*outDim);
@@ -1011,9 +1012,9 @@ Projectivity<T, DO, DI>::Cost<MAP_, ITER_>::operator ()(const MAP_& map) const
     return val;
 }
     
-template <class T, size_t DO, size_t DI> template <class MAP_, class ITER_>
-typename Projectivity<T, DO, DI>::template Cost<MAP_, ITER_>::matrix_type
+template <class T, size_t DO, size_t DI> template <class MAP_, class ITER_> auto
 Projectivity<T, DO, DI>::Cost<MAP_, ITER_>::derivative(const MAP_& map) const
+    -> matrix_type
 {
     const auto	outDim = map.outDim();
     matrix_type	J(_npoints*outDim, map.nparams());
@@ -1056,12 +1057,17 @@ class Affinity : public Projectivity<T, DO, DI>
 {
   public:
     using base_type		= Projectivity<T, DO, DI>;
+    using			base_type::DO1;
+    using			base_type::DI1;
+    constexpr static size_t	NPARAMS	= DO*DI1;
+    constexpr static size_t	DOF	= NPARAMS;
+
     using			typename base_type::element_type;
     using			typename base_type::point_type;
     using			typename base_type::vector_type;
-    using			base_type::DO1;
-    using			base_type::DI1;
-    using derivative_type	= Array2<element_type, DO, DO*DI1>;
+    using derivative_type	= Array2<element_type, DO, NPARAMS>;
+    using derivative0_type	= Array2<element_type, DO, DOF>;
+
     
   //! 入力空間と出力空間の次元を指定してアフィン変換オブジェクトを生成する．
   /*!
@@ -1124,7 +1130,7 @@ class Affinity : public Projectivity<T, DO, DI>
 				    element_type v)		const	;
     template <class T_, size_t D_>
     derivative_type	derivative(const Array<T_, D_>& x)	const	;
-    static std::enable_if_t<DO == 2 && DI == 2, derivative_type>
+    static std::enable_if_t<DO == 2 && DI == 2, derivative0_type>
 			derivative0(element_type u, element_type v)
 			{
 			    constexpr element_type	_0 = 0;
@@ -1133,10 +1139,9 @@ class Affinity : public Projectivity<T, DO, DI>
 			    return {{ u,  v, _1, _0, _0, _0},
 				    {_0, _0, _0,  u,  v, _1}};
 			}
-    template <size_t N_>
-    void		update(const Array<T, N_>& dt)			;
-    template <size_t N_> std::enable_if_t<DO == 2 && DI == 2>
-			compose(const Array<T, N_>& dt)		 	;
+    void		update(const Array<element_type, NPARAMS>& dt)	;
+    std::enable_if_t<DO == 2 && DI == 2>
+			compose(const Array<element_type, DOF>& dt)	;
     
   //! このアフィン変換の変形部分を表現する行列を返す．
   /*! 
@@ -1254,8 +1259,8 @@ inline std::enable_if_t<DO == 2 && DI == 2,
 			typename Affinity<T, DO, DI>::point_type>
 Affinity<T, DO, DI>::operator ()(element_type u, element_type v) const
 {
-    return point_type((*this)[0][0]*u + (*this)[0][1]*v + (*this)[0][2],
-		      (*this)[1][0]*u + (*this)[1][1]*v + (*this)[1][2]);
+    return point_type({(*this)[0][0]*u + (*this)[0][1]*v + (*this)[0][2],
+		       (*this)[1][0]*u + (*this)[1][1]*v + (*this)[1][2]});
 }
 
 //! 与えられた点におけるヤコビ行列を返す．
@@ -1264,9 +1269,8 @@ Affinity<T, DO, DI>::operator ()(element_type u, element_type v) const
   \param x	点の非同次座標(inDim() 次元)または同次座標(inDim()+1次元)
   \return	outDim() x (outDim()x(inDim()+1)) ヤコビ行列
 */
-template <class T, size_t DO, size_t DI> template <class T_, size_t D_>
-typename Affinity<T, DO, DI>::derivative_type
-Affinity<T, DO, DI>::derivative(const Array<T_, D_>& x) const
+template <class T, size_t DO, size_t DI> template <class T_, size_t D_> auto
+Affinity<T, DO, DI>::derivative(const Array<T_, D_>& x) const -> derivative_type
 {
     vector_type	xP;
     if (x.size() == inDim())
@@ -1286,15 +1290,15 @@ Affinity<T, DO, DI>::derivative(const Array<T_, D_>& x) const
 /*!
   \param dt	修正量を表すベクトル(outDim() x (inDim()+1) 次元)
 */
-template <class T, size_t DO, size_t DI> template <size_t N_> inline void
-Affinity<T, DO, DI>::update(const Array<T, N_>& dt)
+template <class T, size_t DO, size_t DI> inline void
+Affinity<T, DO, DI>::update(const Array<element_type, NPARAMS>& dt)
 {
     make_range(base_type::data(), nparams()) -= dt;
 }
 
-template <class T, size_t DO, size_t DI> template <size_t N_>
+template <class T, size_t DO, size_t DI>
 inline std::enable_if_t<DO == 2 && DI == 2>
-Affinity<T, DO, DI>::compose(const Array<T, N_>& dt)
+Affinity<T, DO, DI>::compose(const Array<element_type, DOF>& dt)
 {
     auto	t0 = (*this)[0][0];
     auto	t1 = (*this)[0][1];
@@ -1331,9 +1335,12 @@ class Rigidity : public Affinity<T, D, D>
 {
   public:
     using			base_type = Affinity<T, D, D>;
+
+    constexpr static size_t	NPARAMS = D*(D+1)/2;
+    constexpr static size_t	DOF	= NPARAMS;
+    
     using			typename base_type::element_type;
-    using			typename base_type::vector_type;
-    using derivative_type	= Array2<element_type, D, D*(D+1)/2>;
+    using derivative_type	= Array2<element_type, D, NPARAMS>;
 
   //! 入力空間と出力空間の次元を指定して剛体変換オブジェクトを生成する．
   /*!
@@ -1404,8 +1411,7 @@ class Rigidity : public Affinity<T, D, D>
     size_t		ndataMin()				const	;
     template <class T_, size_t D_>
     derivative_type	derivative(const Array<T_, D_>& x)	const	;
-    template <size_t N_>
-    void		update(const Array<T, N_>& dt)			;
+    void		update(const Array<element_type, NPARAMS>& dt)	;
 };
 
 //! 与えられた点対列の非同次座標から剛体変換を計算する．
@@ -1428,7 +1434,7 @@ Rigidity<T, D>::fit(ITER_ begin, ITER_ end)
 	throw std::invalid_argument("Rigidity::fit(): not enough input data!!");
 
   // 重心の計算
-    Vector<element_type, D>	xc(d), yc(d);
+    Array<element_type, D>	xc(d), yc(d);
     for (auto corres = begin; corres != end; ++corres)
     {
 	xc += corres->first;
@@ -1499,11 +1505,10 @@ Rigidity<T, D>::ndataMin() const
   \param x	点の非同次座標(dim() 次元)または同次座標(dim()+1 次元)
   \return	dim()xdim() x (dim()+1)/2 ヤコビ行列
 */
-template <class T, size_t D> template <class T_, size_t D_>
-typename Rigidity<T, D>::derivative_type
-Rigidity<T, D>::derivative(const Array<T_, D_>& x) const
+template <class T, size_t D> template <class T_, size_t D_> auto
+Rigidity<T, D>::derivative(const Array<T_, D_>& x) const -> derivative_type
 {
-    vector_type	xx;
+    Array<element_type, D>	xx;
     if (x.size() == dim())
 	xx = x;
     else
@@ -1533,8 +1538,8 @@ Rigidity<T, D>::derivative(const Array<T_, D_>& x) const
 /*!
   \param dt	修正量を表すベクトル(dim() x (dim()+1)/2 次元)
 */
-template <class T, size_t D> template <size_t N_> void
-Rigidity<T, D>::update(const Array<T, N_>& dt)
+template <class T, size_t D> void
+Rigidity<T, D>::update(const Array<element_type, NPARAMS>& dt)
 {
     switch (dim())
     {
