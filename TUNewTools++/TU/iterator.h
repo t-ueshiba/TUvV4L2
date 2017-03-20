@@ -277,7 +277,7 @@ make_transform_iterator2(ITER0 iter0, ITER1 iter1, FUNC func)
 }
     
 /************************************************************************
-*  class assignment_iterator<FUNC, ITER>				*
+*  class assignment_iterator<FUNC, ITER, VAL>				*
 ************************************************************************/
 namespace detail
 {
@@ -314,7 +314,7 @@ class assignment_iterator
     : public boost::iterator_adaptor<assignment_iterator<FUNC, ITER>,
 				     ITER,
 				     iterator_value<ITER>,
-				     boost::use_default,
+				     std::input_iterator_tag,
 				     detail::assignment_proxy<FUNC, ITER> >
 {
   private:
@@ -322,7 +322,7 @@ class assignment_iterator
 		      assignment_iterator,
 		      ITER,
 		      iterator_value<ITER>,
-		      boost::use_default,
+		      std::input_iterator_tag,
 		      detail::assignment_proxy<FUNC, ITER> >;
 
   public:
@@ -346,7 +346,8 @@ class assignment_iterator
     FUNC 	_func;	// 代入を可能にするためconstは付けない
 };
     
-template <class FUNC, class ITER> inline assignment_iterator<FUNC, ITER>
+template <class FUNC, class ITER>
+inline assignment_iterator<FUNC, ITER>
 make_assignment_iterator(const ITER& iter, const FUNC& func=FUNC())
 {
     return {iter, func};
