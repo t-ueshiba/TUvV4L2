@@ -104,6 +104,7 @@ class iir_filter_iterator
 		    {
 			_n = 1;
 			_obuf[0] = inpro<0>(index<0>());
+			_ibuf[0] = *super::base();
 			return _obuf[0];
 		    }
 		    else
