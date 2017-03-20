@@ -313,7 +313,7 @@ template <class FUNC, class ITER>
 class assignment_iterator
     : public boost::iterator_adaptor<assignment_iterator<FUNC, ITER>,
 				     ITER,
-				     detail::assignment_proxy<FUNC, ITER>,
+				     iterator_value<ITER>,
 				     boost::use_default,
 				     detail::assignment_proxy<FUNC, ITER> >
 {
@@ -321,7 +321,7 @@ class assignment_iterator
     using super	= boost::iterator_adaptor<
 		      assignment_iterator,
 		      ITER,
-		      detail::assignment_proxy<FUNC, ITER>,
+		      iterator_value<ITER>,
 		      boost::use_default,
 		      detail::assignment_proxy<FUNC, ITER> >;
 

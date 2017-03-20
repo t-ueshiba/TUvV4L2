@@ -563,22 +563,16 @@ BidirectionalIIRFilter<D, T>::limits(T& limit0, T& limit1, T& limit2) const
 template <size_t D, class T> template <class IN, class OUT> inline OUT
 BidirectionalIIRFilter<D, T>::convolve(IN ib, IN ie, OUT out) const
 {
-    typedef iterator_value<OUT>					value_type;
-#if defined(SIMD)
-    typedef Array<value_type, 0, simd::allocator<value_type> >	buf_type;
-#else
-    typedef Array<value_type>					buf_type;
-#endif
-    typedef typename buf_type::iterator				buf_iterator;
+    auto	oute = out;
+    std::advance(oute, std::distance(ib, ie));
     
-    buf_type	bufF(std::distance(ib, ie)), bufB(bufF.size());
+    _iirB.backward(std::make_reverse_iterator(ie),
+		   std::make_reverse_iterator(ib),
+		   std::make_reverse_iterator(oute));
+    _iirF.forward(ib, ie, make_assignment_iterator(
+			      out, [](auto&& y, const auto& x){ y += x; }));
 
-    _iirF.forward(ib, ie, bufF.begin());
-    _iirB.backward(std::reverse_iterator<IN>(ie),
-		   std::reverse_iterator<IN>(ib),
-		   std::reverse_iterator<buf_iterator>(bufB.end()));
-    return std::transform(bufF.cbegin(), bufF.cend(), bufB.cbegin(),
-			  out, std::plus<value_type>());
+    return oute;
 }
 
 //! 与えられた長さの入力データ列に対する出力データ列の長さを返す
