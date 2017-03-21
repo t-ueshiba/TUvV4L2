@@ -174,7 +174,7 @@ setFeature(CAMERAS&& cameras, u_int id, u_int val, float fval)
       case IIDCCamera::ZOOM:
       case IIDCCamera::PAN:
       case IIDCCamera::TILT:
-	if (size(cameras) > 0)
+	if (std::size(cameras) > 0)
 	{
 	    const auto	feature = IIDCCamera::uintToFeature(id);
 
@@ -208,7 +208,7 @@ setFeature(CAMERAS&& cameras, u_int id, u_int val, float fval)
 
       case IIDCCamera::WHITE_BALANCE:
       case IIDCCamera::WHITE_BALANCE + IIDCCAMERA_OFFSET_VR:
-	if (size(cameras) > 0)
+	if (std::size(cameras) > 0)
 	{
 	    if (std::begin(cameras)->isAbsControl(IIDCCamera::WHITE_BALANCE))
 		for (auto& camera : cameras)
@@ -346,7 +346,7 @@ syncedSnap(CAMERAS&& cameras, uint64_t maxSkew=1000)
     typedef std::pair<uint64_t, iterator>	timestamp_t;
     
     Heap<timestamp_t,
-	 std::greater<timestamp_t> >	timestamps(size(cameras));
+	 std::greater<timestamp_t> >	timestamps(std::size(cameras));
 
     std::for_each(std::begin(cameras), std::end(cameras),
 		  std::bind(&IIDCCamera::snap, std::placeholders::_1));
