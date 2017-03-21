@@ -170,7 +170,7 @@ syncedSnap(CAMERAS&& cameras, uint64_t maxSkew=1000)
     typedef std::pair<uint64_t, iterator>	timestamp_t;
     
     Heap<timestamp_t,
-	 std::greater<timestamp_t> >	timestamps(size(cameras));
+    std::greater<timestamp_t> >	timestamps(std::size(cameras));
 
     std::for_each(std::begin(cameras), std::end(cameras),
 		  std::bind(&V4L2Camera::snap, std::placeholders::_1));
