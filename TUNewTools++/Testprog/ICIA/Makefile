@@ -17,9 +17,9 @@ CPPFLAGS	= -DNDEBUG -D_DEBUG -DICIA_DEBUG -DUSE_TBB
 CFLAGS		= -O3
 NVCCFLAGS	= -O
 ifeq ($(shell arch), armv7l)
-  CPPFLAGS     += -DNEON
+#  CPPFLAGS     += -DNEON
 else ifeq ($(shell arch), aarch64)
-  CPPFLAGS     += -DNEON
+#  CPPFLAGS     += -DNEON
 else
 #  CPPFLAGS     += -DSSE3
 endif

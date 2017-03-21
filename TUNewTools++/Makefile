@@ -70,7 +70,6 @@ HDRS		= TU/Array++.h \
 		TU/TreeFilter.h \
 		TU/TriggerGenerator.h \
 		TU/Vector++.h \
-		TU/Warp.h \
 		TU/WeightedMedianFilter.h \
 		TU/YetPorted/Bezier++.h \
 		TU/YetPorted/CCSImage.h \

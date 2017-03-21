@@ -5,6 +5,7 @@ SUBDIR	= BandMatrix		\
 	  FIRFilter		\
 	  GraphCuts		\
 	  GuidedFilter		\
+	  ICIA			\
 	  IIRFilter		\
 	  List			\
 	  NDTree		\
