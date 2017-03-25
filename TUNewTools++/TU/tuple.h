@@ -350,6 +350,24 @@ make_zip_iterator(ITER_TUPLE iter_tuple)
     return {iter_tuple};
 }
 
+namespace detail
+{
+  template <class ITER>
+  struct decayed_iterator_value
+  {
+      using type = iterator_value<ITER>;
+  };
+  template <class... ITER>
+  struct decayed_iterator_value<zip_iterator<std::tuple<ITER...> > >
+  {
+      using type = std::tuple<std::decay_t<iterator_value<ITER> >...>;
+  };
+}
+
+template <class ITER>
+using decayed_iterator_value = typename detail::decayed_iterator_value<ITER>
+					      ::type;
+
 /************************************************************************
 *  struct tuple_head<T>, tuple_leftmost<T>, tuple_nelms<T>		*
 ************************************************************************/

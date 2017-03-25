@@ -2,8 +2,8 @@
  *  $Id: functional.h 1775 2014-12-24 06:08:59Z ueshiba $
  */
 /*!
-  \file		tuple.h
-  \brief	boost::tupleの用途拡張のためのユティリティ
+  \file		pair.h
+  \brief	std::pairの用途拡張のためのユティリティ
 */
 #ifndef __TU_PAIR_H
 #define __TU_PAIR_H

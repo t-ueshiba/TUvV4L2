@@ -27,6 +27,13 @@ template <class E>
 std::ostream&	operator <<(std::ostream& out, const sizes_holder<E>& holder);
 #endif
 
+//! 2つの引数の差の絶対値を返す．
+template <class T> inline T
+diff(const T& a, const T& b)
+{
+    return (a > b ? a - b : b - a);
+}
+
 //! 与えられた二つの整数の最大公約数を求める．
 /*!
   \param m	第1の整数

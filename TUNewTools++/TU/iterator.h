@@ -284,6 +284,18 @@ namespace detail
   template <class FUNC, class ITER>
   class assignment_proxy
   {
+    private:
+      template <class T_>
+      static auto	check_func(ITER iter, const T_& val, FUNC func)
+			  -> decltype(func(*iter, val), std::true_type());
+      template <class T_>
+      static auto	check_func(ITER iter, const T_& val, FUNC func)
+			  -> decltype(*iter = func(val), std::false_type());
+      template <class T_>
+      using	is_binary_func = decltype(check_func(std::declval<ITER>(),
+						     std::declval<T_>(),
+						     std::declval<FUNC>()));
+      
     public:
       using	self = assignment_proxy;
 	
@@ -292,11 +304,62 @@ namespace detail
 	  :_iter(iter), _func(func)					{}
 
       template <class T_>
-      self&	operator =(const T_& val)
+      std::enable_if_t<is_binary_func<T_>::value, self&>
+		operator =(const T_& val)
 		{
 		    _func(*_iter, val);
 		    return *this;
 		}
+      template <class T_>
+      std::enable_if_t<!is_binary_func<T_>::value, self&>
+		operator =(const T_& val)
+		{
+		    *_iter  = _func(val);
+		    return *this;
+		}
+      template <class T_>
+      self&	operator +=(const T_& val)
+		{
+		    *_iter += _func(val);
+		    return *this;
+		}
+      template <class T_>
+      self&	operator -=(const T_& val)
+		{
+		    *_iter -= _func(val);
+		    return *this;
+		}
+      template <class T_>
+      self&	operator *=(const T_& val)
+		{
+		    *_iter *= _func(val);
+		    return *this;
+		}
+      template <class T_>
+      self&	operator /=(const T_& val)
+		{
+		    *_iter /= _func(val);
+		    return *this;
+		}
+      template <class T_>
+      self&	operator &=(const T_& val)
+		{
+		    *_iter &= _func(val);
+		    return *this;
+		}
+      template <class T_>
+      self&	operator |=(const T_& val)
+		{
+		    *_iter |= _func(val);
+		    return *this;
+		}
+      template <class T_>
+      self&	operator ^=(const T_& val)
+		{
+		    *_iter ^= _func(val);
+		    return *this;
+		}
+
 
     private:
       const ITER&	_iter;
@@ -399,6 +462,78 @@ make_vertical_iterator(ROW row, size_t col)
 {
     return {row, {col}};
 }
+
+/************************************************************************
+*  class ring_iterator<ITER>						*
+************************************************************************/
+//! 2つの反復子によって指定された範囲を循環バッファとしてアクセスする反復子
+/*!
+  \param ITER	データ列中の要素を指す反復子の型
+*/
+template <class ITER>
+class ring_iterator : public boost::iterator_adaptor<ring_iterator<ITER>, ITER>
+{
+  private:
+    using super		= boost::iterator_adaptor<ring_iterator, ITER>;
+
+    friend class	boost::iterator_core_access;
+    
+  public:
+    using		typename super::difference_type;
+    
+  public:
+    ring_iterator()
+	:super(), _begin(super::base()), _end(super::base()), _d(0)	{}
+    
+    ring_iterator(ITER begin, ITER end)
+	:super(begin),
+	 _begin(begin), _end(end), _d(std::distance(_begin, _end))	{}
+
+    difference_type	position() const
+			{
+			    return std::distance(_begin, super::base());
+			}
+    
+  private:
+    void		advance(difference_type n)
+			{
+			    n %= _d;
+			    difference_type	i = position() + n;
+			    if (i >= _d)
+				std::advance(super::base_reference(), n - _d);
+			    else if (i < 0)
+				std::advance(super::base_reference(), n + _d);
+			    else
+				std::advance(super::base_reference(), n);
+			}
+    
+    void		increment()
+			{
+			    if (++super::base_reference() == _end)
+				super::base_reference() = _begin;
+			}
+
+    void		decrement()
+			{
+			    if (super::base() == _begin)
+				super::base_reference() = _end;
+			    --super::base_reference();
+			}
+
+    difference_type	distance_to(const ring_iterator& iter) const
+			{
+			    difference_type	n = iter.base() - super::base();
+			    return (n > 0 ? n - _d : n);
+			}
+    
+  private:
+    ITER		_begin;	// 代入を可能にするためconstは付けない
+    ITER		_end;	// 同上
+    difference_type	_d;	// 同上
+};
+
+template <class ITER> ring_iterator<ITER>
+make_ring_iterator(ITER begin, ITER end)	{ return {begin, end}; }
 
 }	// namespace TU
 #endif	// !__TU_ITERATOR_H
