@@ -47,14 +47,14 @@ using all_has_begin	= all<has_begin, std::decay_t<T> >;
 namespace detail
 {
   template <class TUPLE, class UNARY_FUNC> inline void
-  tuple_for_each(TUPLE&, UNARY_FUNC, std::index_sequence<>)
+  tuple_for_each(TUPLE&&, UNARY_FUNC, std::index_sequence<>)
   {
   }
   template <class TUPLE, class UNARY_FUNC, size_t I, size_t... IDX> inline void
-  tuple_for_each(TUPLE& x, UNARY_FUNC f, std::index_sequence<I, IDX...>)
+  tuple_for_each(TUPLE&& x, UNARY_FUNC f, std::index_sequence<I, IDX...>)
   {
       f(std::get<I>(x));
-      tuple_for_each(x, f, std::index_sequence<IDX...>());
+      tuple_for_each(std::forward<TUPLE>(x), f, std::index_sequence<IDX...>());
   }
 }	// namespace detail
     
@@ -63,26 +63,46 @@ inline std::enable_if_t<is_tuple<TUPLE>::value>
 tuple_for_each(TUPLE&& x, UNARY_FUNC f)
 {
     detail::tuple_for_each(
-	x, f, std::make_index_sequence<std::tuple_size<std::decay_t<TUPLE> >
-		 ::value>());
+	std::forward<TUPLE>(x), f,
+	std::make_index_sequence<std::tuple_size<std::decay_t<TUPLE> >
+	   ::value>());
 }
 
+/************************************************************************
+*  make_reference_wrapper(T&&)						*
+************************************************************************/
+//! 与えられた値の型に応じて実引数を生成する
+/*!
+  \param x	関数に渡す引数
+  \return	xの型Tが参照でなければx自身，定数参照ならばstd::cref(x),
+		非定数参照ならばstd::ref(x)
+*/
+template <class T>
+inline std::conditional_t<std::is_reference<T>::value,
+			  std::reference_wrapper<std::remove_reference_t<T> >,
+			  T>
+make_reference_wrapper(T&& x)
+{
+    return x;
+}
+    
 /************************************************************************
 *  tuple_for_each(TUPLE0, TUPLE1, BINARY_FUNC)				*
 ************************************************************************/
 namespace detail
 {
   template <class TUPLE0, class TUPLE1, class BINARY_FUNC> inline void
-  tuple_for_each(TUPLE0&, TUPLE1&, BINARY_FUNC, std::index_sequence<>)
+  tuple_for_each(TUPLE0&&, TUPLE1&&, BINARY_FUNC, std::index_sequence<>)
   {
   }
   template <class TUPLE0, class TUPLE1,
 	    class BINARY_FUNC, size_t I, size_t... IDX> inline void
-  tuple_for_each(TUPLE0& x, TUPLE1& y, BINARY_FUNC f,
+  tuple_for_each(TUPLE0&& x, TUPLE1&& y, BINARY_FUNC f,
 		 std::index_sequence<I, IDX...>)
   {
       f(std::get<I>(x), std::get<I>(y));
-      tuple_for_each(x, y, f, std::index_sequence<IDX...>());
+      tuple_for_each(std::forward<TUPLE0>(x), std::forward<TUPLE1>(y), f,
+		     std::index_sequence<IDX...>());
   }
 }	// namespace detail
 
@@ -91,8 +111,9 @@ inline std::enable_if_t<is_tuple<TUPLE0>::value && is_tuple<TUPLE1>::value>
 tuple_for_each(TUPLE0&& x, TUPLE1&& y, BINARY_FUNC f)
 {
     detail::tuple_for_each(
-	x, y, f, std::make_index_sequence<std::tuple_size<std::decay_t<TUPLE0> >
-		    ::value>());
+	std::forward<TUPLE0>(x), std::forward<TUPLE1>(y), f,
+	std::make_index_sequence<std::tuple_size<std::decay_t<TUPLE0> >
+	   ::value>());
 }
 
 /************************************************************************
@@ -100,21 +121,19 @@ tuple_for_each(TUPLE0&& x, TUPLE1&& y, BINARY_FUNC f)
 ************************************************************************/
 namespace detail
 {
-  template <class TUPLE, class UNARY_FUNC, size_t... IDX>
-  inline auto
-  tuple_transform(TUPLE& x, UNARY_FUNC f, std::index_sequence<IDX...>)
+  template <class TUPLE, class UNARY_FUNC, size_t... IDX> inline auto
+  tuple_transform(TUPLE&& x, UNARY_FUNC f, std::index_sequence<IDX...>)
   {
-      return std::make_tuple(f(std::get<IDX>(x))...);
+      return std::make_tuple(make_reference_wrapper(f(std::get<IDX>(x)))...);
   }
 }	// namespace detail
     
 template <class TUPLE, class UNARY_FUNC,
-	  std::enable_if_t<is_tuple<TUPLE>::value>* = nullptr>
-inline auto
+	  std::enable_if_t<is_tuple<TUPLE>::value>* = nullptr> inline auto
 tuple_transform(TUPLE&& x, UNARY_FUNC f)
 {
     return detail::tuple_transform(
-		x, f,
+		std::forward<TUPLE>(x), f,
 		std::make_index_sequence<std::tuple_size<std::decay_t<TUPLE> >
 		   ::value>());
 }
@@ -126,21 +145,21 @@ namespace detail
 {
   template <class TUPLE0, class TUPLE1, class BINARY_FUNC, size_t... IDX>
   inline auto
-  tuple_transform(TUPLE0& x, TUPLE1& y, BINARY_FUNC f,
+  tuple_transform(TUPLE0&& x, TUPLE1&& y, BINARY_FUNC f,
 		  std::index_sequence<IDX...>)
   {
-      return std::make_tuple(f(std::get<IDX>(x), std::get<IDX>(y))...);
+      return std::make_tuple(make_reference_wrapper(
+				 f(std::get<IDX>(x), std::get<IDX>(y)))...);
   }
 }	// namespace detail
     
 template <class TUPLE0, class TUPLE1, class BINARY_FUNC,
 	  std::enable_if_t<is_tuple<TUPLE0>::value &&
-			   is_tuple<TUPLE1>::value>* = nullptr>
-inline auto
+			   is_tuple<TUPLE1>::value>* = nullptr> inline auto
 tuple_transform(TUPLE0&& x, TUPLE1&& y, BINARY_FUNC f)
 {
     return detail::tuple_transform(
-		x, y, f,
+		std::forward<TUPLE0>(x), std::forward<TUPLE1>(y), f,
 		std::make_index_sequence<std::tuple_size<std::decay_t<TUPLE0> >
 		   ::value>());
 }
@@ -152,23 +171,24 @@ namespace detail
 {
   template <class TUPLE0, class TUPLE1, class TUPLE2, class TRINARY_FUNC,
 	    size_t... IDX> inline auto
-  tuple_transform(TUPLE0& x, TUPLE1& y, TUPLE2& z, TRINARY_FUNC f,
+  tuple_transform(TUPLE0&& x, TUPLE1&& y, TUPLE2&& z, TRINARY_FUNC f,
 		  std::index_sequence<IDX...>)
   {
-      return std::make_tuple(f(std::get<IDX>(x), std::get<IDX>(y),
-			       std::get<IDX>(z))...);
+      return std::make_tuple(make_reference_wrapper(
+				 f(std::get<IDX>(x), std::get<IDX>(y),
+				   std::get<IDX>(z))...));
   }
 }	// namespace detail
     
 template <class TUPLE0, class TUPLE1, class TUPLE2, class TRINARY_FUNC,
 	  std::enable_if_t<is_tuple<TUPLE0>::value &&
 			   is_tuple<TUPLE1>::value &&
-			   is_tuple<TUPLE2>::value>* = nullptr>
-inline auto
+			   is_tuple<TUPLE2>::value>* = nullptr> inline auto
 tuple_transform(TUPLE0&& x, TUPLE1&& y, TUPLE2&& z, TRINARY_FUNC f)
 {
     return detail::tuple_transform(
-		x, y, z, f,
+		std::forward<TUPLE0>(x), std::forward<TUPLE1>(y),
+		std::forward<TUPLE2>(z), f,
 		std::make_index_sequence<std::tuple_size<std::decay_t<TUPLE0> >
 		   ::value>());
 }
@@ -253,12 +273,7 @@ namespace detail
   struct generic_dereference
   {
       template <class ITER_>
-      std::conditional_t<std::is_reference<iterator_reference<ITER_> >::value,
-			 std::reference_wrapper<
-			     std::remove_reference_t<
-				 iterator_reference<ITER_> > >,
-			 iterator_reference<ITER_> >
-      operator ()(ITER_ iter)			const	{ return *iter; }
+      decltype(auto)	operator ()(ITER_ iter)	const	{ return *iter; }
   };
 }	// namespace detail
     

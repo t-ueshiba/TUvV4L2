@@ -13,7 +13,7 @@ IDLS		=
 MOCHDRS		=
 
 INCDIRS		= -I../..
-CPPFLAGS	= -DNDEBUG -D_DEBUG -DICIA_DEBUG -DUSE_TBB 
+CPPFLAGS	= -DNDEBUG -D_DEBUG -DICIA_DEBUG #-DUSE_TBB 
 CFLAGS		= -O3
 NVCCFLAGS	= -O
 ifeq ($(shell arch), armv7l)
@@ -21,7 +21,7 @@ ifeq ($(shell arch), armv7l)
 else ifeq ($(shell arch), aarch64)
 #  CPPFLAGS     += -DNEON
 else
-#  CPPFLAGS     += -DSSE3
+  CPPFLAGS     += -DSSE3
 endif
 CCFLAGS		= $(CFLAGS)
 

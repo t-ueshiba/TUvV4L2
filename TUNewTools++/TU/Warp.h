@@ -94,16 +94,14 @@ class Warp
 			}
 #if defined(SIMD)
 	template <class V=value_type, class T>
-	typename std::enable_if<std::is_integral<V>::value,
-				simd::vec<T> >::type
+	std::enable_if_t<std::is_integral<V>::value, simd::vec<T> >
 			lookup(simd::vec<T> u, simd::vec<T> v) const
 			{
 			    return simd::lookup(std::begin(*_in),
 						v, u, _in.stride());
 			}
 	template <class V=value_type>
-	typename std::enable_if<!std::is_integral<V>::value,
-				simd::Is32vec>::type
+	std::enable_if_t<!std::is_integral<V>::value, simd::Is32vec>
 			lookup(simd::Is32vec u, simd::Is32vec v) const
 			{
 			    return simd::lookup(
@@ -112,8 +110,7 @@ class Warp
 				       v, u, _in.stride());
 			}
 	template <class V=value_type>
-	static typename std::enable_if<!std::is_integral<V>::value,
-				       simd::Is32vec>::type
+	static std::enable_if_t<!std::is_integral<V>::value, simd::Is32vec>
 			interpolate(simd::Is32vec x,
 				    simd::Is32vec y, simd::Is32vec d)
 			{
@@ -300,27 +297,27 @@ Warp::initialize(const typename I::matrix33_type& Htinv, const I& intrinsic,
 		 size_t outWidth, size_t outHeight)
 {
     using namespace std;
-    
-    typedef I						intrinsic_type;
-    typedef typename intrinsic_type::point2_type	point2_type;
-    typedef typename intrinsic_type::vector_type	vector_type;
-    typedef typename intrinsic_type::matrix_type	matrix_type;
+
+    using intrinsic_type	= I;
+    using point2_type		= typename intrinsic_type::point2_type;
+    using vector3_type		= Vector<typename intrinsic_type::element_type,
+					 3>;
+    using matrix33_type		= typename intrinsic_type::matrix33_type;
     
     _fracs.resize(outHeight);
     _width = outWidth;
     
   /* Compute frac for each pixel. */
-    const matrix_type&	HKtinv = Htinv * intrinsic.Ktinv();
-    vector_type		leftmost = HKtinv[2];
+    const matrix33_type	HKtinv = Htinv * intrinsic.Ktinv();
+    vector3_type	leftmost = HKtinv[2];
     for (size_t v = 0; v < height(); ++v)
     {
-	vector_type	x = leftmost;
+	auto		x = leftmost;
 	FracArray	frac(width());
 	size_t		n = 0;
 	for (size_t u = 0; u < width(); ++u)
 	{
-	    const point2_type&	m = intrinsic.u(point2_type({x[0]/x[2],
-							     x[1]/x[2]}));
+	    const auto	m = intrinsic.u({x[0]/x[2], x[1]/x[2]});
 	    if (0.0 <= m[0] && m[0] <= inWidth - 2 &&
 		0.0 <= m[1] && m[1] <= inHeight - 2)
 	    {
@@ -379,11 +376,9 @@ Warp::operator ()(IN in, OUT out) const
 inline Vector2f
 Warp::operator ()(size_t u, size_t v) const
 {
-    Vector2f		val;
-    const FracArray&	fracs = _fracs[v];
-    val[0] = float(fracs.us[u]) + float(fracs.du[u]) / 128.0f;
-    val[1] = float(fracs.vs[u]) + float(fracs.dv[u]) / 128.0f;
-    return val;
+    const auto&	fracs = _fracs[v];
+    return {float(fracs.us[u]) + float(fracs.du[u]) / 128.0f,
+	    float(fracs.vs[u]) + float(fracs.dv[u]) / 128.0f};
 }
 
 template <class IN, class OUT> void
@@ -399,10 +394,10 @@ Warp::warpLine(IN in, OUT out, const FracArray& frac) const
     out += frac.lmost;
 #if defined(SIMD)
     using value_type = typename Interpolate<IN>::value_type;
-    using T = typename std::conditional<(sizeof(value_type) > sizeof(int16_t)),
-					int32_t, int16_t>::type;
-    using O = typename std::conditional<(sizeof(value_type) > sizeof(int16_t)),
-					int32_t*, OUT>::type;
+    using	T = std::conditional_t<(sizeof(value_type) > sizeof(int16_t)),
+				       int32_t, int16_t>;
+    using	O = std::conditional_t<(sizeof(value_type) > sizeof(int16_t)),
+				       int32_t*, OUT>;
 	
     const auto	n = simd::vec<u_char>::floor(std::distance(u, ue));
 
