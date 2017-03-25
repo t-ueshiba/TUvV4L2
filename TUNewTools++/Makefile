@@ -21,7 +21,7 @@ ifeq ($(shell arch), armv7l)
 else ifeq ($(shell arch), aarch64)
   CPPFLAGS     += -DNEON
 else
-  CPPFLAGS     += -DSSE3
+  CPPFLAGS     += -DSSE4
 endif
 CCFLAGS		= $(CFLAGS)
 
@@ -52,6 +52,7 @@ HDRS		= TU/Array++.h \
 		TU/Geometry++.h \
 		TU/GraphCuts.h \
 		TU/GuidedFilter.h \
+		TU/ICIA.h \
 		TU/IIRFilter.h \
 		TU/Image++.h \
 		TU/List.h \
@@ -62,6 +63,7 @@ HDRS		= TU/Array++.h \
 		TU/Profiler.h \
 		TU/Quantizer.h \
 		TU/Random.h \
+		TU/Rectify.h \
 		TU/SADStereo.h \
 		TU/SHOT602.h \
 		TU/SeparableFilter2.h \
@@ -70,6 +72,7 @@ HDRS		= TU/Array++.h \
 		TU/TreeFilter.h \
 		TU/TriggerGenerator.h \
 		TU/Vector++.h \
+		TU/Warp.h \
 		TU/WeightedMedianFilter.h \
 		TU/YetPorted/Bezier++.h \
 		TU/YetPorted/CCSImage.h \
@@ -79,20 +82,17 @@ HDRS		= TU/Array++.h \
 		TU/YetPorted/FeatureMatch.h \
 		TU/YetPorted/GFStereo.h \
 		TU/YetPorted/Heap.h \
-		TU/YetPorted/ICIA.h \
 		TU/YetPorted/IntegralImage.h \
 		TU/YetPorted/Mesh++.h \
 		TU/YetPorted/Movie.h \
 		TU/YetPorted/Nurbs++.h \
 		TU/YetPorted/PSTree.h \
 		TU/YetPorted/Ransac.h \
-		TU/YetPorted/Rectify.h \
 		TU/YetPorted/SADStereo.h \
 		TU/YetPorted/SURFCreator.h \
 		TU/YetPorted/StereoBase.h \
 		TU/YetPorted/StereoIterators.h \
 		TU/YetPorted/StereoUtility.h \
-		TU/YetPorted/Warp.h \
 		TU/algorithm.h \
 		TU/fdstream.h \
 		TU/functional.h \
@@ -178,6 +178,7 @@ SRCS		= ColorConverter.cc \
 		ImageBase.cc \
 		PM16C_04.cc \
 		Random.cc \
+		Rectify.cc \
 		SHOT602.cc \
 		Serial.cc \
 		TriggerGenerator.cc \
@@ -192,6 +193,7 @@ OBJS		= ColorConverter.o \
 		ImageBase.o \
 		PM16C_04.o \
 		Random.o \
+		Rectify.o \
 		SHOT602.o \
 		Serial.o \
 		TriggerGenerator.o \
@@ -227,8 +229,7 @@ EdgeDetector.o: TU/EdgeDetector.h TU/Image++.h TU/types.h TU/pair.h \
 	TU/simd/arm/dup.h TU/simd/compare.h TU/simd/x86/compare.h \
 	TU/simd/arm/compare.h TU/simd/select.h TU/simd/x86/select.h \
 	TU/simd/arm/select.h TU/simd/arithmetic.h TU/simd/x86/arithmetic.h \
-	TU/simd/arm/arithmetic.h TU/simd/misc.h TU/simd/x86/shuffle.h \
-	TU/simd/x86/svml.h TU/simd/transform.h TU/functional.h \
+	TU/simd/arm/arithmetic.h TU/simd/transform.h TU/functional.h \
 	TU/simd/lookup.h TU/simd/x86/lookup.h TU/simd/arm/lookup.h \
 	TU/simd/load_iterator.h TU/simd/store_iterator.h \
 	TU/simd/cvtdown_iterator.h TU/simd/cvtup_iterator.h \
@@ -255,8 +256,7 @@ GaussianCoefficients.o: TU/GaussianConvolver.h TU/Vector++.h TU/Array++.h \
 	TU/simd/arm/dup.h TU/simd/compare.h TU/simd/x86/compare.h \
 	TU/simd/arm/compare.h TU/simd/select.h TU/simd/x86/select.h \
 	TU/simd/arm/select.h TU/simd/arithmetic.h TU/simd/x86/arithmetic.h \
-	TU/simd/arm/arithmetic.h TU/simd/misc.h TU/simd/x86/shuffle.h \
-	TU/simd/x86/svml.h TU/simd/transform.h TU/functional.h \
+	TU/simd/arm/arithmetic.h TU/simd/transform.h TU/functional.h \
 	TU/simd/lookup.h TU/simd/x86/lookup.h TU/simd/arm/lookup.h \
 	TU/simd/load_iterator.h TU/simd/store_iterator.h \
 	TU/simd/cvtdown_iterator.h TU/simd/cvtup_iterator.h \
@@ -269,6 +269,31 @@ ImageBase.o: TU/Image++.h TU/types.h TU/pair.h TU/Vector++.h TU/Array++.h \
 	TU/Geometry++.h TU/Minimize.h TU/Manip.h
 PM16C_04.o: TU/PM16C_04.h TU/Serial.h TU/fdstream.h TU/types.h TU/Manip.h
 Random.o: TU/Random.h TU/types.h
+Rectify.o: TU/Rectify.h TU/Warp.h TU/Image++.h TU/types.h TU/pair.h \
+	TU/Vector++.h TU/Array++.h TU/range.h TU/algorithm.h TU/tuple.h \
+	TU/iterator.h TU/Camera++.h TU/Geometry++.h TU/Minimize.h \
+	TU/simd/simd.h TU/simd/config.h TU/simd/vec.h TU/simd/type_traits.h \
+	TU/simd/x86/type_traits.h TU/simd/arm/type_traits.h TU/simd/x86/vec.h \
+	TU/simd/x86/arch.h TU/simd/arm/vec.h TU/simd/arm/arch.h \
+	TU/simd/allocator.h TU/simd/x86/allocator.h TU/simd/arm/allocator.h \
+	TU/simd/load_store.h TU/simd/x86/load_store.h \
+	TU/simd/arm/load_store.h TU/simd/zero.h TU/simd/x86/zero.h \
+	TU/simd/arm/zero.h TU/simd/cast.h TU/simd/x86/cast.h \
+	TU/simd/arm/cast.h TU/simd/insert_extract.h \
+	TU/simd/x86/insert_extract.h TU/simd/arm/insert_extract.h \
+	TU/simd/shift.h TU/simd/x86/shift.h TU/simd/arm/shift.h \
+	TU/simd/bit_shift.h TU/simd/x86/bit_shift.h TU/simd/arm/bit_shift.h \
+	TU/simd/dup.h TU/simd/cvt.h TU/simd/x86/cvt.h TU/simd/x86/unpack.h \
+	TU/simd/arm/cvt.h TU/simd/logical.h TU/simd/x86/logical.h \
+	TU/simd/x86/logical_base.h TU/simd/arm/logical.h TU/simd/x86/dup.h \
+	TU/simd/arm/dup.h TU/simd/compare.h TU/simd/x86/compare.h \
+	TU/simd/arm/compare.h TU/simd/select.h TU/simd/x86/select.h \
+	TU/simd/arm/select.h TU/simd/arithmetic.h TU/simd/x86/arithmetic.h \
+	TU/simd/arm/arithmetic.h TU/simd/transform.h TU/functional.h \
+	TU/simd/lookup.h TU/simd/x86/lookup.h TU/simd/arm/lookup.h \
+	TU/simd/load_iterator.h TU/simd/store_iterator.h \
+	TU/simd/cvtdown_iterator.h TU/simd/cvtup_iterator.h \
+	TU/simd/shift_iterator.h TU/simd/BufTraits.h TU/simd/zero.h
 SHOT602.o: TU/SHOT602.h TU/Serial.h TU/fdstream.h TU/types.h TU/Manip.h
 Serial.o: TU/Serial.h TU/fdstream.h TU/types.h
 TriggerGenerator.o: TU/TriggerGenerator.h TU/Serial.h TU/fdstream.h \
