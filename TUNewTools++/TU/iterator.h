@@ -133,9 +133,6 @@ using has_begin	= std::integral_constant<bool,
 template <class E>
 using value_t	= iterator_value<iterator_t<E> >;
 
-template <class ITER>
-using subiterator = iterator_t<iterator_reference<ITER> >;
-
 namespace detail
 {
   template <class T>
