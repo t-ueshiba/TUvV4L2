@@ -106,23 +106,35 @@ using iterator_category	  = typename std::iterator_traits<ITER>
 //! libTUTools++ のクラスや関数の実装の詳細を収める名前空間
 namespace detail
 {
-  template <class T>
-  auto	check_begin(const T& x) -> decltype(std::begin(x))		;
+  template <class E>
+  auto	check_begin(E&& x) -> decltype(std::begin(x))			;
   void	check_begin(...)						;
 }
 
-//! 式が持つ定数反復子の型を返す
+//! 式が持つ反復子の型を返す
 /*!
   \param E	式の型
-  \return	E が定数反復子を持てばその型，持たなければ void
+  \return	E が反復子を持てばその型，持たなければ void
 */
 template <class E>
-using const_iterator_t	= decltype(detail::check_begin(std::declval<E>()));
+using iterator_t = decltype(detail::check_begin(std::declval<E>()));
 
-//! 式が定数反復子を持つか判定する
-template <class T>
-using has_begin		= std::integral_constant<
-			      bool, !std::is_void<const_iterator_t<T> >::value>;
+//! 式が反復子を持つか判定する
+template <class E>
+using has_begin	= std::integral_constant<bool,
+					 !std::is_void<iterator_t<E> >::value>;
+
+//! 式が持つ反復子が指す型を返す
+/*!
+  反復子を持たない式を与えるとコンパイルエラーとなる.
+  \param E	反復子を持つ式の型
+  \return	E の反復子が指す型
+*/
+template <class E>
+using value_t	= iterator_value<iterator_t<E> >;
+
+template <class ITER>
+using subiterator = iterator_t<iterator_reference<ITER> >;
 
 namespace detail
 {
@@ -132,35 +144,19 @@ namespace detail
       using type = T;
   };
 
-  template <class E>
-  struct value_t
-  {
-      using type = iterator_value<const_iterator_t<E> >;
-  };
-      
-  template <class E, class=const_iterator_t<E> >
+  template <class E, class=iterator_t<E> >
   struct element_t
   {
-      using F	 = typename value_t<E>::type;
-      using type = typename element_t<F, const_iterator_t<F> >::type;
+      using type = typename element_t<value_t<E> >::type;
   };
   template <class E>
   struct element_t<E, void> : identity<E>				{};
 }	// namespace detail
     
-//! 式が持つ定数反復子が指す型を返す
-/*!
-  定数反復子を持たない式を与えるとコンパイルエラーとなる.
-  \param E	定数反復子を持つ式の型
-  \return	E の定数反復子が指す型
-*/
-template <class E>
-using value_t	= typename detail::value_t<E>::type;
-
-//! 式が持つ定数反復子が指す型を再帰的に辿って到達する型を返す
+//! 式が持つ反復子が指す型を再帰的に辿って到達する型を返す
 /*!
   \param E	式の型
-  \return	E が定数反復子を持てばそれが指す型を再帰的に辿って到達する型，
+  \return	E が反復子を持てばそれが指す型を再帰的に辿って到達する型，
 		持たなければ E 自身
 */
 template <class E>
@@ -417,12 +413,6 @@ make_assignment_iterator(const ITER& iter, const FUNC& func=FUNC())
 }
 
 /************************************************************************
-*  alias subiterator<ITER>						*
-************************************************************************/
-template <class ITER>
-using subiterator	= decltype(std::begin(*std::declval<ITER>()));
-
-/************************************************************************
 *  class row2col<ROW>							*
 ************************************************************************/
 //! 行への参照を与えられると予め指定された列indexに対応する要素への参照を返す関数オブジェクト
@@ -434,18 +424,17 @@ class row2col
 {
   public:
     using argument_type	= iterator_reference<ROW>;
-    using result_type	= iterator_reference<subiterator<ROW> >;
     
   public:
-		row2col(size_t col)	:_col(col)			{}
+			row2col(size_t col)	:_col(col)		{}
     
-    result_type	operator ()(argument_type row) const
-		{
-		    return *(std::begin(row) + _col);
-		}
+    decltype(auto)	operator ()(argument_type row) const
+			{
+			    return *(std::begin(row) + _col);
+			}
     
   private:
-    size_t	_col;	//!< 列を指定するindex
+    const size_t	_col;	//!< 列を指定するindex
 };
 
 /************************************************************************
@@ -453,9 +442,10 @@ class row2col
 ************************************************************************/
 template <class ROW>
 using vertical_iterator = boost::transform_iterator<
-			      row2col<ROW>, ROW,
+			      row2col<ROW>,
+			      ROW,
 			      boost::use_default,
-			      iterator_value<subiterator<ROW> > >;
+			      value_t<iterator_value<ROW> > >;
 
 template <class ROW> inline vertical_iterator<ROW>
 make_vertical_iterator(ROW row, size_t col)

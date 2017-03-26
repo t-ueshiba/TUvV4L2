@@ -16,18 +16,15 @@ template <class T>
 class QuantizerBase
 {
   public:
-    typedef T	value_type;
-
-  protected:
-    typedef typename std::is_floating_point<T>::type	is_floating_point;
+    using value_type	= T;
 
   private:
     template <class PITER>
     class BinProps
     {
       public:
-	typedef float			element_type;
-	typedef Vector<element_type, 3>	vector_type;
+	using element_type	= float;
+	using vector_type	= Vector<element_type, 3>;
 	
       public:
 	BinProps(PITER begin, PITER end)				;
@@ -135,8 +132,8 @@ QuantizerBase<T>::quantize(std::vector<PAIR>& io, size_t nbins, std::true_type)
 template <class T> template <class PAIR> void
 QuantizerBase<T>::quantize(std::vector<PAIR>& io, size_t nbins, std::false_type)
 {
-    typedef typename std::vector<PAIR>::iterator	piterator;
-    typedef BinProps<piterator>				props_type;
+    using piterator	= typename std::vector<PAIR>::iterator;
+    using props_type	= BinProps<piterator>;
 
     const auto	comp = [](const props_type& x, const props_type& y)
 			{ return x.maxVariance() < y.maxVariance(); };
@@ -195,7 +192,7 @@ template <class T>
 template <class PITER> typename QuantizerBase<T>::template BinProps<PITER>
 QuantizerBase<T>::BinProps<PITER>::split()
 {
-    typedef typename std::iterator_traits<PITER>::value_type	pair_type;
+    using pair_type	= iterator_value<PITER>;
 
   // 要素への反復子の配列を作り，昇順にソート
     const u_char T::*	c = (_var[0] > _var[1] ?
@@ -276,42 +273,36 @@ template <class T>
 class Quantizer : public QuantizerBase<T>
 {
   private:
-    typedef QuantizerBase<T>	super;
+    using super	= QuantizerBase<T>;
     
   public:
     template <class ITER>
-    typename std::enable_if<
-        std::is_same<
-	    typename std::iterator_traits<ITER>::value_type, u_char>::value,
-	range<ITER> >::type
-		operator ()(ITER ib, ITER ie, size_t)
-		{
-		    return range<ITER>(ib, ie);
-		}
+    std::enable_if_t<std::is_same<iterator_value<ITER>, u_char>::value,
+		     range<ITER> >
+	operator ()(ITER ib, ITER ie, size_t)
+	{
+	    return range<ITER>(ib, std::distance(ib, ie));
+	}
     template <class ITER>
-    typename std::enable_if<
-        !std::is_same<
-	    typename std::iterator_traits<ITER>::value_type, u_char>::value,
-	const Array<size_t>&>::type
-		operator ()(ITER ib, ITER ie, size_t nbins)	;
+    std::enable_if_t<!std::is_same<iterator_value<ITER>, u_char>::value,
+		     const Array<size_t>&>
+	operator ()(ITER ib, ITER ie, size_t nbins)			;
     friend std::ostream&
-		operator <<(std::ostream& out, const Quantizer<T>& quantizer)
-		{
-		    return out << quantizer._indices;
-		}
+	operator <<(std::ostream& out, const Quantizer<T>& quantizer)
+	{
+	    return out << quantizer._indices;
+	}
     
   private:
     Array<size_t>	_indices;
 };
 
 template <class T> template <class ITER>
-typename std::enable_if<
-    !std::is_same<
-	typename std::iterator_traits<ITER>::value_type, u_char>::value,
-    const Array<size_t>&>::type
+std::enable_if_t<!std::is_same<iterator_value<ITER>, u_char>::value,
+		 const Array<size_t>&>
 Quantizer<T>::operator ()(ITER ib, ITER ie, size_t nbins)
 {
-    typedef std::pair<ITER, Array<size_t>::iterator>	pair_type;
+    using pair_type = std::pair<ITER, Array<size_t>::iterator>;
 
     _indices.resize(std::distance(ib, ie));
     
@@ -319,7 +310,7 @@ Quantizer<T>::operator ()(ITER ib, ITER ie, size_t nbins)
     for (auto idx = _indices.begin(); ib != ie; ++ib, ++idx)
 	io.push_back(pair_type(ib, idx));
 
-    super::quantize(io, nbins, typename super::is_floating_point());
+    super::quantize(io, nbins, std::is_floating_point<T>());
 
     return _indices;
 }
@@ -331,46 +322,37 @@ template <class T>
 class Quantizer2 : public QuantizerBase<T>
 {
   private:
-    typedef QuantizerBase<T>	super;
+    using super	= QuantizerBase<T>;
     
   public:
     template <class ROW>
-    typename std::enable_if<
-	std::is_same<
-	    typename std::iterator_traits<subiterator<ROW> >::value_type,
-	    u_char>::value,
-	range<ROW> >::type
-		operator ()(ROW ib, ROW ie, size_t nbins)
-		{
-		    return range<ROW>(ib, ie);
-		}
+    std::enable_if_t<std::is_same<value_t<iterator_value<ROW> >,
+				  u_char>::value, range<ROW> >
+	operator ()(ROW ib, ROW ie, size_t nbins)
+	{
+	    return range<ROW>(ib, std::distance(ib, ie));
+	}
     template <class ROW>
-    typename std::enable_if<
-	!std::is_same<
-	    typename std::iterator_traits<subiterator<ROW> >::value_type,
-	    u_char>::value,
-	const Array2<size_t>&>::type
-		operator ()(ROW ib, ROW ie, size_t nbins)	;
+    std::enable_if_t<!std::is_same<value_t<iterator_value<ROW> >,
+				   u_char>::value, const Array2<size_t>&>
+	operator ()(ROW ib, ROW ie, size_t nbins)			;
     friend std::ostream&
-		operator <<(std::ostream& out, const Quantizer2<T>& quantizer)
-		{
-		    return out << quantizer._indices;
-		}
+	operator <<(std::ostream& out, const Quantizer2<T>& quantizer)
+	{
+	    return out << quantizer._indices;
+	}
 
   private:
     Array2<size_t>	_indices;
 };
 
 template <class T> template <class ROW>
-typename std::enable_if<
-    !std::is_same<
-	typename std::iterator_traits<subiterator<ROW> >::value_type,
-	u_char>::value,
-    const Array2<size_t>&>::type
+std::enable_if_t<!std::is_same<value_t<iterator_value<ROW> >, u_char>::value,
+		 const Array2<size_t>&>
 Quantizer2<T>::operator ()(ROW ib, ROW ie, size_t nbins)
 {
-    typedef std::pair<subiterator<ROW>,
-		      Array<size_t>::iterator>	pair_type;
+    using pair_type = std::pair<iterator_t<iterator_reference<ROW> >,
+				Array<size_t>::iterator>;
     
     _indices.resize(std::distance(ib, ie),
 		    (ib == ie ? 0 : std::distance(ib->begin(), ib->end())));
@@ -383,7 +365,7 @@ Quantizer2<T>::operator ()(ROW ib, ROW ie, size_t nbins)
 	    io.push_back(pair_type(col, idx));
     }
 
-    super::quantize(io, nbins, typename super::is_floating_point());
+    super::quantize(io, nbins, std::is_floating_point<T>());
 
     return _indices;
 }

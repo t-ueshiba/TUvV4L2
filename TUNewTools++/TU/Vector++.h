@@ -105,7 +105,7 @@ namespace detail
     // transform_iterator への第1テンプレートパラメータを，binder2nd そのもの
     // ではなく，それへの定数参照とすることにより cache のコピーを防ぐ
       using iterator = boost::transform_iterator<const binder2nd&,
-						 const_iterator_t<L> >;
+						 iterator_t<const L> >;
       
     public:
 		product_opnode(const L& l, const R& r, OP op)
@@ -309,7 +309,7 @@ inhomogeneous(const E& expr)
 					     Array<element_type, N-1> >;
 
     const auto	n = std::size(expr) - 1;
-    return result_type(slice(expr, 0, n) / expr[n]);
+    return result_type(slice(expr, 0, n) / *(std::begin(expr) + n));
 }
 
 /************************************************************************
@@ -1908,17 +1908,18 @@ rotation(const E& n, element_t<E> c, element_t<E> s)
 {
     if (std::size(n) != 3)
 	throw std::invalid_argument("TU::Rt: dimension of the argument \'n\' must be 3");
-    Array2<element_t<E>, 3, 3>	Qt = n % n;
+    const auto			nn = evaluate(n);
+    Array2<element_t<E>, 3, 3>	Qt = nn % nn;
     Qt *= (1.0 - c);
     Qt[0][0] += c;
     Qt[1][1] += c;
     Qt[2][2] += c;
-    Qt[0][1] += n[2] * s;
-    Qt[0][2] -= n[1] * s;
-    Qt[1][0] -= n[2] * s;
-    Qt[1][2] += n[0] * s;
-    Qt[2][0] += n[1] * s;
-    Qt[2][1] -= n[0] * s;
+    Qt[0][1] += nn[2] * s;
+    Qt[0][2] -= nn[1] * s;
+    Qt[1][0] -= nn[2] * s;
+    Qt[1][2] += nn[0] * s;
+    Qt[2][0] += nn[1] * s;
+    Qt[2][1] -= nn[0] * s;
 
     return Qt;
 }

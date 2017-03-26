@@ -12,7 +12,20 @@
 namespace TU
 {
 /************************************************************************
-*  predicates all<PRED, T>, is_tuple<T>, all_has_begin<T>		*
+*  predicate is_tuple<T>						*
+************************************************************************/
+namespace detail
+{
+  template <class... T>
+  std::true_type	check_tuple(std::tuple<T...>)			;
+  std::false_type	check_tuple(...)				;
+}	// namespace detail
+    
+template <class T>
+using is_tuple		= decltype(detail::check_tuple(std::declval<T>()));
+
+/************************************************************************
+*  predicates all<PRED, T>, all_has_begin<T>				*
 ************************************************************************/
 template <template <class> class PRED, class T>
 struct all;
@@ -27,16 +40,6 @@ struct all<PRED, std::tuple<HEAD, TAIL...> >
     constexpr static bool	value = PRED<HEAD>::value &&
 					all<PRED, std::tuple<TAIL...> >::value;
 };
-
-namespace detail
-{
-  template <class... T>
-  std::true_type	check_tuple(std::tuple<T...>)			;
-  std::false_type	check_tuple(...)				;
-}	// namespace detail
-    
-template <class T>
-using is_tuple		= decltype(detail::check_tuple(std::declval<T>()));
 
 template <class T>
 using all_has_begin	= all<has_begin, std::decay_t<T> >;
@@ -350,51 +353,37 @@ make_zip_iterator(ITER_TUPLE iter_tuple)
     return {iter_tuple};
 }
 
-namespace detail
-{
-  template <class ITER>
-  struct decayed_iterator_value
-  {
-      using type = iterator_value<ITER>;
-  };
-  template <class... ITER>
-  struct decayed_iterator_value<zip_iterator<std::tuple<ITER...> > >
-  {
-      using type = std::tuple<std::decay_t<iterator_value<ITER> >...>;
-  };
-}
-
-template <class ITER>
-using decayed_iterator_value = typename detail::decayed_iterator_value<ITER>
-					      ::type;
-
 /************************************************************************
-*  struct tuple_head<T>, tuple_leftmost<T>, tuple_nelms<T>		*
+*  tuple_decay_t<T>							*
 ************************************************************************/
 namespace detail
 {
   template <class T>
-  struct tuple_traits
+  struct tuple_decay
   {
-      static constexpr size_t	nelms = 1;
-      using head_type		= T;
-      using leftmost_type	= T;
+      using type = std::decay_t<T>;
   };
-  template <>
-  struct tuple_traits<std::tuple<> >
+  template <class... T>
+  struct tuple_decay<std::tuple<T...> >
   {
-      static constexpr size_t	nelms = 0;
-      using head_type		= void;
-      using leftmost_type	= void;
+      using type = std::tuple<std::decay_t<T>...>;
   };
-  template <class HEAD, class... TAIL>
-  struct tuple_traits<std::tuple<HEAD, TAIL...> >
+}
+
+template <class T>
+using tuple_decay_t = typename detail::tuple_decay<T>::type;
+
+/************************************************************************
+*  tuple_head<T>							*
+************************************************************************/
+namespace detail
+{
+  template <class T>
+  struct tuple_head : identity<T>					{};
+  template <class... T>
+  struct tuple_head<std::tuple<T...> >
   {
-      static constexpr size_t	nelms = tuple_traits<HEAD>::nelms
-				      + tuple_traits<
-					    std::tuple<TAIL...> >::nelms;
-      using head_type		= HEAD;
-      using leftmost_type	= typename tuple_traits<HEAD>::leftmost_type;
+      using type = std::tuple_element_t<0, std::tuple<T...> >;
   };
 }
     
@@ -403,65 +392,8 @@ namespace detail
   \param T	その先頭要素の型を調べるべき型
 */
 template <class T>
-using tuple_head = typename detail::tuple_traits<T>::head_type;
+using tuple_head = typename detail::tuple_head<T>::type;
 
-//! 与えられた型がtupleならばその最左要素の型を，そうでなければ元の型を返す．
-/*!
-  \param T	その最左要素の型を調べるべき型
-*/
-template <class T>
-using tuple_leftmost = typename detail::tuple_traits<T>::leftmost_type;
-
-//! 与えられた型がtupleまたはnull_typeならばその要素数を，そうでなければ1を返す．
-/*!
-  \param T	要素数を調べるべき型
-*/
-template <class T>
-struct tuple_nelms
-{
-    static constexpr size_t	value = detail::tuple_traits<T>::nelms;
-};
-    
-/************************************************************************
-*  struct tuple_for_all<T, COND, ARGS...>				*
-************************************************************************/
-template <class T, template <class...> class COND, class... ARGS>
-struct tuple_for_all : std::integral_constant<bool, COND<T, ARGS...>::value>
-{
-};
-template <template <class...> class COND, class... ARGS>
-struct tuple_for_all<std::tuple<>, COND, ARGS...> : std::true_type
-{
-};
-template <class HEAD, class... TAIL,
-	  template <class...> class COND, class... ARGS>
-struct tuple_for_all<std::tuple<HEAD, TAIL...>, COND,  ARGS...>
-    : std::integral_constant<
-	  bool, (COND<HEAD, ARGS...>::value &&
-		 tuple_for_all<std::tuple<TAIL...>, COND, ARGS...>::value)>
-{
-};
-
-/************************************************************************
-*  struct tuple_is_uniform<T>						*
-************************************************************************/
-template <class T>
-struct tuple_is_uniform : std::true_type
-{
-};
-template <class T>
-struct tuple_is_uniform<std::tuple<T> > : std::true_type
-{
-};
-template <class HEAD, class... TAIL>
-struct tuple_is_uniform<std::tuple<HEAD, TAIL...> >
-    : std::integral_constant<
-	  bool,
-	  (std::is_same<HEAD, tuple_head<std::tuple<TAIL...> > >::value &&
-	   tuple_is_uniform<std::tuple<TAIL...> >::value)>
-{
-};
-    
 /************************************************************************
 *  struct tuple_replace<S, T>						*
 ************************************************************************/
@@ -525,8 +457,8 @@ namespace detail
   };
 }	// namespace detail
     
-template <class TUPLE, enable_if_t<TU::all_has_begin<TUPLE>::value>* = nullptr>
-inline auto
+template <class TUPLE,
+	  enable_if_t<TU::all_has_begin<TUPLE>::value>* = nullptr> inline auto
 begin(TUPLE&& t)
 {
     return TU::make_zip_iterator(TU::tuple_transform(
@@ -535,8 +467,8 @@ begin(TUPLE&& t)
   //				     t, [](auto&& x){ return begin(x); }));
 }
 
-template <class TUPLE, enable_if_t<TU::all_has_begin<TUPLE>::value>* = nullptr>
-inline auto
+template <class TUPLE,
+	  enable_if_t<TU::all_has_begin<TUPLE>::value>* = nullptr> inline auto
 end(TUPLE&& t)
 {
     return TU::make_zip_iterator(TU::tuple_transform(
@@ -545,8 +477,8 @@ end(TUPLE&& t)
   //				     t, [](auto&& x){ return end(x); }));
 }
     
-template <class TUPLE, enable_if_t<TU::all_has_begin<TUPLE>::value>* = nullptr>
-inline auto
+template <class TUPLE,
+	  enable_if_t<TU::all_has_begin<TUPLE>::value>* = nullptr> inline auto
 rbegin(TUPLE&& t)
 {
     return TU::make_zip_iterator(TU::tuple_transform(
@@ -555,8 +487,8 @@ rbegin(TUPLE&& t)
   //				     t, [](auto&& x){ return rbegin(x); }));
 }
 
-template <class TUPLE, enable_if_t<TU::all_has_begin<TUPLE>::value>* = nullptr>
-inline auto
+template <class TUPLE,
+	  enable_if_t<TU::all_has_begin<TUPLE>::value>* = nullptr> inline auto
 rend(TUPLE&& t)
 {
     return TU::make_zip_iterator(TU::tuple_transform(

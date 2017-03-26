@@ -8,7 +8,7 @@
 #include <cassert>
 #include <initializer_list>
 #include "TU/algorithm.h"	// for copy<N>(IN, ARG, OUT), etc...
-#include "TU/tuple.h"		// required before defining const_iterator_t<E>
+#include "TU/tuple.h"		// required before defining iterator_t<E>
 
 namespace TU
 {
@@ -933,8 +933,9 @@ namespace detail
   class unary_opnode : public opnode
   {
     public:
-      using iterator = boost::transform_iterator<OP, const_iterator_t<E> >;
-
+      using iterator	= boost::transform_iterator<OP, iterator_t<const E> >;
+      using reference	= iterator_reference<iterator>;
+      
     public:
 		unary_opnode(const E& expr, OP op)
 		    :_expr(expr), _op(op)				{}
@@ -944,11 +945,12 @@ namespace detail
       iterator	begin()	const	{ return {std::begin(_expr), _op}; }
       iterator	end()	const	{ return {std::end(_expr),   _op}; }
       size_t	size()	const	{ return std::size(_expr); }
-      auto	operator [](size_t i) const
+      reference	operator [](size_t i) const
 		{
+		    assert(i < size());
 		    return *(begin() + i);
 		}
-
+      
     private:
       argument_t<E>	_expr;
       const OP		_op;
@@ -973,8 +975,9 @@ namespace detail
   struct binary_opnode : public opnode
   {
     public:
-      using iterator = transform_iterator2<OP, const_iterator_t<L>,
-					       const_iterator_t<R> >;
+      using iterator	= transform_iterator2<OP, iterator_t<const L>,
+						  iterator_t<const R> >;
+      using reference	= iterator_reference<iterator>;
 
     public:
 		binary_opnode(const L& l, const R& r, OP op)
@@ -991,8 +994,9 @@ namespace detail
       iterator	begin()	const	{ return {std::begin(_l), std::begin(_r), _op};}
       iterator	end()	const	{ return {std::end(_l),   std::end(_r),   _op};}
       size_t	size()	const	{ return std::size(_l); }
-      auto	operator [](size_t i) const
+      reference	operator [](size_t i) const
 		{
+		    assert(i < size());
 		    return *(begin() + i);
 		}
 

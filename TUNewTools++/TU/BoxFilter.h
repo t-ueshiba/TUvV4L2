@@ -70,36 +70,12 @@ class box_filter_iterator
 		}
     
   private:
-    using value_is_expr	= std::integral_constant<bool, rank<value_type>() != 0>;
-
-    template <class VITER_, class ITER_>
-    static void	update(const VITER_& val,
-		       const ITER_& curr, const ITER_& head, std::false_type)
-		{
-		    *val += (*curr - *head);
-		}
-    template <class VITER_, class ITER_>
-    static void	update(const VITER_& val,
-		       const ITER_& curr, const ITER_& head, std::true_type)
-		{
-		    using iterator	= subiterator<VITER_>;
-		    using value_is_expr	= std::integral_constant<
-					      bool,
-					      rank<iterator_value<iterator> >()
-					      != 0>;
-		    
-		    auto	c = std::cbegin(*curr);
-		    auto	h = std::cbegin(*head);
-		    const auto	ve = std::end(*val);
-		    for (auto v = std::begin(*val); v != ve; ++v, ++c, ++h)
-			update(v, c, h, value_is_expr());
-		}
-
     reference	dereference() const
 		{
 		    if (!_valid)
 		    {
-			update(&_val, super::base(), _head, value_is_expr());
+			_val += (*super::base() - *_head);
+		      //(_val += *super::base()) -= *_head;
 			++_head;
 			_valid = true;
 		    }
@@ -113,7 +89,7 @@ class box_filter_iterator
 #ifdef TU_BOX_FILTER_ITERATOR_CONSERVATIVE
 		    if (!_valid)
 		    {
-			update(&_val, super::base(), _head, value_is_expr());
+			_val += (*super::base() - *_head);
 			++_head;
 		    }
 		    else
@@ -294,8 +270,8 @@ class BoxFilter2 : public Filter2<BoxFilter2>
 template <class IN, class OUT> void
 BoxFilter2::convolveRows(IN ib, IN ie, OUT out) const
 {
-    using row_type	= Array<iterator_value<subiterator<IN> > >;
-    using row_iterator	= box_filter_iterator<IN, row_type>;
+    using row_iterator	= box_filter_iterator<
+			      IN, Array<value_t<iterator_value<IN> > > >;
 
     if (std::distance(ib, ie) < rowWinSize())
 	throw std::runtime_error("BoxFilter2::convolveRows(): not enough rows!");
