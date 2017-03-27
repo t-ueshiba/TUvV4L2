@@ -290,68 +290,65 @@ namespace detail
 						     std::declval<FUNC>()));
       
     public:
-      using	self = assignment_proxy;
-	
-    public:
       assignment_proxy(const ITER& iter, const FUNC& func)
 	  :_iter(iter), _func(func)					{}
 
       template <class T_>
-      std::enable_if_t<is_binary_func<T_>::value, self&>
-		operator =(const T_& val)
-		{
-		    _func(*_iter, val);
-		    return *this;
-		}
+      std::enable_if_t<is_binary_func<T_>::value, assignment_proxy&>
+			operator =(const T_& val)
+			{
+			    _func(*_iter, val);
+			    return *this;
+			}
       template <class T_>
-      std::enable_if_t<!is_binary_func<T_>::value, self&>
-		operator =(const T_& val)
-		{
-		    *_iter  = _func(val);
-		    return *this;
-		}
+      std::enable_if_t<!is_binary_func<T_>::value, assignment_proxy&>
+			operator =(const T_& val)
+			{
+			    *_iter  = _func(val);
+			    return *this;
+			}
       template <class T_>
-      self&	operator +=(const T_& val)
-		{
-		    *_iter += _func(val);
-		    return *this;
-		}
+      assignment_proxy&	operator +=(const T_& val)
+			{
+			    *_iter += _func(val);
+			    return *this;
+			}
       template <class T_>
-      self&	operator -=(const T_& val)
-		{
-		    *_iter -= _func(val);
-		    return *this;
-		}
+      assignment_proxy&	operator -=(const T_& val)
+			{
+			    *_iter -= _func(val);
+			    return *this;
+			}
       template <class T_>
-      self&	operator *=(const T_& val)
-		{
-		    *_iter *= _func(val);
-		    return *this;
-		}
+      assignment_proxy&	operator *=(const T_& val)
+			{
+			    *_iter *= _func(val);
+			    return *this;
+			}
       template <class T_>
-      self&	operator /=(const T_& val)
-		{
-		    *_iter /= _func(val);
-		    return *this;
-		}
+      assignment_proxy&	operator /=(const T_& val)
+			{
+			    *_iter /= _func(val);
+			    return *this;
+			}
       template <class T_>
-      self&	operator &=(const T_& val)
-		{
-		    *_iter &= _func(val);
-		    return *this;
-		}
+      assignment_proxy&	operator &=(const T_& val)
+			{
+			    *_iter &= _func(val);
+			    return *this;
+			}
       template <class T_>
-      self&	operator |=(const T_& val)
-		{
-		    *_iter |= _func(val);
-		    return *this;
-		}
+      assignment_proxy&	operator |=(const T_& val)
+			{
+			    *_iter |= _func(val);
+			    return *this;
+			}
       template <class T_>
-      self&	operator ^=(const T_& val)
-		{
-		    *_iter ^= _func(val);
-		    return *this;
-		}
+      assignment_proxy&	operator ^=(const T_& val)
+			{
+			    *_iter ^= _func(val);
+			    return *this;
+			}
 
 
     private:

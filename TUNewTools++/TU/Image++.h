@@ -498,7 +498,6 @@ namespace detail
   class pixel_proxy
   {
     public:
-      using self	= pixel_proxy;
       using value_type	= T;
 
       static constexpr size_t	npixels = 1;
@@ -507,7 +506,7 @@ namespace detail
       pixel_proxy(const ITER& iter)	:_iter(const_cast<ITER&>(iter))	{}
 
       template <class ITER_, class T_>
-      self&		operator =(const pixel_proxy<ITER_, T_>& proxy)
+      pixel_proxy&	operator =(const pixel_proxy<ITER_, T_>& proxy)
 			{
 			    using N = std::integral_constant<
 					  size_t,
@@ -555,7 +554,6 @@ namespace detail
   class pixel_proxy<ITER, YUV422>
   {
     public:
-      using self		= pixel_proxy;
       using value_type		= TU::pair_tree<YUV444, 2>;
       using element_type	= YUV422::element_type;
       
@@ -565,7 +563,7 @@ namespace detail
       pixel_proxy(const ITER& iter)	:_iter(const_cast<ITER&>(iter))	{}
 
       template <class ITER_, class T_>
-      self&		operator =(const pixel_proxy<ITER_, T_>& proxy)
+      pixel_proxy&	operator =(const pixel_proxy<ITER_, T_>& proxy)
 			{
 			    constexpr size_t
 				Np = pixel_proxy<ITER_, T_>::npixels;
@@ -619,7 +617,6 @@ namespace detail
   class pixel_proxy<ITER, YUYV422>
   {
     public:
-      using self		= pixel_proxy;
       using value_type		= TU::pair_tree<YUV444, 2>;
       using element_type	= YUYV422::element_type;
       
@@ -629,7 +626,7 @@ namespace detail
       pixel_proxy(const ITER& iter)	:_iter(const_cast<ITER&>(iter))	{}
 
       template <class ITER_, class T_>
-      self&		operator =(const pixel_proxy<ITER_, T_>& proxy)
+      pixel_proxy&	operator =(const pixel_proxy<ITER_, T_>& proxy)
 			{
 			    constexpr size_t
 				Np = pixel_proxy<ITER_, T_>::npixels;
@@ -683,7 +680,6 @@ namespace detail
   class pixel_proxy<ITER, YUV411>
   {
     public:
-      using self		= pixel_proxy;
       using value_type		= TU::pair_tree<YUV444, 4>;
       using element_type	= YUV411::element_type;
       
@@ -693,7 +689,7 @@ namespace detail
       pixel_proxy(const ITER& iter)	:_iter(const_cast<ITER&>(iter))	{}
 
       template <class ITER_, class T_>
-      self&		operator =(const pixel_proxy<ITER_, T_>& proxy)
+      pixel_proxy&	operator =(const pixel_proxy<ITER_, T_>& proxy)
 			{
 			    constexpr size_t
 				Np = pixel_proxy<ITER_, T_>::npixels;
