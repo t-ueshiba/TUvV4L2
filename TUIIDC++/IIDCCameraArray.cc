@@ -75,40 +75,43 @@ getFeature(const IIDCCamera& camera, u_int id, u_int& val, float& fval)
       case IIDCCamera::TILT:
       {
 	const auto	feature = IIDCCamera::uintToFeature(id);
-	  
-	val  = camera.getValue<u_int>(feature);
-	fval = (camera.inquireFeatureFunction(feature) &
-		IIDCCamera::Abs_Control ?
-		camera.getValue<float>(feature) : 0.0f);
+
+	if (camera.isAbsControl(feature))
+	{
+	    val  = 0;
+	    fval = camera.getValue<float>(feature);
+	}
+	else
+	{
+	    val  = camera.getValue<u_int>(feature);
+	    fval = val;
+	}
       }
 	return true;
 	
       case IIDCCamera::TRIGGER_MODE:
 	val  = camera.getTriggerMode();
-	fval = val;
+	fval = 0;
 	return true;
 
       case IIDCCamera::WHITE_BALANCE:
       case IIDCCamera::WHITE_BALANCE + IIDCCAMERA_OFFSET_VR:
-      {
-	u_int	ub, vr;
-	camera.getWhiteBalance(ub, vr);
-	float	fub = 0, fvr = 0;
-	if (camera.inquireFeatureFunction(IIDCCamera::WHITE_BALANCE) &
-	    IIDCCamera::Abs_Control)
-	    camera.getWhiteBalance(fub, fvr);
-
-	if (id == IIDCCamera::WHITE_BALANCE)
+	if (camera.isAbsControl(IIDCCamera::WHITE_BALANCE))
 	{
-	    val  = ub;
-	    fval = fub;
+	    float	ub, vr;
+	    camera.getWhiteBalance(ub, vr);
+
+	    val  = 0;
+	    fval = (id == IIDCCamera::WHITE_BALANCE ? ub : vr);
 	}
 	else
 	{
-	    val  = vr;
-	    fval = fvr;
+	    u_int	ub, vr;
+	    camera.getWhiteBalance(ub, vr);
+
+	    val  = (id == IIDCCamera::WHITE_BALANCE ? ub : vr);
+	    fval = val;
 	}
-      }
 	return true;
 	
       case IIDCCamera::BRIGHTNESS    + IIDCCAMERA_OFFSET_ONOFF:
@@ -131,7 +134,7 @@ getFeature(const IIDCCamera& camera, u_int id, u_int& val, float& fval)
       case IIDCCamera::TILT	     + IIDCCAMERA_OFFSET_ONOFF:
 	val  = camera.isActive(IIDCCamera::uintToFeature(
 				   id - IIDCCAMERA_OFFSET_ONOFF));
-	fval = val;
+	fval = 0;
 	return true;
 
       case IIDCCamera::BRIGHTNESS    + IIDCCAMERA_OFFSET_AUTO:
@@ -152,12 +155,12 @@ getFeature(const IIDCCamera& camera, u_int id, u_int& val, float& fval)
       case IIDCCamera::TILT	     + IIDCCAMERA_OFFSET_AUTO:
 	val  = camera.isAuto(IIDCCamera::uintToFeature(
 				 id - IIDCCAMERA_OFFSET_AUTO));
-	fval = val;
+	fval = 0;
 	return true;
 
       case IIDCCamera::TRIGGER_MODE  + IIDCCAMERA_OFFSET_AUTO:
 	val  = camera.getTriggerPolarity();
-	fval = val;
+	fval = 0;
 	return true;
 
       case IIDCCamera::BRIGHTNESS    + IIDCCAMERA_OFFSET_ABS:
@@ -179,7 +182,7 @@ getFeature(const IIDCCamera& camera, u_int id, u_int& val, float& fval)
       case IIDCCamera::TILT	     + IIDCCAMERA_OFFSET_ABS:
 	val  = camera.isAbsControl(IIDCCamera::uintToFeature(
 				       id - IIDCCAMERA_OFFSET_ABS));
-	fval = val;
+	fval = 0;
         return true;
 
       default:
