@@ -6,26 +6,13 @@
 #define __TU_TUPLE_H
 
 #include <tuple>
+#include <boost/iterator/iterator_facade.hpp>
 #include <iostream>
-#include "TU/iterator.h"
 
 namespace TU
 {
 /************************************************************************
-*  predicate is_tuple<T>						*
-************************************************************************/
-namespace detail
-{
-  template <class... T>
-  std::true_type	check_tuple(std::tuple<T...>)			;
-  std::false_type	check_tuple(...)				;
-}	// namespace detail
-    
-template <class T>
-using is_tuple		= decltype(detail::check_tuple(std::declval<T>()));
-
-/************************************************************************
-*  predicates all<PRED, T>, all_has_begin<T>				*
+*  predicates: all<PRED, T>						*
 ************************************************************************/
 template <template <class> class PRED, class T>
 struct all;
@@ -41,8 +28,35 @@ struct all<PRED, std::tuple<HEAD, TAIL...> >
 					all<PRED, std::tuple<TAIL...> >::value;
 };
 
+/************************************************************************
+*  predicates: has_begin<E>, all_has_begin<E>				*
+************************************************************************/
+namespace detail
+{
+  template <class E>
+  auto	has_begin(E&& x) -> decltype(std::begin(x), std::true_type())	;
+  auto	has_begin(...)	 -> std::false_type				;
+}	// namespace detail
+
+//! 式が反復子を持つか判定する
+template <class E>
+using has_begin		= decltype(detail::has_begin(std::declval<E>()));
+
+template <class E>
+using all_has_begin	= all<has_begin, std::decay_t<E> >;
+
+/************************************************************************
+*  predicate: is_tuple<T>						*
+************************************************************************/
+namespace detail
+{
+  template <class... T>
+  std::true_type	check_tuple(std::tuple<T...>)			;
+  std::false_type	check_tuple(...)				;
+}	// namespace detail
+    
 template <class T>
-using all_has_begin	= all<has_begin, std::decay_t<T> >;
+using is_tuple		= decltype(detail::check_tuple(std::declval<T>()));
 
 /************************************************************************
 *  tuple_for_each(TUPLE, UNARY_FUNC)					*
@@ -286,7 +300,9 @@ class zip_iterator
 	  zip_iterator<ITER_TUPLE>,
 	  decltype(tuple_transform(std::declval<ITER_TUPLE>(),
 				   detail::generic_dereference())),
-	  iterator_category<typename std::tuple_element<0, ITER_TUPLE>::type>,
+	  typename std::iterator_traits<
+	      typename std::tuple_element<0, ITER_TUPLE>::type>
+			  ::iterator_category,
 	  decltype(tuple_transform(std::declval<ITER_TUPLE>(),
 				   detail::generic_dereference()))>
 {
@@ -295,8 +311,9 @@ class zip_iterator
 		      zip_iterator,
 		      decltype(tuple_transform(std::declval<ITER_TUPLE>(),
 					       detail::generic_dereference())),
-		      iterator_category<
-			  typename std::tuple_element<0, ITER_TUPLE>::type>,
+		      typename std::iterator_traits<
+			  typename std::tuple_element<0, ITER_TUPLE>::type>
+				      ::iterator_category,
 		      decltype(tuple_transform(std::declval<ITER_TUPLE>(),
 					       detail::generic_dereference()))>;
     
@@ -352,71 +369,6 @@ make_zip_iterator(ITER_TUPLE iter_tuple)
 {
     return {iter_tuple};
 }
-
-/************************************************************************
-*  tuple_decay_t<T>							*
-************************************************************************/
-namespace detail
-{
-  template <class T>
-  struct tuple_decay
-  {
-      using type = std::decay_t<T>;
-  };
-  template <class... T>
-  struct tuple_decay<std::tuple<T...> >
-  {
-      using type = std::tuple<std::decay_t<T>...>;
-  };
-}
-
-template <class T>
-using tuple_decay_t = typename detail::tuple_decay<T>::type;
-
-/************************************************************************
-*  tuple_head<T>							*
-************************************************************************/
-namespace detail
-{
-  template <class T>
-  struct tuple_head : identity<T>					{};
-  template <class... T>
-  struct tuple_head<std::tuple<T...> >
-  {
-      using type = std::tuple_element_t<0, std::tuple<T...> >;
-  };
-}
-    
-//! 与えられた型がtupleならばその先頭要素の型を，そうでなければ元の型を返す．
-/*!
-  \param T	その先頭要素の型を調べるべき型
-*/
-template <class T>
-using tuple_head = typename detail::tuple_head<T>::type;
-
-/************************************************************************
-*  struct tuple_replace<S, T>						*
-************************************************************************/
-namespace detail
-{
-  template <class T, class S>
-  struct tuple_replace : std::conditional<std::is_void<T>::value, S, T>
-  {
-  };
-  template <class T, class... S>
-  struct tuple_replace<T, std::tuple<S...> >
-  {
-      using type = std::tuple<typename tuple_replace<T, S>::type...>;
-  };
-}
-    
-//! 与えられた型がtupleならばその全要素の型を，そうでなければ元の型自身を別の型で置き換える．
-/*!
-  \param S	要素型置換の対象となる型
-  \param T	置換後の要素の型．voidならば置換しない．
-*/
-template <class S, class T=void>
-using tuple_replace = typename detail::tuple_replace<T, S>::type;
 
 }	// namespace TU
 
@@ -775,6 +727,77 @@ operator <<(ostream& out, const tuple<T...>& t)
     return out;
 }
 
-
 }	// namespace std
+
+namespace TU
+{
+/************************************************************************
+*  type alias: tuple_head<T>						*
+************************************************************************/
+namespace detail
+{
+  template <class T>
+  struct tuple_head
+  {
+      using type = T;
+  };
+  template <class... T>
+  struct tuple_head<std::tuple<T...> >
+  {
+      using type = std::tuple_element_t<0, std::tuple<T...> >;
+  };
+}	// namespace detail
+    
+//! 与えられた型がtupleならばその先頭要素の型を，そうでなければ元の型を返す．
+/*!
+  \param T	その先頭要素の型を調べるべき型
+*/
+template <class T>
+using tuple_head = typename detail::tuple_head<T>::type;
+
+/************************************************************************
+*  type alias: tuple_replace<S, T>					*
+************************************************************************/
+namespace detail
+{
+  template <class T, class S>
+  struct tuple_replace : std::conditional<std::is_void<T>::value, S, T>
+  {
+  };
+  template <class T, class... S>
+  struct tuple_replace<T, std::tuple<S...> >
+  {
+      using type = std::tuple<typename tuple_replace<T, S>::type...>;
+  };
+}	// namespace detail
+    
+//! 与えられた型がtupleならばその全要素の型を，そうでなければ元の型自身を別の型で置き換える．
+/*!
+  \param S	要素型置換の対象となる型
+  \param T	置換後の要素の型．voidならば置換しない．
+*/
+template <class S, class T=void>
+using tuple_replace = typename detail::tuple_replace<T, S>::type;
+
+/************************************************************************
+*  type alias: tuple_decay_t<T>						*
+************************************************************************/
+namespace detail
+{
+  template <class T>
+  struct tuple_decay
+  {
+      using type = std::decay_t<T>;
+  };
+  template <class... T>
+  struct tuple_decay<std::tuple<T...> >
+  {
+      using type = std::tuple<std::decay_t<T>...>;
+  };
+}	// namespace detail
+
+template <class T>
+using tuple_decay_t = typename detail::tuple_decay<T>::type;
+
+}	// namespace TU
 #endif	// !__TU_TUPLE_H

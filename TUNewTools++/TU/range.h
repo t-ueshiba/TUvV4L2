@@ -8,10 +8,64 @@
 #include <cassert>
 #include <initializer_list>
 #include "TU/algorithm.h"	// for copy<N>(IN, ARG, OUT), etc...
+#include "TU/iterator.h"
 #include "TU/tuple.h"		// required before defining iterator_t<E>
 
 namespace TU
 {
+/************************************************************************
+*  type aliases: iterator_t<E>, value_t<E>, element_t<E>		*
+************************************************************************/
+namespace detail
+{
+  template <class E>
+  auto	check_begin(E&& x) -> decltype(std::begin(x))			;
+  void	check_begin(...)						;
+}
+
+//! 式が持つ反復子の型を返す
+/*!
+  \param E	式の型
+  \return	E が反復子を持てばその型，持たなければ void
+*/
+template <class E>
+using iterator_t = decltype(detail::check_begin(std::declval<E>()));
+
+//! 式が持つ反復子が指す型を返す
+/*!
+  反復子を持たない式を与えるとコンパイルエラーとなる.
+  \param E	反復子を持つ式の型
+  \return	E の反復子が指す型
+*/
+template <class E>
+using value_t	= typename std::iterator_traits<iterator_t<E> >::value_type;
+
+namespace detail
+{
+  template <class T>
+  struct identity
+  {
+      using type = T;
+  };
+
+  template <class E, class=iterator_t<E> >
+  struct element_t
+  {
+      using type = typename element_t<value_t<E> >::type;
+  };
+  template <class E>
+  struct element_t<E, void> : identity<E>				{};
+}	// namespace detail
+    
+//! 式が持つ反復子が指す型を再帰的に辿って到達する型を返す
+/*!
+  \param E	式の型
+  \return	E が反復子を持てばそれが指す型を再帰的に辿って到達する型，
+		持たなければ E 自身
+*/
+template <class E>
+using element_t	= typename detail::element_t<E>::type;
+
 /************************************************************************
 *  rank<E>(), size0<E>(), size<E>() and stride<E>()			*
 ************************************************************************/

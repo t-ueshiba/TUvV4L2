@@ -103,62 +103,6 @@ template <class ITER>
 using iterator_category	  = typename std::iterator_traits<ITER>
 					::iterator_category;
 
-//! libTUTools++ のクラスや関数の実装の詳細を収める名前空間
-namespace detail
-{
-  template <class E>
-  auto	check_begin(E&& x) -> decltype(std::begin(x))			;
-  void	check_begin(...)						;
-}
-
-//! 式が持つ反復子の型を返す
-/*!
-  \param E	式の型
-  \return	E が反復子を持てばその型，持たなければ void
-*/
-template <class E>
-using iterator_t = decltype(detail::check_begin(std::declval<E>()));
-
-//! 式が反復子を持つか判定する
-template <class E>
-using has_begin	= std::integral_constant<bool,
-					 !std::is_void<iterator_t<E> >::value>;
-
-//! 式が持つ反復子が指す型を返す
-/*!
-  反復子を持たない式を与えるとコンパイルエラーとなる.
-  \param E	反復子を持つ式の型
-  \return	E の反復子が指す型
-*/
-template <class E>
-using value_t	= iterator_value<iterator_t<E> >;
-
-namespace detail
-{
-  template <class T>
-  struct identity
-  {
-      using type = T;
-  };
-
-  template <class E, class=iterator_t<E> >
-  struct element_t
-  {
-      using type = typename element_t<value_t<E> >::type;
-  };
-  template <class E>
-  struct element_t<E, void> : identity<E>				{};
-}	// namespace detail
-    
-//! 式が持つ反復子が指す型を再帰的に辿って到達する型を返す
-/*!
-  \param E	式の型
-  \return	E が反復子を持てばそれが指す型を再帰的に辿って到達する型，
-		持たなければ E 自身
-*/
-template <class E>
-using element_t	= typename detail::element_t<E>::type;
-
 /************************************************************************
 *  make_mbr_iterator<ITER, T>						*
 ************************************************************************/
@@ -186,8 +130,7 @@ make_mbr_iterator(const ITER& iter, T iterator_value<ITER>::* mbr)
 template <class ITER> inline auto
 make_first_iterator(const ITER& iter)
 {
-    return make_mbr_iterator(iter,
-			     &std::iterator_traits<ITER>::value_type::first);
+    return make_mbr_iterator(iter, &iterator_value<ITER>::first);
 }
     
 //! std::pairへの反復子からその第2要素に直接アクセスする反復子を作る．
@@ -197,8 +140,7 @@ make_first_iterator(const ITER& iter)
 template <class ITER> inline auto
 make_second_iterator(const ITER& iter)
 {
-    return make_mbr_iterator(iter,
-			     &std::iterator_traits<ITER>::value_type::second);
+    return make_mbr_iterator(iter, &iterator_value<ITER>::second);
 }
     
 /************************************************************************
@@ -272,6 +214,7 @@ make_transform_iterator2(ITER0 iter0, ITER1 iter1, FUNC func)
 /************************************************************************
 *  class assignment_iterator<FUNC, ITER, VAL>				*
 ************************************************************************/
+//! libTUTools++ のクラスや関数の実装の詳細を収める名前空間
 namespace detail
 {
   template <class FUNC, class ITER>
@@ -280,10 +223,10 @@ namespace detail
     private:
       template <class T_>
       static auto	check_func(ITER iter, const T_& val, FUNC func)
-			  -> decltype(func(*iter, val), std::true_type());
+			    -> decltype(func(*iter, val), std::true_type());
       template <class T_>
       static auto	check_func(ITER iter, const T_& val, FUNC func)
-			  -> decltype(*iter = func(val), std::false_type());
+			    -> decltype(*iter = func(val), std::false_type());
       template <class T_>
       using	is_binary_func = decltype(check_func(std::declval<ITER>(),
 						     std::declval<T_>(),
@@ -435,11 +378,7 @@ class row2col
 *  alias vertical_iterator<ROW>						*
 ************************************************************************/
 template <class ROW>
-using vertical_iterator = boost::transform_iterator<
-			      row2col<ROW>,
-			      ROW,
-			      boost::use_default,
-			      value_t<iterator_value<ROW> > >;
+using vertical_iterator = boost::transform_iterator<row2col<ROW>, ROW>;
 
 template <class ROW> inline vertical_iterator<ROW>
 make_vertical_iterator(ROW row, size_t col)
