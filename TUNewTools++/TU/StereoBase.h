@@ -89,21 +89,6 @@ makeDiff(T x, S thresh)
 ************************************************************************/
 struct Minus
 {
-    template <class T>
-    using result_t = std::conditional_t<std::is_integral<T>::value, int, T>;
-
-    template <class T>
-    result_t<T>	operator ()(T x, T y) const
-		{
-		    return result_t<T>(x) - result_t<T>(y);
-		}
-
-    template <class... T>
-    auto	operator ()(std::tuple<T...> x, std::tuple<T...> y) const
-		{
-		    return tuple_transform(x, y, Minus());
-		}
-
 #if defined(SIMD)
     template <class T>
     auto	operator ()(simd::vec<T> x, simd::vec<T> y) const
@@ -113,7 +98,21 @@ struct Minus
 		    return simd::cast<signed_type>(x) -
 			   simd::cast<signed_type>(y);
 		}
+#else
+    template <class T>
+    auto	operator ()(T x, T y) const
+		{
+		    using result_type = std::conditional_t<
+					    std::is_integral<T>::value, int, T>;
+			
+		    return result_type(x) - result_type(y);
+		}
 #endif
+    template <class... T>
+    auto	operator ()(std::tuple<T...> x, std::tuple<T...> y) const
+		{
+		    return tuple_transform(x, y, Minus());
+		}
 };
     
 /************************************************************************

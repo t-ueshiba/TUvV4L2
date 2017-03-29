@@ -380,7 +380,8 @@ SADStereo<SCORE, DISP>::initializeDissimilarities(COL colL, COL colLe,
 	{
 	    ++colRV;
 	    ++colQ;
-	
+
+	    const Minus	minus;
 	    auto	P = make_zip_iterator(
 				std::make_tuple(
 				    boost::make_transform_iterator(
@@ -391,9 +392,10 @@ SADStereo<SCORE, DISP>::initializeDissimilarities(COL colL, COL colLe,
 					make_transform_iterator2(
 					    in_iterator(col2ptr(colRV) + 1),
 					    in_iterator(col2ptr(colRV) - 1),
-					    Minus()),
-					makeDiff(*(colL + 1) - *(colL - 1),
-						 _params.derivativeDiffMax))));
+					    minus),
+					makeDiff(
+					    minus(*(colL + 1), *(colL - 1)),
+					    _params.derivativeDiffMax))));
 	    for (qiterator Q( make_assignment_iterator(
 				  colQ->begin(), blend_type(_params.blend))),
 			   Qe(make_assignment_iterator(
@@ -451,31 +453,34 @@ SADStereo<SCORE, DISP>::updateDissimilarities(COL colL,  COL colLe,
 	    ++colLp;
 	    ++colRVp;
 	    ++colQ;
-	    
+
+	    const Minus	minus;
 	    auto	P = make_zip_iterator(
 				std::make_tuple(
 				    boost::make_transform_iterator(
 					in_iterator(col2ptr(colRV)),
 					makeDiff(*colL,
-						 _params.intensityDiffMax)),
+						  _params.intensityDiffMax)),
 				    boost::make_transform_iterator(
 					make_transform_iterator2(
 					    in_iterator(col2ptr(colRV) + 1),
 					    in_iterator(col2ptr(colRV) - 1),
-					    Minus()),
-					makeDiff(*(colL + 1) - *(colL - 1),
-						 _params.derivativeDiffMax)),
+					    minus),
+					makeDiff(
+					    minus(*(colL + 1), *(colL - 1)),
+					    _params.derivativeDiffMax)),
 				    boost::make_transform_iterator(
 					in_iterator(col2ptr(colRVp)),
 					makeDiff(*colLp,
-						 _params.intensityDiffMax)),
+						  _params.intensityDiffMax)),
 				    boost::make_transform_iterator(
 					make_transform_iterator2(
 					    in_iterator(col2ptr(colRVp) + 1),
 					    in_iterator(col2ptr(colRVp) - 1),
-					    Minus()),
-					makeDiff(*(colLp + 1) - *(colLp - 1),
-						 _params.derivativeDiffMax))));
+					    minus),
+					makeDiff(
+					    minus(*(colLp + 1),*(colLp - 1)),
+					    _params.derivativeDiffMax))));
 	    for (qiterator Q( make_assignment_iterator(
 				  colQ->begin(), ScoreUpdate(_params.blend))),
 			   Qe(make_assignment_iterator(

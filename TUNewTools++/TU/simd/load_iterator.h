@@ -29,20 +29,18 @@ class load_iterator
 				     vec<iterator_value<ITER> > >
 {
   private:
-    typedef iterator_value<ITER>				element_type;
-    typedef boost::iterator_adaptor<load_iterator,
-				    ITER,
-				    vec<element_type>,
-				    boost::use_default,
-				    vec<element_type> >		super;
+    using element_type	= iterator_value<ITER>;
+    using super		= boost::iterator_adaptor<load_iterator,
+						  ITER,
+						  vec<element_type>,
+						  boost::use_default,
+						  vec<element_type> >;
+    friend	class boost::iterator_core_access;
 
   public:
-    typedef typename super::difference_type	difference_type;
-    typedef typename super::value_type		value_type;
-    typedef typename super::reference		reference;
-    
-    friend class	boost::iterator_core_access;
-
+    using	typename super::difference_type;
+    using	typename super::value_type;
+    using	typename super::reference;
     
   public:
     load_iterator(ITER iter)	:super(iter)	{}
@@ -69,7 +67,7 @@ class load_iterator
     difference_type	distance_to(load_iterator iter) const
 			{
 			    return (iter.base() - super::base())
-				 / value_type::size;
+				 / difference_type(value_type::size);
 			}
 };
 
