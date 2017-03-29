@@ -165,12 +165,11 @@ class transform_iterator2
 					  ref,
 					  boost::use_default,
 					  ref>;
+    friend	class boost::iterator_core_access;
 
   public:
     using	typename super::difference_type;
     using	typename super::reference;
-
-    friend	class boost::iterator_core_access;
 	
   public:
 		transform_iterator2(ITER0 iter0, ITER1 iter1, FUNC func)
@@ -222,10 +221,10 @@ namespace detail
   {
     private:
       template <class T_>
-      static auto	check_func(ITER iter, const T_& val, FUNC func)
+      static auto	check_func(ITER iter, T_&& val, FUNC func)
 			    -> decltype(func(*iter, val), std::true_type());
       template <class T_>
-      static auto	check_func(ITER iter, const T_& val, FUNC func)
+      static auto	check_func(ITER iter, T_&& val, FUNC func)
 			    -> decltype(*iter = func(val), std::false_type());
       template <class T_>
       using	is_binary_func = decltype(check_func(std::declval<ITER>(),
@@ -238,56 +237,56 @@ namespace detail
 
       template <class T_>
       std::enable_if_t<is_binary_func<T_>::value, assignment_proxy&>
-			operator =(const T_& val)
+			operator =(T_&& val)
 			{
 			    _func(*_iter, val);
 			    return *this;
 			}
       template <class T_>
       std::enable_if_t<!is_binary_func<T_>::value, assignment_proxy&>
-			operator =(const T_& val)
+			operator =(T_&& val)
 			{
 			    *_iter  = _func(val);
 			    return *this;
 			}
       template <class T_>
-      assignment_proxy&	operator +=(const T_& val)
+      assignment_proxy&	operator +=(T_&& val)
 			{
 			    *_iter += _func(val);
 			    return *this;
 			}
       template <class T_>
-      assignment_proxy&	operator -=(const T_& val)
+      assignment_proxy&	operator -=(T_&& val)
 			{
 			    *_iter -= _func(val);
 			    return *this;
 			}
       template <class T_>
-      assignment_proxy&	operator *=(const T_& val)
+      assignment_proxy&	operator *=(T_&& val)
 			{
 			    *_iter *= _func(val);
 			    return *this;
 			}
       template <class T_>
-      assignment_proxy&	operator /=(const T_& val)
+      assignment_proxy&	operator /=(T_&& val)
 			{
 			    *_iter /= _func(val);
 			    return *this;
 			}
       template <class T_>
-      assignment_proxy&	operator &=(const T_& val)
+      assignment_proxy&	operator &=(T_&& val)
 			{
 			    *_iter &= _func(val);
 			    return *this;
 			}
       template <class T_>
-      assignment_proxy&	operator |=(const T_& val)
+      assignment_proxy&	operator |=(T_&& val)
 			{
 			    *_iter |= _func(val);
 			    return *this;
 			}
       template <class T_>
-      assignment_proxy&	operator ^=(const T_& val)
+      assignment_proxy&	operator ^=(T_&& val)
 			{
 			    *_iter ^= _func(val);
 			    return *this;
@@ -320,11 +319,10 @@ class assignment_iterator
 		      VAL,
 		      boost::use_default,
 		      detail::assignment_proxy<FUNC, ITER> >;
+    friend	class boost::iterator_core_access;
 
   public:
-    using		typename super::reference;
-    
-    friend class	boost::iterator_core_access;
+    using	typename super::reference;
 
   public:
     assignment_iterator(const ITER& iter, const FUNC& func=FUNC())
@@ -397,12 +395,11 @@ template <class ITER>
 class ring_iterator : public boost::iterator_adaptor<ring_iterator<ITER>, ITER>
 {
   private:
-    using super		= boost::iterator_adaptor<ring_iterator, ITER>;
-
-    friend class	boost::iterator_core_access;
+    using super	= boost::iterator_adaptor<ring_iterator, ITER>;
+    friend	class boost::iterator_core_access;
     
   public:
-    using		typename super::difference_type;
+    using	typename super::difference_type;
     
   public:
     ring_iterator()

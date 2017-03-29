@@ -78,50 +78,44 @@ struct Diff<simd::vec<T> >
 };
 #endif
 
+template <class T, class S> inline Diff<T>
+makeDiff(T x, S thresh)
+{
+    return Diff<T>(x, thresh);
+}
+    
 /************************************************************************
 *  struct Minus<T>							*
 ************************************************************************/
-template <class T>
 struct Minus
 {
-    using result_type = std::conditional_t<std::is_integral<T>::value, int, T>;
-    
-    result_type	operator ()(T x, T y) const
-		{
-		    return result_type(x) - result_type(y);
-		}
-};
-    
-#if defined(SIMD)
-template <class T>
-struct Minus<simd::vec<T> >
-{
-    using signed_type	= std::make_signed_t<T>;
-    using result_type	= simd::vec<signed_type>;
+    template <class T>
+    using result_t = std::conditional_t<std::is_integral<T>::value, int, T>;
 
-    result_type	operator ()(simd::vec<T> x, simd::vec<T> y) const
+    template <class T>
+    result_t<T>	operator ()(T x, T y) const
 		{
+		    return result_t<T>(x) - result_t<T>(y);
+		}
+
+    template <class... T>
+    auto	operator ()(std::tuple<T...> x, std::tuple<T...> y) const
+		{
+		    return tuple_transform(x, y, Minus());
+		}
+
+#if defined(SIMD)
+    template <class T>
+    auto	operator ()(simd::vec<T> x, simd::vec<T> y) const
+		{
+		    using signed_type	= std::make_signed_t<T>;
+		    
 		    return simd::cast<signed_type>(x) -
 			   simd::cast<signed_type>(y);
 		}
-};
 #endif
-
-template <class HEAD, class... TAIL>
-struct Minus<std::tuple<HEAD, TAIL...> >
-{
-    typedef decltype(tuple_transform(
-			 std::declval<std::tuple<HEAD, TAIL...> >(),
-			 std::declval<std::tuple<HEAD, TAIL...> >(),
-			 Minus<HEAD>()))			result_type;
-
-    result_type	operator ()(const std::tuple<HEAD, TAIL...>& x,
-			    const std::tuple<HEAD, TAIL...>& y) const
-		{
-		    return tuple_transform(x, y, Minus<HEAD>());
-		}
 };
-
+    
 /************************************************************************
 *  struct Blend<T>							*
 ************************************************************************/
@@ -145,7 +139,7 @@ struct Blend
   private:
     const T	_alpha;
 };
-    
+
 /************************************************************************
 *  col2ptr(COL)								*
 ************************************************************************/

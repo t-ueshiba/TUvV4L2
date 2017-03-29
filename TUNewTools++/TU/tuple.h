@@ -316,12 +316,11 @@ class zip_iterator
 				      ::iterator_category,
 		      decltype(tuple_transform(std::declval<ITER_TUPLE>(),
 					       detail::generic_dereference()))>;
+    friend	class boost::iterator_core_access;
     
   public:
-    using		typename super::reference;
-    using		typename super::difference_type;
-    
-    friend class	boost::iterator_core_access;
+    using	typename super::reference;
+    using	typename super::difference_type;
 
   public:
     zip_iterator(ITER_TUPLE iter_tuple)
