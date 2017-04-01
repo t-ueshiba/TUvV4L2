@@ -20,8 +20,9 @@ namespace detail
   class store_proxy
   {
     public:
-      typedef iterator_value<ITER>	element_type;
-      typedef vec<element_type>		value_type;
+      using element_type = iterator_value<ITER>;
+      using value_type	 = decltype(load<ALIGNED>(std::declval<ITER>()));
+      
 	
     public:
       store_proxy(ITER iter)		:_iter(iter)			{}
@@ -137,75 +138,27 @@ class store_iterator
 			}
 };
 
-namespace detail
-{
-  template <bool ALIGNED>
-  struct storer
-  {
-      template <class ITER_> store_iterator<ITER_, ALIGNED>
-      operator ()(const ITER_& iter) const
-      {
-	  return store_iterator<ITER_, ALIGNED>(iter);
-      }
-  };
-}	// namespace detail
-
-template <class ITER_TUPLE, bool ALIGNED>
-class store_iterator<zip_iterator<ITER_TUPLE>, ALIGNED>
-    : public zip_iterator<decltype(tuple_transform(std::declval<ITER_TUPLE>(),
-						   detail::storer<ALIGNED>()))>
-{
-  private:
-    using super = zip_iterator<decltype(tuple_transform(
-					    std::declval<ITER_TUPLE>(),
-					    detail::storer<ALIGNED>()))>;
-
-    struct load
-    {
-	template <class ITER_> auto
-	operator ()(const ITER_& iter) const -> decltype(iter())
-	{
-	    return iter();
-	}
-    };
-
-  public:
-    using base_type	= ITER_TUPLE;
-    using value_type	= decltype(tuple_transform(std::declval<super>()
-						   .get_iterator_tuple(),
-						   load()));
-    
-  public:
-    store_iterator(zip_iterator<ITER_TUPLE> const& iter)
-	:super(tuple_transform(iter.get_iterator_tuple(),
-			       detail::storer<ALIGNED>()))		{}
-    store_iterator(super const& iter)	:super(iter)			{}
-
-    base_type	base() const
-		{
-		    return tuple_transform(super::get_iterator_tuple(),
-					   [](auto iter)
-					   { return iter.base(); });
-		}
-    
-    value_type	operator ()() const
-		{
-		    return tuple_transform(super::get_iterator_tuple(), load());
-		}
-};
-
-template <bool ALIGNED=false, class ITER> store_iterator<ITER, ALIGNED>
+template <bool ALIGNED=false, class ITER> inline store_iterator<ITER, ALIGNED>
 make_store_iterator(ITER iter)
 {
     return {iter};
 }
 
-template <bool ALIGNED=false, class T> store_iterator<T*, ALIGNED>
+template <bool ALIGNED=false, class T> inline store_iterator<T*, ALIGNED>
 make_store_iterator(vec<T>* p)
 {
     return {p};
 }
     
+template <bool ALIGNED=false, class ITER_TUPLE> inline auto
+make_store_iterator(zip_iterator<ITER_TUPLE> zip_iter)
+{
+    return make_zip_iterator(
+	       tuple_transform(zip_iter.get_iterator_tuple(),
+			       [](auto iter)
+			       { return make_store_iterator<ALIGNED>(iter); }));
+}
+
 }	// namespace simd
 }	// namespace TU
 #endif	// !__TU_SIMD_STORE_ITERATOR_H

@@ -127,7 +127,6 @@ template <class T, bool MASK=false, class... S> inline auto
 cvt_pack(const std::tuple<S...>& x)
 {
     return detail::rearrange(tuple_transform(x, detail::converter<T, MASK>()));
-  //return boost::tuples::cons_transform(detail::converter<T, MASK>(), x);
 }
 
 }	// namespace simd

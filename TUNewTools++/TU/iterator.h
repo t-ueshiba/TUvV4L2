@@ -304,12 +304,12 @@ namespace detail
   \param FUNC	変換を行う関数オブジェクトの型
   \param ITER	変換結果の代入先を指す反復子
 */
-template <class FUNC, class ITER, class VAL=boost::use_default>
+template <class FUNC, class ITER, class VAL=iterator_value<ITER> >
 class assignment_iterator
     : public boost::iterator_adaptor<assignment_iterator<FUNC, ITER, VAL>,
 				     ITER,
 				     VAL,
-				     boost::use_default,
+				     iterator_category<ITER>,
 				     detail::assignment_proxy<FUNC, ITER> >
 {
   private:
@@ -317,7 +317,7 @@ class assignment_iterator
 		      assignment_iterator,
 		      ITER,
 		      VAL,
-		      boost::use_default,
+		      iterator_category<ITER>,
 		      detail::assignment_proxy<FUNC, ITER> >;
     friend	class boost::iterator_core_access;
 
@@ -340,8 +340,10 @@ class assignment_iterator
     FUNC 	_func;	// 代入を可能にするためconstは付けない
 };
     
-template <class VAL=boost::use_default, class FUNC, class ITER>
-inline assignment_iterator<FUNC, ITER, VAL>
+template <class VAL=void, class FUNC, class ITER>
+inline assignment_iterator<FUNC, ITER,
+			   std::conditional_t<std::is_void<VAL>::value,
+					      iterator_value<ITER>, VAL> >
 make_assignment_iterator(const ITER& iter, const FUNC& func=FUNC())
 {
     return {iter, func};

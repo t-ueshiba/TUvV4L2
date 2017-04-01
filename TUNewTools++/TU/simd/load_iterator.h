@@ -71,58 +71,27 @@ class load_iterator
 			}
 };
 
-namespace detail
-{
-  template <bool ALIGNED>
-  struct loader
-  {
-      template <class ITER_> load_iterator<ITER_, ALIGNED>
-      operator ()(const ITER_& iter) const
-      {
-	  return load_iterator<ITER_, ALIGNED>(iter);
-      }
-  };
-}	// namespace detail
-    
-template <class ITER_TUPLE, bool ALIGNED>
-class load_iterator<zip_iterator<ITER_TUPLE>, ALIGNED>
-    : public zip_iterator<decltype(tuple_transform(std::declval<ITER_TUPLE>(),
-						   detail::loader<ALIGNED>()))>
-{
-  private:
-    using super = zip_iterator<decltype(tuple_transform(
-					    std::declval<ITER_TUPLE>(),
-					    detail::loader<ALIGNED>()))>;
-
-  public:
-    using base_type = ITER_TUPLE;
-    
-  public:
-    load_iterator(const zip_iterator<ITER_TUPLE>& iter)
-	:super(tuple_transform(iter.get_iterator_tuple(),
-			       detail::loader<ALIGNED>()))		{}
-    load_iterator(const super& iter)	:super(iter)			{}
-
-    base_type	base() const
-		{
-		    return tuple_transform(super::get_iterator_tuple(),
-					   [](auto iter)
-					   { return iter.base(); });
-		}
-};
-
-template <bool ALIGNED=false, class ITER> load_iterator<ITER, ALIGNED>
+template <bool ALIGNED=false, class ITER> inline load_iterator<ITER, ALIGNED>
 make_load_iterator(ITER iter)
 {
     return {iter};
 }
 
-template <bool ALIGNED=false, class T> load_iterator<const T*, ALIGNED>
+template <bool ALIGNED=false, class T> inline load_iterator<const T*, ALIGNED>
 make_load_iterator(const vec<T>* p)
 {
     return {p};
 }
-    
+
+template <bool ALIGNED=false, class ITER_TUPLE> inline auto
+make_load_iterator(zip_iterator<ITER_TUPLE> zip_iter)
+{
+    return make_zip_iterator(
+	       tuple_transform(zip_iter.get_iterator_tuple(),
+			       [](auto iter)
+			       { return make_load_iterator<ALIGNED>(iter); }));
+}
+
 }	// namespace simd
 }	// namespace TU
 #endif	// !__TU_SIMD_LOAD_ITERATOR_H

@@ -42,24 +42,6 @@ vec<T>	cvt(vec<S> x, vec<S> y)						;
 /************************************************************************
 *  Converting vec tuples						*
 ************************************************************************/
-namespace detail
-{
-  template <class T, bool HI, bool MASK>
-  struct generic_cvt
-  {
-      template <class S_>
-      vec<T>	operator ()(vec<S_> x) const
-		{
-		    return cvt<T, HI, MASK>(x);
-		}
-      template <class S_>
-      vec<T>	operator ()(vec<S_> x, vec<S_> y) const
-		{
-		    return cvt<T, MASK>(x, y);
-		}
-  };
-}
-
 template <class T, bool HI=false, bool MASK=false, class... S> inline auto
 cvt(const std::tuple<S...>& t)
 {
@@ -82,40 +64,39 @@ namespace detail
   struct cvt_adjacent_type
   {
       using C = complementary_type<T>;		// targetのcomplementary
-      using I = typename std::conditional<std::is_integral<T>::value,
-					  T, C>::type;
-      using U = typename std::conditional<
+      using I = std::conditional_t<std::is_integral<T>::value, T, C>;
+      using U = std::conditional_t<
 		    (std::is_same<T, S>::value || std::is_same<C, S>::value),
 		    T,				// 直接target型に変換
-		    typename std::conditional<
+		    std::conditional_t<
 			std::is_same<I, upper_type<signed_type<S> > >::value,
-			I, upper_type<S> >::type>::type;
-      using L = typename std::conditional<
+			I, upper_type<S> > >;
+      using L = std::conditional_t<
 		    (std::is_integral<T>::value != std::is_integral<S>::value),
 		    complementary_type<S>,	// sourceのcomplementary
-		    typename std::conditional<
+		    std::conditional_t<
 			(std::is_same<T, S>::value ||
 			 std::is_same<upper_type<signed_type<T> >, S>::value),
-			T, lower_type<S> >::type>::type;
-      using A = typename std::conditional<
+			T, lower_type<S> > >;
+      using A = std::conditional_t<
 		    std::is_same<T, complementary_type<S> >::value,
-		    S, upper_type<signed_type<T> > >::type;
+		    S, upper_type<signed_type<T> > >;
   };
   template <class T, class S>
   struct cvt_adjacent_type<T, S, true>
   {
-      using U = typename std::conditional<
+      using U = std::conditional_t<
 		    (std::is_same<T, S>::value ||
 		     std::is_same<complementary_mask_type<T>, S>::value),
-		    T, upper_type<S> >::type;
-      using L = typename std::conditional<
+		    T, upper_type<S> >;
+      using L = std::conditional_t<
 		    (std::is_integral<T>::value != std::is_integral<S>::value),
 		    complementary_mask_type<S>,
-		    typename std::conditional<std::is_same<T, S>::value,
-					      T, lower_type<S> >::type>::type;
-      using A = typename std::conditional<
+		    std::conditional_t<std::is_same<T, S>::value,
+				       T, lower_type<S> > >;
+      using A = std::conditional_t<
 		    std::is_same<T, complementary_mask_type<S> >::value,
-		    S, upper_type<T> >::type;
+		    S, upper_type<T> >;
   };
 }
     

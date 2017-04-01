@@ -18,11 +18,6 @@ namespace TU
 template <class SCORE, class DISP>
 class SADStereo : public StereoBase<SADStereo<SCORE, DISP> >
 {
-  private:
-    template <class ITER>
-    using subiterator = iterator_t<tuple_decay_t<iterator_value<ITER> > >;
-
-    
   public:
     using Score			= SCORE;
     using Disparity		= DISP;
@@ -359,47 +354,47 @@ SADStereo<SCORE, DISP>::initializeDissimilarities(COL colL, COL colLe,
 						  COL_RV colRV,
 						  col_siterator colQ) const
 {
+    using left_t	= iterator_value<COL>;
 #if defined(SIMD)
-    using in_iterator	= decltype(simd::make_load_iterator(col2ptr(colRV)));
+    using diff_t	= Diff<simd::vec<left_t> >;
 #else
-    using in_iterator	= decltype(col2ptr(colRV));
+    using diff_t	= Diff<left_t>;
 #endif
-    using blend_type	= Blend<ScoreVec>;
-    
     if (_params.blend > 0)
     {
+	using blend_t	= Blend<ScoreVec>;
 #if defined(SIMD)
 	using qiterator	= simd::cvtup_iterator<
 			      assignment_iterator<
-				  blend_type, subiterator<col_siterator> > >;
+				  blend_t, subiterator<col_siterator> > >;
+	using ddiff_t	= Diff<simd::vec<std::make_signed_t<left_t> > >;
 #else
-	using qiterator	= assignment_iterator<blend_type,
+	using qiterator	= assignment_iterator<blend_t,
 					      subiterator<col_siterator> >;
+	using ddiff_t	= Diff<std::make_signed_t<left_t> >;
 #endif
 	while (++colL != colLe - 1)
 	{
 	    ++colRV;
 	    ++colQ;
 
-	    const Minus	minus;
 	    auto	P = make_zip_iterator(
 				std::make_tuple(
 				    boost::make_transform_iterator(
-					in_iterator(col2ptr(colRV)),
-					makeDiff(*colL,
-						 _params.intensityDiffMax)),
+					make_col_load_iterator(colRV),
+					diff_t(*colL,
+					       _params.intensityDiffMax)),
 				    boost::make_transform_iterator(
 					make_transform_iterator2(
-					    in_iterator(col2ptr(colRV) + 1),
-					    in_iterator(col2ptr(colRV) - 1),
-					    minus),
-					makeDiff(
-					    minus(*(colL + 1), *(colL - 1)),
-					    _params.derivativeDiffMax))));
+					    make_col_load_iterator(colRV) + 1,
+					    make_col_load_iterator(colRV) - 1,
+					    Minus()),
+					ddiff_t(*(colL + 1) - *(colL - 1),
+						_params.derivativeDiffMax))));
 	    for (qiterator Q( make_assignment_iterator(
-				  colQ->begin(), blend_type(_params.blend))),
+				  colQ->begin(), blend_t(_params.blend))),
 			   Qe(make_assignment_iterator(
-				  colQ->end(), blend_type(_params.blend)));
+				  colQ->end(), blend_t(_params.blend)));
 		 Q != Qe; ++Q, ++P)
 		*Q += *P;
 	}
@@ -413,8 +408,8 @@ SADStereo<SCORE, DISP>::initializeDissimilarities(COL colL, COL colLe,
 #endif
 	for (; colL != colLe; ++colL)
 	{
-	    const auto	diff = makeDiff(*colL, _params.intensityDiffMax);
-	    in_iterator	in(col2ptr(colRV));
+	    const auto	diff = diff_t(*colL, _params.intensityDiffMax);
+	    auto	in   = make_col_load_iterator(colRV);
 	    
 	    for (qiterator Q(colQ->begin()), Qe(colQ->end());
 		 Q != Qe; ++Q, ++in)
@@ -432,20 +427,25 @@ SADStereo<SCORE, DISP>::updateDissimilarities(COL colL,  COL colLe,
 					      COL colLp, COL_RV colRVp,
 					      col_siterator colQ) const
 {
+    using left_t	= iterator_value<COL>;
 #if defined(SIMD)
-    using in_iterator	= decltype(simd::make_load_iterator(col2ptr(colRV)));
+    using diff_t	= Diff<simd::vec<left_t> >;
 #else
-    using in_iterator	= decltype(col2ptr(colRV));
+    using diff_t	= Diff<left_t>;
 #endif
+
     if (_params.blend > 0)
     {
+	using blend_t	= Blend<ScoreVec>;
 #if defined(SIMD)
 	using qiterator	= simd::cvtup_iterator<
 			      assignment_iterator<
 				  ScoreUpdate, subiterator<col_siterator> > >;
+	using ddiff_t	= Diff<simd::vec<std::make_signed_t<left_t> > >;
 #else
 	using qiterator	= assignment_iterator<ScoreUpdate,
 					      subiterator<col_siterator> >;
+	using ddiff_t	= Diff<std::make_signed_t<left_t> >;
 #endif
 	while (++colL != colLe - 1)
 	{
@@ -454,33 +454,31 @@ SADStereo<SCORE, DISP>::updateDissimilarities(COL colL,  COL colLe,
 	    ++colRVp;
 	    ++colQ;
 
-	    const Minus	minus;
+	    const Minus	minus{};
 	    auto	P = make_zip_iterator(
 				std::make_tuple(
 				    boost::make_transform_iterator(
-					in_iterator(col2ptr(colRV)),
-					makeDiff(*colL,
-						  _params.intensityDiffMax)),
+					make_col_load_iterator(colRV),
+					diff_t(*colL,
+					       _params.intensityDiffMax)),
 				    boost::make_transform_iterator(
 					make_transform_iterator2(
-					    in_iterator(col2ptr(colRV) + 1),
-					    in_iterator(col2ptr(colRV) - 1),
-					    minus),
-					makeDiff(
-					    minus(*(colL + 1), *(colL - 1)),
-					    _params.derivativeDiffMax)),
+					    make_col_load_iterator(colRV) + 1,
+					    make_col_load_iterator(colRV) - 1,
+					    Minus()),
+					ddiff_t(*(colL + 1) - *(colL - 1),
+						_params.derivativeDiffMax)),
 				    boost::make_transform_iterator(
-					in_iterator(col2ptr(colRVp)),
-					makeDiff(*colLp,
-						  _params.intensityDiffMax)),
+					make_col_load_iterator(colRVp),
+					diff_t(*colLp,
+					       _params.intensityDiffMax)),
 				    boost::make_transform_iterator(
 					make_transform_iterator2(
-					    in_iterator(col2ptr(colRVp) + 1),
-					    in_iterator(col2ptr(colRVp) - 1),
-					    minus),
-					makeDiff(
-					    minus(*(colLp + 1),*(colLp - 1)),
-					    _params.derivativeDiffMax))));
+					    make_col_load_iterator(colRVp) + 1,
+					    make_col_load_iterator(colRVp) - 1,
+					    Minus()),
+					ddiff_t(*(colLp + 1) - *(colLp - 1),
+						_params.derivativeDiffMax))));
 	    for (qiterator Q( make_assignment_iterator(
 				  colQ->begin(), ScoreUpdate(_params.blend))),
 			   Qe(make_assignment_iterator(
@@ -498,9 +496,10 @@ SADStereo<SCORE, DISP>::updateDissimilarities(COL colL,  COL colLe,
 #endif
 	for (; colL != colLe; ++colL)
 	{
-	    const auto	diff_p = makeDiff(*colLp, _params.intensityDiffMax);
-	    const auto	diff_n = makeDiff(*colL,  _params.intensityDiffMax);
-	    in_iterator	in_p(col2ptr(colRVp)), in_n(col2ptr(colRV));
+	    const auto	diff_p = diff_t(*colLp, _params.intensityDiffMax);
+	    const auto	diff_n = diff_t(*colL,  _params.intensityDiffMax);
+	    auto	in_p   = make_col_load_iterator(colRVp);
+	    auto	in_n   = make_col_load_iterator(colRV);
 	
 	    for (qiterator Q(colQ->begin()), Qe(colQ->end());
 		 Q != Qe; ++Q, ++in_p, ++in_n)
@@ -529,7 +528,6 @@ SADStereo<SCORE, DISP>::computeDisparities(const_reverse_col_siterator colQ,
 	 boxR != boxRe; ++boxR)
     {
 #if defined(SIMD)
-	using diterator	= decltype(simd::make_store_iterator(col2ptr(dminRV)));
 	using mask_type	= simd::mask_type<Disparity>;
 #  if defined(WITHOUT_CVTDOWN)
 	using miterator	= simd::cvtdown_mask_iterator<
@@ -538,19 +536,18 @@ SADStereo<SCORE, DISP>::computeDisparities(const_reverse_col_siterator colQ,
 				  subiterator<const_col_siterator>,
 				  subiterator<RMIN_RV> > >;
 #  else
-	using miterator	= simd::mask_iterator<mask_type,
-				    subiterator<const_col_siterator>,
-				    subiterator<RMIN_RV> >;
+	using miterator	= simd::mask_iterator<
+			      mask_type,
+			      subiterator<const_col_siterator>,
+			      subiterator<RMIN_RV> >;
 #  endif
 #else
-	using diterator	= decltype(col2ptr(dminRV));
 	using miterator	= mask_iterator<subiterator<const_col_siterator>,
 					subiterator<RMIN_RV> >;
 #endif
-	using dvalue_type = tuple_decay_t<iterator_value<diterator> >;
 
 	Idx<DisparityVec>	index;
-	diterator		dminRVt(col2ptr(--dminRV));
+	auto			dminRVt = make_col_store_iterator(--dminRV);
 #if defined(SIMD) && defined(WITHOUT_CVTDOWN)
 	miterator	maskRV(make_mask_iterator(boxR->cbegin(),
 						  std::begin(*RminRV)));
@@ -563,8 +560,10 @@ SADStereo<SCORE, DISP>::computeDisparities(const_reverse_col_siterator colQ,
 	     maskRV != maskRVe; ++maskRV)
 #endif
 	{
-	  //*dminRVt = select(*maskRV, index, dvalue_type(*dminRVt));
-	    *dminRVt = fast_select(*maskRV, index, dvalue_type(*dminRVt));
+	    using dvalue_t = iterator_value<decltype(dminRVt)>;
+
+	  //*dminRVt = select(*maskRV, index, dvalue_t(*dminRVt));
+	    *dminRVt = fast_select(*maskRV, index, dvalue_t(*dminRVt));
 
 	    ++dminRVt;
 	    ++index;

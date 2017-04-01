@@ -21,14 +21,15 @@ namespace simd
 */
 template <class T, class ITER, bool MASK=false>
 class cvt_iterator
-    : public boost::iterator_adaptor<cvt_iterator<T, ITER, MASK>,
-				     ITER,
-				     pack_target<T, iterator_value<ITER> >,
-				     boost::single_pass_traversal_tag,
-				     pack_target<T, iterator_value<ITER> > >
+    : public boost::iterator_adaptor<
+		 cvt_iterator<T, ITER, MASK>,
+		 ITER,
+		 pack_target<T, decayed_iterator_value<ITER> >,
+		 boost::single_pass_traversal_tag,
+		 pack_target<T, decayed_iterator_value<ITER> > >
 {
   private:
-    using src_type	= iterator_value<ITER>;
+    using src_type	= decayed_iterator_value<ITER>;
     using dst_type	= pack_target<T, src_type>;
     using super		= boost::iterator_adaptor<
 			      cvt_iterator,
@@ -38,10 +39,10 @@ class cvt_iterator
 			      dst_type>;
 
   public:
-    using		typename super::difference_type;
-    using		typename super::reference;
+    using	typename super::difference_type;
+    using	typename super::reference;
 
-    friend class	boost::iterator_core_access;
+    friend	class boost::iterator_core_access;
 
   public:
 		cvt_iterator(const ITER& iter)	:super(iter)	{}
@@ -93,7 +94,7 @@ class cvt_iterator
 template <class T, class ITER> cvt_iterator<T, ITER>
 make_cvt_iterator(ITER iter)
 {
-    return cvt_iterator<T, ITER>(iter);
+    return {iter};
 }
 
 template <class T, class ITER>

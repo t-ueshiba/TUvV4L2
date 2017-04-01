@@ -6,8 +6,8 @@
 #define __TU_TUPLE_H
 
 #include <tuple>
-#include <boost/iterator/iterator_facade.hpp>
 #include <iostream>
+#include <boost/iterator/iterator_facade.hpp>
 
 namespace TU
 {
@@ -368,6 +368,27 @@ make_zip_iterator(ITER_TUPLE iter_tuple)
 {
     return {iter_tuple};
 }
+
+/************************************************************************
+*  type alias: decayed_iterator_value<ITER>				*
+************************************************************************/
+namespace detail
+{
+  template <class ITER>
+  struct decayed_iterator_value
+  {
+      using type = typename std::iterator_traits<ITER>::value_type;
+  };
+  template <class... ITER>
+  struct decayed_iterator_value<zip_iterator<std::tuple<ITER...> > >
+  {
+      using type = std::tuple<typename decayed_iterator_value<ITER>::type...>;
+  };
+}	// namespace detail
+
+template <class ITER>
+using decayed_iterator_value = typename detail::decayed_iterator_value<ITER>
+					      ::type;
 
 }	// namespace TU
 
@@ -777,26 +798,6 @@ namespace detail
 */
 template <class S, class T=void>
 using tuple_replace = typename detail::tuple_replace<T, S>::type;
-
-/************************************************************************
-*  type alias: tuple_decay_t<T>						*
-************************************************************************/
-namespace detail
-{
-  template <class T>
-  struct tuple_decay
-  {
-      using type = std::decay_t<T>;
-  };
-  template <class... T>
-  struct tuple_decay<std::tuple<T...> >
-  {
-      using type = std::tuple<std::decay_t<T>...>;
-  };
-}	// namespace detail
-
-template <class T>
-using tuple_decay_t = typename detail::tuple_decay<T>::type;
 
 }	// namespace TU
 #endif	// !__TU_TUPLE_H
