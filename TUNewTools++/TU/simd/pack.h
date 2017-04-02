@@ -99,7 +99,7 @@ namespace detail
   template <size_t I, class... T> inline auto
   get(const std::tuple<T...>& t)
   {
-      return tuple_transform(t, [](auto x){ return std::get<I>(x); });
+      return tuple_transform([](auto x){ return std::get<I>(x); }, t);
   }
 
   template <class T>
@@ -126,7 +126,7 @@ cvt_pack(const PACK& x)
 template <class T, bool MASK=false, class... S> inline auto
 cvt_pack(const std::tuple<S...>& x)
 {
-    return detail::rearrange(tuple_transform(x, detail::converter<T, MASK>()));
+    return detail::rearrange(tuple_transform(detail::converter<T, MASK>(), x));
 }
 
 }	// namespace simd

@@ -72,37 +72,37 @@ template <class T> vec<T>	diff(vec<T> x, vec<T> y)		;
 template <class... L, class... R> inline auto
 min(const std::tuple<L...>& l, const std::tuple<R...>& r)
 {
-    return tuple_transform(l, r, [](auto x, auto y){ return min(x, y); });
+    return tuple_transform([](auto x, auto y){ return min(x, y); }, l, r);
 }
 
 template <class... L, class... R> inline auto
 max(const std::tuple<L...>& l, const std::tuple<R...>& r)
 {
-    return tuple_transform(l, r, [](auto x, auto y){ return max(x, y); });
+    return tuple_transform([](auto x, auto y){ return max(x, y); }, l, r);
 }
 
 template <class... L, class... R> inline auto
 avg(const std::tuple<L...>& l, const std::tuple<R...>& r)
 {
-    return tuple_transform(l, r, [](auto x, auto y){ return avg(x, y); });
+    return tuple_transform([](auto x, auto y){ return avg(x, y); }, l, r);
 }
 
 template <class... L, class... R> inline auto
 sub_avg(const std::tuple<L...>& l, const std::tuple<R...>& r)
 {
-    return tuple_transform(l, r, [](auto x, auto y){ return sub_avg(x, y); });
+    return tuple_transform([](auto x, auto y){ return sub_avg(x, y); }, l, r);
 }
 
 template <class... L, class... R> inline auto
 abs(const std::tuple<L...>& l, const std::tuple<R...>& r)
 {
-    return tuple_transform(l, r, [](auto x, auto y){ return abs(x, y); });
+    return tuple_transform([](auto x, auto y){ return abs(x, y); }, l, r);
 }
 
 template <class... L, class... R> inline auto
 diff(const std::tuple<L...>& l, const std::tuple<R...>& r)
 {
-    return tuple_transform(l, r, [](auto x, auto y){ return diff(x, y); });
+    return tuple_transform([](auto x, auto y){ return diff(x, y); }, l, r);
 }
 
 }	// namespace simd

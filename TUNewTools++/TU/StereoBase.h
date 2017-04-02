@@ -89,7 +89,7 @@ struct Minus
     template <class... T>
     auto	operator ()(std::tuple<T...> x, std::tuple<T...> y) const
 		{
-		    return tuple_transform(x, y, Minus());
+		    return tuple_transform(Minus(), x, y);
 		}
 };
     
@@ -534,13 +534,13 @@ namespace simd
   {
       using namespace 	boost;
 
-      return make_tuple(select(get<0>(mask), index, get<0>(dminRV)),
-			select(get<1>(mask), index, get<1>(dminRV)));
+      return std::make_tuple(select(get<0>(mask), index, get<0>(dminRV)),
+			     select(get<1>(mask), index, get<1>(dminRV)));
   }
 }	// end of namespace simd
 #else
 template <class S, class T, class U> inline auto
-fast_select(const S& s, const T& x, const U& y) -> decltype(select(s, x, y))
+fast_select(const S& s, const T& x, const U& y)
 {
     return select(s, x, y);
 }
@@ -790,7 +790,7 @@ StereoBase<STEREO>::selectDisparities(DMIN dminL, DMIN dminLe, DMIN dminR,
 {
     typedef typename std::iterator_traits<COL_D>::value_type	DISP;
     
-    const Parameters&	params = _stereo.getParameters();
+    const auto&	params = _stereo.getParameters();
     
     if (params.doHorizontalBackMatch)
 	std::transform(dminL, dminLe, colD,
@@ -813,7 +813,7 @@ StereoBase<STEREO>::pruneDisparities(DMINV dminV,
     {
 	if (*colD != 0)
 	{
-	    const Parameters&	params = _stereo.getParameters();
+	    const auto&		params = _stereo.getParameters();
 	    const size_t	dL = params.disparityMax - size_t(*colD);
 	    const size_t	dV = *(dminV.operator ->() + dL);
 	    if (diff(dL, dV) > params.disparityInconsistency)

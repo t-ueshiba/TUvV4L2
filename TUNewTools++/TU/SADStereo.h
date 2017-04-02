@@ -560,7 +560,7 @@ SADStereo<SCORE, DISP>::computeDisparities(const_reverse_col_siterator colQ,
 	     maskRV != maskRVe; ++maskRV)
 #endif
 	{
-	    using dvalue_t = iterator_value<decltype(dminRVt)>;
+	    using dvalue_t = decayed_iterator_value<decltype(dminRVt)>;
 
 	  //*dminRVt = select(*maskRV, index, dvalue_t(*dminRVt));
 	    *dminRVt = fast_select(*maskRV, index, dvalue_t(*dminRVt));

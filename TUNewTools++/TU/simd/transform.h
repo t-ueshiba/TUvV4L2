@@ -180,8 +180,8 @@ namespace detail
 		std::enable_if_t<(N_ == vec<I>::size)>* = nullptr>
       auto	upArg_downResult(TUPLE_&& x)
 		{
-		    return downResult(_func(tuple_transform(
-						x, generic_downArg())));
+		    return downResult(_func(tuple_transform(generic_downArg(),
+							    x)));
 		}
       template <size_t N_, class TUPLE_,
 		std::enable_if_t<(N_ > vec<I>::size)>* = nullptr>
@@ -189,10 +189,10 @@ namespace detail
 		{
 		    const auto	y = upArg_downResult<N_/2>(
 					tuple_transform(
-					    x, generic_upArg<N_/2, false>()));
+					    generic_upArg<N_/2, false>(), x));
 		    const auto	z = upArg_downResult<N_/2>(
 					tuple_transform(
-					    x, generic_upArg<N_/2, true >()));
+					    generic_upArg<N_/2, true >(), x));
 		    return downResult(y, z);
 		}
 
@@ -201,7 +201,7 @@ namespace detail
       std::enable_if_t<(N_ == vec<I>::size && N_ > vec<O>::size)>
 		upArg(TUPLE_&& x)
 		{
-		    upResult(_func(tuple_transform(x, generic_downArg())));
+		    upResult(_func(tuple_transform(generic_downArg(), x)));
 		}
       template <size_t N_, class TUPLE_>
       std::enable_if_t<(N_ == vec<O>::size)>
@@ -214,10 +214,10 @@ namespace detail
       std::enable_if_t<(N_ > vec<I>::size && N_ > vec<O>::size)>
 		upArg(TUPLE_&& x)
 		{
-		    upArg<N_/2>(tuple_transform(
-				    x, generic_upArg<N_/2, false>()));
-		    upArg<N_/2>(tuple_transform(
-				    x, generic_upArg<N_/2, true >()));
+		    upArg<N_/2>(tuple_transform(generic_upArg<N_/2, false>(),
+						x));
+		    upArg<N_/2>(tuple_transform(generic_upArg<N_/2, true >(),
+						x));
 		}
 
     public:
@@ -232,8 +232,8 @@ namespace detail
 			    N = (max_size<ITER_TUPLE>::value > vec<O>::size ?
 				 max_size<ITER_TUPLE>::value : vec<O>::size);
 
-			upArg<N>(tuple_transform(
-				     _t, generic_upArg<N, false>()));
+			upArg<N>(tuple_transform(generic_upArg<N, false>(),
+						 _t));
 		    }
 		    return _out;
 		}

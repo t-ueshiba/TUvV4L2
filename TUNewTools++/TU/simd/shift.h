@@ -120,32 +120,32 @@ rotate_r(vec<T> x)
 template <size_t N, class... L, class... R> inline auto
 shift_r(const std::tuple<L...>& l, const std::tuple<R...>& r)
 {
-    return tuple_transform(l, r, [](auto x, auto y)
-				 { return shift_r<N>(x, y); });
+    return tuple_transform([](auto x, auto y){ return shift_r<N>(x, y); },
+			   l, r);
 }
 
 template <size_t N, class... T> inline auto
 shift_r(const std::tuple<T...>& t)
 {
-    return tuple_transform(t, [](auto x){ return shift_r<N>(x); });
+    return tuple_transform([](auto x){ return shift_r<N>(x); }, t);
 }
 
 template <size_t N, class... T> inline auto
 shift_l(const std::tuple<T...>& t)
 {
-    return tuple_transform(t, [](auto x){ return shift_l<N>(x); });
+    return tuple_transform([](auto x){ return shift_l<N>(x); }, t);
 }
 
 template <class... T> inline auto
 shift_lmost_to_rmost(const std::tuple<T...>& t)
 {
-    return tuple_transform(t, [](auto x){ return shift_lmost_to_rmost(x); });
+    return tuple_transform([](auto x){ return shift_lmost_to_rmost(x); }, t);
 }
 
 template <class... T> inline auto
 shift_rmost_to_lmost(const std::tuple<T...>& t)
 {
-    return tuple_transform(t, [](auto x){ return shift_rmost_to_lmost(x); });
+    return tuple_transform([](auto x){ return shift_rmost_to_lmost(x); }, t);
 }
 
 }	// namespace simd

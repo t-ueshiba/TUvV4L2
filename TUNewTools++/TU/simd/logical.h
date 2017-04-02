@@ -29,8 +29,8 @@ vec<T>::andnot(vec<T> x)	{ return *this = simd::andnot(x, *this); }
 template <class... L, class... R> inline auto
 andnot(const std::tuple<L...>& l, const std::tuple<R...>& r)
 {
-    return tuple_transform(l, r, [](const auto& x, const auto& y)
-				 { return andnot(x, y); });
+    return tuple_transform([](const auto& x, const auto& y)
+			   { return andnot(x, y); }, l, r);
 }
 
 }	// namespace simd

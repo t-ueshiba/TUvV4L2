@@ -154,9 +154,9 @@ template <bool ALIGNED=false, class ITER_TUPLE> inline auto
 make_store_iterator(zip_iterator<ITER_TUPLE> zip_iter)
 {
     return make_zip_iterator(
-	       tuple_transform(zip_iter.get_iterator_tuple(),
-			       [](auto iter)
-			       { return make_store_iterator<ALIGNED>(iter); }));
+	       tuple_transform([](auto iter)
+			       { return make_store_iterator<ALIGNED>(iter); },
+			       zip_iter.get_iterator_tuple()));
 }
 
 }	// namespace simd

@@ -45,14 +45,14 @@ vec<T>	cvt(vec<S> x, vec<S> y)						;
 template <class T, bool HI=false, bool MASK=false, class... S> inline auto
 cvt(const std::tuple<S...>& t)
 {
-    return tuple_transform(t, [](auto x){ return cvt<T, HI, MASK>(x); });
+    return tuple_transform([](auto x){ return cvt<T, HI, MASK>(x); }, t);
 }
     
 template <class T, bool MASK=false, class... S1, class... S2> inline auto
 cvt(const std::tuple<S1...>& l, const std::tuple<S2...>& r)
 {
-    return tuple_transform(l, r,
-			   [](auto x, auto y){ cvt<T, false, MASK>(x, y); });
+    return tuple_transform([](auto x, auto y){ return cvt<T, MASK>(x, y); },
+			   l, r);
 }
     
 /************************************************************************

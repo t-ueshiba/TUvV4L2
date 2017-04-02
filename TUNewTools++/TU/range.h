@@ -831,11 +831,10 @@ slice(RANGE&& r, size_t idx, INDICES... indices)
 template <size_t... SIZES, class ITER_TUPLE, class... ARGS> inline auto
 make_range(zip_iterator<ITER_TUPLE> zip_iter, ARGS... args)
 {
-    return tuple_transform(zip_iter.get_iterator_tuple(),
-			   [args...](auto iter)
+    return tuple_transform([args...](auto iter)
 			   {
 			       return make_range<SIZES...>(iter, args...);
-			   });
+			   }, zip_iter.get_iterator_tuple());
 }
     
 template <size_t... SIZES, class TUPLE, class... ARGS,
@@ -843,11 +842,11 @@ template <size_t... SIZES, class TUPLE, class... ARGS,
 inline auto
 slice(TUPLE&& t, ARGS... args)
 {
-    return tuple_transform(t, [args...](auto&& x)
-			      {
-				  return slice<SIZES...>(
-				      std::forward<decltype(x)>(x), args...);
-			      });
+    return tuple_transform([args...](auto&& x)
+			   {
+			       return slice<SIZES...>(
+				   std::forward<decltype(x)>(x), args...);
+			   }, t);
 }
     
 /************************************************************************
