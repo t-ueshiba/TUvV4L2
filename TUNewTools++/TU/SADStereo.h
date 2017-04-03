@@ -272,28 +272,26 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 	
 	start(1);
 	if (rowL <= rowL0)
-	    initializeDissimilarities(std::cbegin(*rowL),
-				      std::cend(  *rowL),
+	    initializeDissimilarities(rowL->cbegin(), rowL->cend(),
 				      make_zip_iterator(
 					  std::make_tuple(
-					      std::cbegin(*rowR),
+					      rowR->cbegin(),
 					      make_vertical_iterator(rowV,
 								     cV))),
-				      std::begin(buffers->Q));
+				      buffers->Q.begin());
 	else
 	{
-	    updateDissimilarities(std::cbegin(*rowL),
-				  std::cend(  *rowL),
+	    updateDissimilarities(rowL->cbegin(), rowL->cend(),
 				  make_zip_iterator(
 				      std::make_tuple(
-					  std::cbegin(*rowR),
+					  rowR->cbegin(),
 					  make_vertical_iterator(rowV, cV))),
-				  std::cbegin(*rowLp),
+				  rowLp->cbegin(),
 				  make_zip_iterator(
 				      std::make_tuple(
-					  std::cbegin(*rowRp),
+					  rowRp->cbegin(),
 					  make_vertical_iterator(rowV, --cVp))),
-				  std::begin(buffers->Q));
+				  buffers->Q.begin());
 	    ++rowLp;
 	    ++rowRp;
 	}
@@ -302,24 +300,21 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 	{
 	    start(2);
 	    buffers->RminR = std::numeric_limits<Score>::max();
-	    computeDisparities(std::crbegin(buffers->Q),
-			       std::crend(  buffers->Q),
-			       std::rbegin( buffers->dminL),
-			       std::rbegin( buffers->delta),
+	    computeDisparities(buffers->Q.crbegin(), buffers->Q.crend(),
+			       buffers->dminL.rbegin(),
+			       buffers->delta.rbegin(),
 			       make_zip_iterator(
 				   std::make_tuple(
-				       std::end(buffers->dminR) - D + 1,
+				       buffers->dminR.end() - D + 1,
 				       make_vertical_iterator(
-					   std::end(buffers->dminV), v))),
+					   buffers->dminV.end(), v))),
 			       make_zip_iterator(
 				   std::make_tuple(
 				       make_dummy_iterator(&(buffers->RminR)),
-				       std::rbegin(buffers->RminV))));
+				       buffers->RminV.rbegin())));
 	    start(3);
-	    selectDisparities(std::cbegin(buffers->dminL),
-			      std::cend(  buffers->dminL),
-			      std::cbegin(buffers->dminR),
-			      std::cbegin(buffers->delta),
+	    selectDisparities(buffers->dminL.cbegin(), buffers->dminL.cend(),
+			      buffers->dminR.cbegin(), buffers->delta.cbegin(),
 			      rowD->begin() + N/2);
 
 	    ++rowD;
