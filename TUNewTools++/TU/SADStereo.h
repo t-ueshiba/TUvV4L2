@@ -349,11 +349,11 @@ SADStereo<SCORE, DISP>::initializeDissimilarities(COL colL, COL colLe,
 						  COL_RV colRV,
 						  col_siterator colQ) const
 {
-    using left_t	= iterator_value<COL>;
+    using pixel_t	= iterator_value<COL>;
 #if defined(SIMD)
-    using diff_t	= Diff<simd::vec<left_t> >;
+    using diff_t	= Diff<simd::vec<pixel_t> >;
 #else
-    using diff_t	= Diff<left_t>;
+    using diff_t	= Diff<pixel_t>;
 #endif
     if (_params.blend > 0)
     {
@@ -362,11 +362,11 @@ SADStereo<SCORE, DISP>::initializeDissimilarities(COL colL, COL colLe,
 	using qiterator	= simd::cvtup_iterator<
 			      assignment_iterator<
 				  blend_t, subiterator<col_siterator> > >;
-	using ddiff_t	= Diff<simd::vec<std::make_signed_t<left_t> > >;
+	using ddiff_t	= Diff<simd::vec<std::make_signed_t<pixel_t> > >;
 #else
 	using qiterator	= assignment_iterator<blend_t,
 					      subiterator<col_siterator> >;
-	using ddiff_t	= Diff<std::make_signed_t<left_t> >;
+	using ddiff_t	= Diff<std::make_signed_t<pixel_t> >;
 #endif
 	while (++colL != colLe - 1)
 	{
@@ -422,11 +422,11 @@ SADStereo<SCORE, DISP>::updateDissimilarities(COL colL,  COL colLe,
 					      COL colLp, COL_RV colRVp,
 					      col_siterator colQ) const
 {
-    using left_t	= iterator_value<COL>;
+    using pixel_t	= iterator_value<COL>;
 #if defined(SIMD)
-    using diff_t	= Diff<simd::vec<left_t> >;
+    using diff_t	= Diff<simd::vec<pixel_t> >;
 #else
-    using diff_t	= Diff<left_t>;
+    using diff_t	= Diff<pixel_t>;
 #endif
 
     if (_params.blend > 0)
@@ -436,11 +436,11 @@ SADStereo<SCORE, DISP>::updateDissimilarities(COL colL,  COL colLe,
 	using qiterator	= simd::cvtup_iterator<
 			      assignment_iterator<
 				  ScoreUpdate, subiterator<col_siterator> > >;
-	using ddiff_t	= Diff<simd::vec<std::make_signed_t<left_t> > >;
+	using ddiff_t	= Diff<simd::vec<std::make_signed_t<pixel_t> > >;
 #else
 	using qiterator	= assignment_iterator<ScoreUpdate,
 					      subiterator<col_siterator> >;
-	using ddiff_t	= Diff<std::make_signed_t<left_t> >;
+	using ddiff_t	= Diff<std::make_signed_t<pixel_t> >;
 #endif
 	while (++colL != colLe - 1)
 	{
@@ -516,8 +516,6 @@ SADStereo<SCORE, DISP>::computeDisparities(const_reverse_col_siterator colQ,
 					   DMIN_RV dminRV,
 					   RMIN_RV RminRV) const
 {
-    const size_t	dsw1 = _params.disparitySearchWidth - 1;
-
   // 評価値を横方向に積算し，最小値を与える視差を双方向に探索する．
     for (const_reverse_col_sbox boxR(colQ, _params.windowSize), boxRe(colQe);
 	 boxR != boxRe; ++boxR)
@@ -540,18 +538,17 @@ SADStereo<SCORE, DISP>::computeDisparities(const_reverse_col_siterator colQ,
 	using miterator	= mask_iterator<subiterator<const_col_siterator>,
 					subiterator<RMIN_RV> >;
 #endif
-
 	Idx<DisparityVec>	index;
 	auto			dminRVt = make_col_store_iterator(--dminRV);
 #if defined(SIMD) && defined(WITHOUT_CVTDOWN)
 	miterator	maskRV(make_mask_iterator(boxR->cbegin(),
 						  std::begin(*RminRV)));
 	for (miterator maskRVe(make_mask_iterator(boxR->cend(),
-						  std::end(*RminRV)));
+						  std::begin(*RminRV)));
 	     maskRV != maskRVe; ++maskRV)
 #else
 	miterator	maskRV(boxR->cbegin(), std::begin(*RminRV));
-	for (miterator maskRVe(boxR->cend(), std::end(*RminRV));
+	for (miterator maskRVe(boxR->cend(), std::begin(*RminRV));
 	     maskRV != maskRVe; ++maskRV)
 #endif
 	{
@@ -564,15 +561,16 @@ SADStereo<SCORE, DISP>::computeDisparities(const_reverse_col_siterator colQ,
 	    ++index;
 	}
 #if defined(SIMD) && defined(WITHOUT_CVTDOWN)
-      	const int	dL = maskRV.base().dL();	// 左画像から見た視差
+      	const auto	dL = maskRV.base().dL();	// 左画像から見た視差
 #else
-      	const int	dL = maskRV.dL();		// 左画像から見た視差
+      	const auto	dL = maskRV.dL();		// 左画像から見た視差
 #endif
 #if defined(SIMD)
-	const Score*	R  = boxR->cbegin().base();
+	const auto	R  = boxR->cbegin().base();
 #else
-	const Score*	R  = boxR->cbegin();
+	const auto	R  = boxR->cbegin();
 #endif
+	const auto	dsw1 = _params.disparitySearchWidth - 1;
 	*dminL = dL;
 	*delta = (dL == 0 || dL == dsw1 ? 0 :
 		  0.5f * float(R[dL-1] - R[dL+1]) /
@@ -590,9 +588,9 @@ template <class SCORE, class DISP> void
 SADStereo<SCORE, DISP>::Buffers::initialize(size_t N, size_t D, size_t W)
 {
 #if defined(SIMD)
-    const size_t	DD = D / ScoreVec::size;
+    const auto	DD = D / ScoreVec::size;
 #else
-    const size_t	DD = D;
+    const auto	DD = D;
 #endif
     Q.resize(W, DD);			// Q(u, *; d)
     Q = 0;
