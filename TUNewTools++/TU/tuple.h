@@ -104,34 +104,6 @@ namespace detail
       return std::get<I>(x);
   }
     
-  template <class FUNC, class... TUPLES> inline void
-  tuple_for_each(std::index_sequence<>, FUNC, TUPLES&&...)
-  {
-  }
-  template <size_t I, size_t... IDX, class FUNC, class... TUPLES> inline void
-  tuple_for_each(std::index_sequence<I, IDX...>, FUNC f, TUPLES&&... x)
-  {
-      f(tuple_get<I>(x)...);
-      tuple_for_each(std::index_sequence<IDX...>(), f,
-		     std::forward<TUPLES>(x)...);
-  }
-}	// namespace detail
-    
-template <class FUNC, class TUPLE, class... TUPLES>
-inline std::enable_if_t<any_tuple<TUPLE, TUPLES...>::value>
-tuple_for_each(FUNC f, TUPLE&& x, TUPLES&&... y)
-{
-    detail::tuple_for_each(std::make_index_sequence<
-			       std::tuple_size<std::decay_t<TUPLE> >::value>(),
-			   f,
-			   std::forward<TUPLE>(x), std::forward<TUPLES>(y)...);
-}
-
-/************************************************************************
-*  tuple_transform(TUPLES..., FUNC)					*
-************************************************************************/
-namespace detail
-{
   template <class... T>
   struct first_tuple_size;
   template<>
@@ -160,6 +132,33 @@ namespace detail
 					 first_tuple_size<TAIL...>::value);
   };
     
+  template <class FUNC, class... TUPLES> inline void
+  tuple_for_each(std::index_sequence<>, FUNC, TUPLES&&...)
+  {
+  }
+  template <size_t I, size_t... IDX, class FUNC, class... TUPLES> inline void
+  tuple_for_each(std::index_sequence<I, IDX...>, FUNC f, TUPLES&&... x)
+  {
+      f(tuple_get<I>(x)...);
+      tuple_for_each(std::index_sequence<IDX...>(), f,
+		     std::forward<TUPLES>(x)...);
+  }
+}	// namespace detail
+    
+template <class FUNC, class... TUPLES>
+inline std::enable_if_t<any_tuple<TUPLES...>::value>
+tuple_for_each(FUNC f, TUPLES&&... x)
+{
+    detail::tuple_for_each(std::make_index_sequence<
+			       detail::first_tuple_size<TUPLES...>::value>(),
+			   f, std::forward<TUPLES>(x)...);
+}
+
+/************************************************************************
+*  tuple_transform(TUPLES..., FUNC)					*
+************************************************************************/
+namespace detail
+{
   template <class FUNC, class... TUPLES> inline auto
   tuple_transform(std::index_sequence<>, FUNC, TUPLES&&...)
   {
