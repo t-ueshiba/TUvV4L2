@@ -204,25 +204,6 @@ select(const std::tuple<S...>& s, const X& x, const Y& y)
 }
 
 /************************************************************************
-*  max/min								*
-************************************************************************/
-template <class X, class Y,
-	  std::enable_if_t<any_tuple<X, Y>::value>* = nullptr> inline auto
-max(const X& x, const Y& y)
-{
-    return tuple_transform([](const auto& u, const auto& v)
-			   { using std::max; return max(u, v); }, x, y);
-}
-
-template <class X, class Y,
-	  std::enable_if_t<any_tuple<X, Y>::value>* = nullptr> inline auto
-min(const X& x, const Y& y)
-{
-    return tuple_transform([](const auto& u, const auto& v)
-			   { using std::min; return min(u, v); }, x, y);
-}
-
-/************************************************************************
 *  class unarizer<FUNC>							*
 ************************************************************************/
 //! 引数をtupleにまとめることによって多変数関数を1変数関数に変換

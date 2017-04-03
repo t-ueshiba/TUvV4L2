@@ -147,12 +147,12 @@ Rectify::scaleHomographies(size_t widthL, size_t heightL, element_type scale)
 			       homogeneous(_H[0](widthL, 0)),
 			       homogeneous(_H[0](0,	 heightL)),
 			       homogeneous(_H[0](widthL, heightL))};
-    const auto		area = length(vector3_type((p[0] ^ p[1]) +
-						   (p[1] ^ p[2]) +
-						   (p[2] ^ p[0])))
-			     + length(vector3_type((p[1] ^ p[2]) +
-						   (p[2] ^ p[3]) +
-						   (p[3] ^ p[1])))/2;
+    const auto		area = (length(vector3_type((p[0] ^ p[1]) +
+						    (p[1] ^ p[2]) +
+						    (p[2] ^ p[0]))) +
+				length(vector3_type((p[1] ^ p[2]) +
+						    (p[2] ^ p[3]) +
+						    (p[3] ^ p[1]))))/2;
 
   // 変換前後の面積比がscaleに一致するように射影変換をスケーリングする．
     const auto		k = scale * sqrt(widthL*heightL / area);

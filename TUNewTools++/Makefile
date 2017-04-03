@@ -60,6 +60,11 @@ HDRS		= TU/Array++.h \
 		TU/Manip.h \
 		TU/Minimize.h \
 		TU/NDTree++.h \
+		TU/NEW/GFStereo.h \
+		TU/NEW/SADStereo.h \
+		TU/NEW/StereoBase.h \
+		TU/NEW/StereoIterators.h \
+		TU/NEW/StereoUtility.h \
 		TU/PM16C_04.h \
 		TU/Profiler.h \
 		TU/Quantizer.h \
@@ -70,6 +75,9 @@ HDRS		= TU/Array++.h \
 		TU/SeparableFilter2.h \
 		TU/Serial.h \
 		TU/SparseMatrix++.h \
+		TU/StereoBase.h \
+		TU/StereoIterators.h \
+		TU/StereoUtility.h \
 		TU/TreeFilter.h \
 		TU/TriggerGenerator.h \
 		TU/Vector++.h \
@@ -83,17 +91,20 @@ HDRS		= TU/Array++.h \
 		TU/YetPorted/FeatureMatch.h \
 		TU/YetPorted/GFStereo.h \
 		TU/YetPorted/Heap.h \
+		TU/YetPorted/ICIA.h \
 		TU/YetPorted/IntegralImage.h \
 		TU/YetPorted/Mesh++.h \
 		TU/YetPorted/Movie.h \
 		TU/YetPorted/Nurbs++.h \
 		TU/YetPorted/PSTree.h \
 		TU/YetPorted/Ransac.h \
+		TU/YetPorted/Rectify.h \
 		TU/YetPorted/SADStereo.h \
 		TU/YetPorted/SURFCreator.h \
 		TU/YetPorted/StereoBase.h \
 		TU/YetPorted/StereoIterators.h \
 		TU/YetPorted/StereoUtility.h \
+		TU/YetPorted/Warp.h \
 		TU/algorithm.h \
 		TU/fdstream.h \
 		TU/functional.h \
@@ -209,10 +220,10 @@ include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
 ColorConverter.o: TU/Image++.h TU/types.h TU/pair.h TU/Vector++.h \
-	TU/Array++.h TU/range.h TU/algorithm.h TU/tuple.h TU/iterator.h
+	TU/Array++.h TU/range.h TU/algorithm.h TU/iterator.h TU/tuple.h
 EdgeDetector.o: TU/EdgeDetector.h TU/Image++.h TU/types.h TU/pair.h \
-	TU/Vector++.h TU/Array++.h TU/range.h TU/algorithm.h TU/tuple.h \
-	TU/iterator.h TU/Geometry++.h TU/Minimize.h TU/simd/simd.h \
+	TU/Vector++.h TU/Array++.h TU/range.h TU/algorithm.h TU/iterator.h \
+	TU/tuple.h TU/Geometry++.h TU/Minimize.h TU/simd/simd.h \
 	TU/simd/config.h TU/simd/vec.h TU/simd/type_traits.h \
 	TU/simd/x86/type_traits.h TU/simd/arm/type_traits.h TU/simd/x86/vec.h \
 	TU/simd/x86/arch.h TU/simd/arm/vec.h TU/simd/arm/arch.h \
@@ -237,9 +248,9 @@ EdgeDetector.o: TU/EdgeDetector.h TU/Image++.h TU/types.h TU/pair.h \
 	TU/simd/shift_iterator.h TU/simd/BufTraits.h TU/simd/zero.h
 FIRGaussianCoefficients.o: TU/FIRGaussianConvolver.h TU/FIRFilter.h \
 	TU/SeparableFilter2.h TU/Array++.h TU/range.h TU/algorithm.h \
-	TU/tuple.h TU/iterator.h
+	TU/iterator.h TU/tuple.h
 GaussianCoefficients.o: TU/GaussianConvolver.h TU/Vector++.h TU/Array++.h \
-	TU/range.h TU/algorithm.h TU/tuple.h TU/iterator.h TU/IIRFilter.h \
+	TU/range.h TU/algorithm.h TU/iterator.h TU/tuple.h TU/IIRFilter.h \
 	TU/SeparableFilter2.h TU/simd/simd.h TU/simd/config.h TU/simd/vec.h \
 	TU/simd/type_traits.h TU/simd/x86/type_traits.h \
 	TU/simd/arm/type_traits.h TU/simd/x86/vec.h TU/simd/x86/arch.h \
@@ -264,16 +275,16 @@ GaussianCoefficients.o: TU/GaussianConvolver.h TU/Vector++.h TU/Array++.h \
 	TU/simd/shift_iterator.h TU/simd/BufTraits.h TU/simd/zero.h \
 	TU/Minimize.h
 GenericImage.o: TU/Image++.h TU/types.h TU/pair.h TU/Vector++.h \
-	TU/Array++.h TU/range.h TU/algorithm.h TU/tuple.h TU/iterator.h
+	TU/Array++.h TU/range.h TU/algorithm.h TU/iterator.h TU/tuple.h
 ImageBase.o: TU/Image++.h TU/types.h TU/pair.h TU/Vector++.h TU/Array++.h \
-	TU/range.h TU/algorithm.h TU/tuple.h TU/iterator.h TU/Camera++.h \
+	TU/range.h TU/algorithm.h TU/iterator.h TU/tuple.h TU/Camera++.h \
 	TU/Geometry++.h TU/Minimize.h TU/Manip.h
 PM16C_04.o: TU/PM16C_04.h TU/Serial.h TU/fdstream.h TU/types.h TU/Manip.h
 Random.o: TU/Random.h TU/types.h
 Rectify.o: TU/Rectify.h TU/Warp.h TU/Image++.h TU/types.h TU/pair.h \
-	TU/Vector++.h TU/Array++.h TU/range.h TU/algorithm.h TU/tuple.h \
-	TU/iterator.h TU/Camera++.h TU/Geometry++.h TU/Minimize.h \
-	TU/simd/simd.h TU/simd/config.h TU/simd/vec.h TU/simd/type_traits.h \
+	TU/Vector++.h TU/Array++.h TU/range.h TU/algorithm.h TU/iterator.h \
+	TU/tuple.h TU/Camera++.h TU/Geometry++.h TU/Minimize.h TU/simd/simd.h \
+	TU/simd/config.h TU/simd/vec.h TU/simd/type_traits.h \
 	TU/simd/x86/type_traits.h TU/simd/arm/type_traits.h TU/simd/x86/vec.h \
 	TU/simd/x86/arch.h TU/simd/arm/vec.h TU/simd/arm/arch.h \
 	TU/simd/allocator.h TU/simd/x86/allocator.h TU/simd/arm/allocator.h \

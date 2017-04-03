@@ -69,38 +69,44 @@ template <class T> vec<T>	diff(vec<T> x, vec<T> y)		;
 /************************************************************************
 *  Arithmetic operators for vec tuples					*
 ************************************************************************/
-template <class... L, class... R> inline auto
-min(const std::tuple<L...>& l, const std::tuple<R...>& r)
+template <class L, class R,
+	  std::enable_if_t<any_tuple<L, R>::value>* = nullptr> inline auto
+min(const L& l, const R& r)
 {
     return tuple_transform([](auto x, auto y){ return min(x, y); }, l, r);
 }
 
-template <class... L, class... R> inline auto
-max(const std::tuple<L...>& l, const std::tuple<R...>& r)
+template <class L, class R,
+	  std::enable_if_t<any_tuple<L, R>::value>* = nullptr> inline auto
+max(const L& l, const R& r)
 {
     return tuple_transform([](auto x, auto y){ return max(x, y); }, l, r);
 }
 
-template <class... L, class... R> inline auto
-avg(const std::tuple<L...>& l, const std::tuple<R...>& r)
+template <class L, class R,
+	  std::enable_if_t<any_tuple<L, R>::value>* = nullptr> inline auto
+avg(const L& l, const R& r)
 {
     return tuple_transform([](auto x, auto y){ return avg(x, y); }, l, r);
 }
 
-template <class... L, class... R> inline auto
-sub_avg(const std::tuple<L...>& l, const std::tuple<R...>& r)
+template <class L, class R,
+	  std::enable_if_t<any_tuple<L, R>::value>* = nullptr> inline auto
+sub_avg(const L& l, const R& r)
 {
     return tuple_transform([](auto x, auto y){ return sub_avg(x, y); }, l, r);
 }
 
-template <class... L, class... R> inline auto
-abs(const std::tuple<L...>& l, const std::tuple<R...>& r)
+template <class L, class R,
+	  std::enable_if_t<any_tuple<L, R>::value>* = nullptr> inline auto
+abs(const L& l, const R& r)
 {
     return tuple_transform([](auto x, auto y){ return abs(x, y); }, l, r);
 }
 
-template <class... L, class... R> inline auto
-diff(const std::tuple<L...>& l, const std::tuple<R...>& r)
+template <class L, class R,
+	  std::enable_if_t<any_tuple<L, R>::value>* = nullptr> inline auto
+diff(const L& l, const R& r)
 {
     return tuple_transform([](auto x, auto y){ return diff(x, y); }, l, r);
 }

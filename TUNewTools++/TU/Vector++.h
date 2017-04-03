@@ -1582,7 +1582,7 @@ BiDiagonal<T>::diagonalize()
 		}
 	    }
 
-    size_t l = min(_Dt.size() - 1, _Et.size());	// last index
+    const auto l = std::min(_Dt.size() - 1, _Et.size());	// last index
     for (size_t m = 0; m < l; ++m)	// ensure positivity of all singular
 	if (_diagonal[m] < 0.0)		// values except for the last one.
 	{
