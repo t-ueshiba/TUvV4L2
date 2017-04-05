@@ -54,15 +54,18 @@ class load_iterator
 			}
     void		advance(difference_type n)
 			{
-			    super::base_reference() += n * value_type::size;
+			    super::base_reference()
+				+= n * difference_type(value_type::size);
 			}
     void		increment()
 			{
-			    super::base_reference() += value_type::size;
+			    super::base_reference()
+				+= difference_type(value_type::size);
 			}
     void		decrement()
 			{
-			    super::base_reference() -= value_type::size;
+			    super::base_reference()
+				-= difference_type(value_type::size);
 			}
     difference_type	distance_to(load_iterator iter) const
 			{

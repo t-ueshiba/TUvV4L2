@@ -615,23 +615,20 @@ class range_iterator
 		}
     void	increment()
 		{
-		    std::advance(super::base_reference(),
-				 difference_type(stride()));
+		    super::base_reference() += difference_type(stride());
 		}
     void	decrement()
 		{
-		    std::advance(super::base_reference(),
-				 -difference_type(stride()));
+		    super::base_reference() -= difference_type(stride());
 		}
     void	advance(difference_type n)
 		{
-		    std::advance(super::base_reference(),
-				 n*difference_type(stride()));
+		    super::base_reference() += n*difference_type(stride());
 		}
     difference_type
 		distance_to(const range_iterator& iter) const
 		{
-		    return std::distance(super::base(), iter.base())
+		    return (iter.base() - super::base())
 			 / difference_type(stride());
 		}
 };
