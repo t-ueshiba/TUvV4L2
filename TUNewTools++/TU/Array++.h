@@ -19,41 +19,24 @@ template <class T>
 class external_allocator
 {
   public:
-    using value_type		= T;
-    using pointer		= T*;
-    using const_pointer		= const T*;
-    using reference		= T&;
-    using const_reference	= const T&;
-    using size_type		= size_t;
-    using difference_type	= ptrdiff_t;
+    using value_type	= T;
     
-    template <class T_>
-    struct rebind	{ using other = external_allocator<T_>; };
-
   public:
-			external_allocator(pointer p, size_type size)
-			    :_p(p), _size(size)				{}
+		external_allocator(T* p, std::size_t size)
+		    :_p(p), _size(size)					{}
 
-    pointer		allocate(size_type n,
-				 typename std::allocator<void>
-					     ::const_pointer=nullptr) const
-			{
-			    if (n > _size)
-				throw std::runtime_error("TU::external_allocator<T>::allocate(): too large memory requested!");
+    T*		allocate(std::size_t n)
+		{
+		    if (n > _size)
+			throw std::runtime_error("TU::external_allocator<T>::allocate(): too large memory requested!");
 			    
-			    return _p;
-			}
-    static void		deallocate(pointer, size_type)			{}
-    static void		construct(pointer p, const_reference val)	{}
-    static void		destroy(pointer p)				{}
-    constexpr size_type	max_size()		const	{ return _size; }
-    static pointer	address(reference r)		{ return &r; }
-    static const_pointer
-			address(const_reference r)	{ return &r; }
+		    return _p;
+		}
+    static void	deallocate(T*, std::size_t)				{}
 
   private:
-    const pointer	_p;
-    const size_type	_size;
+    T* const		_p;
+    const std::size_t	_size;
 };
     
 /************************************************************************
@@ -62,41 +45,39 @@ class external_allocator
 template <class T, class ALLOC>
 struct BufTraits
 {
-    using allocator_type = ALLOC;
-    using pointer	 = typename allocator_type::pointer;
-    using const_pointer	 = typename allocator_type::const_pointer;
-    using iterator	 = pointer;
-    using const_iterator = const_pointer;
+    using allocator_traits	= std::allocator_traits<ALLOC>;
+    using iterator		= typename allocator_traits::pointer;
+    using const_iterator	= typename allocator_traits::const_pointer;
     
   protected:
-    static pointer	null()
-			{
-			    return nullptr;
-			}
+    static auto	null()
+		{
+		    return nullptr;
+		}
     
     template <class IN_, class OUT_>
-    static OUT_		copy(IN_ in, IN_ ie, OUT_ out)
-			{
-			    return std::copy(in, ie, out);
-			}
+    static OUT_	copy(IN_ in, IN_ ie, OUT_ out)
+		{
+		    return std::copy(in, ie, out);
+		}
 
     template <class IN_, class OUT_>
-    static OUT_		copy(IN_ in, size_t n, OUT_ out)
-			{
-			    return std::copy_n(in, n, out);
-			}
+    static OUT_	copy(IN_ in, size_t n, OUT_ out)
+		{
+		    return std::copy_n(in, n, out);
+		}
 
     template <class T_>
-    static void		fill(iterator in, iterator ie, const T_& c)
-			{
-			    std::fill(in, ie, c);
-			}
+    static void	fill(iterator in, iterator ie, const T_& c)
+		{
+		    std::fill(in, ie, c);
+		}
 
     template <class T_>
-    static void		fill(iterator in, size_t n, const T_& c)
-			{
-			    std::fill_n(in, n, c);
-			}
+    static void	fill(iterator in, size_t n, const T_& c)
+		{
+		    std::fill_n(in, n, c);
+		}
 };
 
 /************************************************************************
@@ -145,15 +126,15 @@ class Buf : public BufTraits<T, ALLOC>
     template <size_t I_>
     using axis			= std::integral_constant<size_t, I_>;
     using super			= BufTraits<T, ALLOC>;
+    using allocator_traits	= typename super::allocator_traits;
     
   public:
     constexpr static size_t	D = 1 + sizeof...(SIZES);
 
     using sizes_type		= std::array<size_t, D>;
     using value_type		= T;
-    using allocator_type	= void;
-    using typename super::pointer;
-    using typename super::const_pointer;
+    using pointer		= typename allocator_traits::pointer;
+    using const_pointer		= typename allocator_traits::const_pointer;
 
   public:
   // 標準コンストラクタ/代入演算子およびデストラクタ
@@ -245,6 +226,7 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 {
   private:
     using super			= BufTraits<T, ALLOC>;
+    using allocator_traits	= typename super::allocator_traits;
     using base_iterator		= typename super::iterator;
     using const_base_iterator	= typename super::const_iterator;
     template <size_t I_>
@@ -255,9 +237,9 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 
     using sizes_type		= std::array<size_t, D>;
     using value_type		= T;
-    using typename super::allocator_type;
-    using typename super::pointer;
-    using typename super::const_pointer;
+    using allocator_type	= typename allocator_traits::allocator_type;
+    using pointer		= typename allocator_traits::pointer;
+    using const_pointer		= typename allocator_traits::const_pointer;
 
   public:
   // 標準コンストラクタ/代入演算子およびデストラクタ
@@ -388,9 +370,10 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 
     pointer	alloc(size_t siz)
 		{
-		    const auto	p = _allocator.allocate(siz);
+		    const auto	p = allocator_traits::allocate(_allocator, siz);
 		    for (pointer q = p, qe = q + siz; q != qe; ++q)
-			_allocator.construct(q, value_type());
+			allocator_traits::construct(_allocator,
+						    q, value_type());
 		    return p;
 		}
     void	free(pointer p, size_t siz)
@@ -398,8 +381,8 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 		    if (p != super::null())
 		    {
 			for (pointer q = p, qe = q + siz; q != qe; ++q)
-			    _allocator.destroy(q);
-			_allocator.deallocate(p, siz);
+			    allocator_traits::destroy(_allocator, q);
+			allocator_traits::deallocate(_allocator, p, siz);
 		    }
 		}
 

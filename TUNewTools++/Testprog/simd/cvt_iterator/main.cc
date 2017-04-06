@@ -15,12 +15,11 @@ doJob()
 {
     using namespace	std;
     
-    typedef SRC							src_type;
-    typedef DST							dst_type;
-    typedef cvt_iterator<dst_type,
-			 load_iterator<const src_type*> >	siterator;
-    typedef typename std::iterator_traits<siterator>::value_type
-								value_type;
+    using src_type	= SRC;
+    using dst_type	= DST;
+    using siterator	= cvt_iterator<dst_type,
+				       load_iterator<const src_type*> >;
+    using value_type	= typename std::iterator_traits<siterator>::value_type;
     
     src_type	src[] = { 0,  1,  2,  3,  4,  5,  6,  7,
 			  8,  9, 10, 11, 12, 13, 14, 15,
