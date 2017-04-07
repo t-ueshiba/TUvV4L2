@@ -536,7 +536,8 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 				  to_stride(unit, sizes...));
 		}
 
-    template <class E_, std::enable_if_t<rank<E_>() == D>* = nullptr>
+    template <class E_,
+	      std::enable_if_t<rank<E_>() == rank<array>()>* = nullptr>
 		array(const E_& expr)
 		    :super(sizes(expr, std::make_index_sequence<D>()))
 		{
@@ -544,7 +545,7 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 							TU::size0<E_>()>::value;
 		    copy<S>(std::begin(expr), size(), begin());
 		}
-    template <class E_> std::enable_if_t<rank<E_>() == D, array&>
+    template <class E_> std::enable_if_t<rank<E_>() == rank<array>(), array&>
 		operator =(const E_& expr)
 		{
 		    super::resize(sizes(expr, std::make_index_sequence<D>()));

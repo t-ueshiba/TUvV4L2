@@ -46,7 +46,7 @@ namespace detail
   {
     private:
       template <class T_, class S_>
-      typename std::enable_if<(vec<T_>::size == vec<S_>::size), vec<T_> >::type
+      std::enable_if_t<(vec<T_>::size == vec<S_>::size), vec<T_> >
       cvtadj(vec<S_> x) const
       {
 	  return cvt<T_, false, MASK>(x);

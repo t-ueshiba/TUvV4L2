@@ -30,36 +30,16 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
     using ScoreVec	= Score;
     using DisparityVec	= Disparity;
 #endif
-    using ScoreVecTuple	= std::tuple<ScoreVec, ScoreVec>;
-
-    struct GuideElement : public boost::additive<GuideElement>
-    {
-	GuideElement()	:g_sum(0), g_sqsum(0)				{}
-
-	GuideElement&	operator +=(const GuideElement& x)
-			{
-			    g_sum   += x.g_sum;
-			    g_sqsum += x.g_sqsum;
-			    return *this;
-			}
-	GuideElement&	operator -=(const GuideElement& x)
-			{
-			    g_sum   -= x.g_sum;
-			    g_sqsum -= x.g_sqsum;
-			    return *this;
-			}
-	
-	Score	g_sum;		//!< ガイド画素の和
-	Score	g_sqsum;	//!< ガイド画素の二乗和
-    };
-
+    using ScoreVec2	= Array<ScoreVec, 2>;
+    using GuideElement	= Array<Score, 2>;
+    
     struct init_params
     {
 	init_params(Score g)	:_g(g)					{}
 
-	ScoreVecTuple	operator ()(ScoreVec p) const
+	ScoreVec2	operator ()(ScoreVec p) const
 			{
-			    return ScoreVecTuple(p, _g * p);
+			    return ScoreVec2({p, _g * p});
 			}
 	
       private:
@@ -68,10 +48,12 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
 
     struct init_params2 : public init_params
     {
+	using argument_type	= std::tuple<ScoreVec, ScoreVec>;
+	
 	init_params2(Score g, Score blend)
 	    :init_params(g), _blend(blend)				{}
 	
-	ScoreVecTuple	operator ()(const ScoreVecTuple& pp) const
+	ScoreVec2	operator ()(const argument_type& pp) const
 			{
 			    return init_params::operator ()(_blend(pp));
 			}
@@ -82,13 +64,15 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
     
     struct update_params
     {
+	using argument_type	= std::tuple<ScoreVec, ScoreVec>;
+	
 	update_params(Score gn, Score gp)	:_gn(gn), _gp(gp)	{}
 
-	ScoreVecTuple	operator ()(ScoreVec pn, ScoreVec pp) const
+	ScoreVec2	operator ()(ScoreVec pn, ScoreVec pp) const
 			{
-			    return ScoreVecTuple(pn - pp, _gn * pn - _gp * pp);
+			    return ScoreVec2({pn - pp, _gn * pn - _gp * pp});
 			}
-	ScoreVecTuple	operator ()(const ScoreVecTuple& p) const
+	ScoreVec2	operator ()(const argument_type& p) const
 			{
 			    return (*this)(std::get<0>(p), std::get<1>(p));
 			}
@@ -106,7 +90,7 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
 	update_params2(Score gn, Score gp, Score blend)
 	    :update_params(gn, gp), _blend(blend)			{}
 
-	ScoreVecTuple	operator ()(const argument_type& p) const
+	ScoreVec2	operator ()(const argument_type& p) const
 			{
 			    using	std::get;
 
@@ -124,13 +108,11 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
 	init_coeffs(Score g_avg, Score g_sqavg, Score e)
 	    :_g_avg(g_avg), _g_rvar(1/(g_sqavg - g_avg*g_avg + e*e))	{}
 
-	ScoreVecTuple	operator ()(const ScoreVecTuple& params) const
+	ScoreVec2	operator ()(const ScoreVec2& params) const
 			{
-			    using	std::get;
-			    
-			    const auto	a = (get<1>(params) -
-					     get<0>(params)*_g_avg) * _g_rvar;
-			    return ScoreVecTuple(a, get<0>(params) - a*_g_avg);
+			    const auto	a = (params[1] - params[0]*_g_avg)
+					  * _g_rvar;
+			    return ScoreVec2({a, params[0] - a*_g_avg});
 			}
 
       private:
@@ -142,11 +124,9 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
     {
 	trans_guides(Score g) :_g(g)					{}
 
-	ScoreVec	operator ()(const ScoreVecTuple& coeffs) const
+	ScoreVec	operator ()(const ScoreVec2& coeffs) const
 			{
-			    using 	std::get;
-			    
-			    return (get<0>(coeffs) * _g + get<1>(coeffs));
+			    return coeffs[0] * _g + coeffs[1];
 			}
 	
       private:
@@ -155,24 +135,24 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
 
     using ScoreVecArray		= Array<ScoreVec>;
     using ScoreVecArray2	= Array2<ScoreVec>;
-    using ScoreVecTupleArray	= Array<ScoreVecTuple>;
-    using ScoreVecTupleArray2	= Array2<ScoreVecTuple>;
-    using ScoreVecTupleArray2Array
-				= Array<ScoreVecTupleArray2>;
-    using col_siterator		= typename ScoreVecTupleArray2::iterator;
-    using const_col_siterator	= typename ScoreVecTupleArray2::const_iterator;
+    using ScoreVec2Array	= Array<ScoreVec2>;
+    using ScoreVec2Array2	= Array2<ScoreVec2>;
+    using ScoreVec2Array2Array
+				= Array<ScoreVec2Array2>;
+    using col_siterator		= typename ScoreVec2Array2::iterator;
+    using const_col_siterator	= typename ScoreVec2Array2::const_iterator;
     using const_reverse_col_siterator
-			= typename ScoreVecTupleArray2::const_reverse_iterator;
-    using row_siterator		= typename ScoreVecTupleArray2Array::iterator;
+			= typename ScoreVec2Array2::const_reverse_iterator;
+    using row_siterator		= typename ScoreVec2Array2Array::iterator;
     using const_row_siterator
-			= typename ScoreVecTupleArray2Array::const_iterator;
+			= typename ScoreVec2Array2Array::const_iterator;
     using row_sring		= ring_iterator<row_siterator>;
     using row_sbox		= box_filter_iterator<row_sring>;
     using const_col_sbox	= box_filter_iterator<const_col_siterator,
-						      ScoreVecTupleArray>;
+						      ScoreVec2Array>;
     using const_reverse_col_sbox
 			= box_filter_iterator<const_reverse_col_siterator,
-					      ScoreVecTupleArray>;
+					      ScoreVec2Array>;
 
     using GuideArray		= Array<GuideElement>;
     using GuideArray2		= Array2<GuideElement>;
@@ -192,9 +172,9 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
 	void	initialize(size_t N, size_t D, size_t W)		;
 	void	initialize(size_t N, size_t D, size_t W, size_t H)	;
 	
-	ScoreVecTupleArray2		Q;	// W x D
+	ScoreVec2Array2		Q;	// W x D
 	GuideArray			F;	// 1 x W
-	ScoreVecTupleArray2Array	A;
+	ScoreVec2Array2Array	A;
 	DisparityArray			dminL;	// 1 x (W - N + 1)
 	FloatArray			delta;	// 1 x (W - N + 1)
 	DisparityArray			dminR;	// 1 x (W + D - 1)
@@ -591,8 +571,8 @@ GFStereo<SCORE, DISP>::initializeFilterParameters(COL colL, COL colLe,
 		 Q != Qe; ++Q, ++P)
 		*Q += *P;
 
-	    colF->g_sum   += pixL;
-	    colF->g_sqsum += pixL * pixL;
+	    (*colF)[0] += pixL;
+	    (*colF)[1] += pixL * pixL;
 	}
     }
     else
@@ -618,8 +598,8 @@ GFStereo<SCORE, DISP>::initializeFilterParameters(COL colL, COL colLe,
 		 Q != Qe; ++Q, ++in)
 		*Q += diff(*in);
 	    
-	    colF->g_sum   += pixL;
-	    colF->g_sqsum += pixL * pixL;
+	    (*colF)[0] += pixL;
+	    (*colF)[1] += pixL * pixL;
 	
 	    ++colRV;
 	    ++colQ;
@@ -696,8 +676,8 @@ GFStereo<SCORE, DISP>::updateFilterParameters(COL colL, COL colLe, COL_RV colRV,
 		 Q != Qe; ++Q, ++P)
 		*Q += *P;
 
-	    colF->g_sum   += (pixL - pixLp);
-	    colF->g_sqsum += (pixL * pixL - pixLp * pixLp);
+	    (*colF)[0] += (pixL - pixLp);
+	    (*colF)[1] += (pixL * pixL - pixLp * pixLp);
 	}
     }
     else
@@ -726,8 +706,8 @@ GFStereo<SCORE, DISP>::updateFilterParameters(COL colL, COL colLe, COL_RV colRV,
 		 Q != Qe; ++Q, ++in_p, ++in_n)
 		*Q += std::make_tuple(diff_n(*in_n), diff_p(*in_p));
 
-	    colF->g_sum   += (pixL - pixLp);
-	    colF->g_sqsum += (pixL * pixL - pixLp * pixLp);
+	    (*colF)[0] += (pixL - pixLp);
+	    (*colF)[1] += (pixL * pixL - pixLp * pixLp);
 
 	    ++colRV;
 	    ++colLp;
@@ -752,7 +732,7 @@ GFStereo<SCORE, DISP>::initializeFilterCoefficients(const_col_siterator colQ,
 	 boxR != boxRe; ++boxR)
     {
 	std::transform(boxR->cbegin(), boxR->cend(), colA->begin(),
-		       init_coeffs(boxG->g_sum/n, boxG->g_sqsum/n,
+		       init_coeffs((*boxG)[0]/n, (*boxG)[1]/n,
 				   _params.epsilon));
 	++boxG;
 	++colA;
@@ -851,9 +831,9 @@ GFStereo<SCORE, DISP>::Buffers::initialize(size_t N, size_t D, size_t W)
     const auto	DD = D;
 #endif
     Q.resize(W, DD);			// Q(u, *; d)
-    Q = ScoreVecTuple(0, 0);
+    Q = 0;
     F.resize(W);
-    F = GuideElement();
+    F = 0;
 
     A.resize(N + 1);
     for (auto& rowA : A)
