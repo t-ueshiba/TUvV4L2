@@ -27,7 +27,7 @@ class GuidedFilter : public BoxFilter
     struct init_params
     {
 	template <class IN_, class GUIDE_>
-	Params4	operator ()(std::tuple<IN_, GUIDE_> t) const
+	auto	operator ()(std::tuple<IN_, GUIDE_> t) const
 		{
 		    using	std::get;
 		    
@@ -35,7 +35,7 @@ class GuidedFilter : public BoxFilter
 				   get<0>(t)*get<1>(t), get<1>(t)*get<1>(t));
 		}
 	template <class IN_>
-	Params2	operator ()(IN_ p) const
+	auto	operator ()(IN_ p) const
 		{
 		    return Params2(p, p*p);
 		}
@@ -46,26 +46,24 @@ class GuidedFilter : public BoxFilter
       public:
 	init_coeffs(size_t n, guide_type e)	:_n(n), _sq_e(e*e)	{}
 	
-	void	operator ()(Coeffs& coeffs, const Params4& params) const
+	auto	operator ()(const Params4& params) const
 		{
 		    using 	std::get;
 
-		    get<0>(coeffs) = (_n*get<2>(params)
-				      -  get<0>(params)*get<1>(params))
-				   / (_n*(get<3>(params) + _n*_sq_e)
-				      -   get<1>(params)*get<1>(params));
-		    get<1>(coeffs) = (get<0>(params) -
-				      get<0>(coeffs)*get<1>(params))/_n;
+		    const auto	a = (_n*get<2>(params)
+				     -  get<0>(params)*get<1>(params))
+				  / (_n*(get<3>(params) + _n*_sq_e)
+				     -   get<1>(params)*get<1>(params));
+		    return Coeffs(a, (get<0>(params) - a*get<1>(params))/_n);
 		}
-	void	operator ()(Coeffs& coeffs, const Params2& params) const
+	auto	operator ()(const Params2& params) const
 		{
 		    using	std::get;
 		    
 		    const auto	var = _n*get<1>(params)
 				       - get<0>(params)*get<0>(params);
-		    get<0>(coeffs) = var/(var + _n*_n*_sq_e);
-		    get<1>(coeffs) = (get<0>(params) -
-				      get<0>(coeffs)*get<0>(params))/_n;
+		    const auto	a   = var/(var + _n*_n*_sq_e);
+		    return Coeffs(a, (get<0>(params) - a*get<0>(params))/_n);
 		}
 	
       private:

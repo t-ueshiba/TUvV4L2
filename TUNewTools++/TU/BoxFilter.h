@@ -17,7 +17,7 @@ namespace TU
 /*!
   \param ITER	コンテナ中の要素を指す定数反復子の型
 */
-template <class ITER, class T=iterator_value<ITER> >
+template <class ITER, class T=iterator_substance<ITER> >
 class box_filter_iterator
     : public boost::iterator_adaptor<box_filter_iterator<ITER, T>,
 				     ITER,			// base
@@ -111,7 +111,7 @@ class box_filter_iterator
 */
 template <class T=void, class ITER>
 box_filter_iterator<ITER, std::conditional_t<std::is_void<T>::value,
-					     iterator_value<ITER>, T> >
+					     iterator_substance<ITER>, T> >
 make_box_filter_iterator(ITER iter, size_t w=0)
 {
     return {iter, w};
@@ -270,8 +270,7 @@ class BoxFilter2 : public Filter2<BoxFilter2>
 template <class IN, class OUT> void
 BoxFilter2::convolveRows(IN ib, IN ie, OUT out) const
 {
-    using row_iterator	= box_filter_iterator<
-			      IN, Array<value_t<iterator_value<IN> > > >;
+    using row_iterator	= box_filter_iterator<IN>;
 
     if (std::distance(ib, ie) < rowWinSize())
 	throw std::runtime_error("BoxFilter2::convolveRows(): not enough rows!");

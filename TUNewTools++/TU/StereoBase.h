@@ -233,20 +233,18 @@ template <class ITER, class RV_ITER>
 class mask_iterator : public boost::iterator_adaptor<
 				 mask_iterator<ITER, RV_ITER>,
 				 ITER,
-				 tuple_replace<decayed_iterator_value<RV_ITER>,
-					       bool>,
+				 tuple_replace<iterator_value<RV_ITER>, bool>,
 				 boost::single_pass_traversal_tag,
-				 tuple_replace<decayed_iterator_value<RV_ITER>,
-					       bool> >
+				 tuple_replace<iterator_value<RV_ITER>, bool> >
 {
   private:
-    using rv_type	= decayed_iterator_value<RV_ITER>;
     using super		= boost::iterator_adaptor<
 			      mask_iterator,
 			      ITER,
-			      tuple_replace<rv_type, bool>,
+			      tuple_replace<iterator_value<RV_ITER>, bool>,
 			      boost::single_pass_traversal_tag,
-			      tuple_replace<rv_type, bool> >;
+			      tuple_replace<iterator_value<RV_ITER>, bool> >;
+    using rv_type	= decayed_iterator_value<RV_ITER>;
     using element_type	= tuple_head<rv_type>;
     
   public:

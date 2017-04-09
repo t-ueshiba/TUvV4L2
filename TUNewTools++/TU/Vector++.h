@@ -12,36 +12,6 @@ namespace TU
 /************************************************************************
 *  evaluation of opnodes						*
 ************************************************************************/
-namespace detail
-{
-  template <class E, bool=is_opnode<E>::value>
-  struct result_t
-  {
-      using type = E;		// E が opnode でなければ E そのもの
-  };
-  template <class E>
-  struct result_t<E, true>
-  {
-    private:
-      template <class T_, size_t SIZE_>
-      struct array_t
-      {
-	  using type = array<T_, std::allocator<T_>, SIZE_>;
-      };
-      template <class T_, size_t SIZE_, size_t... SIZES_>
-      struct array_t<array<T_, std::allocator<T_>, SIZES_...>, SIZE_>
-      {
-	  using type = array<T_, std::allocator<T_>, SIZE_, SIZES_...>;
-      };
-
-      using E1	 = typename result_t<TU::value_t<E> >::type;
-      
-    public:
-      using type = typename array_t<E1,
-				    (size0<E1>() == 0 ? 0 : size0<E>())>::type;
-  };
-}	// namespace detail
-
 //! 演算子の評価結果の型を返す
 /*!
   Eの型が演算子ならばその評価結果である配列の型を，rangeならばE自体を，
@@ -51,7 +21,8 @@ namespace detail
 template <class E>
 using result_t	= std::conditional_t<detail::is_opnode<E>::value ||
 				     detail::is_range<E>::value,
-				     typename detail::result_t<E>::type,
+				     typename detail::substance_t<
+					 E, detail::is_opnode>::type,
 				     const E&>;
 
 //! 配列式の評価結果を返す

@@ -21,7 +21,7 @@ ifeq ($(shell arch), armv7l)
 else ifeq ($(shell arch), aarch64)
   CPPFLAGS     += -DNEON
 else
-  CPPFLAGS     += -DSSE3
+#  CPPFLAGS     += -DSSE3
 #  CFLAGAS      += -march=sse4
 endif
 CCFLAGS		= $(CFLAGS)
@@ -49,6 +49,7 @@ HDRS		= TU/Array++.h \
 		TU/FIRFilter.h \
 		TU/FIRGaussianConvolver.h \
 		TU/Filter2.h \
+		TU/GFStereo.h \
 		TU/GaussianConvolver.h \
 		TU/Geometry++.h \
 		TU/GraphCuts.h \
@@ -60,11 +61,6 @@ HDRS		= TU/Array++.h \
 		TU/Manip.h \
 		TU/Minimize.h \
 		TU/NDTree++.h \
-		TU/NEW/GFStereo.h \
-		TU/NEW/SADStereo.h \
-		TU/NEW/StereoBase.h \
-		TU/NEW/StereoIterators.h \
-		TU/NEW/StereoUtility.h \
 		TU/PM16C_04.h \
 		TU/Profiler.h \
 		TU/Quantizer.h \
@@ -83,28 +79,6 @@ HDRS		= TU/Array++.h \
 		TU/Vector++.h \
 		TU/Warp.h \
 		TU/WeightedMedianFilter.h \
-		TU/YetPorted/Bezier++.h \
-		TU/YetPorted/CCSImage.h \
-		TU/YetPorted/ComplexImage.h \
-		TU/YetPorted/CorrectIntensity.h \
-		TU/YetPorted/Feature.h \
-		TU/YetPorted/FeatureMatch.h \
-		TU/YetPorted/GFStereo.h \
-		TU/YetPorted/Heap.h \
-		TU/YetPorted/ICIA.h \
-		TU/YetPorted/IntegralImage.h \
-		TU/YetPorted/Mesh++.h \
-		TU/YetPorted/Movie.h \
-		TU/YetPorted/Nurbs++.h \
-		TU/YetPorted/PSTree.h \
-		TU/YetPorted/Ransac.h \
-		TU/YetPorted/Rectify.h \
-		TU/YetPorted/SADStereo.h \
-		TU/YetPorted/SURFCreator.h \
-		TU/YetPorted/StereoBase.h \
-		TU/YetPorted/StereoIterators.h \
-		TU/YetPorted/StereoUtility.h \
-		TU/YetPorted/Warp.h \
 		TU/algorithm.h \
 		TU/fdstream.h \
 		TU/functional.h \

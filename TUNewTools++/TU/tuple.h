@@ -12,9 +12,14 @@
 namespace TU
 {
 /************************************************************************
-*  predicates: all<PRED, T>						*
+*  predicates: all<PRED, TUPLE>						*
 ************************************************************************/
-template <template <class> class PRED, class T>
+//! std::tuple の全要素型が指定された条件を満たすか判定する
+/*!
+  \param PRED	適用する述語
+  \param TUPLE	適用対象となる std::tuple
+*/ 
+template <template <class> class PRED, class TUPLE>
 struct all;
 template <template <class> class PRED>
 struct all<PRED, std::tuple<> >
@@ -29,21 +34,28 @@ struct all<PRED, std::tuple<HEAD, TAIL...> >
 };
 
 /************************************************************************
-*  predicates: has_begin<E>, all_has_begin<E>				*
+*  predicates: has_begin<T>, all_has_begin<T>				*
 ************************************************************************/
 namespace detail
 {
-  template <class E>
-  auto	has_begin(E&& x) -> decltype(std::begin(x), std::true_type())	;
+  template <class T>
+  auto	has_begin(T&& x) -> decltype(std::begin(x), std::true_type())	;
   auto	has_begin(...)	 -> std::false_type				;
 }	// namespace detail
 
-//! 式が反復子を持つか判定する
-template <class E>
-using has_begin		= decltype(detail::has_begin(std::declval<E>()));
+//! 与えられた型に std::begin() を適用できるか判定する
+/*!
+  \param T	判定対象となる型
+*/ 
+template <class T>
+using has_begin		= decltype(detail::has_begin(std::declval<T>()));
 
-template <class E>
-using all_has_begin	= all<has_begin, std::decay_t<E> >;
+//! 与えられた std::tuple の全要素の型に std::begin() を適用できるか判定する
+/*!
+  \param TUPLE	判定対象となる std::tuple 型
+*/ 
+template <class TUPLE>
+using all_has_begin	= all<has_begin, std::decay_t<TUPLE> >;
 
 /************************************************************************
 *  predicate: is_tuple<T>						*
@@ -54,19 +66,27 @@ namespace detail
   std::true_type	check_tuple(std::tuple<T...>)			;
   std::false_type	check_tuple(...)				;
 }	// namespace detail
-    
+
+//! 与えられた型が std::tuple であるか判定する
+/*!
+  \param T	判定対象となる型
+*/ 
 template <class T>
 using is_tuple		= decltype(detail::check_tuple(std::declval<T>()));
 
 /************************************************************************
 *  predicate: any_tuple<ARGS...>					*
 ************************************************************************/
+//! 少なくとも1つのテンプレート引数が std::tuple であるか判定する
+/*!
+  \param ARGS...	判定対象となる型の並び
+*/
 template <class... ARGS>
 struct any_tuple : std::false_type					{};
 template <class ARG, class... ARGS>
 struct any_tuple<ARG, ARGS...>
     : std::integral_constant<bool, (is_tuple<ARG>::value ||
-				    any_tuple<ARGS...>::value)>	{};
+				    any_tuple<ARGS...>::value)>		{};
     
 /************************************************************************
 *  make_reference_wrapper(T&&)						*
@@ -346,10 +366,16 @@ namespace detail
   };
 }	// namespace detail
 
+//! 反復子が指す型を返す．
+/*!
+  zip_iterator<ITER_TUPLE>::value_type はITER_TUPLE中の各反復子が指す値への
+  参照型のtupleであるが，decayed_iterator_value<zip_iterator<ITER_TUPLE> >は
+  ITER_TUPLE中の各反復子が指す値そのものの型のtupleを返す．
+  \param ITER	反復子
+*/
 template <class ITER>
 using decayed_iterator_value = typename detail::decayed_iterator_value<ITER>
 					      ::type;
-
 }	// namespace TU
 
 /*
@@ -697,14 +723,14 @@ using tuple_head = typename detail::tuple_head<T>::type;
 ************************************************************************/
 namespace detail
 {
-  template <class T, class S>
+  template <class S, class T>
   struct tuple_replace : std::conditional<std::is_void<T>::value, S, T>
   {
   };
-  template <class T, class... S>
-  struct tuple_replace<T, std::tuple<S...> >
+  template <class... S, class T>
+  struct tuple_replace<std::tuple<S...>, T>
   {
-      using type = std::tuple<typename tuple_replace<T, S>::type...>;
+      using type = std::tuple<typename tuple_replace<S, T>::type...>;
   };
 }	// namespace detail
     
@@ -714,7 +740,7 @@ namespace detail
   \param T	置換後の要素の型．voidならば置換しない．
 */
 template <class S, class T=void>
-using tuple_replace = typename detail::tuple_replace<T, S>::type;
+using tuple_replace = typename detail::tuple_replace<S, T>::type;
 
 }	// namespace TU
 #endif	// !__TU_TUPLE_H

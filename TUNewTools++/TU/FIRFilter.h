@@ -22,21 +22,26 @@ namespace TU
 template <size_t D, class COEFF, class ITER, class T=iterator_value<COEFF> >
 class fir_filter_iterator
     : public boost::iterator_adaptor<fir_filter_iterator<D, COEFF, ITER, T>,
-				     ITER, T, boost::forward_traversal_tag, T>
+				     ITER,
+				     T,
+				     boost::forward_traversal_tag,
+				     T>
 {
   private:
     template <size_t I_>
     using index		= std::integral_constant<size_t, I_>;
     using buf_type	= Array<T, D>;	// 初期値を0にするためstd::arrayは使わない
-    using super		= boost::iterator_adaptor<
-			      fir_filter_iterator, ITER, T,
-			      boost::forward_traversal_tag, T>;
+    using super		= boost::iterator_adaptor<fir_filter_iterator,
+						  ITER,
+						  T,
+						  boost::forward_traversal_tag,
+						  T>;
     
   public:
     using	typename super::value_type;
     using	typename super::reference;
 
-    friend class	boost::iterator_core_access;
+    friend	class boost::iterator_core_access;
 
   public:
 		fir_filter_iterator(const ITER& iter, COEFF c)
@@ -212,7 +217,7 @@ FIRFilter<D, T>::limits(T& limit0, T& limit1, T& limit2) const
 template <size_t D, class T> template <class IN, class OUT> OUT
 FIRFilter<D, T>::convolve(IN ib, IN ie, OUT out) const
 {
-    using value_type	= iterator_value<OUT>;
+    using value_type	= iterator_substance<OUT>;
     using citerator	= typename coeffs_type::const_iterator;
     
     return std::copy(make_fir_filter_iterator<D, value_type>(ib, _c.begin()),

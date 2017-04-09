@@ -38,7 +38,7 @@ class SADStereo : public StereoBase<SADStereo<SCORE, DISP> >
     using const_reverse_col_siterator
 			= typename ScoreVecArray2::const_reverse_iterator;
     using const_reverse_col_sbox= box_filter_iterator<
-				    const_reverse_col_siterator, ScoreVecArray>;
+				      const_reverse_col_siterator>;
     using DisparityArray	= Array<Disparity>;
     using DisparityArray2	= Array2<Disparity>;
     using reverse_col_diterator	= typename DisparityArray::reverse_iterator;

@@ -211,7 +211,8 @@ class Buf : public BufTraits<T, ALLOC>
 		}
 
   private:
-    alignas(sizeof(T)) std::array<T, Capacity>	_a;
+  //alignas(sizeof(T)) std::array<T, Capacity>	_a;
+    std::array<T, Capacity>	_a;
 };
 
 //! 可変長多次元バッファクラス
@@ -537,7 +538,7 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 		}
 
     template <class E_,
-	      std::enable_if_t<rank<E_>() == rank<array>()>* = nullptr>
+	      std::enable_if_t<rank<E_>() == D + rank<T>()>* = nullptr>
 		array(const E_& expr)
 		    :super(sizes(expr, std::make_index_sequence<D>()))
 		{
@@ -545,7 +546,7 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 							TU::size0<E_>()>::value;
 		    copy<S>(std::begin(expr), size(), begin());
 		}
-    template <class E_> std::enable_if_t<rank<E_>() == rank<array>(), array&>
+    template <class E_> std::enable_if_t<rank<E_>() == D + rank<T>(), array&>
 		operator =(const E_& expr)
 		{
 		    super::resize(sizes(expr, std::make_index_sequence<D>()));
@@ -805,6 +806,44 @@ operator >>(std::istream& in, array<T, ALLOC, SIZE, SIZES...>& a)
 {
     return a.get(in);
 }
+
+/************************************************************************
+*  substance_t<E, PRED>							*
+************************************************************************/
+namespace detail
+{
+  template <class E, template <class> class PRED, bool=PRED<E>::value>
+  struct substance_t
+  {
+      using type = E;		// PRED<E>::value == false ならば E そのもの
+  };
+  template <class E, template <class> class PRED>
+  struct substance_t<E, PRED, true>
+  {
+    private:
+      template <class T_, size_t SIZE_>
+      struct array_t
+      {
+	  using type = array<T_, std::allocator<T_>, SIZE_>;
+      };
+      template <class T_, size_t SIZE_, size_t... SIZES_>
+      struct array_t<array<T_, std::allocator<T_>, SIZES_...>, SIZE_>
+      {
+	  using type = array<T_, std::allocator<T_>, SIZE_, SIZES_...>;
+      };
+
+      using E1	 = typename substance_t<TU::value_t<E>, PRED>::type;
+      
+    public:
+      using type = typename array_t<E1,
+				    (size0<E1>() == 0 ? 0 : size0<E>())>::type;
+  };
+}	// namespace detail
+
+template <class ITER>
+using iterator_substance
+	  = typename detail::substance_t<decayed_iterator_value<ITER>,
+					 detail::is_range>::type;
 
 /************************************************************************
 *  type definitions for convenience					*

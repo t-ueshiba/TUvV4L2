@@ -30,16 +30,16 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
     using ScoreVec	= Score;
     using DisparityVec	= Disparity;
 #endif
-    using ScoreVec2	= Array<ScoreVec, 2>;
+    using ScoreVecTuple	= std::tuple<ScoreVec, ScoreVec>;
     using GuideElement	= Array<Score, 2>;
     
     struct init_params
     {
 	init_params(Score g)	:_g(g)					{}
 
-	ScoreVec2	operator ()(ScoreVec p) const
+	ScoreVecTuple	operator ()(ScoreVec p) const
 			{
-			    return ScoreVec2({p, _g * p});
+			    return {p, _g * p};
 			}
 	
       private:
@@ -48,12 +48,11 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
 
     struct init_params2 : public init_params
     {
-	using argument_type	= std::tuple<ScoreVec, ScoreVec>;
-	
 	init_params2(Score g, Score blend)
 	    :init_params(g), _blend(blend)				{}
 	
-	ScoreVec2	operator ()(const argument_type& pp) const
+	ScoreVecTuple	operator ()(std::tuple<const ScoreVec&,
+					       const ScoreVec&> pp) const
 			{
 			    return init_params::operator ()(_blend(pp));
 			}
@@ -64,15 +63,14 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
     
     struct update_params
     {
-	using argument_type	= std::tuple<ScoreVec, ScoreVec>;
-	
 	update_params(Score gn, Score gp)	:_gn(gn), _gp(gp)	{}
 
-	ScoreVec2	operator ()(ScoreVec pn, ScoreVec pp) const
+	ScoreVecTuple	operator ()(ScoreVec pn, ScoreVec pp) const
 			{
-			    return ScoreVec2({pn - pp, _gn * pn - _gp * pp});
+			    return {pn - pp, _gn * pn - _gp * pp};
 			}
-	ScoreVec2	operator ()(const argument_type& p) const
+	ScoreVecTuple	operator ()(std::tuple<const ScoreVec&,
+					       const ScoreVec&> p) const
 			{
 			    return (*this)(std::get<0>(p), std::get<1>(p));
 			}
@@ -84,19 +82,17 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
 
     struct update_params2 : public update_params
     {
-	using argument_type	= std::tuple<ScoreVec, ScoreVec,
-					     ScoreVec, ScoreVec>;
-
 	update_params2(Score gn, Score gp, Score blend)
 	    :update_params(gn, gp), _blend(blend)			{}
 
-	ScoreVec2	operator ()(const argument_type& p) const
+	ScoreVecTuple	operator ()(std::tuple<const ScoreVec&,
+					       const ScoreVec&,
+					       const ScoreVec&,
+					       const ScoreVec&> p) const
 			{
-			    using	std::get;
-
 			    return update_params::operator ()(
-				       _blend(get<0>(p), get<1>(p)),
-				       _blend(get<2>(p), get<3>(p)));
+				       _blend(std::get<0>(p), std::get<1>(p)),
+				       _blend(std::get<2>(p), std::get<3>(p)));
 			}
 
       private:
@@ -108,11 +104,12 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
 	init_coeffs(Score g_avg, Score g_sqavg, Score e)
 	    :_g_avg(g_avg), _g_rvar(1/(g_sqavg - g_avg*g_avg + e*e))	{}
 
-	ScoreVec2	operator ()(const ScoreVec2& params) const
+	ScoreVecTuple	operator ()(const ScoreVecTuple& params) const
 			{
-			    const auto	a = (params[1] - params[0]*_g_avg)
+			    const auto	a = (std::get<1>(params) -
+					     std::get<0>(params)*_g_avg)
 					  * _g_rvar;
-			    return ScoreVec2({a, params[0] - a*_g_avg});
+			    return {a, std::get<0>(params) - a*_g_avg};
 			}
 
       private:
@@ -124,9 +121,10 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
     {
 	trans_guides(Score g) :_g(g)					{}
 
-	ScoreVec	operator ()(const ScoreVec2& coeffs) const
+	ScoreVec	operator ()(const ScoreVecTuple& coeffs) const
 			{
-			    return coeffs[0] * _g + coeffs[1];
+			    return std::get<0>(coeffs) * _g
+				 + std::get<1>(coeffs);
 			}
 	
       private:
@@ -135,24 +133,22 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
 
     using ScoreVecArray		= Array<ScoreVec>;
     using ScoreVecArray2	= Array2<ScoreVec>;
-    using ScoreVec2Array	= Array<ScoreVec2>;
-    using ScoreVec2Array2	= Array2<ScoreVec2>;
-    using ScoreVec2Array2Array
-				= Array<ScoreVec2Array2>;
-    using col_siterator		= typename ScoreVec2Array2::iterator;
-    using const_col_siterator	= typename ScoreVec2Array2::const_iterator;
+    using ScoreVecTupleArray	= Array<ScoreVecTuple>;
+    using ScoreVecTupleArray2	= Array2<ScoreVecTuple>;
+    using ScoreVecTupleArray2Array
+				= Array<ScoreVecTupleArray2>;
+    using col_siterator		= typename ScoreVecTupleArray2::iterator;
+    using const_col_siterator	= typename ScoreVecTupleArray2::const_iterator;
     using const_reverse_col_siterator
-			= typename ScoreVec2Array2::const_reverse_iterator;
-    using row_siterator		= typename ScoreVec2Array2Array::iterator;
+			= typename ScoreVecTupleArray2::const_reverse_iterator;
+    using row_siterator		= typename ScoreVecTupleArray2Array::iterator;
     using const_row_siterator
-			= typename ScoreVec2Array2Array::const_iterator;
+			= typename ScoreVecTupleArray2Array::const_iterator;
     using row_sring		= ring_iterator<row_siterator>;
     using row_sbox		= box_filter_iterator<row_sring>;
-    using const_col_sbox	= box_filter_iterator<const_col_siterator,
-						      ScoreVec2Array>;
+    using const_col_sbox	= box_filter_iterator<const_col_siterator>;
     using const_reverse_col_sbox
-			= box_filter_iterator<const_reverse_col_siterator,
-					      ScoreVec2Array>;
+			= box_filter_iterator<const_reverse_col_siterator>;
 
     using GuideArray		= Array<GuideElement>;
     using GuideArray2		= Array2<GuideElement>;
@@ -172,9 +168,9 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
 	void	initialize(size_t N, size_t D, size_t W)		;
 	void	initialize(size_t N, size_t D, size_t W, size_t H)	;
 	
-	ScoreVec2Array2		Q;	// W x D
+	ScoreVecTupleArray2		Q;	// W x D
 	GuideArray			F;	// 1 x W
-	ScoreVec2Array2Array	A;
+	ScoreVecTupleArray2Array	A;
 	DisparityArray			dminL;	// 1 x (W - N + 1)
 	FloatArray			delta;	// 1 x (W - N + 1)
 	DisparityArray			dminR;	// 1 x (W + D - 1)
@@ -831,7 +827,7 @@ GFStereo<SCORE, DISP>::Buffers::initialize(size_t N, size_t D, size_t W)
     const auto	DD = D;
 #endif
     Q.resize(W, DD);			// Q(u, *; d)
-    Q = 0;
+    Q = ScoreVecTuple(0, 0);
     F.resize(W);
     F = 0;
 

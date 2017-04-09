@@ -28,8 +28,7 @@ class iir_filter_iterator
 		iir_filter_iterator<D, FWD, COEFF, ITER, T>,	// self
 		ITER,						// base
 		T,						// value_type
-		boost::single_pass_traversal_tag,		// traversal
-		T>						// reference
+		boost::single_pass_traversal_tag>		// traversal
 {
   private:
     template <size_t D_, bool FWD_>
@@ -38,14 +37,16 @@ class iir_filter_iterator
     using index		= std::integral_constant<size_t, I_>;
     using buf_type	= Array<T, D>;	// 初期値を0にするためstd::arrayは使わない
     using super		= boost::iterator_adaptor<
-			      iir_filter_iterator, ITER, T,
-			      boost::single_pass_traversal_tag, T>;
+			      iir_filter_iterator,
+			      ITER,
+			      T,
+			      boost::single_pass_traversal_tag>;
 
   public:
-    typedef typename super::value_type	value_type;
-    typedef typename super::reference	reference;
+    using	typename super::value_type;
+    using	typename super::reference;
 
-    friend class	boost::iterator_core_access;
+    friend	class boost::iterator_core_access;
 
   public:
 		iir_filter_iterator(const ITER& iter, COEFF ci, COEFF co)
@@ -357,7 +358,7 @@ IIRFilter<D, T>::limitsB(T& limit0B, T& limit1B, T& limit2B) const
 template <size_t D, class T> template <class IN, class OUT> OUT
 IIRFilter<D, T>::forward(IN ib, IN ie, OUT out) const
 {
-    typedef iterator_value<OUT>		value_type;
+    using value_type	= iterator_substance<OUT>;
     
     return std::copy(make_iir_filter_iterator<D, true, value_type>(
 			 ib, _ci.begin(), _co.begin()),
@@ -376,7 +377,7 @@ IIRFilter<D, T>::forward(IN ib, IN ie, OUT out) const
 template <size_t D, class T> template <class IN, class OUT> OUT
 IIRFilter<D, T>::backward(IN ib, IN ie, OUT oe) const
 {
-    typedef iterator_value<OUT>		value_type;
+    using value_type	= iterator_substance<OUT>;
     
     return std::copy(make_iir_filter_iterator<D, false, value_type>(
 			 ib, _ci.rbegin(), _co.rbegin()),
@@ -563,20 +564,17 @@ BidirectionalIIRFilter<D, T>::limits(T& limit0, T& limit1, T& limit2) const
 template <size_t D, class T> template <class IN, class OUT> inline OUT
 BidirectionalIIRFilter<D, T>::convolve(IN ib, IN ie, OUT out) const
 {
-    typedef iterator_value<OUT>		value_type;
-    
     auto	oute = out;
     std::advance(oute, std::distance(ib, ie));
     
     _iirB.backward(std::reverse_iterator<IN>(ie),
 		   std::reverse_iterator<IN>(ib),
 		   std::reverse_iterator<OUT>(oute));
-    _iirF.forward(ib, ie, make_assignment_iterator<value_type>(
+    _iirF.forward(ib, ie, make_assignment_iterator(
 			      out, [](auto&& y, const auto& x){ y += x; }));
 
     return oute;
 }
-
 //! 与えられた長さの入力データ列に対する出力データ列の長さを返す
 /*!
   \param inLength	入力データ列の長さ
@@ -592,6 +590,7 @@ BidirectionalIIRFilter<D, T>::outLength(size_t inLength)
 *  class BidirectionalIIRFilter2<D, T>					*
 ************************************************************************/
 //! 2次元両側Infinite Inpulse Response Filterを表すクラス
+#if 1
 template <size_t D, class T=float>
 class BidirectionalIIRFilter2
     : public SeparableFilter2<BidirectionalIIRFilter<D, T> >
@@ -662,6 +661,98 @@ BidirectionalIIRFilter2<D, T>::initialize(const T cHF[], Order orderH,
 
     return *this;
 }
+#else
+template <size_t D, class T=float>
+class BidirectionalIIRFilter2
+{
+  private:
+    using biir_type	= BidirectionalIIRFilter<D, T>;
 
+  public:
+    using coeff_type	= typename biir_type::coeff_type;
+    using coeffs_type	= typename biir_type::coeffs_type;
+    using Order		= typename biir_type::Order;
+    
+  public:
+    BidirectionalIIRFilter2&
+			initialize(const T cHF[], const T cHB[],
+				   const T cVF[], const T cVB[])	;
+    BidirectionalIIRFilter2&
+			initialize(const T cHF[], Order orderH,
+				   const T cVF[], Order orderV)		;
+
+    const coeffs_type&	ciHF()		const	{ return _filterH.ciF(); }
+    const coeffs_type&	coHF()		const	{ return _filterH.coF(); }
+    const coeffs_type&	ciHB()		const	{ return _filterH.ciB(); }
+    const coeffs_type&	coHB()		const	{ return _filterH.coB(); }
+    const coeffs_type&	ciVF()		const	{ return _filterV.ciF(); }
+    const coeffs_type&	coVF()		const	{ return _filterV.coF(); }
+    const coeffs_type&	ciVB()		const	{ return _filterV.ciB(); }
+    const coeffs_type&	coVB()		const	{ return _filterV.coB(); }
+    size_t	grainSize()		const	{ return 1; }
+    void	setGrainSize(size_t gs)		{ }
+
+    template <class IN, class OUT>
+    void	convolve(IN ib, IN ie, OUT out)	const	;
+
+  private:
+    biir_type	_filterH;
+    biir_type	_filterV;
+};
+    
+//! フィルタのz変換係数をセットする
+/*!
+  \param cHF	横方向前進z変換係数
+  \param cHB	横方向後退z変換係数
+  \param cVF	縦方向前進z変換係数
+  \param cVB	縦方向後退z変換係数
+  \return	このフィルタ自身
+*/
+template <size_t D, class T> inline BidirectionalIIRFilter2<D, T>&
+BidirectionalIIRFilter2<D, T>::initialize(const T cHF[], const T cHB[],
+					  const T cVF[], const T cVB[])
+{
+    _filterH.initialize(cHF, cHB);
+    _filterV.initialize(cVF, cVB);
+
+    return *this;
+}
+
+//! フィルタのz変換係数をセットする
+/*!
+  \param cHF	横方向前進z変換係数
+  \param orderH 横方向微分階数
+  \param cVF	縦方向前進z変換係数
+  \param orderV	縦方向微分階数
+  \return	このフィルタ自身
+*/
+template <size_t D, class T> inline BidirectionalIIRFilter2<D, T>&
+BidirectionalIIRFilter2<D, T>::initialize(const T cHF[], Order orderH,
+					  const T cVF[], Order orderV)
+{
+    _filterH.initialize(cHF, orderH);
+    _filterV.initialize(cVF, orderV);
+
+    return *this;
+}
+
+template <size_t D, class T> template <class IN, class OUT> void
+BidirectionalIIRFilter2<D, T>::convolve(IN ib, IN ie, OUT out) const
+{
+    using buf_type = Array2<value_t<iterator_value<OUT> > >;
+
+    if (ib == ie)
+	return;
+    
+    buf_type	buf(std::distance(ib, ie), _filterH.outLength(std::size(*ib)));
+    _filterV.convolve(ib, ie, buf.begin());
+
+    for (const auto& row : buf)
+    {
+	_filterH.convolve(row.begin(), row.end(), out->begin());
+	++out;
+    }
+}
+#endif
 }
 #endif	// !__TU_IIRFILTER_H
