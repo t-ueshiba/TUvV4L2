@@ -41,7 +41,8 @@ class iir_filter_iterator
 			      ITER,
 			      T,
 			      boost::single_pass_traversal_tag>;
-
+    using val_is_array	= std::integral_constant<bool, size0<T>() == 0>;
+    
   public:
     using	typename super::value_type;
     using	typename super::reference;
@@ -88,6 +89,7 @@ class iir_filter_iterator
 		    {
 			_n = 1;
 			_ibuf[0] = *super::base();
+			resize_values(val_is_array());
 			_obuf[0] = inpro<0>(index<0>());
 			return _obuf[0];
 		    }
@@ -106,6 +108,7 @@ class iir_filter_iterator
 			_n = 1;
 			_obuf[0] = inpro<0>(index<0>());
 			_ibuf[0] = *super::base();
+			resize_values(val_is_array());
 			return _obuf[0];
 		    }
 		    else
@@ -123,6 +126,7 @@ class iir_filter_iterator
 		      case 0:
 			_n = 1;
 			_ibuf[0] = *super::base();
+			resize_values(val_is_array());
 			_obuf[0] = inpro<0>(index<0>());
 			return _obuf[0];
 		      case 1:
@@ -152,6 +156,7 @@ class iir_filter_iterator
 			_n = 1;
 			_obuf[0] = inpro<0>(index<0>());
 			_ibuf[0] = *super::base();
+			resize_values(val_is_array());
 			return _obuf[0];
 		      case 1:
 			_n = 2;
@@ -176,9 +181,18 @@ class iir_filter_iterator
     reference	dereference(selector<D_, true>) const
 		{
 		    const auto	n = _n;
-		    if (++_n == D)
-			_n = 0;
 		    _ibuf[n] = *super::base();
+		    switch (++_n)
+		    {
+		      case 1:
+			resize_values(val_is_array());
+			break;
+		      case D:
+			_n = 0;
+			break;
+		      default:
+			break;
+		    }
 		    return (_obuf[n] = (this->*_inpro[n])(index<0>()));
 		}
     template <size_t D_>
@@ -187,8 +201,17 @@ class iir_filter_iterator
 		    const auto	n = _n;
 		    _obuf[n] = (this->*_inpro[n])(index<0>());
 		    _ibuf[n] = *super::base();
-		    if (++_n == D)
+		    switch (++_n)
+		    {
+		      case 1:
+			resize_values(val_is_array());
+			break;
+		      case D:
 			_n = 0;
+			break;
+		      default:
+			break;
+		    }
 		    return _obuf[n];
 		}
 
@@ -216,6 +239,20 @@ class iir_filter_iterator
 		    constexpr size_t	Ji = (J + (FWD ? 1 : 0))%D;
 		    return _co[I_]*_obuf[J] + _ci[I_]*_ibuf[Ji]
 			 + inpro<N_>(index<I_+1>());
+		}
+
+    void	resize_values(std::true_type) const
+		{
+		    if (_ibuf[0].size() != _ibuf[D-1].size())
+		    {
+			for (size_t i = 1; i < D; ++i)
+			    _ibuf[i] = _ibuf[0];
+			for (size_t i = 0; i < D; ++i)
+			    _obuf[i] = _ibuf[0];
+		    }
+		}
+    void	resize_values(std::false_type) const
+		{
 		}
     
   private:
@@ -590,7 +627,7 @@ BidirectionalIIRFilter<D, T>::outLength(size_t inLength)
 *  class BidirectionalIIRFilter2<D, T>					*
 ************************************************************************/
 //! 2次元両側Infinite Inpulse Response Filterを表すクラス
-#if 1
+#if 0
 template <size_t D, class T=float>
 class BidirectionalIIRFilter2
     : public SeparableFilter2<BidirectionalIIRFilter<D, T> >
@@ -749,7 +786,7 @@ BidirectionalIIRFilter2<D, T>::convolve(IN ib, IN ie, OUT out) const
 
     for (const auto& row : buf)
     {
-	_filterH.convolve(row.begin(), row.end(), out->begin());
+	_filterH.convolve(row.cbegin(), row.cend(), std::begin(*out));
 	++out;
     }
 }
