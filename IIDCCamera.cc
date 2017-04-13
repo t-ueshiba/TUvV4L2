@@ -1686,7 +1686,7 @@ IIDCCamera::operator >>(Image<T>& image) const
       case YUV_444:
       {
 	auto	src = static_cast<const YUV444*>(_img);
-	for (auto& line : image)
+	for (auto&& line : image)
 	{
 	    std::copy_n(make_pixel_iterator(src), line.size(),
 			make_pixel_iterator(line.begin()));
@@ -1697,7 +1697,7 @@ IIDCCamera::operator >>(Image<T>& image) const
       case YUV_422:
       {
 	auto	src = static_cast<const YUV422*>(_img);
-	for (auto& line : image)
+	for (auto&& line : image)
 	{
 	    std::copy_n(make_pixel_iterator(src), line.size(),
 			make_pixel_iterator(line.begin()));
@@ -1708,7 +1708,7 @@ IIDCCamera::operator >>(Image<T>& image) const
       case YUV_411:
       {
 	auto	src = static_cast<const YUV411*>(_img);
-	for (auto& line : image)
+	for (auto&& line : image)
 	{
 	    std::copy_n(make_pixel_iterator(src), line.size(),
 			make_pixel_iterator(line.begin()));
@@ -1719,7 +1719,7 @@ IIDCCamera::operator >>(Image<T>& image) const
       case RGB_24:
       {
 	auto	src = static_cast<const RGB*>(_img);
-	for (auto& line : image)
+	for (auto&& line : image)
 	{
 	    std::copy_n(make_pixel_iterator(src), line.size(),
 			make_pixel_iterator(line.begin()));
@@ -1731,7 +1731,7 @@ IIDCCamera::operator >>(Image<T>& image) const
       case RAW_8:
       {
 	auto	src = static_cast<const u_char*>(_img);
-	for (auto& line : image)
+	for (auto&& line : image)
 	{
 	    std::copy_n(make_pixel_iterator(src), line.size(),
 			make_pixel_iterator(line.begin()));
@@ -1744,7 +1744,7 @@ IIDCCamera::operator >>(Image<T>& image) const
 	if (_littleEndian)
 	{
 	    auto	src = static_cast<const u_short*>(_img);
-	    for (auto& line : image)
+	    for (auto&& line : image)
 	    {
 		std::copy_n(make_pixel_iterator(src), line.size(),
 			    make_pixel_iterator(line.begin()));
@@ -1754,7 +1754,7 @@ IIDCCamera::operator >>(Image<T>& image) const
 	else
 	{
 	    auto	src = static_cast<const Mono16*>(_img);
-	    for (auto& line : image)
+	    for (auto&& line : image)
 	    {
 		std::copy_n(make_pixel_iterator(src), line.size(),
 			    make_pixel_iterator(line.begin()));
@@ -1766,7 +1766,7 @@ IIDCCamera::operator >>(Image<T>& image) const
 	if (_littleEndian)
 	{
 	    auto	src = static_cast<const short*>(_img);
-	    for (auto& line : image)
+	    for (auto&& line : image)
 	    {
 		std::copy_n(make_pixel_iterator(src), line.size(),
 			    make_pixel_iterator(line.begin()));
@@ -1776,7 +1776,7 @@ IIDCCamera::operator >>(Image<T>& image) const
 	else
 	{
 	    auto	src = static_cast<const Mono16*>(_img);
-	    for (auto& line : image)
+	    for (auto&& line : image)
 	    {
 		std::copy_n(make_pixel_iterator(src), line.size(),
 			    make_pixel_iterator(line.begin()));
@@ -1820,27 +1820,27 @@ IIDCCamera::captureRGBImage(Image<T>& image) const
 	switch (_bayer)
 	{
 	  case RGGB:
-	    bayerDecodeRGGB(make_flat_row_iterator(p, width()),
-			    make_flat_row_iterator(p + height()*width(),
-						   width()),
+	    bayerDecodeRGGB(make_range_iterator(p, width(), width()),
+			    make_range_iterator(p + height()*width(),
+						width(), width()),
 			    image.begin());
 	    break;
 	  case BGGR:
-	    bayerDecodeBGGR(make_flat_row_iterator(p, width()),
-			    make_flat_row_iterator(p + height()*width(),
-						   width()),
+	    bayerDecodeBGGR(make_range_iterator(p, width(), width()),
+			    make_range_iterator(p + height()*width(),
+						width(), width()),
 			    image.begin());
 	    break;
 	  case GRBG:
-	    bayerDecodeGRBG(make_flat_row_iterator(p, width()),
-			    make_flat_row_iterator(p + height()*width(),
-						   width()),
+	    bayerDecodeGRBG(make_range_iterator(p, width(), width()),
+			    make_range_iterator(p + height()*width(),
+						width(), width()),
 			    image.begin());
 	    break;
 	  case GBRG:
-	    bayerDecodeGBRG(make_flat_row_iterator(p, width()),
-			    make_flat_row_iterator(p + height()*width(),
-						   width()),
+	    bayerDecodeGBRG(make_range_iterator(p, width(), width()),
+			    make_range_iterator(p + height()*width(),
+						width(), width()),
 			    image.begin());
 	    break;
 	  default:
@@ -1858,27 +1858,27 @@ IIDCCamera::captureRGBImage(Image<T>& image) const
 	    switch (_bayer)
 	    {
 	      case RGGB:
-		bayerDecodeRGGB(make_flat_row_iterator(p, width()),
-				make_flat_row_iterator(p + height()*width(),
-						       width()),
+		bayerDecodeRGGB(make_range_iterator(p, width(), width()),
+				make_range_iterator(p + height()*width(),
+						    width(), width()),
 				image.begin());
 		break;
 	      case BGGR:
-		bayerDecodeBGGR(make_flat_row_iterator(p, width()),
-				make_flat_row_iterator(p + height()*width(),
-						       width()),
+		bayerDecodeBGGR(make_range_iterator(p, width(), width()),
+				make_range_iterator(p + height()*width(),
+						    width(), width()),
 				image.begin());
 		break;
 	      case GRBG:
-		bayerDecodeGRBG(make_flat_row_iterator(p, width()),
-				make_flat_row_iterator(p + height()*width(),
-						       width()),
+		bayerDecodeGRBG(make_range_iterator(p, width(), width()),
+				make_range_iterator(p + height()*width(),
+						    width(), width()),
 				image.begin());
 		break;
 	      case GBRG:
-		bayerDecodeGBRG(make_flat_row_iterator(p, width()),
-				make_flat_row_iterator(p + height()*width(),
-						       width()),
+		bayerDecodeGBRG(make_range_iterator(p, width(), width()),
+				make_range_iterator(p + height()*width(),
+						    width(), width()),
 				image.begin());
 		break;
 	      default:
@@ -1893,28 +1893,28 @@ IIDCCamera::captureRGBImage(Image<T>& image) const
 	    switch (_bayer)
 	    {
 	      case RGGB:
-		bayerDecodeRGGB(make_flat_row_iterator(p, width()),
-				make_flat_row_iterator(p + height()*width(),
-							  width()),
-				   image.begin());
+		bayerDecodeRGGB(make_range_iterator(p, width(), width()),
+				make_range_iterator(p + height()*width(),
+						    width(), width()),
+				image.begin());
 		break;
 	      case BGGR:
-		bayerDecodeBGGR(make_flat_row_iterator(p, width()),
-				   make_flat_row_iterator(p + height()*width(),
-							  width()),
-				   image.begin());
+		bayerDecodeBGGR(make_range_iterator(p, width(), width()),
+				make_range_iterator(p + height()*width(),
+						    width(), width()),
+				image.begin());
 		break;
 	      case GRBG:
-		bayerDecodeGRBG(make_flat_row_iterator(p, width()),
-				   make_flat_row_iterator(p + height()*width(),
-							  width()),
-				   image.begin());
+		bayerDecodeGRBG(make_range_iterator(p, width(), width()),
+				make_range_iterator(p + height()*width(),
+						    width(), width()),
+				image.begin());
 		break;
 	      case GBRG:
-		bayerDecodeGBRG(make_flat_row_iterator(p, width()),
-				   make_flat_row_iterator(p + height()*width(),
-							  width()),
-				   image.begin());
+		bayerDecodeGBRG(make_range_iterator(p, width(), width()),
+				make_range_iterator(p + height()*width(),
+						    width(), width()),
+				image.begin());
 		break;
 	      default:
 		*this >> image;
@@ -1981,29 +1981,29 @@ IIDCCamera::captureBayerRaw(void* image) const
 	switch (_bayer)
 	{
 	  case RGGB:
-	    bayerDecodeRGGB(make_flat_row_iterator(p, width()),
-			    make_flat_row_iterator(p + height()*width(),
-						   width()),
-			    make_flat_row_iterator(rgb, width()));
+	    bayerDecodeRGGB(make_range_iterator(p, width(), width()),
+			    make_range_iterator(p + height()*width(),
+						width(), width()),
+			    make_range_iterator(rgb, width(), width()));
 	    break;
 	  case BGGR:
-	    bayerDecodeBGGR(make_flat_row_iterator(p, width()),
-			    make_flat_row_iterator(p + height()*width(),
-						   width()),
-			    make_flat_row_iterator(rgb, width()));
+	    bayerDecodeBGGR(make_range_iterator(p, width(), width()),
+			    make_range_iterator(p + height()*width(),
+						width(), width()),
+			    make_range_iterator(rgb, width(), width()));
 	    break;
 
 	  case GRBG:
-	    bayerDecodeGRBG(make_flat_row_iterator(p, width()),
-			    make_flat_row_iterator(p + height()*width(),
-						   width()),
-			    make_flat_row_iterator(rgb, width()));
+	    bayerDecodeGRBG(make_range_iterator(p, width(), width()),
+			    make_range_iterator(p + height()*width(),
+						width(), width()),
+			    make_range_iterator(rgb, width(), width()));
 	    break;
 	  case GBRG:
-	    bayerDecodeGBRG(make_flat_row_iterator(p, width()),
-			    make_flat_row_iterator(p + height()*width(),
-						   width()),
-			    make_flat_row_iterator(rgb, width()));
+	    bayerDecodeGBRG(make_range_iterator(p, width(), width()),
+			    make_range_iterator(p + height()*width(),
+						width(), width()),
+			    make_range_iterator(rgb, width(), width()));
 	    break;
 	  default:
 	    for (int n = width() * height(); n-- > 0; )
@@ -2024,28 +2024,28 @@ IIDCCamera::captureBayerRaw(void* image) const
 	    switch (_bayer)
 	    {
 	      case RGGB:
-		bayerDecodeRGGB(make_flat_row_iterator(p, width()),
-				make_flat_row_iterator(p + height()*width(),
-						       width()),
-				make_flat_row_iterator(rgb, width()));
+		bayerDecodeRGGB(make_range_iterator(p, width(), width()),
+				make_range_iterator(p + height()*width(),
+						    width(), width()),
+				make_range_iterator(rgb, width(), width()));
 		break;
 	      case BGGR:
-		bayerDecodeBGGR(make_flat_row_iterator(p, width()),
-				make_flat_row_iterator(p + height()*width(),
-						       width()),
-				make_flat_row_iterator(rgb, width()));
+		bayerDecodeBGGR(make_range_iterator(p, width(), width()),
+				make_range_iterator(p + height()*width(),
+						    width(), width()),
+				make_range_iterator(rgb, width(), width()));
 		break;
 	      case GRBG:
-		bayerDecodeGRBG(make_flat_row_iterator(p, width()),
-				make_flat_row_iterator(p + height()*width(),
-						       width()),
-				make_flat_row_iterator(rgb, width()));
+		bayerDecodeGRBG(make_range_iterator(p, width(), width()),
+				make_range_iterator(p + height()*width(),
+						    width(), width()),
+				make_range_iterator(rgb, width(), width()));
 		break;
 	      case GBRG:
-		bayerDecodeGBRG(make_flat_row_iterator(p, width()),
-				make_flat_row_iterator(p + height()*width(),
-						       width()),
-				make_flat_row_iterator(rgb, width()));
+		bayerDecodeGBRG(make_range_iterator(p, width(), width()),
+				make_range_iterator(p + height()*width(),
+						    width(), width()),
+				make_range_iterator(rgb, width(), width()));
 		break;
 	      default:
 		for (int n = width() * height(); n-- > 0; )
@@ -2063,28 +2063,28 @@ IIDCCamera::captureBayerRaw(void* image) const
 	    switch (_bayer)
 	    {
 	      case RGGB:
-		bayerDecodeRGGB(make_flat_row_iterator(p, width()),
-				   make_flat_row_iterator(p + height()*width(),
-							  width()),
-				   make_flat_row_iterator(rgb, width()));
+		bayerDecodeRGGB(make_range_iterator(p, width(), width()),
+				make_range_iterator(p + height()*width(),
+						    width(), width()),
+				make_range_iterator(rgb, width(), width()));
 		break;
 	      case BGGR:
-		bayerDecodeBGGR(make_flat_row_iterator(p, width()),
-				   make_flat_row_iterator(p + height()*width(),
-							  width()),
-				   make_flat_row_iterator(rgb, width()));
+		bayerDecodeBGGR(make_range_iterator(p, width(), width()),
+				make_range_iterator(p + height()*width(),
+						    width(), width()),
+				make_range_iterator(rgb, width(), width()));
 		break;
 	      case GRBG:
-		bayerDecodeGRBG(make_flat_row_iterator(p, width()),
-				   make_flat_row_iterator(p + height()*width(),
-							  width()),
-				   make_flat_row_iterator(rgb, width()));
+		bayerDecodeGRBG(make_range_iterator(p, width(), width()),
+				make_range_iterator(p + height()*width(),
+						    width(), width()),
+				make_range_iterator(rgb, width(), width()));
 		break;
 	      case GBRG:
-		bayerDecodeGBRG(make_flat_row_iterator(p, width()),
-				   make_flat_row_iterator(p + height()*width(),
-							  width()),
-				   make_flat_row_iterator(rgb, width()));
+		bayerDecodeGBRG(make_range_iterator(p, width(), width()),
+				make_range_iterator(p + height()*width(),
+						    width(), width()),
+				make_range_iterator(rgb, width(), width()));
 		break;
 	      default:
 		for (int n = width() * height(); n-- > 0; )

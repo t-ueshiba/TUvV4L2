@@ -145,7 +145,7 @@ setFormat(CAMERAS&& cameras, u_int id, u_int val)
 inline bool
 setFormat(IIDCCamera& camera, u_int id, u_int val)
 {
-    return setFormat(make_range(&camera, &camera + 1), id, val);
+    return setFormat(make_range(&camera, 1), id, val);
 }
 
 template <class CAMERAS> auto
@@ -323,7 +323,7 @@ setFeature(CAMERAS&& cameras, u_int id, u_int val, float fval)
 inline bool
 setFeature(IIDCCamera& camera, u_int id, u_int val, float fval)
 {
-    return setFeature(make_range(&camera, &camera + 1), id, val, fval);
+    return setFeature(make_range(&camera, 1), id, val, fval);
 }
 
 bool
