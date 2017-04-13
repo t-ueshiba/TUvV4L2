@@ -27,9 +27,10 @@ else
 endif
 CCFLAGS		= $(CFLAGS)
 
-LIBS		= -lTUvIIDC++ -lTUIIDC++ -lTUOgl++ -lTUv++ -lTUTools++ \
+LIBS		= -lusb-1.0 \
+		  -lTUvIIDC++ -lTUIIDC++ -lTUOgl++ -lTUv++ -lTUTools++ \
 		  -lGLU -lGL -lXaw3d -lXt -lXext -lXmu -lX11 \
-		  -lraw1394 -lusb-1.0 -ltbb -ltbbmalloc
+		  -lraw1394 -ltbb -ltbbmalloc
 ifeq ($(shell arch), aarch64)
   LIBS	       += -ldrm
 endif

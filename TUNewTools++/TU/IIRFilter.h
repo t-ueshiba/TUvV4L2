@@ -627,7 +627,7 @@ BidirectionalIIRFilter<D, T>::outLength(size_t inLength)
 *  class BidirectionalIIRFilter2<D, T>					*
 ************************************************************************/
 //! 2次元両側Infinite Inpulse Response Filterを表すクラス
-#if 0
+#if 1
 template <size_t D, class T=float>
 class BidirectionalIIRFilter2
     : public SeparableFilter2<BidirectionalIIRFilter<D, T> >

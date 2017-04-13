@@ -50,10 +50,10 @@ class GuidedFilter : public BoxFilter
 		{
 		    using 	std::get;
 
-		    const auto	a = (_n*get<2>(params)
-				     -  get<0>(params)*get<1>(params))
-				  / (_n*(get<3>(params) + _n*_sq_e)
-				     -   get<1>(params)*get<1>(params));
+		    const auto	a = (_n*get<2>(params) -
+				     get<0>(params)*get<1>(params))
+				  / (_n*(get<3>(params) + _n*_sq_e) -
+				     get<1>(params)*get<1>(params));
 		    return Coeffs(a, (get<0>(params) - a*get<1>(params))/_n);
 		}
 	auto	operator ()(const Params2& params) const
@@ -61,7 +61,7 @@ class GuidedFilter : public BoxFilter
 		    using	std::get;
 		    
 		    const auto	var = _n*get<1>(params)
-				       - get<0>(params)*get<0>(params);
+				    - get<0>(params)*get<0>(params);
 		    const auto	a   = var/(var + _n*_n*_sq_e);
 		    return Coeffs(a, (get<0>(params) - a*get<0>(params))/_n);
 		}
@@ -104,15 +104,15 @@ class GuidedFilter : public BoxFilter
   public:
     GuidedFilter(size_t w, guide_type e) :super(w), _e(e)		{}
 
-    guide_type	epsilon()			const	{return _e;}
+    guide_type	epsilon()		const	{return _e;}
     GuidedFilter&
-		setEpsilon(guide_type e)		{ _e = e; return *this; }
+		setEpsilon(guide_type e)	{ _e = e; return *this; }
     
     template <class IN, class GUIDE, class OUT>
     void	convolve(IN ib, IN ie,
-			 GUIDE gb, GUIDE ge, OUT out)	const	;
+			 GUIDE gb, GUIDE ge, OUT out)		const	;
     template <class IN, class OUT>
-    void	convolve(IN ib, IN ie, OUT out)		const	;
+    void	convolve(IN ib, IN ie, OUT out)			const	;
 
     size_t	outLength(size_t inLen) const
 		{

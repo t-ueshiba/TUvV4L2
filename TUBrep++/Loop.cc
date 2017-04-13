@@ -126,7 +126,7 @@ Loop::detach()
     if (_parent)
     {
 	Loop	*child, *prev = 0;
-	for (ChildIterator iter(_parent); child = iter; ++iter)
+	for (ChildIterator iter(_parent); (child = iter); ++iter)
 	    if (child == this)
 	    {
 		if (prev)
@@ -189,12 +189,12 @@ Loop::involve(register const Point2<int>* p) const
     if (head() == 0)
 	return true;
 
-    register const int		v = (*p)[1];
-    register int		u_nearest = INT_MIN, u_sameside = INT_MIN;
-    register Geometry*	g = head()->geom();
+    const int	v = (*p)[1];
+    int		u_nearest = INT_MIN, u_sameside = INT_MIN;
+    Geometry*	g = head()->geom();
     do
     {
-	register PointB*	q = g->point();
+	PointB*	q = g->point();
 	if ((*q)[1] == v && u_nearest <= (*q)[0] && (*q)[0] <= (*p)[0])
 	{
 	    if ((*q)[0] == (*p)[0])
@@ -216,10 +216,10 @@ Loop::p2g(const Point2<int>* p)
 {
     if (head() != 0)
     {
-	register Geometry*	g = head()->geom();
+	Geometry*	g = head()->geom();
 	do
 	{
-	    if (*g->point() == *p)
+	    if (((*g->point())[0] == (*p)[0]) && ((*g->point())[1] == (*p)[1]))
 		return g;
 	} while ((g = g->next()) != head()->geom());
     }

@@ -183,7 +183,8 @@ struct RGB_ : public E, boost::additive<RGB_<E>,
     template <class E_>
     RGB_(const RGB_<E_>& p)		:E(p.r, p.g, p.b, p.a)		{}
     template <class T_,
-	      std::enable_if_t<std::is_arithmetic<T_>::value>* = nullptr>
+	      std::enable_if_t<std::is_convertible<T_, element_type>::value>*
+	      = nullptr>
     RGB_(const T_& p)
 	:E(element_type(p), element_type(p), element_type(p))		{}
     RGB_(const YUV444& p)						;
@@ -328,17 +329,19 @@ using BGRA = RGB_<detail::BGRA>;
 struct YUV444
 {
     using element_type = u_char;
-    
+
     YUV444(element_type yy=0, element_type uu=128, element_type vv=128)
-	:u(uu), y(yy), v(vv)						{}
+		    :u(uu), y(yy), v(vv)				{}
     template <class E>
     YUV444(const RGB_<E>& p)
-	:y(detail::colorConverter.y<element_type>(p.r, p.g, p.b))
+		    :y(detail::colorConverter.y<element_type>(p.r, p.g, p.b))
 		{
 		    u = detail::colorConverter.u(p.b, y);
 		    v = detail::colorConverter.v(p.r, y);
 		}
-    template <class T>
+    template <class T,
+	      std::enable_if_t<std::is_convertible<T, element_type>::value>*
+	      = nullptr>
     YUV444(const T& p)	:u(128), y(p), v(128)				{}
     
     template <class T,
@@ -460,7 +463,8 @@ struct YUV411
 
     YUV411(element_type yy0=0, element_type yy1=0, element_type xx=128)
 	:x(xx), y0(yy0), y1(yy1)					{}
-    template <class T>
+    template <class T,
+	      std::enable_if_t<std::is_arithmetic<T>::value>* = nullptr>
     YUV411(const T& p)	:x(128), y0(p), y1((&p)[1])			{}
 
     bool	operator ==(const YUV411& p)	const	{return (x  == p.x  &&

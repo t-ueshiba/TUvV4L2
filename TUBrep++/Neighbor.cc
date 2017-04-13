@@ -70,6 +70,7 @@ Neighbor::onLoop(const Loop* l)
     while ((g = g->next()) != l->head()->geom());
 
     if (i >= 0 && nbr[i].ge->next() == nbr[0].gs)
+    {
 	if (i > 0)
 	{
 	    nbr[0].gs = nbr[i].gs;
@@ -81,7 +82,8 @@ Neighbor::onLoop(const Loop* l)
 	    nbr[0].gs = nbr[0].ge;
 	    nbr[0].ge = tmp;
 	}
-
+    }
+    
     for (int j = 0; j <= i; ++j)
 	if (!nbr[j].isreachable)
 	    _elm[_n++].set(nbr[j].gs, nbr[j].ge);

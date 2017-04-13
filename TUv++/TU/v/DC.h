@@ -50,7 +50,7 @@ class DC
   public:
     DC(size_t width, size_t height, float zoom)
 	:_width(width), _height(height), _zoom(zoom),
-	 _offset(0, 0), _layer(UNDERLAY), _pointStyle(DOT)		{}
+	 _offset({0, 0}), _layer(UNDERLAY), _pointStyle(DOT)		{}
     virtual		~DC()						;
     
     size_t		width()				const	{return _width;}

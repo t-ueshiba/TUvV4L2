@@ -314,19 +314,19 @@ class Neighbor
 inline int
 PointB::adj(const Point2<int>* p) const
 {
-    return Point2<int>::adj(*p);
+    return TU::adjacent(*this, *p);
 }
 
 inline int
 PointB::dir(const Point2<int>* p) const
 {
-    return Point2<int>::dir(*p);
+    return TU::direction(*this, *p);
 }
 
 inline int
 PointB::angle(const Point2<int>* p, Point2<int>* q) const
 {
-    return Point2<int>::angle(*p, *q);
+    return TU::angle(*p, *this, *q);
 }
 
 inline Root*

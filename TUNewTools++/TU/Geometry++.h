@@ -154,14 +154,14 @@ direction(const Point2<T>& p, const Point2<T>& q)
   \param p	2次元点
   \param q	2次元点
   \param r	2次元点
-  \return	q->p->rがなす角度を-180degから180degまでを8等分した
-		区間で表した-4から3までの整数値．特に，q, rの少なくとも
-		一方がこの点に一致するならば4
+  \return	p->q->rがなす角度を-180degから180degまでを8等分した
+		区間で表した-4から3までの整数値．特に，p, rの少なくとも
+		一方がqに一致するならば4
 */
 template <class T> int
 angle(const Point2<T>& p, const Point2<T>& q, const Point2<T>& r)
 {
-    int dq = q.dir(p), ang = p.dir(r);
+    int dq = direction(p, q), ang = direction(q, r);
     
     if (dq == 4 || ang == 4)
         return 4;

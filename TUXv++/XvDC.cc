@@ -72,12 +72,10 @@ XvDC::createXvImage(const Image<S>& image)
 
     for (size_t v = 0; v < image.height(); ++v)
     {
-	ImageLine<YUV422> imageLine((YUV422*)_xvimage->data +
-				    v * _xvimage->width,
-				    _xvimage->width);
+	const auto	dst = (YUV422*)_xvimage->data + v * _xvimage->width;
 	std::copy(make_pixel_iterator(image[v].cbegin()),
 		  make_pixel_iterator(image[v].cend()),
-		  make_pixel_iterator(imageLine.begin()));
+		  make_pixel_iterator(dst));
     }
 }
 

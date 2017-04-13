@@ -118,9 +118,9 @@ class Colormap
   // general stuffs
     enum Map		{Graymap, Signedmap, Colorcube};
 
-    Array2<Array<u_long> >	_pixels;
-    const Mode			_mode;
-    Map				_map;
+    Array2<u_long>	_pixels;
+    const Mode		_mode;
+    Map			_map;
 };
 
 inline Display*

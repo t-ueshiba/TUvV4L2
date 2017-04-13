@@ -971,7 +971,7 @@ GFStereo<SCORE, DISP>::computeDisparities(const_reverse_col_siterator colB,
 					  reverse_col_fiterator delta,
 					  DMIN_RV dminRV, RMIN_RV RminRV) const
 {
-    const size_t	n    = _params.windowSize * _params.windowSize;
+  //const size_t	n    = _params.windowSize * _params.windowSize;
     const size_t	dsw1 = _params.disparitySearchWidth - 1;
     ScoreVecArray	R(colB->size()/2);
     
