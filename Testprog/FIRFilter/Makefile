@@ -12,14 +12,15 @@ VPATH		=
 IDLS		=
 MOCHDRS		=
 
-INCDIRS		= -I../.. -I$(PREFIX)/include
+INCDIRS		= -I../..
 CPPFLAGS	= -DNDEBUG -DPROFILE -DUSE_TBB
 CFLAGS		= -O3
 NVCCFLAGS	= -g
 ifeq ($(shell arch), armv7l)
   CPPFLAGS     += -DNEON
 else
-  CPPFLAGS     += -DSSE3
+  CPPFLAGS     += -DAVX2
+  CFLAGS       += -march=core-avx2
 endif
 CCFLAGS		= $(CFLAGS)
 
