@@ -556,12 +556,12 @@ HyperPlane<T, D>::distance(const Array<T_, D_>& x) const -> element_type
 }
 
 template <class T> using LineP	= HyperPlane<T, 2>;	//!< 2次元空間中の直線
-template <class T> using PlaneP	= HyperPlane<T, 3>;	//!< 3次元空間中の平面
+template <class T> using PlaneP = HyperPlane<T, 3>;	//!< 3次元空間中の平面
 
-using LineP2f	= HyperPlane<Vector3f>;		//!< 2次元空間中のfloat型直線
-using LineP2d	= HyperPlane<Vector3d>;		//!< 2次元空間中のdouble型直線
-using PlaneP3f	= HyperPlane<Vector4f>;		//!< 3次元空間中のfloat型平面
-using PlaneP3d	= HyperPlane<Vector4d>;		//!< 3次元空間中のdouble型平面
+using LineP2f	= LineP<float>;			//!< 2次元空間中のfloat型直線
+using LineP2d	= LineP<double>;		//!< 2次元空間中のdouble型直線
+using PlaneP3f	= PlaneP<float>;		//!< 3次元空間中のfloat型平面
+using PlaneP3d	= PlaneP<double>;		//!< 3次元空間中のdouble型平面
 
 /************************************************************************
 *  class Projectivity<T, DO, DI>					*
