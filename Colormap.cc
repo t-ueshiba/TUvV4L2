@@ -154,7 +154,7 @@ Colormap::Colormap(Display* display, const XVisualInfo& vinfo,
       // Allocate private color cells and planes.
 	u_long	planes[8*sizeof(u_long)];
 	if (!XAllocColorCells(_display, _colormap, False, planes, overlayDepth,
-			      _pixels[0].data(), _pixels.ncol()))
+			      _pixels[0].begin(), _pixels.ncol()))
 	{
 	    throw runtime_error("TU::v::Colormap::Colormap(): failed to allocate private colors.");
 	}
@@ -191,7 +191,7 @@ Colormap::Colormap(Display* display, const XVisualInfo& vinfo,
 
 Colormap::~Colormap()
 {
-    XFreeColors(_display, _colormap, _pixels[0].data(), _pixels.ncol(),
+    XFreeColors(_display, _colormap, _pixels[0].begin(), _pixels.ncol(),
 		_overlayPlanes);
     XFreeColormap(_display, _colormap);
 }
@@ -343,7 +343,7 @@ Colormap::getUnderlayPixels() const
     if (_mode == IndexedColor)
     {
 	Array<u_long>	pixels(_pixels.ncol() - _resolution);
-	for (size_t i = 0; i < pixels.dim(); ++i)
+	for (size_t i = 0; i < pixels.size(); ++i)
 	    pixels[i] = _pixels[0][_resolution + i];	// user-defined pixels.
 	return pixels;
     }
@@ -351,7 +351,7 @@ Colormap::getUnderlayPixels() const
     {
 	Array<u_long>	pixels(_vinfo.c_class == PseudoColor ?
 			       _colorcubeNPixels : _resolution);
-	for (size_t i = 0; i < pixels.dim(); ++i)
+	for (size_t i = 0; i < pixels.size(); ++i)
 	    pixels[i] = _pixels[0][i];			// ordinary pixels.
 	return pixels;
     }
@@ -427,7 +427,7 @@ Array<u_long>
 Colormap::getOverlayPixels() const
 {
     Array<u_long>	pixels(_pixels.nrow());
-    for (size_t i = 0; i < pixels.dim(); ++i)
+    for (size_t i = 0; i < pixels.size(); ++i)
 	pixels[i] = _pixels[i][0];	// transparent and user-defined pixels.
     return pixels;
 }

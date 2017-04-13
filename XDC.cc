@@ -83,16 +83,17 @@ XDC::createXImage(const Image<S>& image)
 template <class S, class T> void
 XDC::fillBuff(const Image<S>& image)
 {
-    char* const	buff = _ximage->data;
-    const int	buffWidth = _ximage->width, buffHeight = _ximage->height,
-		bytesPerLine = _ximage->bytes_per_line;
+    const auto	buff	     = _ximage->data;
+    const auto	buffWidth    = _ximage->width;
+    const auto	buffHeight   = _ximage->height;
+    const auto	bytesPerLine = _ximage->bytes_per_line;
     
     if (image.width() == buffWidth && image.height() == buffHeight)
     {
 	for (size_t v = 0; v < image.height(); ++v)
 	{
-	    const S*	p = image[v].data();
-	    T*		q = (T*)(buff + v * bytesPerLine);
+	    auto	p = image[v].begin();
+	    auto	q = reinterpret_cast<T*>(buff + v * bytesPerLine);
 	    for (size_t u = 0; u < image.width(); ++u)
 		*q++ = _colormap.getUnderlayPixel(p[uu<S>(u)], u, v);
 	}
@@ -104,8 +105,9 @@ XDC::fillBuff(const Image<S>& image)
 	    for (int vs = -1, vdp = 0, vd = 0; vd < buffHeight; ++vd)
 		if ((vs+1)*buffHeight <= vd*image.height())
 		{
-		    const S*	p = image[++vs].data();
-		    T*		q = (T*)(buff + vd * bytesPerLine);
+		    auto	p = image[++vs].begin();
+		    auto	q = reinterpret_cast<T*>(buff +
+							 vd * bytesPerLine);
 		    for (int us = -1, ud = 0; ud < buffWidth; )
 		    {
 			if ((us+1)*buffWidth <= ud*image.width())
@@ -124,8 +126,9 @@ XDC::fillBuff(const Image<S>& image)
 	    for (int vs = 0, vd = 0; vd < buffHeight; ++vs)
 		if (vd*image.height() <= vs*buffHeight)
 		{
-		    const S*	p = image[vs].data();
-		    T*		q = (T*)(buff + (vd++) * bytesPerLine);
+		    auto	p = image[vs].begin();
+		    auto	q = reinterpret_cast<T*>(buff +
+							 (vd++) * bytesPerLine);
 		    for (int us = 0, ud = 0; ud < buffWidth; ++us)
 			if (ud*image.width() <= us*buffWidth)
 			    q[ud++] = _colormap.getUnderlayPixel(p[uu<S>(us)],
@@ -259,7 +262,8 @@ XDC::operator <<(const Point2<int>& p)
       {
 	XGCValues	values;
 	XGetGCValues(_colormap.display(), _gc, GCLineWidth, &values);
-	const size_t	w = std::max(int(zoom() * std::max(values.line_width, 1)), 1);
+	const size_t	w = std::max(int(zoom() *
+					 std::max(values.line_width, 1)), 1);
 	XFillRectangle(_colormap.display(), drawable(), _gc,
 		       log2devR(p[0] + offset()[0]),
 		       log2devR(p[1] + offset()[1]), w, w);

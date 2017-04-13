@@ -159,7 +159,7 @@ FileSelection::changeDirectory(const std::string& dirname)
     ::closedir(dirp);
 
   // Sort file names.
-    std::sort(&_filenames[0], &_filenames[_filenames.dim() - 1], cmp());
+    std::sort(&_filenames[0], &_filenames[_filenames.size() - 1], cmp());
 
   // Append '/' to directory names.
     for (int i = 0; _filenames[i] != 0; ++i)
