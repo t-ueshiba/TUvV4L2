@@ -14,7 +14,7 @@
 
 namespace TU
 {
-typedef Array2<Array<int> >	IntArray2;
+typedef Array2<int>	IntArray2;
 
 namespace v
 {
@@ -136,8 +136,8 @@ MyCanvasPane::repaintOverlay()
 	return;
 
     _dc << clear << cross;
-    for (u_int i = 0; i < _points.dim(); ++i)
-	_dc << foreground(1+i) << Point2<int>(_points[i][0], _points[i][1]);
+    for (u_int i = 0; i < _points.size(); ++i)
+	_dc << foreground(1+i) << Point2<int>({_points[i][0], _points[i][1]});
 }
 
 /************************************************************************
@@ -227,51 +227,52 @@ MyCmdWindow::callback(CmdId id, CmdVal val)
     {
       case Id_MouseButton1Press:
 	cerr << "Button1 pressed at ("
-	     << val.u << ", " << val.v << ")." << endl;
+	     << val.u() << ", " << val.v() << ")." << endl;
 	break;
 	
       case Id_MouseButton2Press:
 	cerr << "Button2 pressed at ("
-	     << val.u << ", " << val.v << ")." << endl;
+	     << val.u() << ", " << val.v() << ")." << endl;
 	break;
 	
       case Id_MouseButton3Press:
 	cerr << "Button3 pressed at ("
-	     << val.u << ", " << val.v << ")." << endl;
+	     << val.u() << ", " << val.v() << ")." << endl;
 	break;
 	
       case Id_MouseButton1Release:
 	cerr << "Button1 released at ("
-	     << val.u << ", " << val.v << ")." << endl;
+	     << val.u() << ", " << val.v() << ")." << endl;
 	break;
 	
       case Id_MouseButton2Release:
 	cerr << "Button2 released at ("
-	     << val.u << ", " << val.v << ")." << endl;
+	     << val.u() << ", " << val.v() << ")." << endl;
 	break;
 	
       case Id_MouseButton3Release:
 	cerr << "Button3 released at ("
-	     << val.u << ", " << val.v << ")." << endl;
+	     << val.u() << ", " << val.v() << ")." << endl;
 	break;
 	
       case Id_MouseButton1Drag:
 	cerr << "Button1 dragged at ("
-	     << val.u << ", " << val.v << ")." << endl;
+	     << val.u() << ", " << val.v() << ")." << endl;
 	break;
 	
       case Id_MouseButton2Drag:
 	cerr << "Button2 dragged at ("
-	     << val.u << ", " << val.v << ")." << endl;
+	     << val.u() << ", " << val.v() << ")." << endl;
 	break;
 	
       case Id_MouseButton3Drag:
 	cerr << "Button3 dragged at ("
-	     << val.u << ", " << val.v << ")." << endl;
+	     << val.u() << ", " << val.v() << ")." << endl;
 	break;
 	
       case Id_MouseMove:
-	cerr << "Mouse moved to (" << val.u << ", " << val.v << ")." << endl;
+	cerr << "Mouse moved to (" << val.u() << ", " << val.v() << ")."
+	     << endl;
 	break;
 
       case Id_MouseEnterFocus:
