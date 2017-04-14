@@ -2,14 +2,13 @@
  *  $Id: V4L2CameraUtility.h 1588 2014-07-10 20:05:03Z ueshiba $
  */
 /*!
-  \file		V4L2CameraUtility.h
+  \file		V4L2CameraArray.h
   \brief	クラス TU::V4L2CameraArray の定義と実装
 */
-#ifndef __TU_V4L2CAMERAUTILITY_H
-#define __TU_V4L2CAMERAUTILITY_H
+#ifndef __TU_V4L2CAMERAARRAY_H
+#define __TU_V4L2CAMERAARRAY_H
 
 #include "TU/V4L2++.h"
-#include "TU/Heap.h"
 #include <algorithm>	// for std::for_each()
 #include <functional>	// for std::bind()
 
@@ -80,11 +79,8 @@ constexpr u_int	V4L2CAMERA_ALL		= V4L2Camera::UNKNOWN_FEATURE + 1;
 ************************************************************************/
 template <class CAMERAS> auto
 setFormat(CAMERAS&& cameras, u_int id, int val)
-    -> typename std::enable_if<
-	  std::is_convertible<
-	      typename std::remove_reference<
-		  decltype(*std::begin(cameras))>::type, V4L2Camera>::value,
-	      bool>::type
+    -> std::enable_if_t<
+	   std::is_convertible<value_t<CAMERAS>, V4L2Camera>::value, bool>
 {
     const auto	pixelFormat = V4L2Camera::uintToPixelFormat(id);
 
@@ -112,16 +108,13 @@ setFormat(CAMERAS&& cameras, u_int id, int val)
 inline bool
 setFormat(V4L2Camera& camera, u_int id, int val)
 {
-    return setFormat(make_range(&camera, &camera + 1), id, val);
+    return setFormat(make_range(&camera, 1), id, val);
 }
 
 template <class CAMERAS> auto
 setFeature(CAMERAS&& cameras, u_int id, int val)
-    -> typename std::enable_if<
-	  std::is_convertible<
-	      typename std::remove_reference<
-		  decltype(*std::begin(cameras))>::type, V4L2Camera>::value,
-	      bool>::type
+    -> std::enable_if_t<
+	   std::is_convertible<value_t<CAMERAS>, V4L2Camera>::value, bool>
 {
     const auto	feature = V4L2Camera::uintToFeature(id);
 
@@ -137,7 +130,7 @@ setFeature(CAMERAS&& cameras, u_int id, int val)
 inline bool
 setFeature(V4L2Camera& camera, u_int id, int val)
 {
-    return setFeature(make_range(&camera, &camera + 1), id, val);
+    return setFeature(make_range(&camera, 1), id, val);
 }
 
 inline bool
@@ -160,35 +153,50 @@ getFeature(const V4L2Camera& camera, u_int id, int& val)
 */
 template <class CAMERAS> auto
 syncedSnap(CAMERAS&& cameras, uint64_t maxSkew=1000)
-    -> typename std::enable_if<
-	  std::is_convertible<
-	      typename std::remove_reference<
-		  decltype(*std::begin(cameras))>::type,
-	      V4L2Camera>::value>::type
+    -> std::enable_if_t<
+	   std::is_convertible<value_t<CAMERAS>, V4L2Camera>::value>
 {
-    typedef decltype(std::begin(cameras))	iterator;
-    typedef std::pair<uint64_t, iterator>	timestamp_t;
-    
-    Heap<timestamp_t,
-    std::greater<timestamp_t> >	timestamps(std::size(cameras));
+    using iterator	= decltype(std::begin(cameras));
+    using timestamp_t	= std::pair<uint64_t, iterator>;
+    using cmp		= std::greater<timestamp_t>;
 
+  // 全カメラから画像を取得
     std::for_each(std::begin(cameras), std::end(cameras),
 		  std::bind(&V4L2Camera::snap, std::placeholders::_1));
 
-    timestamp_t	last(0, std::end(cameras));
+  // 全カメラのタイムスタンプとその中で最も遅いlastを得る．
+    std::vector<timestamp_t>	timestamps;
+    timestamp_t			last(0, std::end(cameras));
     for (auto camera = std::begin(cameras); camera != std::end(cameras);
 	 ++camera)
     {
-	timestamp_t	timestamp(camera->arrivaltime(), camera);
-	timestamps.push(timestamp);
-	if (timestamp > last)
-	    last = timestamp;
+	timestamps.push_back({camera->getTimestamp(), camera});
+	if (timestamps.back() > last)
+	    last = timestamps.back();
     }
 
-    for (timestamp_t top; last.first > (top = timestamps.pop()).first + maxSkew;
-	 timestamps.push(last))
-	last = {top.second->snap().arrivaltime(), top.second};
+  // timestampsを最も早いタイムスタンプを先頭要素とするヒープにする．
+    std::make_heap(timestamps.begin(), timestamps.end(), cmp());
+    
+  // 最も早いタイムスタンプと最も遅いタイムスタンプの差がmaxSkewを越えなくなるまで
+  // 前者に対応するカメラから画像を取得する．
+    while (last.first > timestamps.front().first + maxSkew)
+    {
+      // 最も早いタイムスタンプを末尾にもってきてヒープから取り除く．
+	std::pop_heap(timestamps.begin(), timestamps.end(), cmp());
+
+      // ヒープから取り除いたタイムスタンプに対応するカメラから画像を取得して
+      // 新たなタイムスタンプを得る．
+	auto&	back = timestamps.back();
+	back.first = back.second->snap().getTimestamp();
+
+      // これが最も遅いタイムスタンプになるので，lastに記録する．
+	last = back;
+
+      // このタイムスタンプを再度ヒープに追加する．
+	std::push_heap(timestamps.begin(), timestamps.end(), cmp());
+    }
 }
     
 }
-#endif	// ! __TU_IEEE1394CAMERAUTILITY_H
+#endif	// ! __TU_V4L2CAMERARRAY_H

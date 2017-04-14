@@ -1,32 +1,3 @@
-/*
- *  平成14-19年（独）産業技術総合研究所 著作権所有
- *  
- *  創作者：植芝俊夫
- *
- *  本プログラムは（独）産業技術総合研究所の職員である植芝俊夫が創作し，
- *  （独）産業技術総合研究所が著作権を所有する秘密情報です．著作権所有
- *  者による許可なしに本プログラムを使用，複製，改変，第三者へ開示する
- *  等の行為を禁止します．
- *  
- *  このプログラムによって生じるいかなる損害に対しても，著作権所有者お
- *  よび創作者は責任を負いません。
- *
- *  Copyright 2002-2007.
- *  National Institute of Advanced Industrial Science and Technology (AIST)
- *
- *  Creator: Toshio UESHIBA
- *
- *  [AIST Confidential and all rights reserved.]
- *  This program is confidential. Any using, copying, changing or
- *  giving any information concerning with this program to others
- *  without permission by the copyright holder are strictly prohibited.
- *
- *  [No Warranty.]
- *  The copyright holder or the creator are not responsible for any
- *  damages caused by using this program.
- *  
- *  $Id$
- */
 /*!
   \file		Minimize.h
   \brief	汎用最小自乗法に関連する関数の定義と実装
@@ -35,7 +6,6 @@
 #define __TU_MINIMIZE_H
 
 #include "TU/Vector++.h"
-#include <algorithm>
 #include <stdexcept>
 
 namespace TU
@@ -54,9 +24,9 @@ template <class ET>
 class NullConstraint
 {
   public:
-    typedef ET					element_type;
-    typedef Vector<element_type>		vector_type;
-    typedef Matrix<element_type>		matrix_type;
+    using	element_type	= ET;
+    using	vector_type	= Vector<element_type>;
+    using	matrix_type	= Matrix<element_type>;
 
   public:
   //! 任意の引数に対して0次元ベクトルを出力する．
@@ -64,7 +34,7 @@ class NullConstraint
     vector_type	operator ()(const AT&)	const	{return vector_type(0);}
   //! 任意の引数に対して0x0行列を出力する．
     template <class AT>
-    matrix_type	jacobian(const AT&)	const	{return matrix_type(0, 0);}
+    matrix_type	derivative(const AT&)	const	{return matrix_type(0, 0);}
 };
 
 /************************************************************************
@@ -91,17 +61,17 @@ template <class AT>
 class ConstNormConstraint
 {
   public:
-    typedef AT						argument_type;
-    typedef typename argument_type::element_type	element_type;
-    typedef Vector<element_type>			vector_type;
-    typedef Matrix<element_type>			matrix_type;
+    using	argument_type	= AT;
+    using	element_type	= typename argument_type::element_type;
+    using	vector_type	= Vector<element_type>;
+    using	matrix_type	= Matrix<element_type>;
     
   public:
   //! 新たな拘束条件を生成し，その2乗ノルムの目標値を設定する．
   /*!
     \param x	引数(この2乗ノルム値が目標値となる)
   */
-    ConstNormConstraint(const argument_type& x) :_sqr(x.square())	{}
+    ConstNormConstraint(const argument_type& x) :_sqr(square(x))	{}
 
   //! 与えられた引数の2乗ノルム値と目標値の差を出力する．
   /*!
@@ -110,9 +80,7 @@ class ConstNormConstraint
   */
     vector_type	operator ()(const argument_type& x) const
 		{
-		    vector_type	val(1);
-		    val[0] = x.square() - _sqr;
-		    return val;
+		    return {{square(x) - _sqr}};
 		}
 
   //! 与えられた引数の2乗ノルム値について，この引数自身による1階微分値を出力する．
@@ -120,11 +88,11 @@ class ConstNormConstraint
     \param x	引数
     \return	1階微分値を収めた1xd行列(dはベクトル化された引数の次元)
   */
-    matrix_type	jacobian(const argument_type& x) const
+    matrix_type	derivative(const argument_type& x) const
 		{
-		    const vector_type&	y = serialize(x);
-		    matrix_type		L(1, y.size());
-		    (L[0] = y) *= 2.0;
+		    const auto	y = make_range(x.data(), x.capacity());
+		    matrix_type	L(1, y.size());
+		    L[0] = 2 * y;
 		    return L;
 		}
 
@@ -159,7 +127,7 @@ class ConstNormConstraint
 	Vector<F:element_type>	F::operator ()(const AT& x) const
      によって与えられる．
   -# 引数xを与えたときのヤコビアンは，メンバ関数
-	Matrix<F:element_type>	F::jacobian(const AT& x) const
+	Matrix<F:element_type>	F::J(const AT& x) const
      によって与えられる．
   -# メンバ関数
 	void	F::update(const AT& x, const Vector<F::element_type>& dx) const
@@ -174,7 +142,7 @@ class ConstNormConstraint
 	Vector<G:element_type>	G::operator ()(const AT& x) const
      によって与えられる．
   -# 引数xを与えたときのヤコビアンは，メンバ関数
-	Matrix<G::element_type>	G::jacobian(const AT& x) const
+	Matrix<G::element_type>	G::J(const AT& x) const
      によって与えられる．
 
   \param f		その2乗ノルムを最小化すべきベクトル値関数
@@ -189,26 +157,26 @@ template <class F, class G, class AT> Matrix<typename F::element_type>
 minimizeSquare(const F& f, const G& g, AT& x,
 	       size_t niter_max=100, double tol=1.5e-8)
 {
-    using namespace			std;
-    typedef typename F::element_type	element_type;	// element type.
-    typedef Vector<element_type>	vector_type;
-    typedef Matrix<element_type>	matrix_type;
+    using element_type	= typename F::element_type;	// element type.
+    using vector_type	= Vector<element_type>;
+    using matrix_type	= Matrix<element_type>;
     
-    vector_type		fval   = f(x);			// function value.
-    element_type	sqr    = fval * fval;		// square value.
+    auto		fval   = f(x);			// function value.
+    auto		sqr    = square(fval);		// square value.
     element_type	lambda = 1.0e-4;		// L-M parameter.
 
     for (size_t n = 0; n++ < niter_max; )
     {
-	const matrix_type&	J    = f.jacobian(x);	// Jacobian.
-	const vector_type&	Jtf  = fval * J;
-	const vector_type&	gval = g(x);		// constraint residual.
-	const size_t		xdim = J.ncol(), gdim = gval.size();
+	const auto		J    = f.derivative(x);	// J.
+	const vector_type	Jtf  = fval * J;
+	const auto		gval = g(x);		// constraint residual.
+	const auto		xdim = J.ncol();
+	const auto		gdim = gval.size();
 	matrix_type		A(xdim + gdim, xdim + gdim);
 
-	A(0, 0, xdim, xdim) = J.trns() * J;
-	A(xdim, 0, gdim, xdim) = g.jacobian(x);
-	A(0, xdim, xdim, gdim) = A(xdim, 0, gdim, xdim).trns();
+	A(0, xdim, 0, xdim)    = transpose(J) * J;
+	A(xdim, gdim, 0, xdim) = g.derivative(x);
+	A(0, xdim, xdim, gdim) = transpose(A(xdim, gdim, 0, xdim));
 
 	vector_type		diagA(xdim);
 	for (size_t i = 0; i < xdim; ++i)
@@ -220,26 +188,26 @@ minimizeSquare(const F& f, const G& g, AT& x,
 	    for (size_t i = 0; i < xdim; ++i)
 		A[i][i] = (1.0 + lambda) * diagA[i];	// Augument diagonals.
 	    vector_type	dx(xdim + gdim);
-	    dx(0, xdim) = Jtf;
+	    dx(0, xdim)	   = Jtf;
 	    dx(xdim, gdim) = gval;
-	    dx.solve(A);
+	    solve(A, dx);
 
 	  // Compute updated parameters and function value to it.
-	    AT			x_new(x);
+	    auto	x_new(x);
 	    f.update(x_new, dx(0, xdim));
-	    const vector_type&	fval_new = f(x_new);
-	    const element_type	sqr_new  = fval_new * fval_new;
+	    const auto	fval_new = f(x_new);
+	    const auto	sqr_new  = square(fval_new);
 #ifdef TU_MINIMIZE_DEBUG
-	    cerr << "val^2 = " << sqr << ", gval = " << gval
-		 << "  (update: val^2 = " << sqr_new
-		 << ", lambda = " << lambda << ")" << endl;
+	    std::cerr << "val^2 = " << sqr << ", gval = " << gval
+		      << "  (update: val^2 = " << sqr_new
+		      << ", lambda = " << lambda << ")" << std::endl;
 #endif
-	    if (fabs(sqr_new - sqr) <=
-		tol * (fabs(sqr_new) + fabs(sqr) + 1.0e-10))
+	    if (std::abs(sqr_new - sqr) <=
+		tol * (std::abs(sqr_new) + std::abs(sqr) + 1.0e-10))
 	    {
 		for (size_t i = 0; i < xdim; ++i)
 		    A[i][i] = diagA[i];
-		return A(0, 0, xdim, xdim).pinv(1.0e8);
+		return pseudo_inverse(A(0, xdim, 0, xdim), 1.0e8);
 	    }
 
 	    if (sqr_new < sqr)
@@ -294,7 +262,7 @@ minimizeSquare(const F& f, const G& g, AT& x,
 	F::element_type
      という名前でtypedefしている．
   -# ヤコビアンの型を
-	F::jacobian_type
+	F::derivative_type
      という名前でtypedefしている．
   -# ATA型の引数aが持つ自由度を
 	size_t	F::adim() const
@@ -310,7 +278,7 @@ minimizeSquare(const F& f, const G& g, AT& x,
 	Vector<F:element_type>	F::operator ()(const ATA& a, const ATB& b, int j) const
      によって与えられる．
   -# 引数a, b_jを与えたときのaで微分したヤコビアンは，メンバ関数
-	F::jacobian_type	F::jacobianA(const ATA& a, const ATB& b, int j) const
+	F::derivative_type	F::derivativeA(const ATA& a, const ATB& b, int j) const
      によって与えられる．
   -# メンバ関数
 	void	F::updateA(const ATA& a, const Vector<F::element_type>& da) const
@@ -328,7 +296,7 @@ minimizeSquare(const F& f, const G& g, AT& x,
 	Vector<G:element_type>	G::operator ()(const ATA& a) const
      によって与えられる．
   -# 引数aを与えたときのヤコビアンは，メンバ関数
-	Matrix<G::element_type>	G::jacobian(const ATA& a) const
+	Matrix<G::element_type>	G::derivative(const ATA& a) const
      によって与えられる．
 
   \param f		その2乗ノルムを最小化すべきベクトル値関数
@@ -347,57 +315,57 @@ Matrix<typename F::element_type>
 minimizeSquareSparse(const F& f, const G& g, ATA& a, IB bbegin, IB bend,
 		     size_t niter_max=100, double tol=1.5e-8)
 {
-    using namespace					std;
-    typedef typename F::element_type			element_type;
-    typedef typename F::jacobian_type			jacobian_type;
-    typedef Vector<element_type>			vector_type;
-    typedef Matrix<element_type>			matrix_type;
-    typedef typename iterator_traits<IB>::value_type	ATB; // arg. b type.
+    using element_type		= typename F::element_type;
+    using derivative_type	= typename F::derivative_type;
+    using vector_type		= Vector<element_type>;
+    using matrix_type		= Matrix<element_type>;
+    using ATB			= iterator_value<IB>;
     
-    const size_t	nb = distance(bbegin, bend);
+    const size_t	nb = std::distance(bbegin, bend);
     Array<vector_type>	fval(nb);	// function values.
     element_type	sqr = 0;	// sum of squares.
-    int			j = 0;
-    for (IB b = bbegin; b != bend; ++b, ++j)
+    size_t		j = 0;
+    for (auto b = bbegin; b != bend; ++b, ++j)
     {
 	fval[j] = f(a, *b, j);
-	sqr    += fval[j] * fval[j];
+	sqr    += square(fval[j]);
     }
+
     element_type	lambda = 1.0e-7;		// L-M parameter.
 
     for (size_t n = 0; n++ < niter_max; )
     {
-	const size_t		adim = f.adim();
-	jacobian_type		U(f.adims(), f.adims());
+	const auto		adim = f.adim();
+	derivative_type		U(f.adims(), f.adims());
 	vector_type		Jtf(adim);
 	Array<matrix_type>	V(nb);
 	Array<matrix_type>	W(nb);
 	Array<vector_type>	Ktf(nb);
 	j = 0;
-	for (IB b = bbegin; b != bend; ++b, ++j)
+	for (auto b = bbegin; b != bend; ++b, ++j)
 	{
-	    const jacobian_type&	J  = f.jacobianA(a, *b, j);
-	    const jacobian_type&	Jt = J.trns();
-	    const matrix_type&		K  = f.jacobianB(a, *b, j);
+	    const auto	J  = f.derivativeA(a, *b, j);
+	    const auto	K  = f.derivativeB(a, *b, j);
 
-	    U     += Jt * J;
+	    U     += transpose(J) * J;
 	    Jtf   += fval[j] * J;
-	    V[j]   = K.trns() * K;
-	    W[j]   = Jt * K;
+	    V[j]   = transpose(K) * K;
+	    W[j]   = transpose(J) * K;
 	    Ktf[j] = fval[j] * K;
 	}
 
-      	const vector_type&	gval = g(a);
-	const size_t		gdim = gval.size();
-	matrix_type		A(adim + gdim, adim + gdim);
+      	const auto	gval = g(a);
+	const auto	gdim = gval.size();
+	matrix_type	A(adim + gdim, adim + gdim);
 	
-	A(adim, 0, gdim, adim) = g.jacobian(a);
-	A(0, adim, adim, gdim) = A(adim, 0, gdim, adim).trns();
+	A(adim, gdim, 0, adim) = g.derivative(a);
+	A(0, adim, adim, gdim) = transpose(A(adim, gdim, 0, adim));
 
 	for (;;)
 	{
 	  // Compute da: update for parameters a to be estimated.
-	    A(0, 0, adim, adim) = U;
+	    A(0, adim, 0, adim) = matrix_type(U);
+
 	    for (size_t i = 0; i < adim; ++i)
 		A[i][i] *= (1.0 + lambda);		// Augument diagonals.
 
@@ -408,76 +376,76 @@ minimizeSquareSparse(const F& f, const G& g, ATA& a, IB bbegin, IB bend,
 	    Array<vector_type>	VinvKtf(nb);
 	    for (size_t j = 0; j < nb; ++j)
 	    {
-		matrix_type	Vinv = V[j];
+		auto	Vinv = V[j];
 		for (size_t k = 0; k < Vinv.size(); ++k)
 		    Vinv[k][k] *= (1.0 + lambda);	// Augument diagonals.
-		Vinv = Vinv.inv();
-		VinvWt[j]  = Vinv * W[j].trns();
+		Vinv	   = inverse(Vinv);
+		VinvWt[j]  = Vinv * transpose(W[j]);
 		VinvKtf[j] = Vinv * Ktf[j];
-		A(0, 0, adim, adim) -= W[j] * VinvWt[j];
-		da(0, adim) -= W[j] * VinvKtf[j];
+		A(0, adim, 0, adim) -= W[j] * VinvWt[j];
+		da(0, adim)	    -= W[j] * VinvKtf[j];
 	    }
-	    da.solve(A);
+	    solve(A, da);
 
 	  // Compute updated parameters and function value to it.
-	    ATA			a_new(a);
+	    auto		a_new(a);
 	    f.updateA(a_new, da(0, adim));
 	    Array<ATB>		b_new(nb);
-	    copy(bbegin, bend, b_new.begin());
+	    std::copy(bbegin, bend, b_new.begin());
 	    Array<vector_type>	fval_new(nb);
 	    element_type	sqr_new = 0;
 	    for (size_t j = 0; j < nb; ++j)
 	    {
-		const vector_type& db = VinvKtf[j] - VinvWt[j] * da(0, adim);
+		const auto	db = VinvKtf[j] - VinvWt[j] * da(0, adim);
 		f.updateB(b_new[j], db);
 		fval_new[j] = f(a_new, b_new[j], j);
-		sqr_new	   += fval_new[j] * fval_new[j];
+		sqr_new	   += square(fval_new[j]);
 	    }
 #ifdef TU_MINIMIZE_DEBUG
-	    cerr << "val^2 = " << sqr << ", gval = " << gval
-		 << "  (update: val^2 = " << sqr_new
-		 << ", lambda = " << lambda << ")" << endl;
+	    std::cerr << "val^2 = " << sqr << ", gval = " << gval
+		      << "  (update: val^2 = " << sqr_new
+		      << ", lambda = " << lambda << ")" << std::endl;
 #endif
-	    if (fabs(sqr_new - sqr) <=
-		tol * (fabs(sqr_new) + fabs(sqr) + 1.0e-10))
+	    if (std::abs(sqr_new - sqr) <=
+		tol * (std::abs(sqr_new) + std::abs(sqr) + 1.0e-10))
 	    {
 		size_t		bdim = 0;
 		for (size_t j = 0; j < nb; ++j)
 		    bdim += V[j].size();
 		matrix_type	S(adim + bdim, adim + bdim);
-		matrix_type	Sa(S, 0, 0, adim, adim);
-		Sa = U;
+		auto		Sa = S(0, adim, 0, adim);
+		Sa = matrix_type(U);
 		for (size_t j = 0; j < nb; ++j)
 		{
-		    VinvWt[j] = V[j].inv() * W[j].trns();
+		    VinvWt[j] = inverse(V[j]) * transpose(W[j]);
 		    Sa -= W[j] * VinvWt[j];
 		}
 		for (size_t jj = adim, j = 0; j < nb; ++j)
 		{
-		    const matrix_type&	VinvWtSa = VinvWt[j] * Sa;
+		    const matrix_type	VinvWtSa = VinvWt[j] * Sa;
 		    for (size_t kk = adim, k = 0; k <= j; ++k)
 		    {
-			S(jj, kk, VinvWtSa.nrow(), VinvWt[k].nrow())
-			     = VinvWtSa * VinvWt[k].trns();
+			S(jj, VinvWtSa.nrow(), kk, VinvWt[k].nrow())
+			    = VinvWtSa * transpose(VinvWt[k]);
 			kk += VinvWt[k].nrow();
 		    }
-		    S(jj, jj, V[j].nrow(), V[j].nrow()) += V[j].inv();
+		    S(jj, V[j].nrow(), jj, V[j].nrow()) += inverse(V[j]);
 		    jj += VinvWt[j].nrow();
 		}
-		Sa = Sa.pinv(1.0e8);
+		Sa = pseudo_inverse(Sa, 1.0e8);
 		for (size_t jj = adim, j = 0; j < nb; ++j)
 		{
-		    S(jj, 0, VinvWt[j].nrow(), adim) = -VinvWt[j] * Sa;
+		    S(jj, VinvWt[j].nrow(), 0, adim) = -VinvWt[j] * Sa;
 		    jj += VinvWt[j].nrow();
 		}
 		    
-		return S.symmetrize() *= sqr;
+		return symmetrize(S) *= sqr;
 	    }
 	    
 	    if (sqr_new < sqr)
 	    {
 		a = a_new;			// Update parameters.
-		copy(b_new.begin(), b_new.end(), bbegin);
+		std::copy(b_new.begin(), b_new.end(), bbegin);
 		fval = fval_new;		// Update function values.
 		sqr = sqr_new;			// Update residual.
 		lambda *= 0.1;			// Decrease L-M parameter.
@@ -500,28 +468,28 @@ template <class F, class G, class ATA, class IB>  Matrix<typename F::ET>
 minimizeSquareSparseDebug(const F& f, const G& g, ATA& a, IB bbegin, IB bend,
 			  size_t niter_max=100, double tol=1.5e-8)
 {
-    using namespace					std;
-    typedef typename F::element_type			element_type;
-    typedef Vector<element_type>			vector_type;
-    typedef Matrix<element_type>			matrix_type;
-    typedef typename iterator_traits<IB>::value_type	ATB; // arg. b type.
+    using element_type	= typename F::element_type;
+    using vector_type	= Vector<element_type>;
+    using matrix_type	= Matrix<element_type>;
+    using ATB		= iterator_value<IB>;
 
-    const size_t	nb = distance(bbegin, bend);
+    const size_t	nb = std::distance(bbegin, bend);
     Array<vector_type>	fval(nb);	// function values.
     element_type	sqr = 0;	// sum of squares.
-    int			j = 0;
-    for (IB b = bbegin; b != bend; ++b, ++j)
+    size_t		j = 0;
+    for (auto b = bbegin; b != bend; ++b, ++j)
     {
 	fval[j] = f(a, *b, j);
-	sqr    += fval[j] * fval[j];
+	sqr    += square(fval[j]);
     }
+
     element_type	lambda = 1.0e-7;		// L-M parameter.
 
     for (size_t n = 0; n++ < niter_max; )
     {
-	const size_t		adim = f.adim();
-	const size_t		bdim = f.bdim() * nb;
-      	const vector_type&	gval = g(a);
+	const auto		adim = f.adim();
+	const auto		bdim = f.bdim() * nb;
+      	const auto		gval = g(a);
 	const size_t		gdim = gval.size();
 	matrix_type		U(adim, adim);
 	vector_type		Jtf(adim);
@@ -530,34 +498,35 @@ minimizeSquareSparseDebug(const F& f, const G& g, ATA& a, IB bbegin, IB bend,
 	Array<vector_type>	Ktf(nb);
 	matrix_type		A(adim + bdim + gdim, adim + bdim + gdim);
 	j = 0;
-	for (IB b = bbegin; b != bend; ++b, ++j)
+	for (auto b = bbegin; b != bend; ++b, ++j)
 	{
-	    const matrix_type&	J  = f.jacobianA(a, *b, j);
-	    const matrix_type&	Jt = J.trns();
-	    const matrix_type&	K  = f.jacobianB(a, *b, j);
+	    const matrix_type	J  = f.derivativeA(a, *b, j);
+	    const matrix_type	Jt = transpose(J);
+	    const matrix_type	K  = f.derivativeB(a, *b, j);
 
-	    U     += Jt * J;
+	    U     += transpose(J) * J;
 	    Jtf   += fval[j] * J;
-	    V[j]   = K.trns() * K;
-	    W[j]   = Jt * K;
+	    V[j]   = transpose(K) * K;
+	    W[j]   = transpose(J) * K;
 	    Ktf[j] = fval[j] * K;
 
-	    A(0, adim + j*f.bdim(), adim, f.bdim()) = W[j];
-	    A(adim + j*f.bdim(), 0, f.bdim(), adim) = W[j].trns();
+	    A(0, adim, adim + j*f.bdim(), f.bdim()) = W[j];
+	    A(adim + j*f.bdim(), f.bdim(), 0, adim) = tranpose(W[j]);
 	}
-	A(adim + bdim, 0, gdim, adim) = g.jacobian(a);
-	A(0, adim + bdim, adim, gdim) = A(adim + bdim, 0, gdim, adim).trns();
+	A(adim + bdim, gdim, 0, adim) = g.derivative(a);
+	A(0, adim, adim + bdim, gdim) = transpose(A(adim + bdim, gdim,
+						    0, adim));
 
 	for (;;)
 	{
 	  // Compute da: update for parameters a to be estimated.
-	    A(0, 0, adim, adim) = U;
+	    A(0, adim, 0, adim) = U;
 	    for (size_t i = 0; i < adim; ++i)
 		A[i][i] *= (1.0 + lambda);
 	    for (size_t j = 0; j < nb; ++j)
 	    {
-		A(adim + j*f.bdim(), adim + j*f.bdim(), f.bdim(), f.bdim())
-		    = V[j];
+		A(adim + j*f.bdim(), f.bdim(),
+		  adim + j*f.bdim(), f.bdim()) = V[j];
 		for (size_t k = 0; k < f.bdim(); ++k)
 		    A[adim + j*f.bdim() + k][adim + j*f.bdim() + k]
 			*= (1.0 + lambda);
@@ -574,40 +543,41 @@ minimizeSquareSparseDebug(const F& f, const G& g, ATA& a, IB bbegin, IB bend,
 	    ATA			a_new(a);
 	    f.updateA(a_new, dx(0, adim));
 	    Array<ATB>		b_new(nb);
-	    copy(bbegin, bend, b_new.begin());
+	    std::copy(bbegin, bend, b_new.begin());
 	    Array<vector_type>	fval_new(nb);
 	    element_type	sqr_new = 0;
 	    for (size_t j = 0; j < nb; ++j)
 	    {
-		const vector_type& db = dx(adim + j*f.bdim(), f.bdim());
+		const vector_type	db = dx(adim + j*f.bdim(), f.bdim());
 	      //		cerr << "*** check:  "
 	      // << (dx(0, adim) * W[j] + V[j] * db - Ktf[j]);
 		f.updateB(b_new[j], db);
 		fval_new[j] = f(a_new, b_new[j], j);
-		sqr_new	   += fval_new[j] * fval_new[j];
+		sqr_new	   += square(fval_new[j]);
 	    }
 #ifdef TU_MINIMIZE_DEBUG
 	    cerr << "val^2 = " << sqr << ", gval = " << gval
 		 << "  (update: val^2 = " << sqr_new
 		 << ", lambda = " << lambda << ")" << endl;
 #endif
-	    if (fabs(sqr_new - sqr) <=
-		tol * (fabs(sqr_new) + fabs(sqr) + 1.0e-10))
+	    if (std::abs(sqr_new - sqr) <=
+		tol * (std::abs(sqr_new) + std::abs(sqr) + 1.0e-10))
 	    {
-		A(0, 0, adim, adim) = U;
+		A(0, adim, 0, adim) = U;
 		for (size_t j = 0; j < nb; ++j)
-		    A(adim + j*f.bdim(), adim + j*f.bdim(), f.bdim(), f.bdim())
+		    A(adim + j*f.bdim(), f.bdim(), adim + j*f.bdim(), f.bdim())
 			= V[j];
 		vector_type	evalue;
-		A(0, 0, adim + bdim, adim + bdim).eigen(evalue);
-		cerr << evalue;
-		return A(0, 0, adim + bdim, adim + bdim).pinv(1.0e8) *= sqr;
+		eigen(A(0, adim + bdim, 0, adim + bdim), evalue);
+		std::cerr << evalue;
+		return pseudo_inverse(A(0, adim + bdim, 0, adim + bdim), 1.0e8)
+		     *= sqr;
 	    }
 
 	    if (sqr_new < sqr)
 	    {
 		a = a_new;			// Update parameters.
-		copy(b_new.begin(), b_new.end(), bbegin);
+		std::copy(b_new.begin(), b_new.end(), bbegin);
 		fval = fval_new;		// Update function values.
 		sqr = sqr_new;			// Update residual.
 		lambda *= 0.1;			// Decrease L-M parameter.

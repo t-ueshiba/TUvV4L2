@@ -1,32 +1,3 @@
-/*
- *  平成14-19年（独）産業技術総合研究所 著作権所有
- *  
- *  創作者：植芝俊夫
- *
- *  本プログラムは（独）産業技術総合研究所の職員である植芝俊夫が創作し，
- *  （独）産業技術総合研究所が著作権を所有する秘密情報です．著作権所有
- *  者による許可なしに本プログラムを使用，複製，改変，第三者へ開示する
- *  等の行為を禁止します．
- *  
- *  このプログラムによって生じるいかなる損害に対しても，著作権所有者お
- *  よび創作者は責任を負いません。
- *
- *  Copyright 2002-2007.
- *  National Institute of Advanced Industrial Science and Technology (AIST)
- *
- *  Creator: Toshio UESHIBA
- *
- *  [AIST Confidential and all rights reserved.]
- *  This program is confidential. Any using, copying, changing or
- *  giving any information concerning with this program to others
- *  without permission by the copyright holder are strictly prohibited.
- *
- *  [No Warranty.]
- *  The copyright holder or the creator are not responsible for any
- *  damages caused by using this program.
- *  
- *  $Id$
- */
 /*!
   \file		BlockDiagonalMatrix++.h
   \brief	クラス TU::BlockDiagonalMatrix の定義と実装
@@ -69,14 +40,15 @@ class BlockDiagonalMatrix : public Array<Matrix<T> >
   /*!
     \param d	小行列の個数
   */
-    explicit BlockDiagonalMatrix(size_t d=0)	:super(d)		{}
+    explicit BlockDiagonalMatrix(size_t d=0)	:super(d)	{}
     BlockDiagonalMatrix(const Array<size_t>& nrows,
-			const Array<size_t>& ncols)			;
+			const Array<size_t>& ncols)		;
 
-    using			super::size;
-    size_t			nrow()				const	;
-    size_t			ncol()				const	;
-    BlockDiagonalMatrix		trns()				const	;
+    using		super::size;
+    size_t		nrow()				const	;
+    size_t		ncol()				const	;
+    BlockDiagonalMatrix	trns()				const	;
+			operator Matrix<T>()		const	;
 };
 
 //! 各小行列のサイズを指定してブロック対角行列を生成し，全要素を0で初期化する．
@@ -103,8 +75,8 @@ template <class T> size_t
 BlockDiagonalMatrix<T>::nrow() const
 {
     size_t	r = 0;
-    for (size_t i = 0; i < size(); ++i)
-	r += (*this)[i].nrow();
+    for (const auto& block : *this)
+	r += block.nrow();
     return r;
 }
 
@@ -116,12 +88,35 @@ template <class T> size_t
 BlockDiagonalMatrix<T>::ncol() const
 {
     size_t	c = 0;
-    for (size_t i = 0; i < size(); ++i)
-	c += (*this)[i].ncol();
+    for (const auto& block : *this)
+	c += block.ncol();
     return c;
 }
 
-//! このブロック対角行列の転置行列を返す．
+//! ブロック対角行列から通常の行列を生成する.
+/*!
+  \param m	ブロック対角行列
+*/
+template <class T>
+BlockDiagonalMatrix<T>::operator Matrix<T>() const
+{
+    Matrix<T>	m(nrow(), ncol());
+    size_t	r = 0, c = 0;
+    for (const auto& block : *this)
+    {
+	m(r, block.nrow(), c, block.ncol()) = block;
+	r += block.nrow();
+	c += block.ncol();
+    }
+
+    
+    return m;
+}
+    
+/************************************************************************
+*  numeric operators							*
+************************************************************************/
+//! ブロック対角行列の転置行列を返す．
 /*!
   \return	転置行列，すなわち
   \f$
@@ -133,53 +128,14 @@ BlockDiagonalMatrix<T>::ncol() const
   \f$
 */
 template <class T> BlockDiagonalMatrix<T>
-BlockDiagonalMatrix<T>::trns() const
+transpose(const BlockDiagonalMatrix<T>& b)
 {
-    BlockDiagonalMatrix	val(size());
+    BlockDiagonalMatrix<T>	val(b.size());
     for (size_t i = 0; i < val.size(); ++i)
-	val[i] = (*this)[i].trns();
-    return val;
+	val[i] = transpose(b[i]);
+    return std::move(val);
 }
 
-//! ブロック対角行列から通常の行列を生成する.
-/*!
-  \param m	ブロック対角行列
-*/
-template <class T, size_t R, size_t C> inline
-Matrix<T, R, C>::Matrix(const BlockDiagonalMatrix<T>& m)
-    :super(m.nrow(), m.ncol())
-{
-    size_t	r = 0, c = 0;
-    for (size_t i = 0; i < m.size(); ++i)
-    {
-	(*this)(r, c, m[i].nrow(), m[i].ncol()) = m[i];
-	r += m[i].nrow();
-	c += m[i].ncol();
-    }
-}
-
-//! ブロック対角行列から通常の行列に代入する.
-/*!
-  \param m	ブロック対角行列
-  \return	この行列
-*/
-template <class T, size_t R, size_t C> inline Matrix<T, R, C>&
-Matrix<T, R, C>::operator =(const BlockDiagonalMatrix<T>& m)
-{
-    super::resize(m.nrow(), m.ncol());
-    size_t	r = 0, c = 0;
-    for (size_t i = 0; i < m.size(); ++i)
-    {
-	(*this)(r, c, m[i].nrow(), m[i].ncol()) = m[i];
-	r += m[i].nrow();
-	c += m[i].ncol();
-    }
-    return *this;
-}
-    
-/************************************************************************
-*  numeric operators							*
-************************************************************************/
 //! 2つのブロック対角行列の積
 /*!
   \param a	第1引数
@@ -189,11 +145,11 @@ Matrix<T, R, C>::operator =(const BlockDiagonalMatrix<T>& m)
 template <class T> BlockDiagonalMatrix<T>
 operator *(const BlockDiagonalMatrix<T>& a, const BlockDiagonalMatrix<T>& b)
 {
-    a.check_size(b.size());
+    assert(a.size() == b.size());
     BlockDiagonalMatrix<T>	val(a.size());
     for (size_t i = 0; i < val.size(); ++i)
 	val[i] = a[i] * b[i];
-    return val;
+    return std::move(val);
 }
 
 //! ブロック対角行列と通常の行列の積
@@ -209,14 +165,14 @@ operator *(const BlockDiagonalMatrix<T>& b, const Matrix<T>& m)
     size_t	r = 0, c = 0;
     for (size_t i = 0; i < b.size(); ++i)
     {
-	val(r, 0, b[i].nrow(), m.ncol())
-	    = b[i] * m(c, 0, b[i].ncol(), m.ncol());
+	val(r, b[i].nrow(), 0, m.ncol())
+	    = b[i] * m(c, b[i].ncol(), 0, m.ncol());
 	r += b[i].nrow();
 	c += b[i].ncol();
     }
     if (c != m.nrow())
 	throw std::invalid_argument("TU::operator *(const BlockDiagonalMatrix<T>&, const Matrix<T>&): dimension mismatch!!");
-    return val;
+    return std::move(val);
 }
 
 //! 通常の行列とブロック対角行列の積
@@ -232,14 +188,14 @@ operator *(const Matrix<T>& m, const BlockDiagonalMatrix<T>& b)
     size_t	r = 0, c = 0;
     for (size_t i = 0; i < b.size(); ++i)
     {
-	val(0, c, m.nrow(), b[i].ncol())
-	    = m(0, r, m.nrow(), b[i].nrow()) * b[i];
+	val(0, m.nrow(), c, b[i].ncol())
+	    = m(0, m.nrow(), r, b[i].nrow()) * b[i];
 	r += b[i].nrow();
 	c += b[i].ncol();
     }
     if (r != m.ncol())
 	throw std::invalid_argument("TU::operator *(const Matrix<T>&, const BlockDiagonalMatrix<T>&): dimension mismatch!!");
-    return val;
+    return std::move(val);
 }
 
 //! ブロック対角行列とベクトルの積
@@ -261,7 +217,7 @@ operator *(const BlockDiagonalMatrix<T>& b, const Vector<T>& v)
     }
     if (c != v.size())
 	throw std::invalid_argument("TU::operator *(const BlockDiagonalMatrix<T>&, const Vector<T>&): dimension mismatch!!");
-    return val;
+    return std::move(val);
 }
 
 //! ベクトルとブロック対角行列の積
@@ -283,7 +239,7 @@ operator *(const Vector<T>& v, const BlockDiagonalMatrix<T>& b)
     }
     if (r != v.size())
 	throw std::invalid_argument("TU::operator *(const Vector<T>&, const BlockDiagonalMatrix<T>&): dimension mismatch!!");
-    return val;
+    return std::move(val);
 }
  
 }

@@ -12,7 +12,7 @@ VPATH		=
 IDLS		=
 MOCHDRS		=
 
-INCDIRS		= -I../../.. -I$(PREFIX)/include
+INCDIRS		= -I../../..
 CPPFLAGS	= -DNDEBUG
 CFLAGS		= -O3
 NVCCFLAGS	= -O
@@ -37,7 +37,7 @@ INCDIR		= $(PREFIX)/include
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC .cpp:sC .cu:sC
-EXTHDRS		= ../../../TU/functional.h \
+EXTHDRS		= ../../../TU/iterator.h \
 		../../../TU/simd/arm/arch.h \
 		../../../TU/simd/arm/bit_shift.h \
 		../../../TU/simd/arm/cast.h \
@@ -85,20 +85,20 @@ OBJS		= main.o
 include $(PROJECT)/lib/common.mk
 ###
 main.o: ../../../TU/simd/dup.h ../../../TU/simd/cvt.h ../../../TU/tuple.h \
-	../../../TU/functional.h ../../../TU/simd/zero.h \
-	../../../TU/simd/vec.h ../../../TU/simd/config.h \
-	../../../TU/simd/type_traits.h ../../../TU/simd/x86/type_traits.h \
-	../../../TU/simd/arm/type_traits.h ../../../TU/simd/x86/vec.h \
-	../../../TU/simd/x86/arch.h ../../../TU/simd/arm/vec.h \
-	../../../TU/simd/arm/arch.h ../../../TU/simd/x86/zero.h \
-	../../../TU/simd/arm/zero.h ../../../TU/simd/cast.h \
-	../../../TU/simd/x86/cast.h ../../../TU/simd/arm/cast.h \
-	../../../TU/simd/shift.h ../../../TU/simd/x86/shift.h \
-	../../../TU/simd/arm/shift.h ../../../TU/simd/bit_shift.h \
-	../../../TU/simd/x86/bit_shift.h ../../../TU/simd/arm/bit_shift.h \
-	../../../TU/simd/x86/cvt.h ../../../TU/simd/x86/unpack.h \
-	../../../TU/simd/arm/cvt.h ../../../TU/simd/logical.h \
-	../../../TU/simd/x86/logical.h ../../../TU/simd/x86/logical_base.h \
-	../../../TU/simd/arm/logical.h ../../../TU/simd/x86/dup.h \
-	../../../TU/simd/arm/dup.h ../../../TU/simd/load_store.h \
-	../../../TU/simd/x86/load_store.h ../../../TU/simd/arm/load_store.h
+	../../../TU/iterator.h ../../../TU/simd/zero.h ../../../TU/simd/vec.h \
+	../../../TU/simd/config.h ../../../TU/simd/type_traits.h \
+	../../../TU/simd/x86/type_traits.h ../../../TU/simd/arm/type_traits.h \
+	../../../TU/simd/x86/vec.h ../../../TU/simd/x86/arch.h \
+	../../../TU/simd/arm/vec.h ../../../TU/simd/arm/arch.h \
+	../../../TU/simd/x86/zero.h ../../../TU/simd/arm/zero.h \
+	../../../TU/simd/cast.h ../../../TU/simd/x86/cast.h \
+	../../../TU/simd/arm/cast.h ../../../TU/simd/shift.h \
+	../../../TU/simd/x86/shift.h ../../../TU/simd/arm/shift.h \
+	../../../TU/simd/bit_shift.h ../../../TU/simd/x86/bit_shift.h \
+	../../../TU/simd/arm/bit_shift.h ../../../TU/simd/x86/cvt.h \
+	../../../TU/simd/x86/unpack.h ../../../TU/simd/arm/cvt.h \
+	../../../TU/simd/logical.h ../../../TU/simd/x86/logical.h \
+	../../../TU/simd/x86/logical_base.h ../../../TU/simd/arm/logical.h \
+	../../../TU/simd/x86/dup.h ../../../TU/simd/arm/dup.h \
+	../../../TU/simd/load_store.h ../../../TU/simd/x86/load_store.h \
+	../../../TU/simd/arm/load_store.h

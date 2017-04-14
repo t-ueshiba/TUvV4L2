@@ -14,7 +14,7 @@ IDLS		= ForwardKinematicsService.idl ReachingService.idl \
 MOCHDRS		=
 
 INCDIRS		= -I. -I$(PREFIX)/include
-CPPFLAGS	= -DNDEBUG
+CPPFLAGS	= -DNDEBUG -DHRP2KAI
 CFLAGS		= -O3
 NVCCFLAGS	= -O
 ifeq ($(shell arch), armv7l)
@@ -52,6 +52,7 @@ EXTHDRS		= /usr/include/math.h \
 		/usr/local/include/TU/tuple.h
 HDRS		= TU/HRP2++.h \
 		bodyinfo_HRP2DOF7.h \
+		bodyinfo_HRP2KAI.h \
 		bodyinfo_HRP2SH.h \
 		bodyinfo_HRP2YH.h \
 		bodyinfo_HRP2toHRP3.h \

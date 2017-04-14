@@ -12,7 +12,7 @@ VPATH		=
 IDLS		=
 MOCHDRS		=
 
-INCDIRS		= -I. -I$(PREFIX)/include
+INCDIRS		= -I../../..
 CPPFLAGS	= -DNDEBUG
 CFLAGS		= -g
 NVCCFLAGS	= -g
@@ -39,12 +39,13 @@ INCDIR		= $(PREFIX)/include
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC .cpp:sC .cu:sC
-EXTHDRS		= /usr/local/include/TU/Array++.h \
-		/usr/local/include/TU/Quantizer.h \
-		/usr/local/include/TU/functional.h \
-		/usr/local/include/TU/iterator.h \
-		/usr/local/include/TU/mmInstructions.h \
-		/usr/local/include/TU/tuple.h
+EXTHDRS		= ../../../TU/Array++.h \
+		../../../TU/Quantizer.h \
+		../../../TU/Vector++.h \
+		../../../TU/algorithm.h \
+		../../../TU/iterator.h \
+		../../../TU/range.h \
+		../../../TU/tuple.h
 HDRS		=
 SRCS		= main.cc
 OBJS		= main.o
@@ -55,7 +56,6 @@ OBJS		= main.o
 #include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
-main.o: /usr/local/include/TU/Quantizer.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
-	/usr/local/include/TU/functional.h \
-	/usr/local/include/TU/mmInstructions.h
+main.o: ../../../TU/Quantizer.h ../../../TU/Vector++.h \
+	../../../TU/Array++.h ../../../TU/range.h ../../../TU/algorithm.h \
+	../../../TU/tuple.h ../../../TU/iterator.h

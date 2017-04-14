@@ -52,7 +52,7 @@
 #  include "TU/simd/compare.h"
 #  include "TU/simd/select.h"
 #  include "TU/simd/arithmetic.h"
-#  include "TU/simd/misc.h"
+//#  include "TU/simd/misc.h"
 #  include "TU/simd/transform.h"
 #  include "TU/simd/lookup.h"
 
@@ -61,7 +61,6 @@
 #  include "TU/simd/cvtdown_iterator.h"
 #  include "TU/simd/cvtup_iterator.h"
 #  include "TU/simd/shift_iterator.h"
-#  include "TU/simd/row_vec_iterator.h"
 
 #  include "TU/simd/BufTraits.h"
 #endif

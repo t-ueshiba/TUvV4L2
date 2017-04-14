@@ -9,14 +9,14 @@ namespace TU
 namespace simd
 {
 template <class PACK>
-inline typename std::enable_if<!is_pair<PACK>::value, PACK>::type
+inline std::enable_if_t<!is_pair<PACK>::value, PACK>
 load_pack(const pack_element<PACK>* p)
 {
     return load(p);
 }
     
 template <class PACK>
-inline typename std::enable_if<is_pair<PACK>::value, PACK>::type
+inline std::enable_if_t<is_pair<PACK>::value, PACK>
 load_pack(const pack_element<PACK>* p)
 {
     using L = typename PACK::first_type;
@@ -33,9 +33,10 @@ doJob()
 {
     using namespace	std;
 
-    typedef typename std::conditional<
-	(vec<SRC>::size <= vec<DST>::size),
-	pack_target<SRC, vec<DST> >, vec<SRC> >::type	src_pack;
+    using src_pack = std::conditional_t<
+			 (vec<SRC>::size <= vec<DST>::size),
+			 pack_target<SRC, vec<DST> >, vec<SRC> >;
+    
 	
     SRC		src[] = { 0,  1,  2,  3,  4,  5,  6,  7,
 			  8,  9, 10, 11, 12, 13, 14, 15,
@@ -143,6 +144,5 @@ main()
     simd::doJob<double,    float    >();
     simd::doJob<float,     double   >();
 #endif
-
     return 0;
 }

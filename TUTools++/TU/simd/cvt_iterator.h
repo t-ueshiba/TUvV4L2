@@ -21,33 +21,35 @@ namespace simd
 */
 template <class T, class ITER, bool MASK=false>
 class cvt_iterator
-    : public boost::iterator_adaptor<cvt_iterator<T, ITER, MASK>,
-				     ITER,
-				     pack_target<T, iterator_value<ITER> >,
-				     boost::single_pass_traversal_tag,
-				     pack_target<T, iterator_value<ITER> > >
+    : public boost::iterator_adaptor<
+		 cvt_iterator<T, ITER, MASK>,
+		 ITER,
+		 pack_target<T, decayed_iterator_value<ITER> >,
+		 boost::single_pass_traversal_tag,
+		 pack_target<T, decayed_iterator_value<ITER> > >
 {
   private:
-    typedef iterator_value<ITER>			src_type;
-    typedef pack_target<T, src_type>			dst_type;
-    typedef boost::iterator_adaptor<cvt_iterator,
-				    ITER,
-				    dst_type,
-				    boost::single_pass_traversal_tag,
-				    dst_type>		super;
+    using src_type	= decayed_iterator_value<ITER>;
+    using dst_type	= pack_target<T, src_type>;
+    using super		= boost::iterator_adaptor<
+			      cvt_iterator,
+			      ITER,
+			      dst_type,
+			      boost::single_pass_traversal_tag,
+			      dst_type>;
 
   public:
-    typedef typename super::difference_type		difference_type;
-    typedef typename super::reference			reference;
+    using	typename super::difference_type;
+    using	typename super::reference;
 
-    friend class	boost::iterator_core_access;
+    friend	class boost::iterator_core_access;
 
   public:
 		cvt_iterator(const ITER& iter)	:super(iter)	{}
     
   private:
     template <class T_>
-    typename std::enable_if<(vec<T_>::size == src_type::size), vec<T_> >::type
+    std::enable_if_t<(vec<T_>::size == src_type::size), vec<T_> >
 		cvtdown()
 		{
 		    auto	x = *super::base();
@@ -55,7 +57,7 @@ class cvt_iterator
 		    return cvt<T_, false, MASK>(x);
 		}
     template <class T_>
-    typename std::enable_if<(vec<T_>::size > src_type::size), vec<T_> >::type
+    std::enable_if_t<(vec<T_>::size > src_type::size), vec<T_> >
 		cvtdown()
 		{
 		    using A = cvt_above_type<
@@ -92,7 +94,7 @@ class cvt_iterator
 template <class T, class ITER> cvt_iterator<T, ITER>
 make_cvt_iterator(ITER iter)
 {
-    return cvt_iterator<T, ITER>(iter);
+    return {iter};
 }
 
 template <class T, class ITER>

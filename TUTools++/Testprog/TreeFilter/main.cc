@@ -31,7 +31,7 @@ main()
 
     typedef int					value_type;
     typedef float				weight_type;
-    typedef Array2<Array<value_type> >		array2_type;
+    typedef Array2<value_type>			array2_type;
     typedef Diff<value_type, weight_type>	wfunc_type;
 
     weight_type					sigma = 1.0/std::log(2.0);

@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id$
+ *  $Id: GaussianCoefficients.cc 1489 2014-02-26 21:57:47Z ueshiba $
  */
 #include "TU/GaussianConvolver.h"
 #include "TU/Minimize.h"
@@ -99,7 +99,7 @@ GaussianCoefficients<T>::EvenConstraint::operator ()(const argument_type& params
 }
 
 template <class T> typename GaussianCoefficients<T>::matrix_type
-GaussianCoefficients<T>::EvenConstraint::jacobian(const argument_type& params) const
+GaussianCoefficients<T>::EvenConstraint::derivative(const argument_type& params) const
 {
     using namespace	std;
     
@@ -142,7 +142,7 @@ GaussianCoefficients<T>::CostFunction
 	element_type	f = 0.0, x = k*_range/_ndivisions;
 	for (size_t i = 0; i < params.size(); ++i)
 	{
-	    const Params&	p = params[i];
+	    const auto&	p = params[i];
 	    f += (p.a*cos(x*p.theta) + p.b*sin(x*p.theta))*exp(-x*p.alpha);
 	}
 	val[k] = f - (x*x - 1.0)*exp(-x*x/2.0);
@@ -153,17 +153,17 @@ GaussianCoefficients<T>::CostFunction
     
 template <class T> typename GaussianCoefficients<T>::matrix_type
 GaussianCoefficients<T>::CostFunction
-		       ::jacobian(const argument_type& params) const
+		       ::derivative(const argument_type& params) const
 {
     matrix_type	val(_ndivisions+1, 4*params.size());
     for (size_t k = 0; k < val.nrow(); ++k)
     {
-	vector_type&	row = val[k];
-	element_type	x = k*_range/_ndivisions;
+	auto	row = val[k];
+	auto	x = k*_range/_ndivisions;
 	
 	for (size_t i = 0; i < params.size(); ++i)
 	{
-	    const Params&	p = params[i];
+	    const auto&		p = params[i];
 	    const element_type	c = cos(x*p.theta), s = sin(x*p.theta),
 				e = exp(-x*p.alpha);
 	    row[4*i]   = c * e;

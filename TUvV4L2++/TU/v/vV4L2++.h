@@ -53,7 +53,7 @@ setFormat(CAMERAS&& cameras, CmdId id, CmdVal val, Window& window)
 inline bool
 setFormat(V4L2Camera& camera, CmdId id, CmdVal val, Window& window)
 {
-    return setFormat(make_range(&camera, &camera + 1), id, val, window);
+    return setFormat(make_range(&camera, 1), id, val, window);
 }
 
 template <class CAMERAS> auto
@@ -108,7 +108,7 @@ setFeature(CAMERAS&& cameras, CmdId id, CmdVal val, CmdPane& cmdPane)
 inline bool
 setFeature(V4L2Camera& camera, CmdId id, CmdVal val, CmdPane& cmdPane)
 {
-    return setFeature(make_range(&camera, &camera + 1), id, val, cmdPane);
+    return setFeature(make_range(&camera, 1), id, val, cmdPane);
 }
 
 }	// namespace v

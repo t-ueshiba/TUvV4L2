@@ -1,31 +1,5 @@
 /*
- *  平成14-19年（独）産業技術総合研究所 著作権所有
- *  
- *  創作者：植芝俊夫
- *
- *  本プログラムは（独）産業技術総合研究所の職員である植芝俊夫が創作し，
- *  （独）産業技術総合研究所が著作権を所有する秘密情報です．著作権所有
- *  者による許可なしに本プログラムを使用，複製，改変，第三者へ開示する
- *  等の行為を禁止します．
- *  
- *  このプログラムによって生じるいかなる損害に対しても，著作権所有者お
- *  よび創作者は責任を負いません。
- *
- *  Copyright 2002-2007.
- *  National Institute of Advanced Industrial Science and Technology (AIST)
- *
- *  Creator: Toshio UESHIBA
- *
- *  [AIST Confidential and all rights reserved.]
- *  This program is confidential. Any using, copying, changing or
- *  giving any information concerning with this program to others
- *  without permission by the copyright holder are strictly prohibited.
- *
- *  [No Warranty.]
- *  The copyright holder or the creator are not responsible for any
- *  damages caused by using this program.
- *  
- *  $Id$
+ *  $Id: ImageBase.cc 1836 2015-07-06 06:42:09Z ueshiba $
  */
 #include "TU/Image++.h"
 #include "TU/Camera++.h"
@@ -97,11 +71,8 @@ ImageBase::~ImageBase()
 ImageBase::TypeInfo
 ImageBase::restoreHeader(std::istream& in)
 {
-    using namespace	std;
-
   // Reset calibration parameters.
-    P = 0;
-    P[0][0] = P[1][1] = P[2][2] = 1.0;
+    P = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 0, 1}};
     d1 = d2 = 0.0;
     
   // Read the first magic character.
@@ -117,7 +88,7 @@ ImageBase::restoreHeader(std::istream& in)
       case 'B':
 	return restoreBMPHeader(in);
       default:
-	throw runtime_error("TU::ImageBase::restoreHeader: neighter PBM nor BMP file!!");
+	throw std::runtime_error("TU::ImageBase::restoreHeader: neighter PBM nor BMP file!!");
 	break;
     }
 
@@ -251,12 +222,10 @@ ImageBase::type2depth(Type type)
 ImageBase::TypeInfo
 ImageBase::restorePBMHeader(std::istream& in)
 {
-    using namespace	std;
-    
   // Read pbm type.
     int		c;
     TypeInfo	typeInfo;
-    in >> c >> ws;		// Read pbm type and skip trailing white spaces.
+    in >> c >> std::ws;		// Read pbm type and skip trailing white spaces.
     switch (c)
     {
       case U_CHAR:
@@ -266,7 +235,7 @@ ImageBase::restorePBMHeader(std::istream& in)
 	typeInfo.type = RGB_24;
 	break;
       default:
-	throw runtime_error("TU::ImageBase::restorePBMHeader: unknown pbm type!!");
+	throw std::runtime_error("TU::ImageBase::restorePBMHeader: unknown pbm type!!");
     }
     
   // Process comment lines.
@@ -307,12 +276,12 @@ ImageBase::restorePBMHeader(std::istream& in)
 		if (isBigEndian())
 		{
 		    if (!strcmp(val, "Little"))
-			throw runtime_error("TU::ImageBase::restore_epbm: big endian is not supported!!");
+			throw std::runtime_error("TU::ImageBase::restore_epbm: big endian is not supported!!");
 		}
 		else
 		{
 		    if (!strcmp(val, "Big"))
-			throw runtime_error("TU::ImageBase::restore_epbm: little endian is not supported!!");
+			throw std::runtime_error("TU::ImageBase::restore_epbm: little endian is not supported!!");
 		}
 		break;
 	      default:
@@ -385,12 +354,10 @@ ImageBase::restorePBMHeader(std::istream& in)
 ImageBase::TypeInfo
 ImageBase::restoreBMPHeader(std::istream& in)
 {
-    using namespace	std;
-    
   // Read pbm type.
     int	c = in.get();				// Read second magic character.
     if (c != 'M')
-	throw runtime_error("TU::ImageBase::restoreBMPHeader: not a BMP file!!");
+	throw std::runtime_error("TU::ImageBase::restoreBMPHeader: not a BMP file!!");
 
   // Read file header.
     get<int>(in);				// Skip bfSize.
@@ -437,7 +404,7 @@ ImageBase::restoreBMPHeader(std::istream& in)
 	get<short>(in);				// Skip biPlanes.
 	d = get<short>(in);			// Read biBitCount.
 	if (get<int>(in) != 0)			// Read biCompression.
-	    throw runtime_error("TUImageBase::restoreBMPHeader: compressed BMP file not supported!!");
+	    throw std::runtime_error("TUImageBase::restoreBMPHeader: compressed BMP file not supported!!");
 	get<int>(in);				// Skip biSizeImage.
 	get<int>(in);				// Skip biXPixPerMeter.
 	get<int>(in);				// Skip biYPixPerMeter.
@@ -459,7 +426,7 @@ ImageBase::restoreBMPHeader(std::istream& in)
 	break;
 
       default:	// Illegal information header size:
-	throw runtime_error("TU::ImageBase::restoreBMPHeader: information header corrupted!!");
+	throw std::runtime_error("TU::ImageBase::restoreBMPHeader: information header corrupted!!");
 	break;
     }
 
@@ -476,7 +443,7 @@ ImageBase::restoreBMPHeader(std::istream& in)
 	typeInfo.type = BMP_32;
 	break;
       default:
-	throw runtime_error("TU::ImageBase::restoreBMPHeader: unsupported depth!!");
+	throw std::runtime_error("TU::ImageBase::restoreBMPHeader: unsupported depth!!");
 	break;
     }
 
@@ -488,53 +455,51 @@ ImageBase::restoreBMPHeader(std::istream& in)
 ImageBase::Type
 ImageBase::savePBMHeader(std::ostream& out, Type type) const
 {
-    using namespace	std;
-    
     out << 'P';
     switch (type)
     {
       case RGB_24:
-	out << int(RGB_24) << endl;
+	out << int(RGB_24) << std::endl;
 	break;
       default:
-	out << int(U_CHAR) << endl;
+	out << int(U_CHAR) << std::endl;
 	break;
     }
 
     const size_t	depth = type2depth(type);
-    out << "# PixelLength: " << bit2byte(depth) << endl;
+    out << "# PixelLength: " << bit2byte(depth) << std::endl;
     out << "# DataType: ";
     switch (type)
     {
       default:
-	out << "Char" << endl;
+	out << "Char" << std::endl;
 	break;
       case RGB_24:
-	out << "RGB24" << endl;
+	out << "RGB24" << std::endl;
 	break;
       case SHORT:
-	out << "Short" << endl;
+	out << "Short" << std::endl;
 	break;
       case INT:
-	out << "Int" << endl;
+	out << "Int" << std::endl;
 	break;
       case FLOAT:
-	out << "Float" << endl;
+	out << "Float" << std::endl;
 	break;
       case DOUBLE:
-	out << "Double" << endl;
+	out << "Double" << std::endl;
 	break;
       case YUV_444:
-	out << "YUV444" << endl;
+	out << "YUV444" << std::endl;
 	break;
       case YUV_422:
-	out << "YUV422" << endl;
+	out << "YUV422" << std::endl;
 	break;
       case YUYV_422:
-	out << "YUYV422" << endl;
+	out << "YUYV422" << std::endl;
 	break;
       case YUV_411:
-	out << "YUV411" << endl;
+	out << "YUV411" << std::endl;
 	break;
     }
     out << "# Sign: ";
@@ -544,33 +509,33 @@ ImageBase::savePBMHeader(std::ostream& out, Type type) const
       case INT:
       case FLOAT:
       case DOUBLE:
-	out << "Signed" << endl;
+	out << "Signed" << std::endl;
 	break;
       default:
-	out << "Unsigned" << endl;
+	out << "Unsigned" << std::endl;
 	break;
     }
     if (isBigEndian())
-	out << "# Endian: Big" << endl;
+	out << "# Endian: Big" << std::endl;
     else
-	out << "# Endian: Little" << endl;
-    out << "# PinHoleParameterH11: " << P[0][0] << endl
-	<< "# PinHoleParameterH12: " << P[0][1] << endl
-	<< "# PinHoleParameterH13: " << P[0][2] << endl
-	<< "# PinHoleParameterH14: " << P[0][3] << endl
-	<< "# PinHoleParameterH21: " << P[1][0] << endl
-	<< "# PinHoleParameterH22: " << P[1][1] << endl
-	<< "# PinHoleParameterH23: " << P[1][2] << endl
-	<< "# PinHoleParameterH24: " << P[1][3] << endl
-	<< "# PinHoleParameterH31: " << P[2][0] << endl
-	<< "# PinHoleParameterH32: " << P[2][1] << endl
-	<< "# PinHoleParameterH33: " << P[2][2] << endl
-	<< "# PinHoleParameterH34: " << P[2][3] << endl;
+	out << "# Endian: Little" << std::endl;
+    out << "# PinHoleParameterH11: " << P[0][0] << std::endl
+	<< "# PinHoleParameterH12: " << P[0][1] << std::endl
+	<< "# PinHoleParameterH13: " << P[0][2] << std::endl
+	<< "# PinHoleParameterH14: " << P[0][3] << std::endl
+	<< "# PinHoleParameterH21: " << P[1][0] << std::endl
+	<< "# PinHoleParameterH22: " << P[1][1] << std::endl
+	<< "# PinHoleParameterH23: " << P[1][2] << std::endl
+	<< "# PinHoleParameterH24: " << P[1][3] << std::endl
+	<< "# PinHoleParameterH31: " << P[2][0] << std::endl
+	<< "# PinHoleParameterH32: " << P[2][1] << std::endl
+	<< "# PinHoleParameterH33: " << P[2][2] << std::endl
+	<< "# PinHoleParameterH34: " << P[2][3] << std::endl;
     if (d1 != 0.0 || d2 != 0.0)
-	out << "# DistortionParameterD1: " << d1 << endl
-	    << "# DistortionParameterD2: " << d2 << endl;
+	out << "# DistortionParameterD1: " << d1 << std::endl
+	    << "# DistortionParameterD2: " << d2 << std::endl;
     out << _width() << ' ' << _height() << '\n'
-	<< 255 << endl;
+	<< 255 << std::endl;
     
     return type;
 }

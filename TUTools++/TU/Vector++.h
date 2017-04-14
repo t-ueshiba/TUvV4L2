@@ -1,378 +1,230 @@
-/*
- *  平成14-19年（独）産業技術総合研究所 著作権所有
- *  
- *  創作者：植芝俊夫
- *
- *  本プログラムは（独）産業技術総合研究所の職員である植芝俊夫が創作し，
- *  （独）産業技術総合研究所が著作権を所有する秘密情報です．著作権所有
- *  者による許可なしに本プログラムを使用，複製，改変，第三者へ開示する
- *  等の行為を禁止します．
- *  
- *  このプログラムによって生じるいかなる損害に対しても，著作権所有者お
- *  よび創作者は責任を負いません。
- *
- *  Copyright 2002-2007.
- *  National Institute of Advanced Industrial Science and Technology (AIST)
- *
- *  Creator: Toshio UESHIBA
- *
- *  [AIST Confidential and all rights reserved.]
- *  This program is confidential. Any using, copying, changing or
- *  giving any information concerning with this program to others
- *  without permission by the copyright holder are strictly prohibited.
- *
- *  [No Warranty.]
- *  The copyright holder or the creator are not responsible for any
- *  damages caused by using this program.
- *  
- *  $Id$
- */
 /*!
   \file		Vector++.h
-  \brief	ベクトルと行列およびそれに関連するクラスの定義と実装
+  \brief	ベクトルと行列の演算およびそれに関連するクラスの定義と実装
 */
 #ifndef __TU_VECTORPP_H
 #define __TU_VECTORPP_H
 
 #include "TU/Array++.h"
-#include <numeric>
-#include <cmath>
-#include <utility>	// std::declval<T>
 
 namespace TU
 {
-template <class T, size_t D=0>			class Vector;
-template <class T, size_t R=0, size_t C=0>	class Matrix;
-
 /************************************************************************
-*  class Rotation<T>							*
+*  evaluation of opnodes						*
 ************************************************************************/
-//! 2次元超平面内での回転を表すクラス
+//! 演算子の評価結果の型を返す
 /*!
-  具体的には
-  \f[
-    \TUvec{R}{}(p, q; \theta) \equiv
-    \begin{array}{r@{}l}
-      & \begin{array}{ccccccccccc}
-        & & \makebox[4.0em]{} & p & & & \makebox[3.8em]{} & q & & &
-      \end{array} \\
-      \begin{array}{l}
-        \\ \\ \\ \raisebox{1.5ex}{$p$} \\ \\ \\ \\ \raisebox{1.5ex}{$q$} \\ \\ \\
-      \end{array} &
-      \TUbeginarray{ccccccccccc}
-	1 \\
-	& \ddots \\
-	& & 1 \\
-	& & & \cos\theta & & & & -\sin\theta \\
-	& & & & 1 \\
-	& & & & & \ddots \\
-	& & & & & & 1 \\
-	& & & \sin\theta & & & & \cos\theta \\
-	& & & & & & & & 1\\
-	& & & & & & & & & \ddots \\
-	& & & & & & & & & & 1
-      \TUendarray
-    \end{array}
-  \f]
-  なる回転行列で表される．
+  Eの型が演算子ならばその評価結果である配列の型を，rangeならばE自体を，
+  どちらでもなければEへの定数参照を返す
+  \param E	配列式の型
 */
-template <class T>
-class Rotation
-{
-  public:
-    typedef T	element_type;	//!< 成分の型
-    
-  public:
-    Rotation(size_t p, size_t q, element_type x, element_type y)	;
-    Rotation(size_t p, size_t q, element_type theta)			;
+template <class E>
+using result_t	= std::conditional_t<detail::is_opnode<E>::value ||
+				     detail::is_range<E>::value,
+				     typename detail::substance_t<
+					 E, detail::is_opnode>::type,
+				     const E&>;
 
-  //! p軸を返す．
-  /*!
-    \return	p軸のindex
-  */
-    size_t		p()				const	{return _p;}
-
-  //! q軸を返す．
-  /*!
-    \return	q軸のindex
-  */
-    size_t		q()				const	{return _q;}
-
-  //! 回転角生成ベクトルの長さを返す．
-  /*!
-    \return	回転角生成ベクトル(x, y)に対して\f$\sqrt{x^2 + y^2}\f$
-  */
-    element_type	length()			const	{return _l;}
-
-  //! 回転角のcos値を返す．
-  /*!
-    \return	回転角のcos値
-  */
-    element_type	cos()				const	{return _c;}
-
-  //! 回転角のsin値を返す．
-  /*!
-    \return	回転角のsin値
-  */
-    element_type	sin()				const	{return _s;}
-    
-  private:
-    const size_t		_p, _q;		// rotation axis
-    element_type	_l;		// length of (x, y)
-    element_type	_c, _s;		// cos & sin
-};
-
-//! 2次元超平面内での回転を生成する
+//! 配列式の評価結果を返す
 /*!
-  \param p	p軸を指定するindex
-  \param q	q軸を指定するindex
-  \param x	回転角を生成する際のx値
-  \param y	回転角を生成する際のy値
-		\f[
-		  \cos\theta = \frac{x}{\sqrt{x^2+y^2}},{\hskip 1em}
-		  \sin\theta = \frac{y}{\sqrt{x^2+y^2}}
-		\f]
+  \param expr	配列式
+  \return	exprが演算子ならばその評価結果である配列を，そうでなければ
+		expr自体の参照を返す
 */
-template <class T> inline
-Rotation<T>::Rotation(size_t p, size_t q, element_type x, element_type y)
-    :_p(p), _q(q), _l(1), _c(1), _s(0)
+template <class E> inline result_t<E>
+evaluate(const E& expr)
 {
-    const element_type	absx = std::abs(x), absy = std::abs(y);
-    _l = (absx > absy ? absx * std::sqrt(1 + (absy*absy)/(absx*absx))
-		      : absy * std::sqrt(1 + (absx*absx)/(absy*absy)));
-    if (_l != 0)
-    {
-	_c = x / _l;
-	_s = y / _l;
-    }
+    return expr;
 }
 
-//! 2次元超平面内での回転を生成する
-/*!
-  \param p	p軸を指定するindex
-  \param q	q軸を指定するindex
-  \param theta	回転角
-*/
-template <class T> inline
-Rotation<T>::Rotation(size_t p, size_t q, element_type theta)
-    :_p(p), _q(q), _l(1), _c(std::cos(theta)), _s(std::sin(theta))
+template <class E>
+inline std::enable_if_t<detail::is_opnode<E>::value, std::ostream&>
+operator <<(std::ostream& out, const E& expr)
 {
+    return out << evaluate(expr);
+}
+    
+/************************************************************************
+*  products of two ranges						*
+************************************************************************/
+namespace detail
+{
+  //! 2つの配列式に対する積演算子を表すクラス
+  /*!
+    \param OP	積演算子の型
+    \param L	積演算子の第1引数となる式の型
+    \param R	積演算子の第2引数となる式の型
+   */
+  template <class OP, class L, class R>
+  class product_opnode : public opnode
+  {
+    private:
+      class binder2nd
+      {
+	public:
+	  binder2nd(OP op, const R& r)	:_r(r), _op(op)	{}
+
+	  template <class T_>
+	  auto	operator ()(const T_& arg)	const	{ return _op(arg, _r); }
+
+	private:
+	  TU::result_t<R>	_r;	// 評価後に固定された第2引数
+	  const OP		_op;
+      };
+
+    public:
+    // transform_iterator への第1テンプレートパラメータを，binder2nd そのもの
+    // ではなく，それへの定数参照とすることにより cache のコピーを防ぐ
+      using iterator = boost::transform_iterator<const binder2nd&,
+						 iterator_t<const L> >;
+      
+    public:
+		product_opnode(const L& l, const R& r, OP op)
+		    :_l(l), _binder(op, r)				{}
+
+      constexpr static size_t
+		size0()		{ return TU::size0<L>(); }
+      iterator	begin()	const	{ return {std::begin(_l), _binder}; }
+      iterator	end()	const	{ return {std::end(_l),   _binder}; }
+      size_t	size()	const	{ return std::size(_l); }
+      auto	operator [](size_t i) const
+		{
+		    return *(begin() + i);
+		}
+
+    private:
+      argument_t<L>	_l;
+      const binder2nd	_binder;
+  };
+
+  template <class OP, class L, class R> inline product_opnode<OP, L, R>
+  make_product_opnode(const L& l, const R& r, OP op)
+  {
+      return {l, r, op};
+  }
+
+  struct bit_xor
+  {
+      template <class X_, class Y_>
+      auto	operator ()(const X_& x, const Y_& y) const
+		{
+		    return x ^ y;
+		}
+  };
+}	// namespace detail
+
+//! 2つの1次元配列式の内積をとる.
+/*!
+  演算子ノードではなく，評価結果のスカラー値が返される.
+  \param l	左辺の1次元配列式
+  \param r	右辺の1次元配列式
+  \return	内積の評価結果
+*/
+template <class L, class R,
+	  std::enable_if_t<rank<L>() == 1 && rank<R>() == 1>* = nullptr>
+inline auto
+operator *(const L& l, const R& r)
+{
+    using value_type = std::common_type_t<value_t<L>, value_t<R> >;
+
+    assert(size<0>(l) == size<0>(r));
+    constexpr size_t	S = detail::max<size0<L>(), size0<R>()>::value;
+    return inner_product<S>(std::begin(l), std::size(l), std::begin(r),
+			    value_type(0));
 }
 
-/************************************************************************
-*  class Vector<T>							*
-************************************************************************/
-//! T型の成分を持つベクトルを表すクラス
+//! 2次元配列式と1または2次元配列式の積をとる.
 /*!
-  \param T	成分の型
-  \param B	バッファ
+  \param l	左辺の2次元配列式
+  \param r	右辺の1または2次元配列式
+  \return	積を表す演算子ノード
 */
-template <class T, size_t D>
-class Vector : public Array<T, D>
+template <class L, class R, std::enable_if_t<rank<L>() == 2 &&
+					     rank<R>() >= 1 &&
+					     rank<R>() <= 2>* = nullptr>
+inline auto
+operator *(const L& l, const R& r)
 {
-  private:
-    typedef Array<T, D>				super;
+    return detail::make_product_opnode(l, r, [](const auto& x, const auto& y)
+					     { return x * y; });
+}
+
+//! 1次元配列式と2次元配列式の積をとる.
+/*!
+  \param l	左辺の1次元配列式
+  \param r	右辺の2次元配列式
+  \return	積を表す演算子ノード
+*/
+template <class L, class R,
+	  std::enable_if_t<rank<L>() == 1 && rank<R>() == 2>* = nullptr>
+inline auto
+operator *(const L& l, const R& r)
+{
+    constexpr size_t	S = size0<value_t<R> >();
+    return detail::make_product_opnode(
+      	       make_range<S>(column_begin(r), size<1>(r)), l,
+	       [](const auto& x, const auto& y){ return x * y; });
+}
     
-  public:
-    typedef typename super::element_type		element_type;
-    typedef typename super::value_type			value_type;
-    typedef typename super::difference_type		difference_type;
-    typedef typename super::reference			reference;
-    typedef typename super::const_reference		const_reference;
-    typedef typename super::iterator			iterator;
-    typedef typename super::const_iterator		const_iterator;
-    typedef typename super::reverse_iterator		reverse_iterator;
-    typedef typename super::const_reverse_iterator	const_reverse_iterator;
-  //! 成分の型が等しい3次元ベクトルの型
-    typedef Vector<T, 3>				vector3_type;
-  //! 成分の型が等しい3x3行列の型
-    typedef Matrix<T, 3, 3>				matrix33_type;
-    
-  public:
-    Vector()								;
-    explicit Vector(size_t d)						;
-    Vector(T* p, size_t d)						;
-    template <size_t D2>
-    Vector(Vector<T, D2>& v, size_t i, size_t d)			;
-    Vector(std::initializer_list<value_type> args)			;
-    Vector&		operator =(std::
-				   initializer_list<value_type> args)	;
-    Vector&		operator =(const element_type& c)		;
-    
-    using		super::data;
-    using		super::begin;
-    using		super::cbegin;
-    using		super::end;
-    using		super::cend;
-    using		super::rbegin;
-    using		super::crbegin;
-    using		super::rend;
-    using		super::crend;
-    using		super::size;
-    
-    const Vector<T>	operator ()(size_t i, size_t d)		const	;
-    Vector<T>		operator ()(size_t i, size_t d)			;
-    T			square()				const	;
-    double		length()				const	;
-    Vector&		normalize()					;
-    Vector		normal()				const	;
-    matrix33_type	skew()					const	;
-    Vector<T>		homogeneous()				const	;
-    Vector<T>		inhomogeneous()				const	;
-#if !defined(__NVCC__)
-    template <class E,
-	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
-    Vector(const E& v)							;
-    template <class E>
-    typename std::enable_if<is_range<E>::value, Vector&>::type
-			operator =(const E& v)				;
-    template <class E>
-    typename std::enable_if<is_range<E>::value, Vector&>::type
-			operator *=(const E& m)				;
-    template <class E>
-    typename std::enable_if<is_range<E>::value, Vector&>::type
-			operator ^=(const E& v)				;
-    template <class E>
-    typename std::enable_if<is_range<E>::value, T>::type
-    			sqdist(const E& v)			const	;
-    template <class E>
-    typename std::enable_if<is_range<E>::value, double>::type
-			dist(const E& v)			const	;
-    template <class E>
-    typename std::enable_if<is_range<E>::value, Vector&>::type
-			solve(const E& m)				;
+//! 2つの1次元配列式の外積をとる.
+/*!
+  \param l	左辺の1次元配列式
+  \param r	右辺の1次元配列式
+  \return	外積を表す演算子ノード
+*/
+template <class L, class R,
+	  std::enable_if_t<rank<L>() == 1 && rank<R>() == 1>* = nullptr>
+inline auto
+operator %(const L& l, const R& r)
+{
+    return detail::make_product_opnode(l, r, [](const auto& x, const auto& y)
+					     { return x * y; });
+}
+
+//! 2つの1次元配列式のベクトル積をとる.
+/*!
+  演算子ノードではなく，評価結果の3次元配列が返される.
+  \param l	左辺の1次元配列式
+  \param r	右辺の1次元配列式
+  \return	ベクトル積
+*/
+template <class L, class R>
+inline std::enable_if_t<rank<L>() == 1 && rank<R>() == 1,
+			Array<std::common_type_t<element_t<L>, element_t<R> >,
+			      3> >
+operator ^(const L& l, const R& r)
+{
+#ifdef TU_DEBUG
+    std::cout << "operator ^ [" << print_sizes(l) << ']' << std::endl;
 #endif
-};
-
-//! ベクトルを生成し，全成分を0で初期化する．
-template <class T, size_t D>
-Vector<T, D>::Vector()
-    :super()
-{
-}
-
-//! 指定された次元のベクトルを生成し，全成分を0で初期化する．
-/*!
-  \param d	ベクトルの次元
-*/
-template <class T, size_t D> inline
-Vector<T, D>::Vector(size_t d)
-    :super(d)
-{
-}
-
-//! 外部記憶領域と次元を指定してベクトルを生成する．
-/*!
-  \param p	外部記憶領域へのポインタ
-  \param d	ベクトルの次元
-*/
-template <class T, size_t D> inline
-Vector<T, D>::Vector(T* p, size_t d)
-    :super(p, d)
-{
-}
-
-//! 与えられたベクトルと記憶領域を共有する部分ベクトルを生成する．
-/*!
-  \param v	元のベクトル
-  \param i	部分ベクトルの第0成分を指定するindex
-  \param d	部分ベクトルの次元
-*/
-template <class T, size_t D> template <size_t D2> inline
-Vector<T, D>::Vector(Vector<T, D2>& v, size_t i, size_t d)
-    :super(v, i, d)
-{
-}
-
-template <class T, size_t D> inline
-Vector<T, D>::Vector(std::initializer_list<value_type> args)
-    :super(args)
-{
-}
+    assert(size<0>(l) == 3 && size<0>(r) == 3);
     
-template <class T, size_t D> inline Vector<T, D>&
-Vector<T, D>::operator =(std::initializer_list<value_type> args)
-{
-    super::operator =(args);
-    return *this;
+    const auto&	el = evaluate(l);
+    const auto&	er = evaluate(r);
+
+    return {el[1] * er[2] - el[2] * er[1],
+	    el[2] * er[0] - el[0] * er[2],
+	    el[0] * er[1] - el[1] * er[0]};
 }
 
-template <class T, size_t D> inline Vector<T, D>&
-Vector<T, D>::operator =(const element_type& c)
-{
-    super::operator =(c);
-    return *this;
-}
-    
-//! このベクトルと記憶領域を共有した部分ベクトルを生成する．
+//! 2次元配列式の各行と1次元配列式のベクトル積をとる.
 /*!
-    \param i	部分ベクトルの第0成分を指定するindex
-    \param d	部分ベクトルの次元
-    \return	生成された部分ベクトル
+  \param l	左辺の2次元配列式
+  \param r	右辺の1次元配列式
+  \return	ベクトル積を表す演算子ノード
 */
-template <class T, size_t D> inline Vector<T>
-Vector<T, D>::operator ()(size_t i, size_t d)
+template <class L, class R, std::enable_if_t<rank<L>() == 2 &&
+					     rank<R>() == 1>* = nullptr>
+inline auto
+operator ^(const L& l, const R& r)
 {
-    return Vector<T>(*this, i, d);
+    return detail::make_product_opnode(l, r, detail::bit_xor());
 }
 
-//! このベクトルと記憶領域を共有した部分ベクトルを生成する．
-/*!
-    \param i	部分ベクトルの第0成分を指定するindex
-    \param d	部分ベクトルの次元
-    \return	生成された部分ベクトル
-*/
-template <class T, size_t D> inline const Vector<T>
-Vector<T, D>::operator ()(size_t i, size_t d) const
-{
-    return Vector<T>(const_cast<Vector<T, D>&>(*this), i, d);
-}
-
-//! このベクトルの長さの2乗を返す．
-/*!
-  \return	ベクトルの長さの2乗，すなわち\f$\TUnorm{\TUvec{u}{}}^2\f$
-*/
-template <class T, size_t D> inline T
-Vector<T, D>::square() const
-{
-    return *this * *this;
-}
-
-//! このベクトルの長さを返す．
-/*!
-  \return	ベクトルの長さ，すなわち\f$\TUnorm{\TUvec{u}{}}\f$
-*/
-template <class T, size_t D> inline double
-Vector<T, D>::length() const
-{
-    return std::sqrt(double(square()));
-}
-
-//! このベクトルの長さを1に正規化する．
-/*!
-  \return	このベクトル，すなわち
-		\f$
-		  \TUvec{u}{}\leftarrow\frac{\TUvec{u}{}}{\TUnorm{\TUvec{u}{}}}
-		\f$
-*/
-template <class T, size_t D> inline Vector<T, D>&
-Vector<T, D>::normalize()
-{
-    return *this /= length();
-}
-
-//! このベクトルの長さを1に正規化したベクトルを返す．
-/*!
-  \return	長さを正規化したベクトル，すなわち
-		\f$\frac{\TUvec{u}{}}{\TUnorm{\TUvec{u}{}}}\f$
-*/
-template <class T, size_t D> inline Vector<T, D>
-Vector<T, D>::normal() const
-{
-    return Vector(*this).normalize();
-}
-
-//! この3次元ベクトルから3x3反対称行列を生成する．
+/************************************************************************
+*  generic algorithms for vectors					*
+************************************************************************/
+//! 3次元ベクトルから3x3反対称行列を生成する．
 /*!
   \return	生成された反対称行列，すなわち
   \f[
@@ -383,1052 +235,233 @@ Vector<T, D>::normal() const
   \f]
   \throw std::invalid_argument	3次元ベクトルでない場合に送出
 */
-template <class T, size_t D> Matrix<T, 3, 3>
-Vector<T, D>::skew() const
+template <class E, std::enable_if_t<rank<E>() == 1>* = nullptr> inline auto
+skew(const E& expr)
 {
-    if (size() != 3)
-	throw std::invalid_argument("TU::Vector<T, D>::skew: dimension must be 3");
-    matrix33_type	r;
-    r[2][1] = (*this)[0];
-    r[0][2] = (*this)[1];
-    r[1][0] = (*this)[2];
-    r[1][2] = -r[2][1];
-    r[2][0] = -r[0][2];
-    r[0][1] = -r[1][0];
-    return r;
+    using result_t = Array2<element_t<E>, 3, 3>;
+    
+    assert(size<0>(expr) == 3);
+
+    const auto&	a = evaluate(expr);
+    return result_t({{0, -a[2], a[1]}, {a[2], 0, -a[0]}, {-a[1], a[0], 0}});
 }
 
 //! 非同次座標を表すベクトルに対し，値1を持つ成分を最後に付加した同次座標ベクトルを返す．
 /*!
   \return	同次化されたベクトル
 */
-template <class T, size_t D> inline Vector<T>
-Vector<T, D>::homogeneous() const
+template <class E, std::enable_if_t<rank<E>() == 1>* = nullptr> inline auto
+homogeneous(const E& expr)
 {
-    Vector<T>	v(size() + 1);
-    v(0, size()) = *this;
-    v[size()]	 = 1;
-    return v;
+    constexpr size_t	N = size0<E>();
+    using element_type	= element_t<E>;
+    using result_type	= std::conditional_t<N == 0,
+					     Array<element_type, 0>,
+					     Array<element_type, N+1> >;
+
+    const auto	n = std::size(expr);
+    result_type	r(n + 1);
+    slice(r, 0, n) = expr;
+    r[n]	   = 1;
+    return r;
 }
 
 //! 同次座標を表すベクトルに対し，各成分を最後の成分で割った非同次座標ベクトルを返す．
 /*!
   \return	非同次化されたベクトル
 */
-template <class T, size_t D> inline Vector<T>
-Vector<T, D>::inhomogeneous() const
+template <class E, std::enable_if_t<rank<E>() == 1>* = nullptr> inline auto
+inhomogeneous(const E& expr)
 {
-    return (*this)(0, size()-1) / (*this)[size()-1];
+    constexpr size_t	N = size0<E>();
+    using element_type	= element_t<E>;
+    using result_type	= std::conditional_t<N == 0,
+					     Array<element_type, 0>,
+					     Array<element_type, N-1> >;
+
+    const auto	n = std::size(expr) - 1;
+    return result_type(slice(expr, 0, n) / *(std::begin(expr) + n));
 }
 
-#if !defined(__NVCC__)
-//! 他のベクトルと同一成分を持つベクトルを作る(コピーコンストラクタの拡張)．
-/*!
-  \param v	コピー元ベクトル
-*/
-template <class T, size_t D>
-template <class E, typename std::enable_if<is_range<E>::value>::type*> inline
-Vector<T, D>::Vector(const E& v)
-    :super(v)
-{
-}
-    
-//! 他のベクトルを自分に代入する(代入演算子の拡張)．
-/*!
-  \param v	コピー元ベクトル
-  \return	このベクトル
-*/
-template <class T, size_t D> template <class E>
-inline typename std::enable_if<is_range<E>::value, Vector<T, D>&>::type
-Vector<T, D>::operator =(const E& v)
-{
-    super::operator =(v);
-    return *this;
-}
-
-//! このベクトルの右から行列を掛ける．
-/*!
-  \param m	掛ける行列
-  \return	このベクトル，すなわち
-		\f$\TUvec{u}{}\leftarrow \TUvec{u}{}\TUvec{M}{}\f$
-*/
-template <class T, size_t D> template <class E>
-inline typename std::enable_if<is_range<E>::value, Vector<T, D>&>::type
-Vector<T, D>::operator *=(const E& m)
-{
-    return *this = *this * m;
-}
-
-//! このベクトルと他の3次元ベクトルとのベクトル積をとる．
-/*!
-  \param v	他のベクトル
-  \return	このベクトル，すなわち
-		\f$\TUvec{u}{}\leftarrow \TUvec{u}{} \times \TUvec{v}{}\f$
-*/
-template <class T, size_t D> template <class E>
-inline typename std::enable_if<is_range<E>::value, Vector<T, D>&>::type
-Vector<T, D>::operator ^=(const E& v)
-{
-    return *this = *this ^ v;
-}
-
-//! このベクトルと他のベクトルの差の長さの2乗を返す．
-/*!
-  \param v	比較対象となるベクトル
-  \return	ベクトル間の差の2乗，すなわち
-		\f$\TUnorm{\TUvec{u}{} - \TUvec{v}{}}^2\f$
-*/
-template <class T, size_t D> template <class E>
-inline typename std::enable_if<is_range<E>::value, T>::type
-Vector<T, D>::sqdist(const E& v) const
-{
-    return Vector(*this - v).square();
-}
-
-//! このベクトルと他のベクトルの差の長さを返す．
-/*!
-  \param v	比較対象となるベクトル
-  \return	ベクトル間の差，すなわち
-		\f$\TUnorm{\TUvec{u}{} - \TUvec{v}{}}\f$
-*/
-template <class T, size_t D> template <class E>
-inline typename std::enable_if<is_range<E>::value, double>::type
-Vector<T, D>::dist(const E& v) const
-{
-    return std::sqrt(double(sqdist(v)));
-}
-#endif	// !__NVCC__
-    
 /************************************************************************
-*  class Matrix<T, R, C>						*
+*  generic algorithms for matrices					*
 ************************************************************************/
-template <class T>	class BlockDiagonalMatrix;
-template <class T>	class TriDiagonal;
-template <class T>	class SVDecomposition;
-
-//! T型の成分を持つ行列を表すクラス
-/*!
-  各行がT型の成分を持つベクトル#TU::Vector<T>になっている．
-  \param T	成分の型
-  \param B	バッファ
-  \param R	行バッファ
-*/
-template <class T, size_t R, size_t C>
-class Matrix : public Array2<Vector<T>, R, C>
-{
-  private:
-    typedef Array2<Vector<T>, R, C>			super;
-    
-  public:
-    typedef typename super::element_type		element_type;
-    typedef typename super::value_type			value_type;
-    typedef typename super::difference_type		difference_type;
-    typedef typename super::reference			reference;
-    typedef typename super::const_reference		const_reference;
-    typedef typename super::iterator			iterator;
-    typedef typename super::const_iterator		const_iterator;
-    typedef typename super::reverse_iterator		reverse_iterator;
-    typedef typename super::const_reverse_iterator	const_reverse_iterator;
-  //! 成分の型が等しい3次元ベクトルの型
-    typedef Vector<T, 3>				vector3_type;
-  //! 成分の型が等しい4次元ベクトルの型
-    typedef Vector<T, 4>				vector4_type;
-  //! 成分の型が等しい2x2行列の型
-    typedef Matrix<T, 2, 2>				matrix22_type;
-  //! 成分の型が等しい3x3行列の型
-    typedef Matrix<T, 3, 3>				matrix33_type;
-    
-  public:
-    Matrix()								;
-    Matrix(size_t r, size_t c)						;
-    Matrix(T* p, size_t r, size_t c)					;
-    template <size_t R2, size_t C2>
-    Matrix(Matrix<T, R2, C2>& m, size_t i, size_t j, size_t r, size_t c);
-    Matrix(std::initializer_list<value_type> args)			;
-    Matrix(const BlockDiagonalMatrix<T>& m)				;
-    Matrix&		operator =(std::
-				   initializer_list<value_type> arg)	;
-    Matrix&		operator =(const BlockDiagonalMatrix<T>& m)	;
-    Matrix&		operator =(const element_type& c)		;
-    
-    using		super::begin;
-    using		super::cbegin;
-    using		super::end;
-    using		super::cend;
-    using		super::rbegin;
-    using		super::crbegin;
-    using		super::rend;
-    using		super::crend;
-    using		super::size;
-    using		super::nrow;
-    using		super::ncol;
-    using		super::data;
-
-    const Matrix<T>	operator ()(size_t i, size_t j,
-				    size_t r, size_t c)		const	;
-    Matrix<T>		operator ()(size_t i, size_t j,
-				    size_t r, size_t c)			;
-    Matrix&		diag(T c)					;
-    Matrix<T>		trns()					const	;
-    Matrix		inv()					const	;
-    T			det()					const	;
-    T			det(size_t p, size_t q)			const	;
-    T			trace()					const	;
-    Matrix		adj()					const	;
-    Matrix<T>		pinv(T cndnum=1.0e5)			const	;
-    Matrix<T>		eigen(Vector<T>& eval, bool abs=true)	const	;
-    Matrix<T>		geigen(const Matrix<T>& BB,
-			       Vector<T>& eval, bool abs=true)	const	;
-    Matrix		cholesky()				const	;
-    Matrix&		normalize()					;
-    Matrix&		rotate_from_left(const Rotation<T>& r)		;
-    Matrix&		rotate_from_right(const Rotation<T>& r)		;
-    T			square()				const	;
-    double		length()				const	;
-    Matrix&		symmetrize()					;
-    Matrix&		antisymmetrize()				;
-    void		rot2angle(T& theta_x,
-				  T& theta_y, T& theta_z)	const	;
-    vector3_type	rot2axis(T& c, T& s)			const	;
-    vector3_type	rot2axis()				const	;
-    vector4_type	rot2quaternion()			const	;
-
-    static Matrix	I(size_t d)					;
-    static matrix22_type
-			Rt(T theta)					;
-    template <class T2, size_t D2>
-    static matrix33_type
-			Rt(const Vector<T2, D2>& n, T c, T s)		;
-    template <class T2, size_t D2>
-    static matrix33_type
-			Rt(const Vector<T2, D2>& v)			;
-#if !defined(__NVCC__)
-    template <class E,
-	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
-    Matrix(const E& expr)	:super(expr)				{}
-    template <class E>
-    typename std::enable_if<is_range<E>::value, Matrix&>::type
-			operator =(const E& expr)
-			{
-			    super::operator =(expr);
-			    return *this;
-			}
-    template <class E>
-    typename std::enable_if<is_range<E>::value, Matrix&>::type
-			operator *=(const E& m)				;
-    template <class E>
-    typename std::enable_if<is_range<E>::value, Matrix&>::type
-			operator ^=(const E& v)				;
-    template <class E>
-    typename std::enable_if<is_range<E>::value, Matrix&>::type
-			solve(const E& m)				;
-#endif	// !__NVCC__
-};
-
-//! 行列を生成し，全成分を0で初期化する．
-template <class T, size_t R, size_t C> inline
-Matrix<T, R, C>::Matrix()
-    :super()
-{
-}
-
-//! 指定されたサイズの行列を生成し，全成分を0で初期化する．
-/*!
-  \param r	行列の行数
-  \param c	行列の列数
-*/
-template <class T, size_t R, size_t C> inline
-Matrix<T, R, C>::Matrix(size_t r, size_t c)
-    :super(r, c)
-{
-}
-
-//! 外部記憶領域とサイズを指定して行列を生成する．
-/*!
-  \param p	外部記憶領域へのポインタ
-  \param r	行列の行数
-  \param c	行列の列数
-*/
-template <class T, size_t R, size_t C> inline
-Matrix<T, R, C>::Matrix(T* p, size_t r, size_t c)
-    :super(p, r, c)
-{
-}
-
-//! 与えられた行列と記憶領域を共有する部分行列を生成する．
-/*!
-  \param m	元の行列
-  \param i	部分行列の第0行を指定するindex
-  \param j	部分行列の第0列を指定するindex
-  \param r	部分行列の行数
-  \param c	部分行列の列数
-*/
-template <class T, size_t R, size_t C>
-template <size_t R2, size_t C2> inline
-Matrix<T, R, C>::Matrix(Matrix<T, R2, C2>& m,
-			size_t i, size_t j, size_t r, size_t c)
-    :super(m, i, j, r, c)
-{
-}
-
-template <class T, size_t R, size_t C> inline
-Matrix<T, R, C>::Matrix(std::initializer_list<value_type> args)
-    :super(args)
-{
-}
-
-template <class T, size_t R, size_t C>
-inline Matrix<T, R, C>&
-Matrix<T, R, C>::operator =(std::initializer_list<value_type> args)
-{
-    super::operator =(args);
-    return *this;
-}
-
-template <class T, size_t R, size_t C>
-inline Matrix<T, R, C>&
-Matrix<T, R, C>::operator =(const element_type& c)
-{
-    super::operator =(c);
-    return *this;
-}
-
-//! この行列と記憶領域を共有した部分行列を生成する．
-/*!
-    \param i	部分行列の左上隅成分となる行を指定するindex
-    \param j	部分行列の左上隅成分となる列を指定するindex
-    \param r	部分行列の行数
-    \param c	部分行列の列数
-    \return	生成された部分行列
-*/
-template <class T, size_t R, size_t C> inline Matrix<T>
-Matrix<T, R, C>::operator ()(size_t i, size_t j, size_t r, size_t c)
-{
-    return Matrix<T>(*this, i, j, r, c);
-}
-
-//! この行列と記憶領域を共有した部分行列を生成する．
-/*!
-    \param i	部分行列の左上隅成分となる行を指定するindex
-    \param j	部分行列の左上隅成分となる列を指定するindex
-    \param r	部分行列の行数
-    \param c	部分行列の列数
-    \return	生成された部分行列
-*/
-template <class T, size_t R, size_t C> inline const Matrix<T>
-Matrix<T, R, C>::operator ()(size_t i, size_t j, size_t r, size_t c) const
-{
-    return Matrix<T>(const_cast<Matrix<T, R, C>&>(*this), i, j, r, c);
-}
-
-//! この正方行列を全て同一の対角成分値を持つ対角行列にする．
+//! 全て同一の対角成分値を持つ正方行列を生成する．
 /*!
   \param c	対角成分の値
-  \return	この行列，すなわち\f$\TUvec{A}{} \leftarrow \diag(c,\ldots,c)\f$
+  \return	対角行列，すなわち\f$\TUvec{A}{} \leftarrow \diag(c,\ldots,c)\f$
 */
-template <class T, size_t R, size_t C>
-Matrix<T, R, C>&
-Matrix<T, R, C>::diag(T c)
+template <size_t N=0, class T> auto
+diag(T c, size_t n=N)
 {
-    super::check_size(ncol());
-    *this = element_type(0);
-    for (size_t i = 0; i < nrow(); ++i)
-	(*this)[i][i] = c;
-    return *this;
+    Array2<T, N, N>	a(n, n);
+    for (size_t i = 0; i != a.size(); ++i)
+	a[i][i] = c;
+    return std::move(a);
 }
 
-//! この行列の転置行列を返す．
-/*!
-  \return	転置行列，すなわち\f$\TUtvec{A}{}\f$
-*/
-template <class T, size_t R, size_t C> Matrix<T>
-Matrix<T, R, C>::trns() const
-{
-    Matrix<T> val(ncol(), nrow());
-    for (size_t i = 0; i < nrow(); ++i)
-	for (size_t j = 0; j < ncol(); ++j)
-	    val[j][i] = (*this)[i][j];
-    return val;
-}
-
-//! この行列の逆行列を返す．
-/*!
-  \return	逆行列，すなわち\f$\TUinv{A}{}\f$
-*/
-template <class T, size_t R, size_t C>
-inline Matrix<T, R, C>
-Matrix<T, R, C>::inv() const
-{
-    return I(nrow()).solve(*this);
-}
-
-//! この行列の小行列式を返す．
-/*!
-  \param p	元の行列から取り除く行を指定するindex
-  \param q	元の行列から取り除く列を指定するindex
-  \return	小行列式，すなわち\f$\det\TUvec{A}{pq}\f$
-*/
-template <class T, size_t R, size_t C> T
-Matrix<T, R, C>::det(size_t p, size_t q) const
-{
-    Matrix<T>		d(nrow()-1, ncol()-1);
-    for (size_t i = 0; i < p; ++i)
-    {
-	for (size_t j = 0; j < q; ++j)
-	    d[i][j] = (*this)[i][j];
-	for (size_t j = q; j < d.ncol(); ++j)
-	    d[i][j] = (*this)[i][j+1];
-    }
-    for (size_t i = p; i < d.nrow(); ++i)
-    {
-	for (size_t j = 0; j < q; ++j)
-	    d[i][j] = (*this)[i+1][j];
-	for (size_t j = q; j < d.ncol(); ++j)
-	    d[i][j] = (*this)[i+1][j+1];
-    }
-    return d.det();
-}
-
-//! この正方行列のtraceを返す．
+//! 正方行列のtraceを返す．
 /*!
   \return			trace, すなわち\f$\trace\TUvec{A}{}\f$
   \throw std::invalid_argument	正方行列でない場合に送出
 */
-template <class T, size_t R, size_t C> T
-Matrix<T, R, C>::trace() const
+template <class E, std::enable_if_t<rank<E>() == 2>* = nullptr> auto
+trace(const E& expr)
 {
-    if (nrow() != ncol())
-        throw
-	  std::invalid_argument("TU::Matrix<T>::trace(): not square matrix!!");
-    T	val = 0.0;
-    for (size_t i = 0; i < nrow(); ++i)
-	val += (*this)[i][i];
+    assert(size<0>(expr) == size<1>(expr));
+
+    element_t<E>	val = 0;
+    for (size_t i = 0; i < std::size(expr); ++i)
+	val += expr[i][i];
     return val;
 }
 
-//! この行列の余因子行列を返す．
-/*!
-  \return	余因子行列，すなわち
-		\f$\TUtilde{A}{} = (\det\TUvec{A}{})\TUinv{A}{}\f$
-*/
-template <class T, size_t R, size_t C> Matrix<T, R, C>
-Matrix<T, R, C>::adj() const
-{
-    Matrix<T, R, C>	val(nrow(), ncol());
-    for (size_t i = 0; i < val.nrow(); ++i)
-	for (size_t j = 0; j < val.ncol(); ++j)
-	    val[i][j] = ((i + j) % 2 ? -det(j, i) : det(j, i));
-    return val;
-}
-
-//! この行列の疑似逆行列を返す．
-/*!
-  \param cndnum	最大特異値に対する絶対値の割合がこれに達しない基底は無視
-  \return	疑似逆行列，すなわち与えられた行列の特異値分解を
-		\f$\TUvec{A}{} = \TUvec{V}{}\diag(\sigma_0,\ldots,\sigma_{n-1})
-		\TUtvec{U}{}\f$とすると
-		\f[
-		  \TUvec{u}{0}\sigma_0^{-1}\TUtvec{v}{0} + \cdots +
-		  \TUvec{u}{r}\sigma_{r-1}^{-1}\TUtvec{v}{r-1},
-		  {\hskip 1em}\mbox{where}{\hskip 0.5em}
-		  \TUabs{\sigma_1} > \epsilon\TUabs{\sigma_0},\ldots,
-		  \TUabs{\sigma_{r-1}} > \epsilon\TUabs{\sigma_0}
-		\f]
-*/
-template <class T, size_t R, size_t C> Matrix<T>
-Matrix<T, R, C>::pinv(T cndnum) const
-{
-    SVDecomposition<T>	svd(*this);
-    Matrix<T>		val(svd.ncol(), svd.nrow());
-    
-    for (size_t i = 0; i < svd.diagonal().size(); ++i)
-	if (std::fabs(svd[i]) * cndnum > std::fabs(svd[0]))
-	{
-	    const Vector<T>	tmp = svd.Ut()[i] / svd[i];
-	    val += tmp % svd.Vt()[i];
-	}
-
-    return val;
-}
-
-//! この対称行列の固有値と固有ベクトルを返す．
-/*!
-    \param eval	固有値が返される
-    \param abs	固有値を絶対値の大きい順に並べるならtrue, 値の大きい順に
-		並べるならfalse
-    \return	各行が固有ベクトルから成る回転行列，すなわち
-		\f[
-		  \TUvec{A}{}\TUvec{U}{} =
-		  \TUvec{U}{}\diag(\lambda_0,\ldots,\lambda_{n-1}),
-		  {\hskip 1em}\mbox{where}{\hskip 0.5em}
-		  \TUtvec{U}{}\TUvec{U}{} = \TUvec{I}{n},~\det\TUvec{U}{} = 1
-		\f]
-		なる\f$\TUtvec{U}{}\f$
-*/
-template <class T, size_t R, size_t C> Matrix<T>
-Matrix<T, R, C>::eigen(Vector<T>& eval, bool abs) const
-{
-    TriDiagonal<T>	tri(*this);
-
-    tri.diagonalize(abs);
-    eval = tri.diagonal();
-
-    return tri.Ut();
-}
-
-//! この対称行列の一般固有値と一般固有ベクトルを返す．
-/*!
-    \param BB	もとの行列と同一サイズの正値対称行列
-    \param eval	一般固有値が返される
-    \param abs	一般固有値を絶対値の大きい順に並べるならtrue, 値の大きい順に
-		並べるならfalse
-    \return	各行が一般固有ベクトルから成る正則行列
-		（ただし直交行列ではない），すなわち
-		\f[
-		  \TUvec{A}{}\TUvec{U}{} =
-		  \TUvec{B}{}\TUvec{U}{}\diag(\lambda_0,\ldots,\lambda_{n-1}),
-		  {\hskip 1em}\mbox{where}{\hskip 0.5em}
-		  \TUtvec{U}{}\TUvec{B}{}\TUvec{U}{} = \TUvec{I}{n}
-		\f]
-		なる\f$\TUtvec{U}{}\f$
-*/
-template <class T, size_t R, size_t C> Matrix<T>
-Matrix<T, R, C>::geigen(const Matrix<T>& BB, Vector<T>& eval, bool abs) const
-{
-    Matrix<T>	Ltinv = BB.cholesky().inv(), Linv = Ltinv.trns();
-    Matrix<T>	A =  Linv * (*this) * Ltinv;
-    Matrix<T>	Ut = A.eigen(eval, abs);
-    
-    return Ut * Linv;
-}
-
-//! この正値対称行列のCholesky分解（上半三角行列）を返す．
+//! 正値対称行列のCholesky分解（上半三角行列）を返す．
 /*!
   計算においては，もとの行列の上半部分しか使わない
+  \param A	正値対称行列
   \return	\f$\TUvec{A}{} = \TUvec{L}{}\TUtvec{L}{}\f$なる
 		\f$\TUtvec{L}{}\f$（上半三角行列）
   \throw std::invalid_argument	正方行列でない場合に送出
   \throw std::runtime_error	正値でない場合に送出
 */
-template <class T, size_t R, size_t C> Matrix<T, R, C>
-Matrix<T, R, C>::cholesky() const
+template <class E, std::enable_if_t<rank<E>() == 2>* = nullptr> auto
+cholesky(const E& A)
 {
-    if (nrow() != ncol())
-        throw
-	    std::invalid_argument("TU::Matrix<T>::cholesky(): not square matrix!!");
+    if (size<0>(A) != size<1>(A))
+        throw std::invalid_argument("TU::cholesky(): not square matrix!!");
 
-    Matrix<T, R, C>	Lt(*this);
-    for (size_t i = 0; i < nrow(); ++i)
+    Array2<element_t<E>, size0<E>(), size0<E>()>	Lt(A);
+    for (size_t i = 0; i < Lt.nrow(); ++i)
     {
-	T d = Lt[i][i];
+	const auto	Li = Lt[i];
+	auto		d = Li[i];
 	if (d <= 0)
-	    throw std::runtime_error("TU::Matrix<T>::cholesky(): not positive definite matrix!!");
+	    throw std::runtime_error("TU::cholesky(): not positive definite matrix!!");
 	for (size_t j = 0; j < i; ++j)
-	    Lt[i][j] = 0;
-	Lt[i][i] = d = std::sqrt(d);
-	for (size_t j = i + 1; j < ncol(); ++j)
-	    Lt[i][j] /= d;
-	for (size_t j = i + 1; j < nrow(); ++j)
-	    for (size_t k = j; k < ncol(); ++k)
-		Lt[j][k] -= (Lt[i][j] * Lt[i][k]);
+	    Li[j] = 0;
+	Li[i] = d = std::sqrt(d);
+	for (size_t j = i + 1; j < Li.size(); ++j)
+	    Li[j] /= d;
+	for (size_t j = i + 1; j < Lt.nrow(); ++j)
+	    for (size_t k = j; k < Li.size(); ++k)
+		Lt[j][k] -= (Li[j] * Li[k]);
     }
     
-    return Lt;
+    return std::move(Lt);
 }
 
-//! この行列のノルムを1に正規化する．
-/*!
-    \return	この行列，すなわち
-		\f$
-		  \TUvec{A}{}\leftarrow\frac{\TUvec{A}{}}{\TUnorm{\TUvec{A}{}}}
-		\f$
-*/
-template <class T, size_t R, size_t C> Matrix<T, R, C>&
-Matrix<T, R, C>::normalize()
-{
-    T	sum = 0.0;
-    for (size_t i = 0; i < nrow(); ++i)
-	sum += (*this)[i] * (*this)[i];
-    return *this /= std::sqrt(sum);
-}
-
-//! この行列の左から（転置された）回転行列を掛ける．
-/*!
-    \return	この行列，すなわち
-		\f$\TUvec{A}{}\leftarrow\TUtvec{R}{}\TUvec{A}{}\f$
-*/
-template <class T, size_t R, size_t C> Matrix<T, R, C>&
-Matrix<T, R, C>::rotate_from_left(const Rotation<T>& r)
-{
-    for (size_t j = 0; j < ncol(); ++j)
-    {
-	const T	tmp = (*this)[r.p()][j];
-	
-	(*this)[r.p()][j] =  r.cos()*tmp + r.sin()*(*this)[r.q()][j];
-	(*this)[r.q()][j] = -r.sin()*tmp + r.cos()*(*this)[r.q()][j];
-    }
-    return *this;
-}
-
-//! この行列の右から回転行列を掛ける．
-/*!
-    \return	この行列，すなわち
-		\f$\TUvec{A}{}\leftarrow\TUvec{A}{}\TUvec{R}{}\f$
-*/
-template <class T, size_t R, size_t C> Matrix<T, R, C>&
-Matrix<T, R, C>::rotate_from_right(const Rotation<T>& r)
-{
-    for (size_t i = 0; i < nrow(); ++i)
-    {
-	const T	tmp = (*this)[i][r.p()];
-	
-	(*this)[i][r.p()] =  tmp*r.cos() + (*this)[i][r.q()]*r.sin();
-	(*this)[i][r.q()] = -tmp*r.sin() + (*this)[i][r.q()]*r.cos();
-    }
-    return *this;
-}
-
-//! この行列の2乗ノルムの2乗を返す．
-/*!
-    \return	行列の2乗ノルムの2乗，すなわち\f$\TUnorm{\TUvec{A}{}}^2\f$
-*/
-template <class T, size_t R, size_t C> T
-Matrix<T, R, C>::square() const
-{
-    T	val = 0.0;
-    for (size_t i = 0; i < nrow(); ++i)
-	val += (*this)[i] * (*this)[i];
-    return val;
-}
-
-//! この行列の2乗ノルムを返す．
-/*!
-  \return	行列の2乗ノルム，すなわち\f$\TUnorm{\TUvec{A}{}}\f$
-*/
-template <class T, size_t R, size_t C> inline double
-Matrix<T, R, C>::length() const
-{
-    return std::sqrt(double(square()));
-}
-
-//! この行列の下半三角部分を上半三角部分にコピーして対称化する．
+//! 正方行列の下半三角部分を上半三角部分にコピーして対称化する．
 /*!
     \return	この行列
 */
-template <class T, size_t R, size_t C> Matrix<T, R, C>&
-Matrix<T, R, C>::symmetrize()
+template <class T, size_t N> Array2<T, N, N>&
+symmetrize(Array2<T, N, N>& a)
 {
-    for (size_t i = 0; i < nrow(); ++i)
+    assert(a.nrow() == a.ncol());
+    
+    for (size_t i = 0; i < a.nrow(); ++i)
 	for (size_t j = 0; j < i; ++j)
-	    (*this)[j][i] = (*this)[i][j];
-    return *this;
+	    a[j][i] = a[i][j];
+    return a;
 }
 
 //! この行列の下半三角部分の符号を反転し，上半三角部分にコピーして反対称化する．
 /*!
     \return	この行列
 */
-template <class T, size_t R, size_t C> Matrix<T, R, C>&
-Matrix<T, R, C>::antisymmetrize()
+template <class T, size_t N> Array2<T, N, N>&
+antisymmetrize(Array2<T, N, N>& a)
 {
-    for (size_t i = 0; i < nrow(); ++i)
+    assert(a.nrow() == a.ncol());
+    
+    for (size_t i = 0; i < a.nrow(); ++i)
     {
-	(*this)[i][i] = 0.0;
+	a[i][i] = 0.0;
 	for (size_t j = 0; j < i; ++j)
-	    (*this)[j][i] = -(*this)[i][j];
+	    a[j][i] = -a[i][j];
     }
-    return *this;
+    return a;
 }
 
-//! この3次元回転行列から各軸周りの回転角を取り出す．
-/*!
-  この行列を\f$\TUtvec{R}{}\f$とすると，
-  \f[
-    \TUvec{R}{} =
-    \TUbeginarray{ccc}
-      \cos\theta_z & -\sin\theta_z & \\
-      \sin\theta_z &  \cos\theta_z & \\
-      & & 1
-    \TUendarray
-    \TUbeginarray{ccc}
-       \cos\theta_y & & \sin\theta_y \\
-       & 1 & \\
-      -\sin\theta_y & & \cos\theta_y
-    \TUendarray
-    \TUbeginarray{ccc}
-      1 & & \\
-      & \cos\theta_x & -\sin\theta_x \\
-      & \sin\theta_x &  \cos\theta_x
-    \TUendarray
-  \f]
-  なる\f$\theta_x, \theta_y, \theta_z\f$が回転角となる．
- \param theta_x	x軸周りの回転角(\f$ -\pi \le \theta_x \le \pi\f$)を返す．
- \param theta_y	y軸周りの回転角
-	(\f$ -\frac{\pi}{2} \le \theta_y \le \frac{\pi}{2}\f$)を返す．
- \param theta_z	z軸周りの回転角(\f$ -\pi \le \theta_z \le \pi\f$)を返す．
- \throw invalid_argument	3次元正方行列でない場合に送出
-*/
-template <class T, size_t R, size_t C> void
-Matrix<T, R, C>::rot2angle(T& theta_x, T& theta_y, T& theta_z) const
-{
-    using namespace	std;
-    
-    if (nrow() != 3 || ncol() != 3)
-	throw invalid_argument("TU::Matrix<T>::rot2angle: input matrix must be 3x3!!");
-
-    if ((*this)[0][0] == 0.0 && (*this)[0][1] == 0.0)
-    {
-	theta_x = std::atan2(-(*this)[2][1], (*this)[1][1]);
-	theta_y = ((*this)[0][2] < 0.0 ? M_PI / 2.0 : -M_PI / 2.0);
-	theta_z = 0.0;
-    }
-    else
-    {
-	theta_x =  std::atan2((*this)[1][2], (*this)[2][2]);
-	theta_y = -std::asin((*this)[0][2]);
-	theta_z =  std::atan2((*this)[0][1], (*this)[0][0]);
-    }
-}
-
-//! この3次元回転行列から回転角と回転軸を取り出す．
-/*!
-  この行列を\f$\TUtvec{R}{}\f$とすると，
-  \f[
-    \TUtvec{R}{} \equiv \TUvec{I}{3}\cos\theta
-    + \TUvec{n}{}\TUtvec{n}{}(1 - \cos\theta)
-    - \TUskew{n}{}\sin\theta
-  \f]
-  なる\f$\theta~(0 \le \theta \le \pi)\f$と\f$\TUvec{n}{}\f$が
-  それぞれ回転角と回転軸となる．
- \param c	回転角のcos値，すなわち\f$\cos\theta\f$を返す．
- \param s	回転角のsin値，すなわち\f$\sin\theta (\ge 0)\f$を返す．
- \return	回転軸を表す3次元単位ベクトル，すなわち\f$\TUvec{n}{}\f$
- \throw std::invalid_argument	3x3行列でない場合に送出
-*/
-template <class T, size_t R, size_t C> Vector<T, 3>
-Matrix<T, R, C>::rot2axis(T& c, T& s) const
-{
-    if (nrow() != 3 || ncol() != 3)
-	throw std::invalid_argument("TU::Matrix<T>::rot2axis: input matrix must be 3x3!!");
-
-  // Compute cosine and sine of rotation angle.
-    const T	trace = (*this)[0][0] + (*this)[1][1] + (*this)[2][2];
-    c = T(0.5) * (trace - T(1));
-    s = T(0.5) * std::sqrt((T(1) + trace)*(T(3) - trace));
-
-  // Compute rotation axis.
-    vector3_type	n;
-    n[0] = (*this)[1][2] - (*this)[2][1];
-    n[1] = (*this)[2][0] - (*this)[0][2];
-    n[2] = (*this)[0][1] - (*this)[1][0];
-    n.normalize();
-
-    return n;
-}
-
-//! この3次元回転行列から回転角と回転軸を取り出す．
-/*!
-  この行列を\f$\TUtvec{R}{}\f$とすると，
-  \f[
-    \TUtvec{R}{} \equiv \TUvec{I}{3}\cos\theta
-    + \TUvec{n}{}\TUtvec{n}{}(1 - \cos\theta)
-    - \TUskew{n}{}\sin\theta
-  \f]
-  なる\f$\theta~(0 \le \theta \le \pi)\f$と\f$\TUvec{n}{}\f$が
-  それぞれ回転角と回転軸となる．
- \return			回転角と回転軸を表す3次元ベクトル，すなわち
-				\f$\theta\TUvec{n}{}\f$
- \throw invalid_argument	3x3行列でない場合に送出
-*/
-template <class T, size_t R, size_t C> Vector<T, 3>
-Matrix<T, R, C>::rot2axis() const
-{
-    if (nrow() != 3 || ncol() != 3)
-	throw std::invalid_argument("TU::Matrix<T>::rot2axis: input matrix must be 3x3!!");
-
-    const T	trace = (*this)[0][0] + (*this)[1][1] + (*this)[2][2],
-		s2 = std::sqrt((T(1) + trace)*(T(3) - trace));	// 2*sin
-    if (s2 + T(1) == T(1))			// sin << 1 ?
-	return vector3_type();			// zero vector
-    
-    vector3_type	axis;
-    axis[0] = (*this)[1][2] - (*this)[2][1];
-    axis[1] = (*this)[2][0] - (*this)[0][2];
-    axis[2] = (*this)[0][1] - (*this)[1][0];
-
-    return axis * (std::atan2(s2, trace - T(1)) / s2);
-}
-
-//! この3次元回転行列から四元数を取り出す．
-/*!
-  この行列を\f$\TUtvec{R}{}\f$とすると，
-  \f[
-    \TUtvec{R}{} \equiv \TUvec{I}{3}\cos\theta
-    + \TUvec{n}{}\TUtvec{n}{}(1 - \cos\theta)
-    - \TUskew{n}{}\sin\theta
-  \f]
-  なる\f$\theta~(0 \le \theta \le \pi)\f$と\f$\TUvec{n}{}\f$に対して，四元数は
-  \f[
-    \TUvec{q}{} \equiv
-    \TUbeginarray{c}
-      \cos\frac{\theta}{2} \\ \TUvec{n}{}\sin\frac{\theta}{2}
-    \TUendarray
-  \f]
-  と定義される．
- \return			四元数を表す4次元単位ベクトル
- \throw invalid_argument	3x3行列でない場合に送出
-*/
-template <class T, size_t R, size_t C> Vector<T, 4>
-Matrix<T, R, C>::rot2quaternion() const
-{
-    if (nrow() != 3 || ncol() != 3)
-	throw std::invalid_argument("TU::Matrix<T>::rot2quaternion: input matrix must be 3x3!!");
-
-    vector4_type	q;
-    q[0] = T(0.5) * std::sqrt(trace() + T(1));
-    if (q[0] + T(1) == T(1))	// q[0] << 1 ?
-    {
-	Vector<T>	eval;
-	q(1, 3) = eigen(eval, false)[0];
-    }
-    else
-    {
-	const Matrix<T>&	S = trns() - *this;
-	q[1] = T(0.25) * S[2][1] / q[0];
-	q[2] = T(0.25) * S[0][2] / q[0];
-	q[3] = T(0.25) * S[1][0] / q[0];
-    }
-
-    return q;
-}
-
-//! 単位正方行列を生成する．
-/*!
-  \param d	単位正方行列の次元
-  \return	単位正方行列
-*/
-template <class T, size_t R, size_t C> inline Matrix<T, R, C>
-Matrix<T, R, C>::I(size_t d)
-{
-    return Matrix<T, R, C>(d, d).diag(1.0);
-}
-
-template <class T, size_t R, size_t C>
-inline typename Matrix<T, R, C>::matrix22_type
-Matrix<T, R, C>::Rt(T theta)
-{
-    matrix22_type	Qt;
-    Qt[0][0] = Qt[1][1] = std::cos(theta);
-    Qt[0][1] = std::sin(theta);
-    Qt[1][0] = -Qt[0][1];
-
-    return Qt;
-}
-
-//! 3次元回転行列を生成する．
-/*!
-  \param n	回転軸を表す3次元単位ベクトル
-  \param c	回転角のcos値
-  \param s	回転角のsin値
-  \return	生成された回転行列，すなわち
-		\f[
-		  \TUtvec{R}{} \equiv \TUvec{I}{3}\cos\theta
-		  + \TUvec{n}{}\TUtvec{n}{}(1 - \cos\theta)
-		  - \TUskew{n}{}\sin\theta
-		\f]
-*/
-template <class T, size_t R, size_t C>
-template <class T2, size_t D2>
-inline typename Matrix<T, R, C>::matrix33_type
-Matrix<T, R, C>::Rt(const Vector<T2, D2>& n, T c, T s)
-{
-    if (n.size() != 3)
-	throw std::invalid_argument("TU::Matrix<T, R, C>::Rt: dimension of the argument \'n\' must be 3");
-    matrix33_type	Qt = n % n;
-    Qt *= (1.0 - c);
-    Qt[0][0] += c;
-    Qt[1][1] += c;
-    Qt[2][2] += c;
-    Qt[0][1] += n[2] * s;
-    Qt[0][2] -= n[1] * s;
-    Qt[1][0] -= n[2] * s;
-    Qt[1][2] += n[0] * s;
-    Qt[2][0] += n[1] * s;
-    Qt[2][1] -= n[0] * s;
-
-    return Qt;
-}
-
-//! 3次元回転行列を生成する．
-/*!
-  \param v	回転角と回転軸を表す3次元ベクトルまたは四元数を表す4次元単位ベクトル
-  \return	生成された回転行列，すなわち3次元ベクトルの場合は
-		\f[
-		  \TUtvec{R}{} \equiv \TUvec{I}{3}\cos\theta
-		  + \TUvec{n}{}\TUtvec{n}{}(1 - \cos\theta)
-		  - \TUskew{n}{}\sin\theta,
-		  {\hskip 1em}\mbox{where}{\hskip 0.5em}
-		  \theta \equiv \TUnorm{\TUvec{v}{}},~
-		  \TUvec{n}{} \equiv \frac{\TUvec{v}{}}{\TUnorm{\TUvec{v}{}}}
-		\f]
-		4次元単位ベクトルの場合は
-		\f[
-		  \TUtvec{R}{} \equiv
-		  \TUvec{I}{3}(q_0^2 - \TUtvec{q}{}\TUvec{q}{})
-		  + 2\TUvec{q}{}\TUtvec{q}{}
-		  - 2q_0\TUskew{q}{},
-		  {\hskip 1em}\mbox{where}{\hskip 0.5em}
-		  q_0 \equiv v_0,~
-		  \TUvec{q}{} \equiv [v_1,~v_2,~v_3]^\top
-		\f]
-*/
-template <class T, size_t R, size_t C> template <class T2, size_t D2>
-typename Matrix<T, R, C>::matrix33_type
-Matrix<T, R, C>::Rt(const Vector<T2, D2>& v)
-{
-    if (v.size() == 4)			// quaternion ?
-    {
-	const T		q0 = v[0];
-	vector3_type	q;
-	q[0] = v[1];
-	q[1] = v[2];
-	q[2] = v[3];
-	matrix33_type	Qt;
-	Qt = (2.0 * q) % q;
-	const T		c = q0*q0 - q.square();
-	Qt[0][0] += c;
-	Qt[1][1] += c;
-	Qt[2][2] += c;
-	q *= (2.0 * q0);
-	Qt[0][1] += q[2];
-	Qt[0][2] -= q[1];
-	Qt[1][0] -= q[2];
-	Qt[1][2] += q[0];
-	Qt[2][0] += q[1];
-	Qt[2][1] -= q[0];
-
-	return Qt;
-    }
-
-    const T	theta = v.length();
-    if (theta + T(1) == T(1))		// theta << 1 ?
-	return I(3);
-    else
-    {
-	T	c = std::cos(theta), s = std::sin(theta);
-	return Rt(vector3_type(v / theta), c, s);
-    }
-}
-
-#if !defined(__NVCC__)
-//! この行列の右から他の行列を掛ける．
-/*!
-  \param m	掛ける行列
-  \return	この行列，すなわち
-		\f$\TUvec{A}{}\leftarrow \TUvec{A}{}\TUvec{M}{}\f$
-*/
-template <class T, size_t R, size_t C> template <class E>
-inline typename std::enable_if<is_range<E>::value, Matrix<T, R, C>&>::type
-Matrix<T, R, C>::operator *=(const E& m)
-{
-    return *this = *this * m;
-}
-
-//! この?x3行列と3次元ベクトルとのベクトル積をとる．
-/*!
-  \param v	3次元ベクトル
-  \return	この行列，すなわち
-		\f$\TUvec{A}{}\leftarrow(\TUtvec{A}{}\times\TUvec{v}{})^\top\f$
-*/
-template <class T, size_t R, size_t C> template <class E>
-inline typename std::enable_if<is_range<E>::value, Matrix<T, R, C>&>::type
-Matrix<T, R, C>::operator ^=(const E& v)
-{
-    return *this = *this ^ v;
-}
-    
 /************************************************************************
-*  class LUDecomposition<T>						*
+*  class LUDecomposition<T, N>						*
 ************************************************************************/
 //! 正方行列のLU分解を表すクラス
-template <class T>
-class LUDecomposition : private Array2<Vector<T> >
+template <class T, size_t N=0>
+class LUDecomposition
 {
-  private:
-    typedef T						element_type;
-    typedef Array2<Vector<T> >				super;
-    
   public:
-    template <class E,
-	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
-    LUDecomposition(const E& m)				;
+    template <class E_, std::enable_if_t<rank<E_>() == 2>* = nullptr>
+    LUDecomposition(const E_& expr)			;
 
-    template <class T2, size_t D2>
-    void	substitute(Vector<T2, D2>& b)	const	;
+    template <class E_>
+    std::enable_if_t<rank<std::decay_t<E_> >() == 1, E_&>
+		substitute(E_&& expr)		const	;
 
   //! もとの正方行列の行列式を返す．
   /*!
     \return	もとの正方行列の行列式
   */
-    T		det()				const	{return _det;}
-    
+    T		det()				const	{ return _det; }
+    size_t	size()				const	{ return _A.size(); }
+	
   private:
-    using	super::nrow;
-    using	super::ncol;
-    
-    Array<int>	_index;
-    T		_det;
+    Array2<T, N, N>	_A;
+    Array<int>		_indices;
+    T			_det;
 };
 
 //! 与えられた正方行列のLU分解を生成する．
 /*!
- \param m			LU分解する正方行列
- \throw std::invalid_argument	mが正方行列でない場合に送出
+  \param m			LU分解する正方行列
+  \throw std::invalid_argument	mが正方行列でない場合に送出
 */
-template <class T>
-template <class E, typename std::enable_if<is_range<E>::value>::type*>
-LUDecomposition<T>::LUDecomposition(const E& m)
-    :super(m), _index(ncol()), _det(1.0)
+template <class T, size_t N>
+template <class E_, std::enable_if_t<rank<E_>() == 2>*>
+LUDecomposition<T, N>::LUDecomposition(const E_& expr)
+    :_A(expr), _indices(size()), _det(1)
 {
-    using namespace	std;
-    
-    if (nrow() != ncol())
-        throw invalid_argument("TU::LUDecomposition<T>::LUDecomposition: not square matrix!!");
+    if (_A.nrow() != _A.ncol())
+        throw std::invalid_argument("TU::LUDecomposition<T>::LUDecomposition: not square matrix!!");
 
-    for (size_t j = 0; j < ncol(); ++j)	// initialize column index
-	_index[j] = j;			// for explicit pivotting
+  // Initialize column index for explicit pivotting
+    for (size_t j = 0; j < _indices.size(); ++j)
+	_indices[j] = j;
 
-    Vector<T>	scale(ncol());
-    for (size_t j = 0; j < ncol(); ++j)	// find maximum abs. value in each col.
-    {					// for implicit pivotting
-	T max = 0.0;
-
-	for (size_t i = 0; i < nrow(); ++i)
+  // Find maximum abs. value in each col. for implicit pivotting
+    Array<T, N>	scale(size());
+    for (size_t j = 0; j < size(); ++j)
+    {
+	T	max = 0;
+	for (const auto& a : _A)
 	{
-	    const T tmp = std::fabs((*this)[i][j]);
+	    const T	tmp = std::fabs(a[j]);
 	    if (tmp > max)
 		max = tmp;
 	}
-	scale[j] = (max != 0.0 ? 1.0 / max : 1.0);
+	scale[j] = (max != 0 ? T(1) / max : T(1));
     }
 
-    for (size_t i = 0; i < nrow(); ++i)
+    for (size_t i = 0; i < size(); ++i)
     {
-	for (size_t j = 0; j < i; ++j)		// left part (j < i)
+      // Left part (j < i)
+	for (size_t j = 0; j < i; ++j)
 	{
-	    T& sum = (*this)[i][j];
+	    T&	sum = _A[i][j];
 	    for (size_t k = 0; k < j; ++k)
-		sum -= (*this)[i][k] * (*this)[k][j];
+		sum -= _A[i][k] * _A[k][j];
 	}
 
+      // Diagonal and right part (i <= j)
 	size_t	jmax = i;
-	T	max = 0.0;
-	for (size_t j = i; j < ncol(); ++j)  // diagonal and right part (i <= j)
+	T	max  = 0;
+	for (size_t j = i; j < size(); ++j)
 	{
-	    T& sum = (*this)[i][j];
+	    T&	sum = _A[i][j];
 	    for (size_t k = 0; k < i; ++k)
-		sum -= (*this)[i][k] * (*this)[k][j];
-	    const T tmp = std::fabs(sum) * scale[j];
+		sum -= _A[i][k] * _A[k][j];
+	    const T	tmp = std::fabs(sum) * scale[j];
 	    if (tmp >= max)
 	    {
 		max  = tmp;
@@ -1437,20 +470,21 @@ LUDecomposition<T>::LUDecomposition(const E& m)
 	}
 	if (jmax != i)			// pivotting required ?
 	{
-	    for (size_t k = 0; k < nrow(); ++k)	// swap i-th and jmax-th column
-		swap((*this)[k][i], (*this)[k][jmax]);
-	    swap(_index[i], _index[jmax]);	// swap column index
-	    swap(scale[i], scale[jmax]);	// swap colum-wise scale factor
+	  // Swap i-th and jmax-th column	    
+	    for (size_t k = 0; k < size(); ++k)
+		std::swap(_A[k][i], _A[k][jmax]);
+	    std::swap(_indices[i], _indices[jmax]);	// swap column indices
+	    std::swap(scale[i], scale[jmax]);	// swap colum-wise scale factor
 	    _det = -_det;
 	}
 
-	_det *= (*this)[i][i];
+	_det *= _A[i][i];
 
-	if ((*this)[i][i] == 0.0)	// singular matrix ?
+	if (_A[i][i] == 0)	// singular matrix ?
 	    break;
 
-	for (size_t j = i + 1; j < nrow(); ++j)
-	    (*this)[i][j] /= (*this)[i][i];
+	for (size_t j = i + 1; j < size(); ++j)
+	    _A[i][j] /= _A[i][i];
     }
 }
 
@@ -1464,108 +498,176 @@ LUDecomposition<T>::LUDecomposition(const E& m)
 				しない場合に送出
   \throw std::runtime_error	もとの正方行列が正則でない場合に送出
 */
-template <class T> template <class T2, size_t D2> void
-LUDecomposition<T>::substitute(Vector<T2, D2>& b) const
+template <class T, size_t N>
+template <class E_> std::enable_if_t<rank<std::decay_t<E_> >() == 1, E_&>
+LUDecomposition<T, N>::substitute(E_&& b) const
 {
-    if (b.size() != ncol())
+    if (std::size(b) != size())
 	throw std::invalid_argument("TU::LUDecomposition<T>::substitute: Dimension of given vector is not equal to mine!!");
-    
-    Vector<T2, D2>	tmp(b);
-    for (size_t j = 0; j < b.size(); ++j)
-	b[j] = tmp[_index[j]];
 
-    for (size_t j = 0; j < b.size(); ++j)	// forward substitution
+  // tmpはbと異なる実体でなければならないので，
+  //     auto tmp = evaluate(b);
+  // ではダメ．
+    Array<T, N>	tmp = b;
+    for (size_t j = 0; j < size(); ++j)
+	b[j] = tmp[_indices[j]];
+
+    for (size_t j = 0; j < size(); ++j)		// forward substitution
 	for (size_t i = 0; i < j; ++i)
-	    b[j] -= b[i] * (*this)[i][j];
-    for (size_t j = b.size(); j-- > 0; )	// backward substitution
+	    b[j] -= b[i] * _A[i][j];
+    for (size_t j = size(); j-- > 0; )		// backward substitution
     {
-	for (size_t i = b.size(); --i > j; )
-	    b[j] -= b[i] * (*this)[i][j];
-	if ((*this)[j][j] == 0.0)		// singular matrix ?
+	for (size_t i = size(); --i > j; )
+	    b[j] -= b[i] * _A[i][j];
+	if (_A[j][j] == 0)			// singular matrix ?
 	    throw std::runtime_error("TU::LUDecomposition<T>::substitute: singular matrix !!");
-	b[j] /= (*this)[j][j];
+	b[j] /= _A[j][j];
     }
+
+    return b;
 }
 
-//! 連立1次方程式を解く．
+/************************************************************************
+*  generic algorithms using LUDecomposition<T, N>			*
+************************************************************************/
+//! 行列の行列式を返す．
 /*!
-  \param m	正則な正方行列
-  \return	\f$\TUtvec{u}{} = \TUtvec{x}{}\TUvec{M}{}\f$
-		の解を納めたこのベクトル，すなわち
-		\f$\TUtvec{u}{} \leftarrow \TUtvec{u}{}\TUinv{M}{}\f$
-*/
-template <class T, size_t D> template <class E>
-inline typename std::enable_if<is_range<E>::value, Vector<T, D>&>::type
-Vector<T, D>::solve(const E& m)
-{
-    LUDecomposition<T>(m).substitute(*this);
-    return *this;
-}
-
-//! 連立1次方程式を解く．
-/*!
-  \param m	正則な正方行列
-  \return	\f$\TUvec{A}{} = \TUvec{X}{}\TUvec{M}{}\f$
-		の解を納めたこの行列，すなわち
-		\f$\TUvec{A}{} \leftarrow \TUvec{A}{}\TUinv{M}{}\f$
-*/
-template <class T, size_t R, size_t C> template <class E>
-typename std::enable_if<is_range<E>::value, Matrix<T, R, C>&>::type
-Matrix<T, R, C>::solve(const E& m)
-{
-    LUDecomposition<T>	lu(m);
-    
-    for (size_t i = 0; i < nrow(); ++i)
-	lu.substitute((*this)[i]);
-    return *this;
-}
-    
-//! この行列の行列式を返す．
-/*!
+  \param A	正方行列
   \return	行列式，すなわち\f$\det\TUvec{A}{}\f$
 */
-template <class T, size_t R, size_t C> inline T
-Matrix<T, R, C>::det() const
+template <class E, std::enable_if_t<rank<E>() == 2>* = nullptr> inline auto
+det(const E& A)
 {
-    return LUDecomposition<T>(*this).det();
+    return LUDecomposition<element_t<E>, size0<E>()>(A).det();
 }
 
+//! 行列の小行列式を返す．
+/*!
+  \param A	正方行列
+  \param p	元の行列から取り除く行を指定するindex
+  \param q	元の行列から取り除く列を指定するindex
+  \return	小行列式，すなわち\f$\det\TUvec{A}{pq}\f$
+*/
+template <class E, std::enable_if_t<rank<E>() == 2>* = nullptr> auto
+det(const E& A, size_t p, size_t q)
+{
+    const auto&			A_ = evaluate(A);
+    Array2<element_t<E> >	D(A_.nrow()-1, A_.ncol()-1);
+    for (size_t i = 0; i < p; ++i)
+    {
+	for (size_t j = 0; j < q; ++j)
+	    D[i][j] = A_[i][j];
+	for (size_t j = q; j < D.ncol(); ++j)
+	    D[i][j] = A_[i][j+1];
+    }
+    for (size_t i = p; i < D.nrow(); ++i)
+    {
+	for (size_t j = 0; j < q; ++j)
+	    D[i][j] = A_[i+1][j];
+	for (size_t j = q; j < D.ncol(); ++j)
+	    D[i][j] = A_[i+1][j+1];
+    }
+    return det(D);
+}
+
+//! 行列の余因子行列を返す．
+/*!
+  \param A	正方行列
+  \return	余因子行列，すなわち
+		\f$\TUtilde{A}{} = (\det\TUvec{A}{})\TUinv{A}{}\f$
+*/
+template <class E, std::enable_if_t<rank<E>() == 2>* = nullptr> auto
+adjoint(const E& A)
+{
+    constexpr size_t		N = size0<E>();
+    Array2<element_t<E>, N, N>	val(size<0>(A), size<1>(A));
+    for (size_t i = 0; i < val.nrow(); ++i)
+	for (size_t j = 0; j < val.ncol(); ++j)
+	    val[i][j] = ((i + j) % 2 ? -det(A, j, i) : det(A, j, i));
+    return std::move(val);
+}
+
+//! 連立1次方程式を解く．
+/*!
+  \param A	正則な正方行列
+  \return	\f$\TUtvec{b}{} = \TUtvec{x}{}\TUvec{A}{}\f$
+		の解ベクトル，すなわち \f$\TUtvec{b}{}\TUinv{A}{}\f$
+*/
+template <class E, class F>
+inline std::enable_if_t<rank<E>() == 2 && rank<std::decay_t<F> >() == 1, F&>
+solve(const E& A, F&& b)
+{
+    return LUDecomposition<element_t<E>, size0<E>()>(A).substitute(b);
+}
+
+//! 連立1次方程式を解く．
+/*!
+  \param A	正則な正方行列
+  \param B	行列
+  \return	\f$\TUvec{B}{} = \TUvec{X}{}\TUvec{A}{}\f$
+		の解を納めた行列，すなわち	\f$\TUvec{B}{}\TUinv{A}{}\f$
+*/
+template <class E, class F>
+inline std::enable_if_t<rank<E>() == 2 && rank<std::decay_t<F> >() == 2, F&>
+solve(const E& A, F&& B)
+{
+    LUDecomposition<element_t<E>, size0<E>()>	lu(A);
+    for_each<size0<std::decay_t<F> >()>(std::begin(B), std::size(B),
+					[&lu](auto&& b){ lu.substitute(b); });
+    return B;
+}
+    
+//! 行列の逆行列を返す．
+/*!
+  \param A	正則な正方行列
+  \return	逆行列，すなわち\f$\TUinv{A}{}\f$
+*/
+template <class E, std::enable_if_t<rank<E>() == 2>* = nullptr> inline auto
+inverse(const E& A)
+{
+    using	element_type = element_t<E>;
+    
+    constexpr size_t		N = size0<E>();
+    Array2<element_type, N, N>	B = diag<N>(element_type(1), std::size(A));
+    return std::move(solve(A, B));
+}
+    
 /************************************************************************
 *  class Householder<T>							*
 ************************************************************************/
 template <class T>	class QRDecomposition;
+template <class T>	class TriDiagonal;
 template <class T>	class BiDiagonal;
 
 //! Householder変換を表すクラス
 template <class T>
-class Householder : public Matrix<T>
+class Householder : public Array2<T>
 {
   private:
-    typedef Matrix<T>						super;
+    using super		= Array2<T>;
     
   public:
-    typedef T							element_type;
+    using element_type	= T;
     
   private:
     Householder(size_t dd, size_t d)
-	:super(dd, dd), _d(d), _sigma(Matrix<T>::nrow())	{}
-    template <class E,
-	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
-    Householder(const E& a, size_t d)				;
+	:super(dd, dd), _d(d), _sigma(super::nrow())		{}
+    template <class E_, std::enable_if_t<rank<E_>() == 2>* = nullptr>
+    Householder(const E_& a, size_t d)				;
 
     using		super::size;
     
-    void		apply_from_left(Matrix<T>& a, size_t m)	;
-    void		apply_from_right(Matrix<T>& a, size_t m);
-    void		apply_from_both(Matrix<T>& a, size_t m)	;
+    void		apply_from_left(Array2<T>& a, size_t m)	;
+    void		apply_from_right(Array2<T>& a, size_t m);
+    void		apply_from_both(Array2<T>& a, size_t m)	;
     void		make_transformation()			;
-    const Vector<T>&	sigma()				const	{return _sigma;}
-    Vector<T>&		sigma()					{return _sigma;}
+    const Array<T>&	sigma()				const	{return _sigma;}
+    Array<T>&		sigma()					{return _sigma;}
     bool		sigma_is_zero(size_t m, T comp)	const	;
 
   private:
     const size_t	_d;		// deviation from diagonal element
-    Vector<T>		_sigma;
+    Array<T>		_sigma;
 
     friend class	QRDecomposition<T>;
     friend class	TriDiagonal<T>;
@@ -1573,16 +675,16 @@ class Householder : public Matrix<T>
 };
 
 template <class T>
-template <class E, typename std::enable_if<is_range<E>::value>::type*>
-Householder<T>::Householder(const E& a, size_t d)
+template <class E_, typename std::enable_if_t<rank<E_>() == 2>*>
+Householder<T>::Householder(const E_& a, size_t d)
     :super(a), _d(d), _sigma(size())
 {
-    if (a.size() != a.ncol())
+    if (super::nrow() != super::ncol())
 	throw std::invalid_argument("TU::Householder<T>::Householder: Given matrix must be square !!");
 }
 
 template <class T> void
-Householder<T>::apply_from_left(Matrix<T>& a, size_t m)
+Householder<T>::apply_from_left(Array2<T>& a, size_t m)
 {
     if (a.nrow() < size())
 	throw std::invalid_argument("TU::Householder<T>::apply_from_left: # of rows of given matrix is smaller than my dimension !!");
@@ -1622,7 +724,7 @@ Householder<T>::apply_from_left(Matrix<T>& a, size_t m)
 }
 
 template <class T> void
-Householder<T>::apply_from_right(Matrix<T>& a, size_t m)
+Householder<T>::apply_from_right(Array2<T>& a, size_t m)
 {
     if (a.ncol() < size())
 	throw std::invalid_argument("Householder<T>::apply_from_right: # of column of given matrix is smaller than my dimension !!");
@@ -1662,9 +764,9 @@ Householder<T>::apply_from_right(Matrix<T>& a, size_t m)
 }
 
 template <class T> void
-Householder<T>::apply_from_both(Matrix<T>& a, size_t m)
+Householder<T>::apply_from_both(Array2<T>& a, size_t m)
 {
-    Vector<T>	u = a[m](m+_d, a.ncol()-m-_d);
+    auto	u = slice(a[m], m+_d, a.ncol()-m-_d);
     T		scale = 0.0;
     for (size_t j = 0; j < u.size(); ++j)
 	scale += std::fabs(u[j]);
@@ -1673,24 +775,24 @@ Householder<T>::apply_from_both(Matrix<T>& a, size_t m)
     {
 	u /= scale;
 
-	T		h = u * u;
+	T	h = u * u;
 	const T	s = (u[0] > 0.0 ? std::sqrt(h) : -std::sqrt(h));
-	h	     += s * u[0];			// H = u^2 / 2
-	u[0]	     += s;				// m-th row <== u
+	h	+= s * u[0];			// H = u^2 / 2
+	u[0]	+= s;				// m-th row <== u
 
-	Matrix<T>	A = a(m+_d, m+_d, a.nrow()-m-_d, a.ncol()-m-_d);
-	Vector<T>	p = _sigma(m+_d, size()-m-_d);
-	for (size_t i = 0; i < A.nrow(); ++i)
+	auto	A = a(m+_d, a.nrow()-m-_d, m+_d, a.ncol()-m-_d);
+	auto	p = _sigma(m+_d, size()-m-_d);
+	for (size_t i = 0; i < A.size(); ++i)
 	    p[i] = (A[i] * u) / h;			// p = Au / H
 
 	const T	k = (u * p) / (h + h);		// K = u*p / 2H
-	for (size_t i = 0; i < A.nrow(); ++i)
+	for (size_t i = 0; i < A.size(); ++i)
 	{				// m-th col of 'a' is used as 'q'
 	    a[m+_d+i][m] = p[i] - k * u[i];		// q = p - Ku
 	    for (size_t j = 0; j <= i; ++j)		// A = A - uq' - qu'
 		A[j][i] = (A[i][j] -= (u[i]*a[m+_d+j][m] + a[m+_d+i][m]*u[j]));
 	}
-	for (size_t j = 1; j < A.nrow(); ++j)
+	for (size_t j = 1; j < A.size(); ++j)
 	    A[j][0] = A[0][j] = -A[0][j];
 
 	for (size_t j = m+_d; j < a.ncol(); ++j)
@@ -1746,39 +848,32 @@ Householder<T>::sigma_is_zero(size_t m, T comp) const
   \f$\TUvec{A}{} = \TUtvec{R}{}\TUtvec{Q}{}\f$なる下半三角行列
   \f$\TUtvec{R}{} \in \TUspace{R}{m\times n}\f$と回転行列
   \f$\TUtvec{Q}{} \in \TUspace{R}{n\times n}\f$を求める
-  （\f$\TUvec{A}{}\f$の各行を\f$\TUtvec{Q}{}\f$の行の線型結合で表現す
-  る）．
+  （\f$\TUvec{A}{}\f$の各行を\f$\TUtvec{Q}{}\f$の行の線型結合で表現する）．
  */
 template <class T>
-class QRDecomposition : private Matrix<T>
+class QRDecomposition
 {
-  private:
-    typedef Matrix<T>					super;
+  public:
+    using element_type	= T;
     
   public:
-    typedef T						element_type;
-    
-  public:
-    template <class E,
-	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
-    QRDecomposition(const E& m)				;
+    template <class E_, std::enable_if_t<rank<E_>() == 2>* = nullptr>
+    QRDecomposition(const E_& A)				;
 
   //! QR分解の下半三角行列を返す．
   /*!
     \return	下半三角行列\f$\TUtvec{R}{}\f$
   */
-    const Matrix<T>&	Rt()			const	{return *this;}
+    const Array2<T>&	Rt()			const	{ return _Rt; }
 
   //! QR分解の回転行列を返す．
   /*!
     \return	回転行列\f$\TUtvec{Q}{}\f$
   */
-    const Matrix<T>&	Qt()			const	{return _Qt;}
+    const Array2<T>&	Qt()			const	{ return _Qt; }
     
   private:
-    using		super::nrow;
-    using		super::ncol;
-    
+    Array2<T>		_Rt;
     Householder<T>	_Qt;			// rotation matrix
 };
 
@@ -1786,22 +881,172 @@ class QRDecomposition : private Matrix<T>
 /*!
  \param m	QR分解する一般行列
 */
-template <class T>
-template <class E, typename std::enable_if<is_range<E>::value>::type*>
-QRDecomposition<T>::QRDecomposition(const E& m)
-    :super(m), _Qt(m.ncol(), 0)
+template <class T> template <class E_, std::enable_if_t<rank<E_>() == 2>*>
+QRDecomposition<T>::QRDecomposition(const E_& A)
+    :_Rt(A), _Qt(_Rt.ncol(), 0)
 {
-    size_t	n = std::min(nrow(), ncol());
+    const size_t	n = std::min(_Rt.nrow(), _Rt.ncol());
     for (size_t j = 0; j < n; ++j)
-	_Qt.apply_from_right(*this, j);
+	_Qt.apply_from_right(_Rt, j);
     _Qt.make_transformation();
     for (size_t i = 0; i < n; ++i)
     {
-	(*this)[i][i] = _Qt.sigma()[i];
-	for (size_t j = i + 1; j < ncol(); ++j)
-	    (*this)[i][j] = 0.0;
+	auto	r = _Rt[i];
+	r[i] = _Qt.sigma()[i];
+	for (size_t j = i + 1; j < _Rt.ncol(); ++j)
+	    r[j] = 0.0;
     }
 }
+
+/************************************************************************
+*  class Rotation<T>							*
+************************************************************************/
+//! 2次元超平面内での回転を表すクラス
+/*!
+  具体的には
+  \f[
+    \TUvec{R}{}(p, q; \theta) \equiv
+    \begin{array}{r@{}l}
+      & \begin{array}{ccccccccccc}
+        & & \makebox[4.0em]{} & p & & & \makebox[3.8em]{} & q & & &
+      \end{array} \\
+      \begin{array}{l}
+        \\ \\ \\ \raisebox{1.5ex}{$p$} \\ \\ \\ \\ \raisebox{1.5ex}{$q$} \\ \\ \\
+      \end{array} &
+      \TUbeginarray{ccccccccccc}
+	1 \\
+	& \ddots \\
+	& & 1 \\
+	& & & \cos\theta & & & & -\sin\theta \\
+	& & & & 1 \\
+	& & & & & \ddots \\
+	& & & & & & 1 \\
+	& & & \sin\theta & & & & \cos\theta \\
+	& & & & & & & & 1\\
+	& & & & & & & & & \ddots \\
+	& & & & & & & & & & 1
+      \TUendarray
+    \end{array}
+  \f]
+  なる回転行列で表される．
+*/
+template <class T>
+class Rotation
+{
+  public:
+    typedef T	element_type;	//!< 成分の型
+    
+  public:
+  //! 2次元超平面内での回転を生成する
+  /*!
+    \param p	p軸を指定するindex
+    \param q	q軸を指定するindex
+    \param x	回転角を生成する際のx値
+    \param y	回転角を生成する際のy値
+		\f[
+		  \cos\theta = \frac{x}{\sqrt{x^2+y^2}},{\hskip 1em}
+		  \sin\theta = \frac{y}{\sqrt{x^2+y^2}}
+		\f]
+  */
+		Rotation(size_t p, size_t q, element_type x, element_type y)
+		    :_p(p), _q(q), _l(1), _c(1), _s(0)
+		{
+		    const element_type	absx = std::abs(x), absy = std::abs(y);
+		    _l = (absx > absy ?
+			  absx * std::sqrt(1 + (absy*absy)/(absx*absx)) :
+			  absy * std::sqrt(1 + (absx*absx)/(absy*absy)));
+		    if (_l != 0)
+		    {
+			_c = x / _l;
+			_s = y / _l;
+		    }
+		}
+
+  //! 2次元超平面内での回転を生成する
+  /*!
+    \param p		p軸を指定するindex
+    \param q		q軸を指定するindex
+    \param theta	回転角
+  */
+		Rotation(size_t p, size_t q, element_type theta)
+		    :_p(p), _q(q),
+		     _l(1), _c(std::cos(theta)), _s(std::sin(theta))
+		{
+		}
+
+  //! p軸を返す．
+  /*!
+    \return	p軸のindex
+  */
+    size_t	p()				const	{return _p;}
+
+  //! q軸を返す．
+  /*!
+    \return	q軸のindex
+  */
+    size_t	q()				const	{return _q;}
+
+  //! 回転角生成ベクトルの長さを返す．
+  /*!
+    \return	回転角生成ベクトル(x, y)に対して\f$\sqrt{x^2 + y^2}\f$
+  */
+    T		length()			const	{return _l;}
+
+  //! 回転角のcos値を返す．
+  /*!
+    \return	回転角のcos値
+  */
+    T		cos()				const	{return _c;}
+
+  //! 回転角のsin値を返す．
+  /*!
+    \return	回転角のsin値
+  */
+    T		sin()				const	{return _s;}
+    
+  //! この回転行列の転置を与えられた行列の左から掛ける．
+  /*!
+    \return	与えられた行列，すなわち
+		\f$\TUvec{A}{}\leftarrow\TUtvec{R}{}\TUvec{A}{}\f$
+  */
+    template <class E_>
+    std::enable_if_t<rank<std::decay_t<E_> >() == 2, E_&>
+		apply_from_left(E_&& A) const
+		{
+		    for (size_t j = 0; j < size<1>(A); ++j)
+		    {
+			const auto	tmp = A[_p][j];
+	
+			A[_p][j] =  _c*tmp + _s*A[_q][j];
+			A[_q][j] = -_s*tmp + _c*A[_q][j];
+		    }
+		    return A;
+		}
+
+  //! この回転行列を与えられた行列の右から掛ける．
+  /*!
+    \return	与えられた行列，すなわち
+		\f$\TUvec{A}{}\leftarrow\TUvec{A}{}\TUvec{R}{}\f$
+  */
+    template <class E_>
+    std::enable_if_t<rank<std::decay_t<E_> >() == 2, E_&>
+		apply_from_right(E_&& A) const
+		{
+		    for (auto&& a : A)
+		    {
+			const auto	tmp = a[_p];
+	
+			a[_p] =  tmp*_c + a[_q]*_s;
+			a[_q] = -tmp*_s + a[_q]*_c;
+		    }
+		    return A;
+		}
+    
+  private:
+    const size_t	_p, _q;		// rotation axis
+    element_type	_l;		// length of (x, y)
+    element_type	_c, _s;		// cos & sin
+};
 
 /************************************************************************
 *  class TriDiagonal<T>							*
@@ -1816,12 +1061,11 @@ template <class T>
 class TriDiagonal
 {
   public:
-    typedef T		element_type;	//!< 成分の型
+    using element_type	= T;	//!< 成分の型
     
   public:
-    template <class E,
-	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
-    TriDiagonal(const E& a)				;
+    template <class E_, std::enable_if_t<rank<E_>() == 2>* = nullptr>
+    TriDiagonal(const E_& a)				;
 
   //! 3重対角化される対称行列の次元(= 行数 = 列数)を返す．
   /*!
@@ -1833,21 +1077,29 @@ class TriDiagonal
   /*!
     \return	回転行列
   */
-    const Matrix<T>&	Ut()			const	{return _Ut;}
+    const Array2<T>&	Ut()			const	{return _Ut;}
 
   //! 3重対角行列の対角成分を返す．
   /*!
     \return	対角成分
   */
-    const Vector<T>&	diagonal()		const	{return _diagonal;}
+    const Array<T>&	diagonal()		const	{return _diagonal;}
 
   //! 3重対角行列の非対角成分を返す．
   /*!
     \return	非対角成分
   */
-    const Vector<T>&	off_diagonal()		const	{return _Ut.sigma();}
+    const Array<T>&	off_diagonal()		const	{return _Ut.sigma();}
 
     void		diagonalize(bool abs=true)	;
+
+    template <class E_>
+    std::enable_if_t<rank<std::decay_t<E_> >() == 1, Array2<T> >
+			move(E_&& evals)
+			{
+			    evals = std::move(_diagonal);
+			    return std::move(static_cast<Array2<T>&>(_Ut));
+			}
     
   private:
     enum		{NITER_MAX = 30};
@@ -1857,8 +1109,8 @@ class TriDiagonal
 					    T& x, T& y)		const	;
     
     Householder<T>	_Ut;
-    Vector<T>		_diagonal;
-    Vector<T>&		_off_diagonal;
+    Array<T>		_diagonal;
+    Array<T>&		_off_diagonal;
 };
 
 //! 与えられた対称行列を3重対角化する．
@@ -1866,9 +1118,8 @@ class TriDiagonal
   \param a			3重対角化する対称行列
   \throw std::invalid_argument	aが正方行列でない場合に送出
 */
-template <class T>
-template <class E, typename std::enable_if<is_range<E>::value>::type*>
-TriDiagonal<T>::TriDiagonal(const E& a)
+template <class T> template <class E_, std::enable_if_t<rank<E_>() == 2>*>
+TriDiagonal<T>::TriDiagonal(const E_& a)
     :_Ut(a, 1), _diagonal(_Ut.nrow()), _off_diagonal(_Ut.sigma())
 {
     if (_Ut.nrow() != _Ut.ncol())
@@ -1921,7 +1172,7 @@ TriDiagonal<T>::diagonalize(bool abs)
 	    {
 		Rotation<T>	rot(i-1, i, x, y);
 		
-		_Ut.rotate_from_left(rot);
+		rot.apply_from_left(_Ut);
 
 		if (i > m+1)
 		    _off_diagonal[i-1] = rot.length();
@@ -2001,6 +1252,62 @@ TriDiagonal<T>::initialize_rotation(size_t m, size_t n, T& x, T& y) const
 }
 
 /************************************************************************
+*  generic algorithms using TriDiagonal<T>				*
+************************************************************************/
+//! 対称行列の固有値と固有ベクトルを返す．
+/*!
+  \param A	対称行列 
+  \param evals	固有値が返される
+  \param abs	固有値を絶対値の大きい順に並べるならtrue, 値の大きい順に
+		並べるならfalse
+  \return	各行が固有ベクトルから成る回転行列，すなわち
+		\f[
+		  \TUvec{A}{}\TUvec{U}{} =
+		  \TUvec{U}{}\diag(\lambda_0,\ldots,\lambda_{n-1}),
+		  {\hskip 1em}\mbox{where}{\hskip 0.5em}
+		  \TUtvec{U}{}\TUvec{U}{} = \TUvec{I}{n},~\det\TUvec{U}{} = 1
+		\f]
+		なる\f$\TUtvec{U}{}\f$
+*/
+template <class E, class F,
+	  std::enable_if_t<rank<E>() == 2 &&
+			   rank<std::decay_t<F> >() == 1>* = nullptr> auto
+eigen(const E& A, F&& evals, bool abs=true)
+{
+    TriDiagonal<element_t<E> >	tri(A);
+    tri.diagonalize(abs);
+    return tri.move(evals);
+}
+
+//! 対称行列の一般固有値と一般固有ベクトルを返す．
+/*!
+  \param A	対称行列 
+  \param BB	Aと同一サイズの正値対称行列
+  \param evals	一般固有値が返される
+  \param abs	一般固有値を絶対値の大きい順に並べるならtrue, 値の大きい順に
+		並べるならfalse
+  \return	各行が一般固有ベクトルから成る正則行列
+		（ただし直交行列ではない），すなわち
+		\f[
+		  \TUvec{A}{}\TUvec{U}{} =
+		  \TUvec{B}{}\TUvec{U}{}\diag(\lambda_0,\ldots,\lambda_{n-1}),
+		  {\hskip 1em}\mbox{where}{\hskip 0.5em}
+		  \TUtvec{U}{}\TUvec{B}{}\TUvec{U}{} = \TUvec{I}{n}
+		\f]
+		なる\f$\TUtvec{U}{}\f$
+*/
+template <class E, class F, class G,
+	  std::enable_if_t<rank<E>() == 2 &&
+			   rank<F>() == 2 &&
+			   rank<std::decay_t<G> >() == 1>* = nullptr> auto
+geigen(const E& A, const F& BB, G&& evals, bool abs=true)
+{
+    const auto	Ltinv = inverse(BB.cholesky());
+    const auto	Linv  = transpose(Ltinv);
+    return std::move(evaluate(eigen(Linv * A * Ltinv, evals, abs) * Linv));
+}
+
+/************************************************************************
 *  class BiDiagonal<T>							*
 ************************************************************************/
 //! 一般行列の2重対角化を表すクラス
@@ -2016,11 +1323,10 @@ template <class T>
 class BiDiagonal
 {
   public:
-    typedef T					element_type;	//!< 成分の型
+    using element_type = T;	//!< 成分の型
     
   public:
-    template <class E,
-	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
+    template <class E, std::enable_if_t<rank<E>() == 2>* = nullptr>
     BiDiagonal(const E& a)			;
 
   //! 2重対角化される行列の行数を返す．
@@ -2039,25 +1345,25 @@ class BiDiagonal
   /*!
     \return	右から掛ける回転行列の転置
   */
-    const Matrix<T>&	Ut()		const	{return _Ut;}
+    const Array2<T>&	Ut()		const	{return _Ut;}
 
   //! 2重対角化を行うために左から掛ける回転行列を返す．
   /*!
     \return	左から掛ける回転行列
   */
-    const Matrix<T>&	Vt()		const	{return _Vt;}
+    const Array2<T>&	Vt()		const	{return _Vt;}
 
   //! 2重対角行列の対角成分を返す．
   /*!
     \return	対角成分
   */
-    const Vector<T>&	diagonal()	const	{return _Dt.sigma();}
+    const Array<T>&	diagonal()	const	{return _Dt.sigma();}
 
   //! 2重対角行列の非対角成分を返す．
   /*!
     \return	非対角成分
   */
-    const Vector<T>&	off_diagonal()	const	{return _Et.sigma();}
+    const Array<T>&	off_diagonal()	const	{return _Et.sigma();}
 
     void		diagonalize()		;
 
@@ -2071,28 +1377,28 @@ class BiDiagonal
 
     Householder<T>	_Dt;
     Householder<T>	_Et;
-    Vector<T>&		_diagonal;
-    Vector<T>&		_off_diagonal;
+    Array<T>&		_diagonal;
+    Array<T>&		_off_diagonal;
     T			_anorm;
-    const Matrix<T>&	_Ut;
-    const Matrix<T>&	_Vt;
+    const Array2<T>&	_Ut;
+    const Array2<T>&	_Vt;
 };
 
 //! 与えられた一般行列を2重対角化する．
 /*!
   \param a	2重対角化する一般行列
 */
-template <class T>
-template <class E, typename std::enable_if<is_range<E>::value>::type*>
+template <class T> template <class E, std::enable_if_t<rank<E>() == 2>*>
 BiDiagonal<T>::BiDiagonal(const E& a)
-    :_Dt((a.size() < a.ncol() ? a.ncol() : a.size()), 0),
-     _Et((a.size() < a.ncol() ? a.size() : a.ncol()), 1),
-     _diagonal(_Dt.sigma()), _off_diagonal(_Et.sigma()), _anorm(0),
-     _Ut(a.size() < a.ncol() ? _Dt : _Et),
-     _Vt(a.size() < a.ncol() ? _Et : _Dt)
+    :_Dt(std::max(size<0>(a), size<1>(a)), 0),
+     _Et(std::min(size<0>(a), size<1>(a)), 1),
+     _diagonal(_Dt.sigma()),
+     _off_diagonal(_Et.sigma()), _anorm(0),
+     _Ut(size<0>(a) < size<1>(a) ? _Dt : _Et),
+     _Vt(size<0>(a) < size<1>(a) ? _Et : _Dt)
 {
-    detail::argument_t<E, true>	A(a);
-    
+    const auto&	A = evaluate(a);
+
     if (nrow() < ncol())
 	for (size_t i = 0; i < nrow(); ++i)
 	    for (size_t j = 0; j < ncol(); ++j)
@@ -2155,7 +1461,7 @@ BiDiagonal<T>::diagonalize()
 		    {
 			Rotation<T>	rotD(m-1, i, x, -y);
 
-			_Dt.rotate_from_left(rotD);
+			rotD.apply_from_left(_Dt);
 			
 			_diagonal[i] = -y*rotD.sin()
 				     + _diagonal[i]*rotD.cos();
@@ -2187,7 +1493,7 @@ BiDiagonal<T>::diagonalize()
 	      /* Apply rotation from left */
 		Rotation<T>	rotE(i-1, i, x, y);
 		
-		_Et.rotate_from_left(rotE);
+		rotE.apply_from_left(_Et);
 
 		if (i > m+1)
 		    _off_diagonal[i-1] = rotE.length();
@@ -2206,7 +1512,7 @@ BiDiagonal<T>::diagonalize()
 	      /* Apply rotation from right to recover bi-diagonality */
 		Rotation<T>	rotD(i-1, i, x, y);
 
-		_Dt.rotate_from_left(rotD);
+		rotD.apply_from_left(_Dt);
 
 		_diagonal[i-1] = rotD.length();
 		tmp = _off_diagonal[i];
@@ -2247,7 +1553,7 @@ BiDiagonal<T>::diagonalize()
 		}
 	    }
 
-    size_t l = min(_Dt.size() - 1, _Et.size());	// last index
+    const auto l = std::min(_Dt.size() - 1, _Et.size());	// last index
     for (size_t m = 0; m < l; ++m)	// ensure positivity of all singular
 	if (_diagonal[m] < 0.0)		// values except for the last one.
 	{
@@ -2311,20 +1617,19 @@ template <class T>
 class SVDecomposition : private BiDiagonal<T>
 {
   private:
-    typedef BiDiagonal<T>			super;
+    using super		= BiDiagonal<T>;
     
   public:
-    typedef T					element_type;	//!< 成分の型
+    using element_type	= T;			//!< 成分の型
 
   public:
   //! 与えられた一般行列の特異値分解を求める．
   /*!
     \param a	特異値分解する一般行列
   */
-    template <class E,
-	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
-    SVDecomposition(const E& a)
-	:super(a)				{super::diagonalize();}
+    template <class E_, std::enable_if_t<rank<E_>() == 2>* = nullptr>
+    SVDecomposition(const E_& a)
+	:super(a)				{ super::diagonalize(); }
 
     using	super::nrow;
     using	super::ncol;
@@ -2337,55 +1642,348 @@ class SVDecomposition : private BiDiagonal<T>
     \param i	絶対値の大きい順に並んだ特異値の1つを指定するindex
     \return	指定されたindexに対応する特異値
   */
-    const T&	operator [](int i)	const	{return diagonal()[i];}
+    T		operator [](int i)	const	{ return diagonal()[i]; }
 };
-#endif	// !__NVCC__
 
 /************************************************************************
-*  global functions							*
+*  generic algorithms using SVDecomposition<T>				*
 ************************************************************************/
-template <class T, size_t D> const Vector<T, D>&
-serialize(const Vector<T, D>& x)
+//! この行列の疑似逆行列を返す．
+/*!
+  \param cndnum	最大特異値に対する絶対値の割合がこれに達しない基底は無視
+  \return	疑似逆行列，すなわち与えられた行列の特異値分解を
+		\f$\TUvec{A}{} = \TUvec{V}{}\diag(\sigma_0,\ldots,\sigma_{n-1})
+		\TUtvec{U}{}\f$とすると
+		\f[
+		  \TUvec{u}{0}\sigma_0^{-1}\TUtvec{v}{0} + \cdots +
+		  \TUvec{u}{r}\sigma_{r-1}^{-1}\TUtvec{v}{r-1},
+		  {\hskip 1em}\mbox{where}{\hskip 0.5em}
+		  \TUabs{\sigma_1} > \epsilon\TUabs{\sigma_0},\ldots,
+		  \TUabs{\sigma_{r-1}} > \epsilon\TUabs{\sigma_0}
+		\f]
+*/
+template <class E, std::enable_if_t<rank<E>() == 2>* = nullptr> auto
+pseudo_inverse(const E& A, element_t<E> cndnum=1.0e5)
 {
-    return x;
-}
-template <class T, size_t R, size_t C> Vector<T>
-serialize(const Matrix<T, R, C>& x)
-{
-    return Vector<T>(const_cast<T*>(x.data()), x.nrow() * x.ncol());
-}
+    using element_type	= element_t<E>;
     
+    SVDecomposition<element_type>	svd(A);
+    Array2<element_type>		val(svd.ncol(), svd.nrow());
+
+    for (size_t i = 0; i < svd.diagonal().size(); ++i)
+	if (std::fabs(svd[i]) * cndnum > std::fabs(svd[0]))
+	    val += (svd.Ut()[i] / svd[i]) % svd.Vt()[i];
+    return val;
+}
+
 /************************************************************************
-*  type aliases								*
+*  generic algorithms concerning with rotations				*
 ************************************************************************/
-typedef Vector<short,  2>	Vector2s;
-typedef Vector<int,    2>	Vector2i;
-typedef Vector<float,  2>	Vector2f;
-typedef Vector<double, 2>	Vector2d;
-typedef Vector<short,  3>	Vector3s;
-typedef Vector<int,    3>	Vector3i;
-typedef Vector<float,  3>	Vector3f;
-typedef Vector<double, 3>	Vector3d;
-typedef Vector<short,  4>	Vector4s;
-typedef Vector<int,    4>	Vector4i;
-typedef Vector<float,  4>	Vector4f;
-typedef Vector<double, 4>	Vector4d;
-typedef Matrix<float,  2, 2>	Matrix22f;
-typedef Matrix<double, 2, 2>	Matrix22d;
-typedef Matrix<float,  2, 3>	Matrix23f;
-typedef Matrix<double, 2, 3>	Matrix23d;
-typedef Matrix<float,  3, 3>	Matrix33f;
-typedef Matrix<double, 3, 3>	Matrix33d;
-typedef Matrix<float,  3, 4>	Matrix34f;
-typedef Matrix<double, 3, 4>	Matrix34d;
-typedef Matrix<float,  4, 4>	Matrix44f;
-typedef Matrix<double, 4, 4>	Matrix44d;
+//! この3次元回転行列から各軸周りの回転角を取り出す．
+/*!
+  この行列を\f$\TUtvec{R}{}\f$とすると，
+  \f[
+    \TUvec{R}{} =
+    \TUbeginarray{ccc}
+      \cos\theta_z & -\sin\theta_z & \\
+      \sin\theta_z &  \cos\theta_z & \\
+      & & 1
+    \TUendarray
+    \TUbeginarray{ccc}
+       \cos\theta_y & & \sin\theta_y \\
+       & 1 & \\
+      -\sin\theta_y & & \cos\theta_y
+    \TUendarray
+    \TUbeginarray{ccc}
+      1 & & \\
+      & \cos\theta_x & -\sin\theta_x \\
+      & \sin\theta_x &  \cos\theta_x
+    \TUendarray
+  \f]
+  なる\f$\theta_x, \theta_y, \theta_z\f$が回転角となる．
+ \param theta_x	x軸周りの回転角(\f$ -\pi \le \theta_x \le \pi\f$)を返す．
+ \param theta_y	y軸周りの回転角
+	(\f$ -\frac{\pi}{2} \le \theta_y \le \frac{\pi}{2}\f$)を返す．
+ \param theta_z	z軸周りの回転角(\f$ -\pi \le \theta_z \le \pi\f$)を返す．
+ \throw invalid_argument	3次元正方行列でない場合に送出
+*/
+template <class E> std::enable_if_t<rank<E>() == 2>
+rotation_angle(const E& expr, element_t<E>& theta_x,
+	       element_t<E>& theta_y, element_t<E>& theta_z)
+{
+    using	T = element_t<E>;
     
+    const auto&	Rt = evaluate(expr);
+    
+    if (size<0>(Rt) != 3 || size<1>(Rt) != 3)
+	throw std::invalid_argument("TU::rot2angle: input matrix must be 3x3!!");
+
+    if (Rt[0][0] == T(0) && Rt[0][1] == T(0))
+    {
+	theta_x = std::atan2(-Rt[2][1], Rt[1][1]);
+	theta_y = (Rt[0][2] < 0 ? M_PI/2 : -M_PI/2);
+	theta_z = T(0);
+    }
+    else
+    {
+	theta_x =  std::atan2(Rt[1][2], Rt[2][2]);
+	theta_y = -std::asin(Rt[0][2]);
+	theta_z =  std::atan2(Rt[0][1], Rt[0][0]);
+    }
+}
+
+//! この3次元回転行列から回転角と回転軸を取り出す．
+/*!
+  この行列を\f$\TUtvec{R}{}\f$とすると，
+  \f[
+    \TUtvec{R}{} \equiv \TUvec{I}{3}\cos\theta
+    + \TUvec{n}{}\TUtvec{n}{}(1 - \cos\theta)
+    - \TUskew{n}{}\sin\theta
+  \f]
+  なる\f$\theta~(0 \le \theta \le \pi)\f$と\f$\TUvec{n}{}\f$が
+  それぞれ回転角と回転軸となる．
+  \param expr
+  \param c	回転角のcos値，すなわち\f$\cos\theta\f$を返す．
+  \param s	回転角のsin値，すなわち\f$\sin\theta (\ge 0)\f$を返す．
+  \return	回転軸を表す3次元単位ベクトル，すなわち\f$\TUvec{n}{}\f$
+  \throw std::invalid_argument	3x3行列でない場合に送出
+*/
+template <class E> std::enable_if_t<rank<E>() == 2, Array<element_t<E>, 3> >
+rotation_axis(const E& expr, element_t<E>& c, element_t<E>& s)
+{
+    using	T = element_t<E>;
+    
+    const auto&	Rt = expr;
+
+    if (size<0>(Rt) != 3 || size<1>(Rt) != 3)
+	throw std::invalid_argument("TU::rot2angle: input matrix must be 3x3!!");
+
+  // Compute cosine and sine of rotation angle.
+    const T	trace = Rt[0][0] + Rt[1][1] + Rt[2][2];
+    c = T(0.5) * (trace - T(1));
+    s = T(0.5) * std::sqrt((T(1) + trace)*(T(3) - trace));
+
+  // Compute rotation axis.
+    Array<T, 3>	n({Rt[1][2]-Rt[2][1], Rt[2][0]-Rt[0][2], Rt[0][1]-Rt[1][0]});
+    return std::move(normalize(n));
+}
+
+//! この3次元回転行列から回転角と回転軸を取り出す．
+/*!
+  この行列を\f$\TUtvec{R}{}\f$とすると，
+  \f[
+    \TUtvec{R}{} \equiv \TUvec{I}{3}\cos\theta
+    + \TUvec{n}{}\TUtvec{n}{}(1 - \cos\theta)
+    - \TUskew{n}{}\sin\theta
+  \f]
+  なる\f$\theta~(0 \le \theta \le \pi)\f$と\f$\TUvec{n}{}\f$が
+  それぞれ回転角と回転軸となる．
+ \return			回転角と回転軸を表す3次元ベクトル，すなわち
+				\f$\theta\TUvec{n}{}\f$
+ \throw invalid_argument	3x3行列でない場合に送出
+*/
+template <class E> std::enable_if_t<rank<E>() == 2, Array<element_t<E>, 3> >
+rotation_axis(const E& expr)
+{
+    using	T = element_t<E>;
+    
+    const auto&	Rt = expr;
+
+    if (size<0>(Rt) != 3 || size<1>(Rt) != 3)
+	throw std::invalid_argument("TU::rot2angle: input matrix must be 3x3!!");
+
+    const T	trace = Rt[0][0] + Rt[1][1] + Rt[2][2],
+		s2 = std::sqrt((T(1) + trace)*(T(3) - trace));	// 2*sin
+    if (s2 + T(1) == T(1))			// sin << 1 ?
+	return Array<T, 3>();			// zero vector
+    
+    Array<T, 3>	axis({Rt[1][2]-Rt[2][1], Rt[2][0]-Rt[0][2], Rt[0][1]-Rt[1][0]});
+
+    return std::move(axis *= (std::atan2(s2, trace - T(1)) / s2));
+}
+
+//! この3次元回転行列から四元数を取り出す．
+/*!
+  この行列を\f$\TUtvec{R}{}\f$とすると，
+  \f[
+    \TUtvec{R}{} \equiv \TUvec{I}{3}\cos\theta
+    + \TUvec{n}{}\TUtvec{n}{}(1 - \cos\theta)
+    - \TUskew{n}{}\sin\theta
+  \f]
+  なる\f$\theta~(0 \le \theta \le \pi)\f$と\f$\TUvec{n}{}\f$に対して，四元数は
+  \f[
+    \TUvec{q}{} \equiv
+    \TUbeginarray{c}
+      \cos\frac{\theta}{2} \\ \TUvec{n}{}\sin\frac{\theta}{2}
+    \TUendarray
+  \f]
+  と定義される．
+ \return			四元数を表す4次元単位ベクトル
+ \throw invalid_argument	3x3行列でない場合に送出
+*/
+template <class E> std::enable_if_t<rank<E>() == 2, Array<element_t<E>, 4> >
+quaternion(const E& expr)
+{
+    using	T = element_t<E>;
+    
+    const auto&	Rt = expr;
+
+    if (size<0>(Rt) != 3 || size<1>(Rt) != 3)
+	throw std::invalid_argument("TU::rot2angle: input matrix must be 3x3!!");
+
+    Array<T, 4>	q;
+    q[0] = T(0.5) * std::sqrt(trace(Rt) + T(1));
+    if (q[0] + T(1) == T(1))	// q[0] << 1 ?
+    {
+	Array<T, 3>	eval;
+	slice(q, 1, 3) = eigen(Rt, eval, false)[0];
+    }
+    else
+    {
+	const auto	S = transpose(Rt) - Rt;
+	q[1] = T(0.25) * S[2][1] / q[0];
+	q[2] = T(0.25) * S[0][2] / q[0];
+	q[3] = T(0.25) * S[1][0] / q[0];
+    }
+
+    return q;
+}
+
+template <class T>
+inline std::enable_if_t<std::is_floating_point<T>::value, Array2<T, 2, 2> >
+rotation(T theta)
+{
+    Array2<T, 2, 2>	Qt;
+    Qt[0][0] = Qt[1][1] = std::cos(theta);
+    Qt[0][1] = std::sin(theta);
+    Qt[1][0] = -Qt[0][1];
+
+    return Qt;
+}
+
+//! 3次元回転行列を生成する．
+/*!
+  \param n	回転軸を表す3次元単位ベクトル
+  \param c	回転角のcos値
+  \param s	回転角のsin値
+  \return	生成された回転行列，すなわち
+		\f[
+		  \TUtvec{R}{} \equiv \TUvec{I}{3}\cos\theta
+		  + \TUvec{n}{}\TUtvec{n}{}(1 - \cos\theta)
+		  - \TUskew{n}{}\sin\theta
+		\f]
+*/
+template <class E>
+inline std::enable_if_t<rank<E>() == 1, Array2<element_t<E>, 3, 3>>
+rotation(const E& n, element_t<E> c, element_t<E> s)
+{
+    if (std::size(n) != 3)
+	throw std::invalid_argument("TU::Rt: dimension of the argument \'n\' must be 3");
+    const auto			nn = evaluate(n);
+    Array2<element_t<E>, 3, 3>	Qt = nn % nn;
+    Qt *= (1.0 - c);
+    Qt[0][0] += c;
+    Qt[1][1] += c;
+    Qt[2][2] += c;
+    Qt[0][1] += nn[2] * s;
+    Qt[0][2] -= nn[1] * s;
+    Qt[1][0] -= nn[2] * s;
+    Qt[1][2] += nn[0] * s;
+    Qt[2][0] += nn[1] * s;
+    Qt[2][1] -= nn[0] * s;
+
+    return Qt;
+}
+
+//! 3次元回転行列を生成する．
+/*!
+  \param v	回転角と回転軸を表す3次元ベクトルまたは四元数を表す4次元単位ベクトル
+  \return	生成された回転行列，すなわち3次元ベクトルの場合は
+		\f[
+		  \TUtvec{R}{} \equiv \TUvec{I}{3}\cos\theta
+		  + \TUvec{n}{}\TUtvec{n}{}(1 - \cos\theta)
+		  - \TUskew{n}{}\sin\theta,
+		  {\hskip 1em}\mbox{where}{\hskip 0.5em}
+		  \theta \equiv \TUnorm{\TUvec{v}{}},~
+		  \TUvec{n}{} \equiv \frac{\TUvec{v}{}}{\TUnorm{\TUvec{v}{}}}
+		\f]
+		4次元単位ベクトルの場合は
+		\f[
+		  \TUtvec{R}{} \equiv
+		  \TUvec{I}{3}(q_0^2 - \TUtvec{q}{}\TUvec{q}{})
+		  + 2\TUvec{q}{}\TUtvec{q}{}
+		  - 2q_0\TUskew{q}{},
+		  {\hskip 1em}\mbox{where}{\hskip 0.5em}
+		  q_0 \equiv v_0,~
+		  \TUvec{q}{} \equiv [v_1,~v_2,~v_3]^\top
+		\f]
+*/
+template <class E>
+inline std::enable_if_t<rank<E>() == 1, Array2<element_t<E>, 3, 3>>
+rotation(const E& v)
+{
+    using	T = element_t<E>;
+    
+    if (std::size(v) == 4)			// quaternion ?
+    {
+	const T		q0 = v[0];
+	Array<T, 3>	q{{v[1], v[2], v[3]}};
+	Array2<T, 3, 3>	Qt = (T(2) * q) % q;
+	const T		c = q0*q0 - square(q);
+	Qt[0][0] += c;
+	Qt[1][1] += c;
+	Qt[2][2] += c;
+	q *= (T(2) * q0);
+	Qt[0][1] += q[2];
+	Qt[0][2] -= q[1];
+	Qt[1][0] -= q[2];
+	Qt[1][2] += q[0];
+	Qt[2][0] += q[1];
+	Qt[2][1] -= q[0];
+
+	return Qt;
+    }
+
+    const T	theta = length(v);
+    if (theta + T(1) == T(1))		// theta << 1 ?
+	return diag<3>(T(1));
+    else
+    {
+	const T	c = std::cos(theta), s = std::sin(theta);
+	return rotation(v / theta, c, s);
+    }
+}
+
+/************************************************************************
+*  type definitions for convenience					*
+************************************************************************/
+template <class T, size_t N=0, class ALLOC=std::allocator<T> >
+using Vector = array<T, ALLOC, N>;				//!< 1次元配列
+
+template <class T, size_t R=0, size_t C=0, class ALLOC=std::allocator<T> >
+using Matrix = array<T, ALLOC, R, C>;				//!< 2次元配列
+
+using Vector2s	= Vector<short,  2>;
+using Vector2i	= Vector<int,    2>;
+using Vector2f	= Vector<float,  2>;
+using Vector2d	= Vector<double, 2>;
+using Vector3s	= Vector<short,  3>;
+using Vector3i	= Vector<int,    3>;
+using Vector3f	= Vector<float,  3>;
+using Vector3d	= Vector<double, 3>;
+using Vector4s	= Vector<short,  4>;
+using Vector4i	= Vector<int,    4>;
+using Vector4f	= Vector<float,  4>;
+using Vector4d	= Vector<double, 4>;
+using Matrix22f	= Matrix<float,  2, 2>;
+using Matrix22d	= Matrix<double, 2, 2>;
+using Matrix23f	= Matrix<float,  2, 3>;
+using Matrix23d	= Matrix<double, 2, 3>;
+using Matrix33f	= Matrix<float,  3, 3>;
+using Matrix33d	= Matrix<double, 3, 3>;
+using Matrix34f	= Matrix<float,  3, 4>;
+using Matrix34d	= Matrix<double, 3, 4>;
+using Matrix44f	= Matrix<float,  4, 4>;
+using Matrix44d	= Matrix<double, 4, 4>;
 }
 #endif	// !__TU_VECTORPP_H
-
-
-
-
-
-

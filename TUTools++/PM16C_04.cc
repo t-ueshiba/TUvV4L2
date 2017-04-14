@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id$
+ *  $Id: PM16C_04.cc 1557 2014-05-09 10:40:33Z ueshiba $
  */
 #include "TU/PM16C_04.h"
 #include "TU/Manip.h"

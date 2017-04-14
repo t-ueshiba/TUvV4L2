@@ -47,7 +47,7 @@ class Energy
     typedef int					argument_type;
     typedef T					result_type;
     typedef Array<result_type>			array_type;
-    typedef Array2<array_type>			array2_type;
+    typedef Array2<result_type>			array2_type;
     
     class Generator
     {

@@ -11,11 +11,11 @@ makeSparseMatrix(const Matrix<T>& D)
 {
     SparseMatrix<T, SYM>	S;
     S.beginInit();
-    for (u_int i = 0; i < D.nrow(); ++i)
+    for (size_t i = 0; i < D.nrow(); ++i)
     {
 	S.setRow();
 	
-	for (u_int j = (SYM ? i : 0); j < D.ncol(); ++j)
+	for (size_t j = (SYM ? i : 0); j < D.ncol(); ++j)
 	    if ((D[i][j] != T(0)) || (SYM && (i == j)))
 		S.setCol(j, D[i][j]);
     }
@@ -28,8 +28,8 @@ template <class T, bool SYM> Matrix<T>
 makeDenseMatrix(const SparseMatrix<T, SYM>& S)
 {
     Matrix<T>	D(S.nrow(), S.ncol());
-    for (u_int i = 0; i < S.nrow(); ++i)
-	for (u_int j = 0; j < S.ncol(); ++j)
+    for (size_t i = 0; i < S.nrow(); ++i)
+	for (size_t j = 0; j < S.ncol(); ++j)
 	    D[i][j] = S(i, j);
 
     return D;
@@ -47,17 +47,17 @@ composeTest()
     cerr << "--- S ---\n" << S;
     SparseMatrix<T, true>	SSt = S.compose();
     cerr << "--- S*St ---\n" << SSt;
-    cerr << "--- error ---\n" << makeDenseMatrix(SSt) - A * A.trns();
+    cerr << "--- error ---\n" << makeDenseMatrix(SSt) - A * transpose(A);
 
     Matrix<T>	B;
     cerr << "B>> " << flush;
     cin >> B;
-    B.symmetrize();
+    symmetrize(B);
     SparseMatrix<T, true>	W = makeSparseMatrix<true>(B);
     cerr << "--- W ---\n" << W;
     SparseMatrix<T, true>	SWSt = S.compose(W);
     cerr << "--- S*W*St ---\n" << SWSt;
-    cerr << "--- error ---\n" << makeDenseMatrix(SWSt) - A * B * A.trns();
+    cerr << "--- error ---\n" << makeDenseMatrix(SWSt) - A * B * transpose(A);
 }
 
 template <class T, bool SYM> void

@@ -1,32 +1,3 @@
-/*
- *  平成14-19年（独）産業技術総合研究所 著作権所有
- *  
- *  創作者：植芝俊夫
- *
- *  本プログラムは（独）産業技術総合研究所の職員である植芝俊夫が創作し，
- *  （独）産業技術総合研究所が著作権を所有する秘密情報です．著作権所有
- *  者による許可なしに本プログラムを使用，複製，改変，第三者へ開示する
- *  等の行為を禁止します．
- *  
- *  このプログラムによって生じるいかなる損害に対しても，著作権所有者お
- *  よび創作者は責任を負いません。
- *
- *  Copyright 2002-2007.
- *  National Institute of Advanced Industrial Science and Technology (AIST)
- *
- *  Creator: Toshio UESHIBA
- *
- *  [AIST Confidential and all rights reserved.]
- *  This program is confidential. Any using, copying, changing or
- *  giving any information concerning with this program to others
- *  without permission by the copyright holder are strictly prohibited.
- *
- *  [No Warranty.]
- *  The copyright holder or the creator are not responsible for any
- *  damages caused by using this program.
- *  
- *  $Id: Array++.h 1785 2015-02-14 05:43:15Z ueshiba $
- */
 /*!
   \file		SADStereo.h
   \brief	SADステレオマッチングクラスの定義と実装
@@ -48,43 +19,43 @@ template <class SCORE, class DISP>
 class SADStereo : public StereoBase<SADStereo<SCORE, DISP> >
 {
   public:
-    typedef SCORE					Score;
-    typedef DISP					Disparity;
+    using Score			= SCORE;
+    using Disparity		= DISP;
 
   private:
-    typedef StereoBase<SADStereo<Score, Disparity> >	super;
+    using super			= StereoBase<SADStereo<Score, Disparity> >;
 #if defined(SIMD)
-    typedef simd::vec<Score>				ScoreVec;
-    typedef simd::vec<Disparity>			DisparityVec;
+    using ScoreVec		= simd::vec<Score>;
+    using DisparityVec		= simd::vec<Disparity>;
 #else
-    typedef Score					ScoreVec;
-    typedef Disparity					DisparityVec;
+    using ScoreVec		= Score;
+    using DisparityVec		= Disparity;
 #endif
-    typedef Array<ScoreVec>				ScoreVecArray;
-    typedef Array2<ScoreVecArray>			ScoreVecArray2;
-    typedef typename ScoreVecArray2::iterator		col_siterator;
-    typedef typename ScoreVecArray2::const_iterator	const_col_siterator;
-    typedef typename ScoreVecArray2::const_reverse_iterator
-						const_reverse_col_siterator;
-    typedef box_filter_iterator<const_reverse_col_siterator>
-							const_reverse_col_sbox;
-    typedef Array<Disparity>				DisparityArray;
-    typedef Array2<DisparityArray>			DisparityArray2;
-    typedef typename DisparityArray::reverse_iterator	reverse_col_diterator;
-    typedef Array<float>				FloatArray;
-    typedef FloatArray::reverse_iterator		reverse_col_fiterator;
+    using ScoreVecArray		= Array<ScoreVec>;
+    using ScoreVecArray2	= Array2<ScoreVec>;
+    using col_siterator		= typename ScoreVecArray2::iterator;
+    using const_col_siterator	= typename ScoreVecArray2::const_iterator;
+    using const_reverse_col_siterator
+			= typename ScoreVecArray2::const_reverse_iterator;
+    using const_reverse_col_sbox= box_filter_iterator<
+				      const_reverse_col_siterator>;
+    using DisparityArray	= Array<Disparity>;
+    using DisparityArray2	= Array2<Disparity>;
+    using reverse_col_diterator	= typename DisparityArray::reverse_iterator;
+    using FloatArray		= Array<float>;
+    using reverse_col_fiterator	= FloatArray::reverse_iterator;
 
     struct ScoreUpdate
     {
-	typedef ScoreVec				result_type;
-	typedef boost::tuple<ScoreVec, ScoreVec,
-			     ScoreVec, ScoreVec>	argument_type;
+	using result_type	= ScoreVec;
+	using argument_type	= std::tuple<ScoreVec, ScoreVec,
+					     ScoreVec, ScoreVec>;
 	
 	ScoreUpdate(Score blend)	:_blend(blend)	{}
 
 	result_type	operator ()(const argument_type& args) const
 			{
-			    using 	boost::get;
+			    using 	std::get;
 
 			    return _blend(get<0>(args), get<1>(args))
 				 - _blend(get<2>(args), get<3>(args));
@@ -221,19 +192,22 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowR, ROW_D rowD)
     if (H < N || W < N)				// 充分な行数／列数があるか確認
 	return;
 
-    Buffers*	buffers = _bufferPool.get();	// 各種作業領域を確保
+    auto* const	buffers = _bufferPool.get();	// 各種作業領域を確保
     buffers->initialize(N, D, W);
 
     std::advance(rowD, N/2);	// 出力行をウィンドウサイズの半分だけ進める
-    ROW		rowLp = rowL, rowRp = rowR;
+    auto	rowLp = rowL;
+    auto	rowRp = rowR;
 
   // 各行に対してステレオマッチングを行い視差を計算
-    for (ROW rowL0 = rowL + N - 1; rowL != rowLe; ++rowL)
+    for (const auto rowL0 = rowL + N - 1; rowL != rowLe; ++rowL)
     {
 	start(1);
 	if (rowL <= rowL0)
+	{
 	    initializeDissimilarities(rowL->cbegin(), rowL->cend(),
 				      rowR->cbegin(), buffers->Q.begin());
+	}
 	else
 	{
 	    updateDissimilarities(rowL->cbegin(), rowL->cend(), rowR->cbegin(),
@@ -278,18 +252,20 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
     if (H < N || W < N)				// 充分な行数／列数があるか確認
 	return;
 
-    Buffers*	buffers = _bufferPool.get();	// 各種作業領域を確保
+    auto* const	buffers = _bufferPool.get();	// 各種作業領域を確保
     buffers->initialize(N, D, W, H);
     
     std::advance(rowD, N/2);	// 出力行をウィンドウサイズの半分だけ進める
 
-    const ROW_D		rowD0 = rowD;
-    size_t		v = H, cV = std::distance(rowL, rowLlast);
-    ROW			rowLp = rowL, rowRp = rowR;
-    size_t		cVp = cV;
+    const auto	rowD0 = rowD;
+    auto	v  = H;
+    size_t	cV = std::distance(rowL, rowLlast);
+    auto	rowLp = rowL;
+    auto	rowRp = rowR;
+    auto	cVp = cV;
 
   // 各行に対してステレオマッチングを行い視差を計算
-    for (const ROW rowL0 = rowL + N - 1; rowL != rowLe; ++rowL)
+    for (const auto rowL0 = rowL + N - 1; rowL != rowLe; ++rowL)
     {
 	--v;
 	--cV;
@@ -297,8 +273,8 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 	start(1);
 	if (rowL <= rowL0)
 	    initializeDissimilarities(rowL->cbegin(), rowL->cend(),
-				      make_fast_zip_iterator(
-					  boost::make_tuple(
+				      make_zip_iterator(
+					  std::make_tuple(
 					      rowR->cbegin(),
 					      make_vertical_iterator(rowV,
 								     cV))),
@@ -306,13 +282,13 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 	else
 	{
 	    updateDissimilarities(rowL->cbegin(), rowL->cend(),
-				  make_fast_zip_iterator(
-				      boost::make_tuple(
+				  make_zip_iterator(
+				      std::make_tuple(
 					  rowR->cbegin(),
 					  make_vertical_iterator(rowV, cV))),
 				  rowLp->cbegin(),
-				  make_fast_zip_iterator(
-				      boost::make_tuple(
+				  make_zip_iterator(
+				      std::make_tuple(
 					  rowRp->cbegin(),
 					  make_vertical_iterator(rowV, --cVp))),
 				  buffers->Q.begin());
@@ -327,13 +303,13 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 	    computeDisparities(buffers->Q.crbegin(), buffers->Q.crend(),
 			       buffers->dminL.rbegin(),
 			       buffers->delta.rbegin(),
-			       make_fast_zip_iterator(
-				   boost::make_tuple(
+			       make_zip_iterator(
+				   std::make_tuple(
 				       buffers->dminR.end() - D + 1,
 				       make_vertical_iterator(
 					   buffers->dminV.end(), v))),
-			       make_fast_zip_iterator(
-				   boost::make_tuple(
+			       make_zip_iterator(
+				   std::make_tuple(
 				       make_dummy_iterator(&(buffers->RminR)),
 				       buffers->RminV.rbegin())));
 	    start(3);
@@ -373,55 +349,47 @@ SADStereo<SCORE, DISP>::initializeDissimilarities(COL colL, COL colLe,
 						  COL_RV colRV,
 						  col_siterator colQ) const
 {
+    using pixel_t	= iterator_value<COL>;
 #if defined(SIMD)
-    typedef decltype(simd::make_load_iterator(col2ptr(colRV)))	in_iterator;
+    using diff_t	= Diff<simd::vec<pixel_t> >;
 #else
-    typedef decltype(col2ptr(colRV))				in_iterator;
+    using diff_t	= Diff<pixel_t>;
 #endif
-    typedef Diff<tuple_head<iterator_value<in_iterator> > >	diff_type;
-
     if (_params.blend > 0)
     {
-	typedef Blend<ScoreVec>					blend_type;
+	using blend_t	= Blend<ScoreVec>;
 #if defined(SIMD)
-	typedef simd::cvtup_iterator<
-	    assignment_iterator<blend_type,
-				subiterator<col_siterator> > >	qiterator;
+	using qiterator	= simd::cvtup_iterator<
+			      assignment_iterator<
+				  blend_t, subiterator<col_siterator> > >;
+	using ddiff_t	= Diff<simd::vec<std::make_signed_t<pixel_t> > >;
 #else
-	typedef assignment_iterator<
-	    blend_type, subiterator<col_siterator> >		qiterator;
+	using qiterator	= assignment_iterator<blend_t,
+					      subiterator<col_siterator> >;
+	using ddiff_t	= Diff<std::make_signed_t<pixel_t> >;
 #endif
-	typedef Minus<iterator_value<in_iterator> >		minus_type;
-	typedef Diff<
-	    tuple_head<typename minus_type::result_type> >	ddiff_type;
-
 	while (++colL != colLe - 1)
 	{
 	    ++colRV;
 	    ++colQ;
-	
-	    auto	P = make_fast_zip_iterator(
-				boost::make_tuple(
+
+	    auto	P = make_zip_iterator(
+				std::make_tuple(
 				    boost::make_transform_iterator(
-					in_iterator(col2ptr(colRV)),
-					diff_type(*colL,
-						  _params.intensityDiffMax)),
+					make_col_load_iterator(colRV),
+					diff_t(*colL,
+					       _params.intensityDiffMax)),
 				    boost::make_transform_iterator(
-					boost::make_transform_iterator(
-					    make_fast_zip_iterator(
-						boost::make_tuple(
-						    in_iterator(
-							col2ptr(colRV) + 1),
-						    in_iterator(
-							col2ptr(colRV) - 1))),
-					    make_unarizer(minus_type())),
-					ddiff_type(
-					    *(colL + 1) - *(colL - 1),
-					    _params.derivativeDiffMax))));
+					make_transform_iterator2(
+					    make_col_load_iterator(colRV) + 1,
+					    make_col_load_iterator(colRV) - 1,
+					    Minus()),
+					ddiff_t(*(colL + 1) - *(colL - 1),
+						_params.derivativeDiffMax))));
 	    for (qiterator Q( make_assignment_iterator(
-				  colQ->begin(), blend_type(_params.blend))),
+				  colQ->begin(), blend_t(_params.blend))),
 			   Qe(make_assignment_iterator(
-				  colQ->end(), blend_type(_params.blend)));
+				  colQ->end(), blend_t(_params.blend)));
 		 Q != Qe; ++Q, ++P)
 		*Q += *P;
 	}
@@ -429,15 +397,14 @@ SADStereo<SCORE, DISP>::initializeDissimilarities(COL colL, COL colLe,
     else
     {
 #if defined(SIMD)
-	typedef simd::cvtup_iterator<subiterator<col_siterator> >
-								qiterator;
+	using qiterator	= simd::cvtup_iterator<subiterator<col_siterator> >;
 #else
-	typedef subiterator<col_siterator>			qiterator;
+	using qiterator	= subiterator<col_siterator>;
 #endif
 	for (; colL != colLe; ++colL)
 	{
-	    const diff_type	diff(*colL, _params.intensityDiffMax);
-	    in_iterator	in(col2ptr(colRV));
+	    const auto	diff = diff_t(*colL, _params.intensityDiffMax);
+	    auto	in   = make_col_load_iterator(colRV);
 	    
 	    for (qiterator Q(colQ->begin()), Qe(colQ->end());
 		 Q != Qe; ++Q, ++in)
@@ -455,67 +422,58 @@ SADStereo<SCORE, DISP>::updateDissimilarities(COL colL,  COL colLe,
 					      COL colLp, COL_RV colRVp,
 					      col_siterator colQ) const
 {
+    using pixel_t	= iterator_value<COL>;
 #if defined(SIMD)
-    typedef decltype(simd::make_load_iterator(col2ptr(colRV)))	in_iterator;
+    using diff_t	= Diff<simd::vec<pixel_t> >;
 #else
-    typedef decltype(col2ptr(colRV))				in_iterator;
+    using diff_t	= Diff<pixel_t>;
 #endif
-    typedef Diff<tuple_head<iterator_value<in_iterator> > >	diff_type;
 
     if (_params.blend > 0)
     {
+	using blend_t	= Blend<ScoreVec>;
 #if defined(SIMD)
-	typedef simd::cvtup_iterator<
-	    assignment_iterator<ScoreUpdate,
-				subiterator<col_siterator> > >	qiterator;
+	using qiterator	= simd::cvtup_iterator<
+			      assignment_iterator<
+				  ScoreUpdate, subiterator<col_siterator> > >;
+	using ddiff_t	= Diff<simd::vec<std::make_signed_t<pixel_t> > >;
 #else
-	typedef assignment_iterator<
-	    ScoreUpdate, subiterator<col_siterator> >		qiterator;
+	using qiterator	= assignment_iterator<ScoreUpdate,
+					      subiterator<col_siterator> >;
+	using ddiff_t	= Diff<std::make_signed_t<pixel_t> >;
 #endif
-	typedef Minus<iterator_value<in_iterator> >		minus_type;
-	typedef Diff<
-	    tuple_head<typename minus_type::result_type> >	ddiff_type;
-
 	while (++colL != colLe - 1)
 	{
 	    ++colRV;
 	    ++colLp;
 	    ++colRVp;
 	    ++colQ;
-	    
-	    auto	P = make_fast_zip_iterator(
-				boost::make_tuple(
+
+	    const Minus	minus{};
+	    auto	P = make_zip_iterator(
+				std::make_tuple(
 				    boost::make_transform_iterator(
-					in_iterator(col2ptr(colRV)),
-					diff_type(
-					    *colL, _params.intensityDiffMax)),
+					make_col_load_iterator(colRV),
+					diff_t(*colL,
+					       _params.intensityDiffMax)),
 				    boost::make_transform_iterator(
-					boost::make_transform_iterator(
-					    make_fast_zip_iterator(
-						boost::make_tuple(
-						    in_iterator(
-							col2ptr(colRV) + 1),
-						    in_iterator(
-							col2ptr(colRV) - 1))),
-					    make_unarizer(minus_type())),
-					ddiff_type(*(colL + 1) - *(colL - 1),
-						   _params.derivativeDiffMax)),
+					make_transform_iterator2(
+					    make_col_load_iterator(colRV) + 1,
+					    make_col_load_iterator(colRV) - 1,
+					    Minus()),
+					ddiff_t(*(colL + 1) - *(colL - 1),
+						_params.derivativeDiffMax)),
 				    boost::make_transform_iterator(
-					in_iterator(col2ptr(colRVp)),
-					diff_type(*colLp,
-						  _params.intensityDiffMax)),
+					make_col_load_iterator(colRVp),
+					diff_t(*colLp,
+					       _params.intensityDiffMax)),
 				    boost::make_transform_iterator(
-					boost::make_transform_iterator(
-					    make_fast_zip_iterator(
-						boost::make_tuple(
-						    in_iterator(
-							col2ptr(colRVp) + 1),
-						    in_iterator(
-							col2ptr(colRVp) - 1))),
-					    make_unarizer(minus_type())),
-					ddiff_type(
-					    *(colLp + 1) - *(colLp - 1),
-					    _params.derivativeDiffMax))));
+					make_transform_iterator2(
+					    make_col_load_iterator(colRVp) + 1,
+					    make_col_load_iterator(colRVp) - 1,
+					    Minus()),
+					ddiff_t(*(colLp + 1) - *(colLp - 1),
+						_params.derivativeDiffMax))));
 	    for (qiterator Q( make_assignment_iterator(
 				  colQ->begin(), ScoreUpdate(_params.blend))),
 			   Qe(make_assignment_iterator(
@@ -527,16 +485,16 @@ SADStereo<SCORE, DISP>::updateDissimilarities(COL colL,  COL colLe,
     else
     {
 #if defined(SIMD)
-	typedef simd::cvtup_iterator<subiterator<col_siterator> >
-								qiterator;
+	using qiterator	= simd::cvtup_iterator<subiterator<col_siterator> >;
 #else
-	typedef subiterator<col_siterator>			qiterator;
+	using qiterator	= subiterator<col_siterator>;
 #endif
 	for (; colL != colLe; ++colL)
 	{
-	    const diff_type	diff_p(*colLp, _params.intensityDiffMax),
-				diff_n(*colL,  _params.intensityDiffMax);
-	    in_iterator		in_p(col2ptr(colRVp)), in_n(col2ptr(colRV));
+	    const auto	diff_p = diff_t(*colLp, _params.intensityDiffMax);
+	    const auto	diff_n = diff_t(*colL,  _params.intensityDiffMax);
+	    auto	in_p   = make_col_load_iterator(colRVp);
+	    auto	in_n   = make_col_load_iterator(colRV);
 	
 	    for (qiterator Q(colQ->begin()), Qe(colQ->end());
 		 Q != Qe; ++Q, ++in_p, ++in_n)
@@ -558,63 +516,61 @@ SADStereo<SCORE, DISP>::computeDisparities(const_reverse_col_siterator colQ,
 					   DMIN_RV dminRV,
 					   RMIN_RV RminRV) const
 {
-    const size_t	dsw1 = _params.disparitySearchWidth - 1;
-
   // 評価値を横方向に積算し，最小値を与える視差を双方向に探索する．
     for (const_reverse_col_sbox boxR(colQ, _params.windowSize), boxRe(colQe);
 	 boxR != boxRe; ++boxR)
     {
 #if defined(SIMD)
-	typedef decltype(simd::make_store_iterator(col2ptr(dminRV)))
-								diterator;
-	typedef simd::mask_type<Disparity>			mask_type;
+	using mask_type	= simd::mask_type<Disparity>;
 #  if defined(WITHOUT_CVTDOWN)
-	typedef simd::cvtdown_mask_iterator<
-	    mask_type,
-	    simd::mask_iterator<subiterator<const_col_siterator>,
-				subiterator<RMIN_RV> > >	miterator;
+	using miterator	= simd::cvtdown_mask_iterator<
+			      mask_type,
+			      simd::mask_iterator<
+				  subiterator<const_col_siterator>,
+				  subiterator<RMIN_RV> > >;
 #  else
-	typedef simd::mask_iterator<mask_type,
-				    subiterator<const_col_siterator>,
-				    subiterator<RMIN_RV> >	miterator;
+	using miterator	= simd::mask_iterator<
+			      mask_type,
+			      subiterator<const_col_siterator>,
+			      subiterator<RMIN_RV> >;
 #  endif
 #else
-	typedef decltype(col2ptr(dminRV))			diterator;
-	typedef mask_iterator<subiterator<const_col_siterator>,
-			      subiterator<RMIN_RV> >		miterator;
+	using miterator	= mask_iterator<subiterator<const_col_siterator>,
+					subiterator<RMIN_RV> >;
 #endif
-	typedef iterator_value<diterator>			dvalue_type;
-
 	Idx<DisparityVec>	index;
-	diterator		dminRVt(col2ptr(--dminRV));
+	auto			dminRVt = make_col_store_iterator(--dminRV);
 #if defined(SIMD) && defined(WITHOUT_CVTDOWN)
 	miterator	maskRV(make_mask_iterator(boxR->cbegin(),
 						  std::begin(*RminRV)));
 	for (miterator maskRVe(make_mask_iterator(boxR->cend(),
-						  std::end(*RminRV)));
+						  std::begin(*RminRV)));
 	     maskRV != maskRVe; ++maskRV)
 #else
 	miterator	maskRV(boxR->cbegin(), std::begin(*RminRV));
-	for (miterator maskRVe(boxR->cend(), std::end(*RminRV));
+	for (miterator maskRVe(boxR->cend(), std::begin(*RminRV));
 	     maskRV != maskRVe; ++maskRV)
 #endif
 	{
-	  //*dminRVt = select(*maskRV, index, dvalue_type(*dminRVt));
-	    *dminRVt = fast_select(*maskRV, index, dvalue_type(*dminRVt));
+	    using dvalue_t = decayed_iterator_value<decltype(dminRVt)>;
+
+	  //*dminRVt = select(*maskRV, index, dvalue_t(*dminRVt));
+	    *dminRVt = fast_select(*maskRV, index, dvalue_t(*dminRVt));
 
 	    ++dminRVt;
 	    ++index;
 	}
 #if defined(SIMD) && defined(WITHOUT_CVTDOWN)
-      	const int	dL = maskRV.base().dL();	// 左画像から見た視差
+      	const auto	dL = maskRV.base().dL();	// 左画像から見た視差
 #else
-      	const int	dL = maskRV.dL();		// 左画像から見た視差
+      	const auto	dL = maskRV.dL();		// 左画像から見た視差
 #endif
 #if defined(SIMD)
-	const Score*	R  = boxR->cbegin().base();
+	const auto	R  = boxR->cbegin().base();
 #else
-	const Score*	R  = boxR->cbegin();
+	const auto	R  = boxR->cbegin();
 #endif
+	const auto	dsw1 = _params.disparitySearchWidth - 1;
 	*dminL = dL;
 	*delta = (dL == 0 || dL == dsw1 ? 0 :
 		  0.5f * float(R[dL-1] - R[dL+1]) /
@@ -632,9 +588,9 @@ template <class SCORE, class DISP> void
 SADStereo<SCORE, DISP>::Buffers::initialize(size_t N, size_t D, size_t W)
 {
 #if defined(SIMD)
-    const size_t	DD = D / ScoreVec::size;
+    const auto	DD = D / ScoreVec::size;
 #else
-    const size_t	DD = D;
+    const auto	DD = D;
 #endif
     Q.resize(W, DD);			// Q(u, *; d)
     Q = 0;

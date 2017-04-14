@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id$
+ *  $Id: GraphCuts.h 1829 2015-06-15 00:30:03Z ueshiba $
  */
 /*!
   \file		GraphCuts.h

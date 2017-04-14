@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id$
+ *  $Id: GaussianConvolver.h 1586 2014-07-09 02:11:08Z ueshiba $
  */
 /*!
   \file		GaussianConvolver.h
@@ -67,7 +67,7 @@ template <class T> class GaussianCoefficients
 	EvenConstraint(element_type sigma) :_sigma(sigma)		{}
 	
 	vector_type	operator ()(const argument_type& params) const	;
-	matrix_type	jacobian(const argument_type& params)	 const	;
+	matrix_type	derivative(const argument_type& params)	 const	;
 
       private:
 	element_type	_sigma;
@@ -78,14 +78,14 @@ template <class T> class GaussianCoefficients
       public:
 	typedef typename GaussianCoefficients<T>::element_type	element_type;
 	typedef Array<Params>					argument_type;
-    
-	enum		{D = 2};
+
+	constexpr static size_t	D = 2;
 
 	CostFunction(int ndivisions, element_type range)
 	    :_ndivisions(ndivisions), _range(range)			{}
     
 	vector_type	operator ()(const argument_type& params) const	;
-	matrix_type	jacobian(const argument_type& params)	 const	;
+	matrix_type	derivative(const argument_type& params)	 const	;
 	void		update(argument_type& params,
 			       const vector_type& dp)		 const	;
 

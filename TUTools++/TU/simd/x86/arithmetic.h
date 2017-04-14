@@ -4,6 +4,7 @@
 #if !defined(__TU_SIMD_X86_ARITHMETIC_H)
 #define __TU_SIMD_X86_ARITHMETIC_H
 
+#include "TU/simd/zero.h"
 #include "TU/simd/x86/unpack.h"
 
 namespace TU

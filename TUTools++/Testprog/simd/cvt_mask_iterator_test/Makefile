@@ -12,7 +12,7 @@ VPATH		=
 IDLS		=
 MOCHDRS		=
 
-INCDIRS		= -I../../.. -I$(PREFIX)/include
+INCDIRS		= -I../../..
 CPPFLAGS	= -DNDEBUG
 CFLAGS		= -g
 ifeq ($(shell arch), armv7l)
@@ -21,15 +21,11 @@ else ifeq ($(shell arch), aarch64)
   CPPFLAGS     += -DNEON
 else
   CPPFLAGS     += -DAVX2
+  CFLAGS       += -march=core-avx2
 endif
 CCFLAGS		= $(CFLAGS)
 
 LIBS		=
-ifneq ($(findstring darwin,$(OSTYPE)),)
-  LIBS	       += -framework IOKit -framework CoreFoundation \
-		  -framework CoreServices
-endif
-
 LINKER		= $(CXX)
 
 BINDIR		= $(PREFIX)/bin
@@ -42,7 +38,6 @@ INCDIR		= $(PREFIX)/include
 SUFFIX		= .cc:sC .cpp:sC .cu:sC
 EXTHDRS		= ../../../TU/functional.h \
 		../../../TU/iterator.h \
-		../../../TU/pair.h \
 		../../../TU/simd/arm/arch.h \
 		../../../TU/simd/arm/bit_shift.h \
 		../../../TU/simd/arm/cast.h \
@@ -87,8 +82,8 @@ OBJS		= main.o
 include $(PROJECT)/lib/common.mk
 ###
 main.o: ../../../TU/simd/cvtdown_iterator.h ../../../TU/iterator.h \
-	../../../TU/tuple.h ../../../TU/functional.h ../../../TU/pair.h \
-	../../../TU/simd/cvt.h ../../../TU/simd/zero.h ../../../TU/simd/vec.h \
+	../../../TU/functional.h ../../../TU/simd/cvt.h ../../../TU/tuple.h \
+	../../../TU/simd/zero.h ../../../TU/simd/vec.h \
 	../../../TU/simd/config.h ../../../TU/simd/type_traits.h \
 	../../../TU/simd/x86/type_traits.h ../../../TU/simd/arm/type_traits.h \
 	../../../TU/simd/x86/vec.h ../../../TU/simd/x86/arch.h \

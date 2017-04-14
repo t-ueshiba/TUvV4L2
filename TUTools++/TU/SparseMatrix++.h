@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *
- *  $Id$
+ *  $Id: SparseMatrix++.h 1937 2016-02-20 02:46:39Z ueshiba $
  */
 /*!
   \file		SparseMatrix++.h

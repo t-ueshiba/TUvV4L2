@@ -12,7 +12,7 @@ VPATH		=
 IDLS		=
 MOCHDRS		=
 
-INCDIRS		= -I../../.. -I$(PREFIX)/include
+INCDIRS		= -I../../..
 CPPFLAGS	= -DNDEBUG #-DTU_SIMD_DEBUG
 CFLAGS		= -g
 NVCCFLAGS	= -g
@@ -39,9 +39,9 @@ INCDIR		= $(PREFIX)/include
 #########################
 SUFFIX		= .cc:sC .cpp:sC .cu:sC
 EXTHDRS		= ../../../TU/Array++.h \
-		../../../TU/functional.h \
+		../../../TU/algorithm.h \
 		../../../TU/iterator.h \
-		../../../TU/pair.h \
+		../../../TU/range.h \
 		../../../TU/simd/arithmetic.h \
 		../../../TU/simd/arm/arch.h \
 		../../../TU/simd/arm/arithmetic.h \
@@ -94,8 +94,8 @@ OBJS		= main.o
 #include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
-main.o: ../../../TU/Array++.h ../../../TU/iterator.h ../../../TU/tuple.h \
-	../../../TU/functional.h ../../../TU/pair.h \
+main.o: ../../../TU/Array++.h ../../../TU/range.h ../../../TU/algorithm.h \
+	../../../TU/tuple.h ../../../TU/iterator.h \
 	../../../TU/simd/load_store.h ../../../TU/simd/vec.h \
 	../../../TU/simd/config.h ../../../TU/simd/type_traits.h \
 	../../../TU/simd/x86/type_traits.h ../../../TU/simd/arm/type_traits.h \

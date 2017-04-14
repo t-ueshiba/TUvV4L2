@@ -4,14 +4,13 @@
 #include <cstdlib>
 #include "TU/types.h"
 #include "TU/GuidedFilter.h"
-#include <boost/tuple/tuple_io.hpp>
 
 int
 main(int argc, char* argv[])
 {
     using namespace	std;
     using namespace	TU;
-
+    
     size_t		w = 3;
     float		e = 0.01;
     extern char*	optarg;
@@ -27,34 +26,35 @@ main(int argc, char* argv[])
 	}
      
   // guided filterを2つの1D arrayに適用する．
-    Array<int>	a;
+    Array<int>		a;
     cerr << "a> ";
     cin >> a;
 
-    Array<u_char>	b(a.size());
-    for (size_t i = 0; i < b.size(); ++i)
-	b[i] = a[i]; //+ 1;
+    Array<u_char>	b(a);
+    Array<float>	c(a.size());
 
     GuidedFilter<float>	gf(w, e);
-    Array<float>	c(a.size());
   //gf.convolve(a.begin(), a.end(), b.begin(), b.end(), c.begin() + w - 1);
-    gf.convolve(a.begin(), a.end(), c.begin() + w - 1);
+  //gf.convolve(a.begin(), a.end(), c.begin() + w - 1);
+
+    auto		ab = std::make_tuple(std::cref(a), std::cref(b));
+    gf.convolve(std::begin(ab), std::end(ab), c.begin() + w - 1);
     cout << c;
 
   // guided filterを2つの2D arrayに適用する．
-    Array2<Array<short> >	A;
+    Array2<short>	A;
     cerr << "A> ";
     cin >> A;
 
-    Array2<Array<u_char> >	B(A.nrow(), A.ncol());
-    for (size_t i = 0; i < B.nrow(); ++i)
-	for (size_t j = 0; j < B.ncol(); ++j)
-	    B[i][j] = A[i][j];// + 1;
+    Array2<u_char>	B(A);
+    Array2<float>	C(A.nrow(), A.ncol());
 
     GuidedFilter2<float>	gf2(w, w, e);
-    Array2<Array<float> >	C(A.nrow(), A.ncol());
-  //gf2.convolve(A.begin(), A.end(), B.begin(), B.end(), C.begin());
+    gf2.convolve(A.begin(), A.end(), B.begin(), B.end(), C.begin());
     gf2.convolve(A.begin(), A.end(), C.begin());
+
+    auto	AB = std::make_tuple(std::cref(A), std::cref(B));
+  //gf2.convolve(std::begin(AB), std::end(AB), C.begin());
     cout << C;
 
     return 0;

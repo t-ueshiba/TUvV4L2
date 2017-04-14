@@ -13,10 +13,12 @@ IDLS		=
 MOCHDRS		=
 
 INCDIRS		= -I../..
-CPPFLAGS	= -DNDEBUG -DPROFILE -DUSE_TBB
+CPPFLAGS	= -DNDEBUG -DPROFILE #-DUSE_TBB
 CFLAGS		= -O3
 NVCCFLAGS	= -g
 ifeq ($(shell arch), armv7l)
+  CPPFLAGS     += -DNEON
+else ifeq ($(shell arch), aarch64)
   CPPFLAGS     += -DNEON
 else
   CPPFLAGS     += -DAVX2
@@ -24,11 +26,7 @@ else
 endif
 CCFLAGS		= $(CFLAGS)
 
-LIBS		= -lTUTools++ -ltbb -ltbbmalloc
-ifneq ($(findstring darwin,$(OSTYPE)),)
-  LIBS	       += -framework IOKit -framework CoreFoundation \
-		  -framework CoreServices
-endif
+LIBS		= -lTUNewTools++ -ltbb -ltbbmalloc
 
 LINKER		= $(CXX)
 
@@ -43,16 +41,16 @@ SUFFIX		= .cc:sC .cpp:sC .cu:sC
 EXTHDRS		= ../../TU/Array++.h \
 		../../TU/DericheConvolver.h \
 		../../TU/GaussianConvolver.h \
-		../../TU/Geometry++.h \
 		../../TU/IIRFilter.h \
 		../../TU/Image++.h \
-		../../TU/Minimize.h \
 		../../TU/Profiler.h \
 		../../TU/SeparableFilter2.h \
 		../../TU/Vector++.h \
+		../../TU/algorithm.h \
 		../../TU/functional.h \
 		../../TU/iterator.h \
 		../../TU/pair.h \
+		../../TU/range.h \
 		../../TU/simd/BufTraits.h \
 		../../TU/simd/allocator.h \
 		../../TU/simd/arithmetic.h \
@@ -86,8 +84,6 @@ EXTHDRS		= ../../TU/Array++.h \
 		../../TU/simd/load_store.h \
 		../../TU/simd/logical.h \
 		../../TU/simd/lookup.h \
-		../../TU/simd/misc.h \
-		../../TU/simd/row_vec_iterator.h \
 		../../TU/simd/select.h \
 		../../TU/simd/shift.h \
 		../../TU/simd/shift_iterator.h \
@@ -111,8 +107,6 @@ EXTHDRS		= ../../TU/Array++.h \
 		../../TU/simd/x86/lookup.h \
 		../../TU/simd/x86/select.h \
 		../../TU/simd/x86/shift.h \
-		../../TU/simd/x86/shuffle.h \
-		../../TU/simd/x86/svml.h \
 		../../TU/simd/x86/type_traits.h \
 		../../TU/simd/x86/unpack.h \
 		../../TU/simd/x86/vec.h \
@@ -131,10 +125,10 @@ OBJS		= main.o
 #include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
-main.o: ../../TU/Image++.h ../../TU/types.h ../../TU/Geometry++.h \
-	../../TU/Vector++.h ../../TU/Array++.h ../../TU/iterator.h \
-	../../TU/tuple.h ../../TU/functional.h ../../TU/pair.h \
-	../../TU/Minimize.h ../../TU/DericheConvolver.h ../../TU/IIRFilter.h \
+main.o: ../../TU/Image++.h ../../TU/types.h ../../TU/pair.h \
+	../../TU/Vector++.h ../../TU/Array++.h ../../TU/range.h \
+	../../TU/algorithm.h ../../TU/tuple.h ../../TU/iterator.h \
+	../../TU/DericheConvolver.h ../../TU/IIRFilter.h \
 	../../TU/SeparableFilter2.h ../../TU/simd/simd.h \
 	../../TU/simd/config.h ../../TU/simd/vec.h \
 	../../TU/simd/type_traits.h ../../TU/simd/x86/type_traits.h \
@@ -160,12 +154,10 @@ main.o: ../../TU/Image++.h ../../TU/types.h ../../TU/Geometry++.h \
 	../../TU/simd/arm/compare.h ../../TU/simd/select.h \
 	../../TU/simd/x86/select.h ../../TU/simd/arm/select.h \
 	../../TU/simd/arithmetic.h ../../TU/simd/x86/arithmetic.h \
-	../../TU/simd/arm/arithmetic.h ../../TU/simd/misc.h \
-	../../TU/simd/x86/shuffle.h ../../TU/simd/x86/svml.h \
-	../../TU/simd/transform.h ../../TU/simd/lookup.h \
+	../../TU/simd/arm/arithmetic.h ../../TU/simd/transform.h \
+	../../TU/functional.h ../../TU/simd/lookup.h \
 	../../TU/simd/x86/lookup.h ../../TU/simd/arm/lookup.h \
 	../../TU/simd/load_iterator.h ../../TU/simd/store_iterator.h \
 	../../TU/simd/cvtdown_iterator.h ../../TU/simd/cvtup_iterator.h \
-	../../TU/simd/shift_iterator.h ../../TU/simd/row_vec_iterator.h \
-	../../TU/simd/BufTraits.h ../../TU/simd/zero.h \
-	../../TU/GaussianConvolver.h ../../TU/Profiler.h
+	../../TU/simd/shift_iterator.h ../../TU/simd/BufTraits.h \
+	../../TU/simd/zero.h ../../TU/GaussianConvolver.h ../../TU/Profiler.h

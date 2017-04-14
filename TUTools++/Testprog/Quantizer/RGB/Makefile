@@ -12,9 +12,9 @@ VPATH		=
 IDLS		=
 MOCHDRS		=
 
-INCDIRS		= -I. -I$(PREFIX)/include
+INCDIRS		= -I../../..
 CPPFLAGS	= -DNDEBUG
-CFLAGS		= -g
+CFLAGS		= -O3
 NVCCFLAGS	= -g
 ifneq ($(findstring icpc,$(CXX)),)
   CFLAGS	= -O3
@@ -23,7 +23,7 @@ ifneq ($(findstring icpc,$(CXX)),)
 endif
 CCFLAGS		= $(CFLAGS)
 
-LIBS		= -lTUTools++
+LIBS		= -lTUNewTools++
 ifneq ($(findstring darwin,$(OSTYPE)),)
   LIBS	       += -framework IOKit -framework CoreFoundation \
 		  -framework CoreServices
@@ -39,18 +39,17 @@ INCDIR		= $(PREFIX)/include
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC .cpp:sC .cu:sC
-EXTHDRS		= /usr/local/include/TU/Array++.h \
-		/usr/local/include/TU/Geometry++.h \
-		/usr/local/include/TU/Image++.h \
-		/usr/local/include/TU/Minimize.h \
-		/usr/local/include/TU/Profiler.h \
-		/usr/local/include/TU/Quantizer.h \
-		/usr/local/include/TU/Vector++.h \
-		/usr/local/include/TU/functional.h \
-		/usr/local/include/TU/iterator.h \
-		/usr/local/include/TU/mmInstructions.h \
-		/usr/local/include/TU/tuple.h \
-		/usr/local/include/TU/types.h
+EXTHDRS		= ../../../TU/Array++.h \
+		../../../TU/Image++.h \
+		../../../TU/Profiler.h \
+		../../../TU/Quantizer.h \
+		../../../TU/Vector++.h \
+		../../../TU/algorithm.h \
+		../../../TU/iterator.h \
+		../../../TU/pair.h \
+		../../../TU/range.h \
+		../../../TU/tuple.h \
+		../../../TU/types.h
 HDRS		=
 SRCS		= main.cc
 OBJS		= main.o
@@ -61,10 +60,7 @@ OBJS		= main.o
 #include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
-main.o: /usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
-	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
-	/usr/local/include/TU/tuple.h /usr/local/include/TU/functional.h \
-	/usr/local/include/TU/mmInstructions.h \
-	/usr/local/include/TU/Minimize.h /usr/local/include/TU/Quantizer.h \
-	/usr/local/include/TU/Profiler.h
+main.o: ../../../TU/Image++.h ../../../TU/types.h ../../../TU/pair.h \
+	../../../TU/Vector++.h ../../../TU/Array++.h ../../../TU/range.h \
+	../../../TU/algorithm.h ../../../TU/tuple.h ../../../TU/iterator.h \
+	../../../TU/Quantizer.h ../../../TU/Profiler.h

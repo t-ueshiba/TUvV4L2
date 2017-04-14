@@ -12,7 +12,7 @@ VPATH		=
 IDLS		=
 MOCHDRS		=
 
-INCDIRS		= -I. -I$(PREFIX)/include
+INCDIRS		= -I../.. -I$(PREFIX)/include
 CPPFLAGS	= -DNDEBUG
 CFLAGS		= -g
 NVCCFLAGS	= -g
@@ -39,7 +39,7 @@ INCDIR		= $(PREFIX)/include
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC .cpp:sC .cu:sC
-EXTHDRS		= /usr/local/include/TU/GraphCuts.h
+EXTHDRS		= ../../TU/GraphCuts.h
 HDRS		=
 SRCS		= main.cc
 OBJS		= main.o
@@ -50,4 +50,4 @@ OBJS		= main.o
 #include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
-main.o: /usr/local/include/TU/GraphCuts.h
+main.o: ../../TU/GraphCuts.h

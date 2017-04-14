@@ -1,31 +1,22 @@
 SUBDIR	= BandMatrix		\
-	  Bezier		\
 	  BoxFilter		\
 	  BoxFilter2		\
 	  DP			\
-	  EdgeDetector		\
 	  FIRFilter		\
 	  GraphCuts		\
 	  GuidedFilter		\
-	  Heap			\
+	  ICIA			\
 	  IIRFilter		\
 	  List			\
 	  NDTree		\
-	  PSTree		\
+	  Quantizer		\
 	  Random		\
-	  SURF			\
 	  Serial		\
 	  Sparse		\
-	  Spline		\
 	  TreeFilter		\
 	  Vector		\
 	  WeightedMedianFilter	\
-	  simd			\
-	  stereoIIDC		\
-	  stereoGUI		\
-	  stereoTest		\
-	  stereoTime		\
-	  stereoV4L2
+	  simd
 
 TARGETS	= all clean depend
 

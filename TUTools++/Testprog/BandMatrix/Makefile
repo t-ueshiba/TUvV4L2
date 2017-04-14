@@ -42,9 +42,9 @@ SUFFIX		= .cc:sC .cpp:sC .cu:sC
 EXTHDRS		= ../../TU/Array++.h \
 		../../TU/BandMatrix++.h \
 		../../TU/Vector++.h \
-		../../TU/functional.h \
+		../../TU/algorithm.h \
 		../../TU/iterator.h \
-		../../TU/pair.h \
+		../../TU/range.h \
 		../../TU/tuple.h
 HDRS		=
 SRCS		= main.cc
@@ -57,5 +57,5 @@ OBJS		= main.o
 include $(PROJECT)/lib/common.mk
 ###
 main.o: ../../TU/BandMatrix++.h ../../TU/Vector++.h ../../TU/Array++.h \
-	../../TU/iterator.h ../../TU/tuple.h ../../TU/functional.h \
-	../../TU/pair.h
+	../../TU/range.h ../../TU/algorithm.h ../../TU/tuple.h \
+	../../TU/iterator.h

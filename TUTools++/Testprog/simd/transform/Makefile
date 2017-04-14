@@ -12,7 +12,7 @@ VPATH		=
 IDLS		=
 MOCHDRS		=
 
-INCDIRS		= -I../../.. -I$(PREFIX)/include
+INCDIRS		= -I../../..
 CPPFLAGS	= -DNDEBUG #-DTU_SIMD_DEBUG
 CFLAGS		= -g
 NVCCFLAGS	= -g
@@ -43,7 +43,6 @@ INCDIR		= $(PREFIX)/include
 SUFFIX		= .cc:sC .cpp:sC .cu:sC
 EXTHDRS		= ../../../TU/functional.h \
 		../../../TU/iterator.h \
-		../../../TU/pair.h \
 		../../../TU/simd/arithmetic.h \
 		../../../TU/simd/arm/arch.h \
 		../../../TU/simd/arm/arithmetic.h \
@@ -94,8 +93,8 @@ OBJS		= main.o
 include $(PROJECT)/lib/common.mk
 ###
 main.o: ../../../TU/simd/transform.h ../../../TU/iterator.h \
-	../../../TU/tuple.h ../../../TU/functional.h ../../../TU/pair.h \
-	../../../TU/simd/cvt.h ../../../TU/simd/zero.h ../../../TU/simd/vec.h \
+	../../../TU/functional.h ../../../TU/simd/cvt.h ../../../TU/tuple.h \
+	../../../TU/simd/zero.h ../../../TU/simd/vec.h \
 	../../../TU/simd/config.h ../../../TU/simd/type_traits.h \
 	../../../TU/simd/x86/type_traits.h ../../../TU/simd/arm/type_traits.h \
 	../../../TU/simd/x86/vec.h ../../../TU/simd/x86/arch.h \

@@ -10,8 +10,8 @@
 
 #include "TU/IIDC++.h"
 #include "TU/algorithm.h"
-#include "TU/Heap.h"
 #include <string>
+#include <vector>
 
 namespace TU
 {
@@ -89,11 +89,8 @@ constexpr u_int	IIDCCAMERA_ALL		= IIDCCamera::BRIGHTNESS + 2;
 ************************************************************************/
 template <class CAMERAS> auto
 setFormat(CAMERAS&& cameras, u_int id, u_int val)
-    -> typename std::enable_if<
-	  std::is_convertible<
-	      typename std::remove_reference<
-		  decltype(*std::begin(cameras))>::type, IIDCCamera>::value,
-	      bool>::type
+    -> std::enable_if_t<
+	   std::is_convertible<value_t<CAMERAS>, IIDCCamera>::value, bool>
 {
     switch (id)
     {
@@ -150,11 +147,8 @@ setFormat(IIDCCamera& camera, u_int id, u_int val)
 
 template <class CAMERAS> auto
 setFeature(CAMERAS&& cameras, u_int id, u_int val, float fval)
-    -> typename std::enable_if<
-	  std::is_convertible<
-	      typename std::remove_reference<
-		  decltype(*std::begin(cameras))>::type, IIDCCamera>::value,
-	      bool>::type
+    -> std::enable_if_t<
+	   std::is_convertible<value_t<CAMERAS>, IIDCCamera>::value, bool>
 {
     switch (id)
     {
@@ -336,34 +330,49 @@ getFeature(const IIDCCamera& camera, u_int id, u_int& val, float& fval)	;
 */
 template <class CAMERAS> auto
 syncedSnap(CAMERAS&& cameras, uint64_t maxSkew=1000)
-    -> typename std::enable_if<
-	  std::is_convertible<
-	      typename std::remove_reference<
-		  decltype(*std::begin(cameras))>::type,
-	      IIDCCamera>::value>::type
+    -> std::enable_if_t<
+	   std::is_convertible<value_t<CAMERAS>, IIDCCamera>::value>
 {
-    typedef decltype(std::begin(cameras))	iterator;
-    typedef std::pair<uint64_t, iterator>	timestamp_t;
-    
-    Heap<timestamp_t,
-	 std::greater<timestamp_t> >	timestamps(std::size(cameras));
+    using iterator	= decltype(std::begin(cameras));
+    using timestamp_t	= std::pair<uint64_t, iterator>;
+    using cmp		= std::greater<timestamp_t>;
 
+  // 全カメラから画像を取得
     std::for_each(std::begin(cameras), std::end(cameras),
 		  std::bind(&IIDCCamera::snap, std::placeholders::_1));
 
-    timestamp_t	last(0, std::end(cameras));
+  // 全カメラのタイムスタンプとその中で最も遅いlastを得る．
+    std::vector<timestamp_t>	timestamps;
+    timestamp_t			last(0, std::end(cameras));
     for (auto camera = std::begin(cameras); camera != std::end(cameras);
 	 ++camera)
     {
-	timestamp_t	timestamp(camera->getTimestamp(), camera);
-	timestamps.push(timestamp);
-	if (timestamp > last)
-	    last = timestamp;
+	timestamps.push_back({camera->getTimestamp(), camera});
+	if (timestamps.back() > last)
+	    last = timestamps.back();
     }
 
-    for (timestamp_t top; last.first > (top = timestamps.pop()).first + maxSkew;
-	 timestamps.push(last))
-	last = {top.second->snap().getTimestamp(), top.second};
+  // timestampsを最も早いタイムスタンプを先頭要素とするヒープにする．
+    std::make_heap(timestamps.begin(), timestamps.end(), cmp());
+    
+  // 最も早いタイムスタンプと最も遅いタイムスタンプの差がmaxSkewを越えなくなるまで
+  // 前者に対応するカメラから画像を取得する．
+    while (last.first > timestamps.front().first + maxSkew)
+    {
+      // 最も早いタイムスタンプを末尾にもってきてヒープから取り除く．
+	std::pop_heap(timestamps.begin(), timestamps.end(), cmp());
+
+      // ヒープから取り除いたタイムスタンプに対応するカメラから画像を取得して
+      // 新たなタイムスタンプを得る．
+	auto&	back = timestamps.back();
+	back.first = back.second->snap().getTimestamp();
+
+      // これが最も遅いタイムスタンプになるので，lastに記録する．
+	last = back;
+
+      // このタイムスタンプを再度ヒープに追加する．
+	std::push_heap(timestamps.begin(), timestamps.end(), cmp());
+    }
 }
     
 }

@@ -16,20 +16,18 @@ namespace simd
 ************************************************************************/
 template <class ITER>
 class shift_iterator
-    : public boost::iterator_adaptor<
-			shift_iterator<ITER>,
-			ITER,
-			boost::use_default,
-			boost::forward_traversal_tag,
-			typename std::iterator_traits<ITER>::value_type>
+    : public boost::iterator_adaptor<shift_iterator<ITER>,
+				     ITER,
+				     boost::use_default,
+				     boost::forward_traversal_tag,
+				     iterator_value<ITER> >
 {
   private:
-    typedef boost::iterator_adaptor<
-		shift_iterator,
-		ITER,
-		boost::use_default,
-		boost::forward_traversal_tag,
-		typename std::iterator_traits<ITER>::value_type>	super;
+    typedef boost::iterator_adaptor<shift_iterator,
+				    ITER,
+				    boost::use_default,
+				    boost::forward_traversal_tag,
+				    iterator_value<ITER> >	super;
 
   public:
     typedef typename super::value_type		value_type;

@@ -21,28 +21,26 @@ namespace simd
 			そうでなければfalse
 */
 template <class ITER, bool ALIGNED=false>
-class load_iterator : public boost::iterator_adaptor<
-			load_iterator<ITER, ALIGNED>,
-			ITER,
-			vec<typename std::iterator_traits<ITER>::value_type>,
-			boost::use_default,
-			vec<typename std::iterator_traits<ITER>::value_type> >
+class load_iterator
+    : public boost::iterator_adaptor<load_iterator<ITER, ALIGNED>,
+				     ITER,
+				     vec<iterator_value<ITER> >,
+				     boost::use_default,
+				     vec<iterator_value<ITER> > >
 {
   private:
-    typedef typename std::iterator_traits<ITER>::value_type	element_type;
-    typedef boost::iterator_adaptor<load_iterator,
-				    ITER,
-				    vec<element_type>,
-				    boost::use_default,
-				    vec<element_type> >		super;
+    using element_type	= iterator_value<ITER>;
+    using super		= boost::iterator_adaptor<load_iterator,
+						  ITER,
+						  vec<element_type>,
+						  boost::use_default,
+						  vec<element_type> >;
+    friend	class boost::iterator_core_access;
 
   public:
-    typedef typename super::difference_type	difference_type;
-    typedef typename super::value_type		value_type;
-    typedef typename super::reference		reference;
-    
-    friend class	boost::iterator_core_access;
-
+    using	typename super::difference_type;
+    using	typename super::value_type;
+    using	typename super::reference;
     
   public:
     load_iterator(ITER iter)	:super(iter)	{}
@@ -56,84 +54,47 @@ class load_iterator : public boost::iterator_adaptor<
 			}
     void		advance(difference_type n)
 			{
-			    super::base_reference() += n * value_type::size;
+			    super::base_reference()
+				+= n * difference_type(value_type::size);
 			}
     void		increment()
 			{
-			    super::base_reference() += value_type::size;
+			    super::base_reference()
+				+= difference_type(value_type::size);
 			}
     void		decrement()
 			{
-			    super::base_reference() -= value_type::size;
+			    super::base_reference()
+				-= difference_type(value_type::size);
 			}
     difference_type	distance_to(load_iterator iter) const
 			{
 			    return (iter.base() - super::base())
-				 / value_type::size;
+				 / difference_type(value_type::size);
 			}
 };
 
-namespace detail
-{
-  template <bool ALIGNED>
-  struct loader
-  {
-      template <class ITER_> load_iterator<ITER_, ALIGNED>
-      operator ()(const ITER_& iter) const
-      {
-	  return load_iterator<ITER_, ALIGNED>(iter);
-      }
-  };
-}	// namespace detail
-    
-template <class ITER_TUPLE, bool ALIGNED>
-class load_iterator<fast_zip_iterator<ITER_TUPLE>, ALIGNED>
-    : public fast_zip_iterator<decltype(boost::tuples::cons_transform(
-					    detail::loader<ALIGNED>(),
-					    std::declval<ITER_TUPLE>()))>
-{
-  private:
-    typedef fast_zip_iterator<decltype(boost::tuples::cons_transform(
-					   detail::loader<ALIGNED>(),
-					   std::declval<ITER_TUPLE>()))> super;
-
-    struct base_iterator
-    {
-	template <class ITER_> auto
-	operator ()(const ITER_& iter) const -> decltype(iter.base())
-	{
-	    return iter.base();
-	}
-    };
-
-  public:
-    typedef ITER_TUPLE	base_type;
-    
-  public:
-    load_iterator(const fast_zip_iterator<ITER_TUPLE>& iter)
-	:super(boost::tuples::cons_transform(detail::loader<ALIGNED>(),
-					     iter.get_iterator_tuple())){}
-    load_iterator(const super& iter)	:super(iter)			{}
-
-    base_type	base() const
-		{
-		    return boost::tuples::cons_transform(
-			       base_iterator(), super::get_iterator_tuple());
-		}
-};
-
-template <bool ALIGNED=false, class ITER> load_iterator<ITER, ALIGNED>
+template <bool ALIGNED=false, class ITER> inline load_iterator<ITER, ALIGNED>
 make_load_iterator(ITER iter)
 {
-    return load_iterator<ITER, ALIGNED>(iter);
+    return {iter};
 }
 
-template <bool ALIGNED=false, class T> load_iterator<const T*, ALIGNED>
+template <bool ALIGNED=false, class T> inline load_iterator<const T*, ALIGNED>
 make_load_iterator(const vec<T>* p)
 {
-    return load_iterator<const T*, ALIGNED>(p);
+    return {p};
 }
-    
+
+template <bool ALIGNED=false, class ITER_TUPLE> inline auto
+make_load_iterator(zip_iterator<ITER_TUPLE> zip_iter)
+{
+    return make_zip_iterator(
+	       tuple_transform([](auto iter)
+			       { return make_load_iterator<ALIGNED>(iter); },
+			       zip_iter.get_iterator_tuple()));
+}
+
 }	// namespace simd
 }	// namespace TU
 #endif	// !__TU_SIMD_LOAD_ITERATOR_H

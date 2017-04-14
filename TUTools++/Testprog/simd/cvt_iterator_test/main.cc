@@ -15,17 +15,18 @@ doJob()
 {
     using namespace	std;
     
-    typedef SRC						src_type;
-    typedef DST						dst_type;
-    typedef load_iterator<const src_type*>		siterator;
-    typedef store_iterator<dst_type*>			diterator;
-    typedef typename boost::mpl::if_c<
-	vec<src_type>::size <= vec<dst_type>::size,
-	cvtdown_iterator<dst_type, siterator>,
-	siterator>::type				src_iterator;
-    typedef typename boost::mpl::if_c<
-	vec<src_type>::size <= vec<dst_type>::size,
-	diterator, cvtup_iterator<diterator> >::type	dst_iterator;
+    using src_type	= SRC;
+    using dst_type	= DST;
+    using siterator	= load_iterator<const src_type*>;
+    using diterator	= store_iterator<dst_type*>;
+    using src_iterator	= std::conditional_t<
+			      (vec<src_type>::size <= vec<dst_type>::size),
+			      cvtdown_iterator<dst_type, siterator>,
+			      siterator>;
+    using dst_iterator	= std::conditional_t<
+			      (vec<src_type>::size <= vec<dst_type>::size),
+			      diterator,
+			      cvtup_iterator<diterator> >;
 
     src_type	src[] = { 0,  1,  2,  3,  4,  5,  6,  7,
 			  8,  9, 10, 11, 12, 13, 14, 15,

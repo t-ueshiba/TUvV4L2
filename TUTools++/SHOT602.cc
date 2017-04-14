@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id$
+ *  $Id: SHOT602.cc 1544 2014-04-18 12:14:41Z ueshiba $
  */
 #include "TU/SHOT602.h"
 #include "TU/Manip.h"
