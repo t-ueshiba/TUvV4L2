@@ -654,7 +654,7 @@ V4L2Camera::operator >>(Image<T>& image) const
       case BGR24:
       {
 	auto	src = reinterpret_cast<const BGR*>(img);
-	for (auto& line : image)
+	for (auto&& line : image)
 	{
 	    std::copy_n(make_pixel_iterator(src), line.size(),
 			make_pixel_iterator(line.begin()));
@@ -666,7 +666,7 @@ V4L2Camera::operator >>(Image<T>& image) const
       case RGB24:
       {
 	auto	src = reinterpret_cast<const RGB*>(img);
-	for (auto& line : image)
+	for (auto&& line : image)
 	{
 	    std::copy_n(make_pixel_iterator(src), line.size(),
 			make_pixel_iterator(line.begin()));
@@ -678,7 +678,7 @@ V4L2Camera::operator >>(Image<T>& image) const
       case BGR32:
       {
 	auto	src = reinterpret_cast<const ABGR*>(img);
-	for (auto& line : image)
+	for (auto&& line : image)
 	{
 	    std::copy_n(make_pixel_iterator(src), line.size(),
 			make_pixel_iterator(line.begin()));
@@ -690,7 +690,7 @@ V4L2Camera::operator >>(Image<T>& image) const
       case RGB32:
       {
 	auto	src = reinterpret_cast<const RGBA*>(img);
-	for (auto& line : image)
+	for (auto&& line : image)
 	{
 	    std::copy_n(make_pixel_iterator(src), line.size(),
 			make_pixel_iterator(line.begin()));
@@ -702,7 +702,7 @@ V4L2Camera::operator >>(Image<T>& image) const
       case GREY:
       {
 	auto	src = reinterpret_cast<const u_char*>(img);
-	for (auto& line : image)
+	for (auto&& line : image)
 	{
 	    std::copy_n(make_pixel_iterator(src), line.size(),
 			make_pixel_iterator(line.begin()));
@@ -714,7 +714,7 @@ V4L2Camera::operator >>(Image<T>& image) const
       case Y16:
       {
 	auto	src = reinterpret_cast<const u_short*>(img);
-	for (auto& line : image)
+	for (auto&& line : image)
 	{
 	    std::copy_n(make_pixel_iterator(src), line.size(),
 			make_pixel_iterator(line.begin()));
@@ -726,7 +726,7 @@ V4L2Camera::operator >>(Image<T>& image) const
       case YUYV:
       {
 	auto	src = reinterpret_cast<const YUYV422*>(img);
-	for (auto& line : image)
+	for (auto&& line : image)
 	{
 	    std::copy_n(make_pixel_iterator(src), line.size(),
 			make_pixel_iterator(line.begin()));
@@ -738,7 +738,7 @@ V4L2Camera::operator >>(Image<T>& image) const
       case UYVY:
       {
 	auto	src = reinterpret_cast<const YUV422*>(img);
-	for (auto& line : image)
+	for (auto&& line : image)
 	{
 	    std::copy_n(make_pixel_iterator(src), line.size(),
 			make_pixel_iterator(line.begin()));
@@ -785,24 +785,28 @@ V4L2Camera::captureRGBImage(Image<T>& image) const
     {
 
       case SBGGR8:
-	bayerDecodeBGGR(make_flat_row_iterator(img, width()),
-			make_flat_row_iterator(img + height()*width(), width()),
+	bayerDecodeBGGR(make_range_iterator(img, width(), width()),
+			make_range_iterator(img + height()*width(),
+					    width(), width()),
 			image.begin());
 	break;
       case SGBRG8:
-	bayerDecodeGBRG(make_flat_row_iterator(img, width()),
-			make_flat_row_iterator(img + height()*width(), width()),
+	bayerDecodeGBRG(make_range_iterator(img, width(), width()),
+			make_range_iterator(img + height()*width(),
+					    width(), width()),
 			image.begin());
 	break;
       case SGRBG8:
-	bayerDecodeGRBG(make_flat_row_iterator(img, width()),
-			make_flat_row_iterator(img + height()*width(), width()),
+	bayerDecodeGRBG(make_range_iterator(img, width(), width()),
+			make_range_iterator(img + height()*width(),
+					    width(), width()),
 			image.begin());
 	break;
 #ifdef V4L2_PIX_FMT_SRGGB8
       case SRGGB8:
-	bayerDecodeRGGB(make_flat_row_iterator(img, width()),
-			make_flat_row_iterator(img + height()*width(), width()),
+	bayerDecodeRGGB(make_range_iterator(img, width(), width()),
+			make_range_iterator(img + height()*width(),
+					    width(), width()),
 			image.begin());
 	break;
 #endif
@@ -876,26 +880,30 @@ V4L2Camera::captureBayerRaw(void* image) const
     switch (pixelFormat())
     {
       case SBGGR8:
-	bayerDecodeBGGR(make_flat_row_iterator(img, width()),
-			make_flat_row_iterator(img + height()*width(), width()),
-			make_flat_row_iterator(rgb, width()));
+	bayerDecodeBGGR(make_range_iterator(img, width(), width()),
+			make_range_iterator(img + height()*width(),
+					    width(), width()),
+			make_range_iterator(rgb, width(), width()));
 	break;
 
       case SGRBG8:
-	bayerDecodeGRBG(make_flat_row_iterator(img, width()),
-			make_flat_row_iterator(img + height()*width(), width()),
-			make_flat_row_iterator(rgb, width()));
+	bayerDecodeGRBG(make_range_iterator(img, width(), width()),
+			make_range_iterator(img + height()*width(),
+					    width(), width()),
+			make_range_iterator(rgb, width(), width()));
 	break;
       case SGBRG8:
-	bayerDecodeGBRG(make_flat_row_iterator(img, width()),
-			make_flat_row_iterator(img + height()*width(), width()),
-			make_flat_row_iterator(rgb, width()));
+	bayerDecodeGBRG(make_range_iterator(img, width(), width()),
+			make_range_iterator(img + height()*width(),
+					    width(), width()),
+			make_range_iterator(rgb, width(), width()));
 	break;
 #ifdef V4L2_PIX_FMT_SRGGB8
       case SRGGB8:
-	bayerDecodeRGGB(make_flat_row_iterator(img, width()),
-			make_flat_row_iterator(img + height()*width(), width()),
-			make_flat_row_iterator(rgb, width()));
+	bayerDecodeRGGB(make_range_iterator(img, width(), width()),
+			make_range_iterator(img + height()*width(),
+					    width(), width()),
+			make_range_iterator(rgb, width(), width()));
 	break;
 #endif
       default:
