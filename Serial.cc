@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id$
+ *  $Id: Serial.cc 1338 2013-05-16 06:34:42Z ueshiba $
  */
 #include "TU/Serial.h"
 #include <stdexcept>

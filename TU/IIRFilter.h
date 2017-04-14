@@ -1,32 +1,3 @@
-/*
- *  平成14-19年（独）産業技術総合研究所 著作権所有
- *  
- *  創作者：植芝俊夫
- *
- *  本プログラムは（独）産業技術総合研究所の職員である植芝俊夫が創作し，
- *  （独）産業技術総合研究所が著作権を所有する秘密情報です．著作権所有
- *  者による許可なしに本プログラムを使用，複製，改変，第三者へ開示する
- *  等の行為を禁止します．
- *  
- *  このプログラムによって生じるいかなる損害に対しても，著作権所有者お
- *  よび創作者は責任を負いません。
- *
- *  Copyright 2002-2007.
- *  National Institute of Advanced Industrial Science and Technology (AIST)
- *
- *  Creator: Toshio UESHIBA
- *
- *  [AIST Confidential and all rights reserved.]
- *  This program is confidential. Any using, copying, changing or
- *  giving any information concerning with this program to others
- *  without permission by the copyright holder are strictly prohibited.
- *
- *  [No Warranty.]
- *  The copyright holder or the creator are not responsible for any
- *  damages caused by using this program.
- *  
- *  $Id$
- */
 /*!
   \file		IIRFilter.h
   \brief	各種infinite impulse response filterに関するクラスの定義と実装
@@ -34,8 +5,6 @@
 #ifndef	__TU_IIRFILTER_H
 #define	__TU_IIRFILTER_H
 
-#include <algorithm>
-#include <array>
 #include "TU/SeparableFilter2.h"
 #include "TU/simd/simd.h"
 
@@ -53,240 +22,248 @@ namespace TU
   \param T	フィルタ出力の型
 */
 template <size_t D, bool FWD, class COEFF, class ITER,
-	  class T=typename std::iterator_traits<COEFF>::value_type>
+	  class T=iterator_value<COEFF> >
 class iir_filter_iterator
     : public boost::iterator_adaptor<
 		iir_filter_iterator<D, FWD, COEFF, ITER, T>,	// self
 		ITER,						// base
 		T,						// value_type
-		boost::single_pass_traversal_tag,		// traversal
-		T>						// reference
+		boost::single_pass_traversal_tag>		// traversal
 {
   private:
-    typedef boost::iterator_adaptor<
-		iir_filter_iterator, ITER, T,
-		boost::single_pass_traversal_tag, T>	super;
-    typedef Array<T, D>					buf_type;
-    typedef typename buf_type::const_iterator		buf_iterator;
-
     template <size_t D_, bool FWD_>
-    struct selector				{enum {dim = D_, fwd = FWD_};};
+    struct selector	{ enum {dim = D_, fwd = FWD_}; };
+    template <size_t I_>
+    using index		= std::integral_constant<size_t, I_>;
+    using buf_type	= Array<T, D>;	// 初期値を0にするためstd::arrayは使わない
+    using super		= boost::iterator_adaptor<
+			      iir_filter_iterator,
+			      ITER,
+			      T,
+			      boost::single_pass_traversal_tag>;
+    using val_is_array	= std::integral_constant<bool, size0<T>() == 0>;
     
   public:
-    typedef typename super::value_type	value_type;
-    typedef typename super::reference	reference;
+    using	typename super::value_type;
+    using	typename super::reference;
 
-    friend class	boost::iterator_core_access;
+    friend	class boost::iterator_core_access;
 
   public:
-		iir_filter_iterator(ITER const& iter, COEFF ci, COEFF co)
-		    :super(iter), _ci(ci), _co(co), _ibuf(), _obuf(), _i(0)
+		iir_filter_iterator(const ITER& iter, COEFF ci, COEFF co)
+		    :super(iter), _ci(ci), _co(co), _ibuf(), _obuf(), _n(0)
 		{
-		    std::fill(_ibuf.begin(), _ibuf.end(), value_type(0));
-		    std::fill(_obuf.begin(), _obuf.end(), value_type(0));
+		    set_inpro(index<0>());
+		}
+		iir_filter_iterator(const iir_filter_iterator& iter)
+		    :super(iter), _ci(iter._ci), _co(iter._co),
+		     _ibuf(iter._ibuf), _obuf(iter._obuf), _n(iter._n)
+		{
+		    set_inpro(index<0>());
+		}
+    iir_filter_iterator&
+		operator =(const iir_filter_iterator& iter)
+		{
+		    if (this != &iter)
+		    {
+			super::operator =(iter);
+			_ci   = iter._ci;
+			_co   = iter._co;
+			_ibuf = iter._ibuf;
+			_obuf = iter._obuf;
+			_n    = iter._n;
+			set_inpro(index<0>());
+		    }
+
+		    return *this;
 		}
 
   private:
-    static value_type	inpro(COEFF c, buf_iterator b, size_t i)
-			{
-			    const auto	bi  = b + i;
-			    value_type	val = *c * *bi;
-			    for (auto p = bi; ++p != b + D; )
-				val += *++c * *p;
-			    for (auto p = b; p != bi; ++p)
-				val += *++c * *p;
-
-			    return val;
-			}
-    static value_type	inpro_2_0(COEFF c, buf_iterator b)
-			{
-			    return *c * *b + *(c+1) * *(b+1);
-			}
-    static value_type	inpro_2_1(COEFF c, buf_iterator b)
-			{
-			    return *c * *(b+1) + *(c+1) * *b;
-			}
-    static value_type	inpro_4_0(COEFF c, buf_iterator b)
-			{
-			    return *c	  * *b	   + *(c+1) * *(b+1)
-				 + *(c+2) * *(b+2) + *(c+3) * *(b+3);
-			}
-    static value_type	inpro_4_1(COEFF c, buf_iterator b)
-			{
-			    return *c	  * *(b+1) + *(c+1) * *(b+2)
-				 + *(c+2) * *(b+3) + *(c+3) * *b;
-			}
-    static value_type	inpro_4_2(COEFF c, buf_iterator b)
-			{
-			    return *c	  * *(b+2) + *(c+1) * *(b+3)
-				 + *(c+2) * *b	   + *(c+3) * *(b+1);
-			}
-    static value_type 	inpro_4_3(COEFF c, buf_iterator b)
-			{
-			    return *c	  * *(b+3) + *(c+1) * *b
-				 + *(c+2) * *(b+1) + *(c+3) * *(b+2);
-			}
-
-    template <size_t D_>
-    value_type	update(selector<D_, true>) const
-		{
-		    const auto	i = _i;
-		    if (++_i == D)
-			_i = 0;
-		    _ibuf[i] = *super::base();
-		    return (_obuf[i] = inpro(_co, _obuf.cbegin(),  i)
-				     + inpro(_ci, _ibuf.cbegin(), _i));
-		}
-    
-    template <size_t D_>
-    value_type	update(selector<D_, false>) const
-		{
-		    const auto	val = inpro(_co, _obuf.cbegin(), _i)
-				    + inpro(_ci, _ibuf.cbegin(), _i);
-		    _obuf[_i] = val;
-		    _ibuf[_i] = *super::base();
-		    if (++_i == D)
-			_i = 0;
-		    return val;
-		}
-
-    value_type	update(selector<2, true>) const
-		{
-		    value_type	val;
-		    
-		    if (_i == 0)
-		    {
-			_i = 1;
-			_ibuf[0] = *super::base();
-			_obuf[0] = val
-				 = inpro_2_0(_co, _obuf.cbegin())
-				 + inpro_2_1(_ci, _ibuf.cbegin());
-		    }
-		    else
-		    {
-			_i = 0;
-			_ibuf[1] = *super::base();
-			_obuf[1] = val
-				 = inpro_2_1(_co, _obuf.cbegin())
-				 + inpro_2_0(_ci, _ibuf.cbegin());
-		    }
-
-		    return val;
-		}
-
-    value_type	update(selector<2, false>) const
-		{
-		    value_type	val;
-		    
-		    if (_i == 0)
-		    {
-			_i = 1;
-			_obuf[0] = val
-				 = inpro_2_0(_co, _obuf.cbegin())
-				 + inpro_2_0(_ci, _ibuf.cbegin());
-			_ibuf[0] = *super::base();
-		    }
-		    else
-		    {
-			_i = 0;
-			_obuf[1] = val
-				 = inpro_2_1(_co, _obuf.cbegin())
-				 + inpro_2_1(_ci, _ibuf.cbegin());
-			_ibuf[1] = *super::base();
-		    }
-
-		    return val;
-		}
-
-    value_type	update(selector<4, true>) const
-		{
-		    value_type	val;
-		    
-		    switch (_i)
-		    {
-		      case 0:
-			_i = 1;
-			_ibuf[0] = *super::base();
-			_obuf[0] = val
-				 = inpro_4_0(_co, _obuf.cbegin())
-				 + inpro_4_1(_ci, _ibuf.cbegin());
-			break;
-		      case 1:
-			_i = 2;
-			_ibuf[1] = *super::base();
-			_obuf[1] = val
-				 = inpro_4_1(_co, _obuf.cbegin())
-				 + inpro_4_2(_ci, _ibuf.cbegin());
-			break;
-		      case 2:
-			_i = 3;
-			_ibuf[2] = *super::base();
-			_obuf[2] = val
-				 = inpro_4_2(_co, _obuf.cbegin())
-				 + inpro_4_3(_ci, _ibuf.cbegin());
-			break;
-		      default:
-			_i = 0;
-			_ibuf[3] = *super::base();
-			_obuf[3] = val
-				 = inpro_4_3(_co, _obuf.cbegin())
-				 + inpro_4_0(_ci, _ibuf.cbegin());
-			break;
-		    }
-
-		    return val;
-		}
-
-    value_type	update(selector<4, false>) const
-		{
-		    value_type	val;
-		    
-		    switch (_i)
-		    {
-		      case 0:
-			_i = 1;
-			_obuf[0] = val
-				 = inpro_4_0(_co, _obuf.cbegin())
-				 + inpro_4_0(_ci, _ibuf.cbegin());
-			_ibuf[0] = *super::base();
-			break;
-		      case 1:
-			_i = 2;
-			_obuf[1] = val
-				 = inpro_4_1(_co, _obuf.cbegin())
-				 + inpro_4_1(_ci, _ibuf.cbegin());
-			_ibuf[1] = *super::base();
-			break;
-		      case 2:
-			_i = 3;
-			_obuf[2] = val
-				 = inpro_4_2(_co, _obuf.cbegin())
-				 + inpro_4_2(_ci, _ibuf.cbegin());
-			_ibuf[2] = *super::base();
-			break;
-		      default:
-			_i = 0;
-			_obuf[3] = val
-				 = inpro_4_3(_co, _obuf.cbegin())
-				 + inpro_4_3(_ci, _ibuf.cbegin());
-			_ibuf[3] = *super::base();
-			break;
-		    }
-
-		    return val;
-		}
-
     reference	dereference() const
 		{
-		    return update(selector<D, FWD>());
+		    return dereference(selector<D, FWD>());
+		}
+    reference	dereference(selector<2, true>) const
+		{
+		    if (_n == 0)
+		    {
+			_n = 1;
+			_ibuf[0] = *super::base();
+			resize_values(val_is_array());
+			_obuf[0] = inpro<0>(index<0>());
+			return _obuf[0];
+		    }
+		    else
+		    {
+			_n = 0;
+			_ibuf[1] = *super::base();
+			_obuf[1] = inpro<1>(index<0>());
+			return _obuf[1];
+		    }
+		}
+    reference	dereference(selector<2, false>) const
+		{
+		    if (_n == 0)
+		    {
+			_n = 1;
+			_obuf[0] = inpro<0>(index<0>());
+			_ibuf[0] = *super::base();
+			resize_values(val_is_array());
+			return _obuf[0];
+		    }
+		    else
+		    {
+			_n = 0;
+			_obuf[1] = inpro<1>(index<0>());
+			_ibuf[1] = *super::base();
+			return _obuf[1];
+		    }
+		}
+    reference	dereference(selector<4, true>) const
+		{
+		    switch (_n)
+		    {
+		      case 0:
+			_n = 1;
+			_ibuf[0] = *super::base();
+			resize_values(val_is_array());
+			_obuf[0] = inpro<0>(index<0>());
+			return _obuf[0];
+		      case 1:
+			_n = 2;
+			_ibuf[1] = *super::base();
+			_obuf[1] = inpro<1>(index<0>());
+			return _obuf[1];
+		      case 2:
+			_n = 3;
+			_ibuf[2] = *super::base();
+			_obuf[2] = inpro<2>(index<0>());
+			return _obuf[2];
+		      default:
+			_n = 0;
+			_ibuf[3] = *super::base();
+			_obuf[3] = inpro<3>(index<0>());
+			break;
+		    }
+
+		    return _obuf[3];
+		}
+    reference	dereference(selector<4, false>) const
+		{
+		    switch (_n)
+		    {
+		      case 0:
+			_n = 1;
+			_obuf[0] = inpro<0>(index<0>());
+			_ibuf[0] = *super::base();
+			resize_values(val_is_array());
+			return _obuf[0];
+		      case 1:
+			_n = 2;
+			_obuf[1] = inpro<1>(index<0>());
+			_ibuf[1] = *super::base();
+			return _obuf[1];
+		      case 2:
+			_n = 3;
+			_obuf[2] = inpro<2>(index<0>());
+			_ibuf[2] = *super::base();
+			return _obuf[2];
+		      default:
+			_n = 0;
+			_obuf[3] = inpro<3>(index<0>());
+			_ibuf[3] = *super::base();
+			break;
+		    }
+			    
+		    return _obuf[3];
+		}
+    template <size_t D_>
+    reference	dereference(selector<D_, true>) const
+		{
+		    const auto	n = _n;
+		    _ibuf[n] = *super::base();
+		    switch (++_n)
+		    {
+		      case 1:
+			resize_values(val_is_array());
+			break;
+		      case D:
+			_n = 0;
+			break;
+		      default:
+			break;
+		    }
+		    return (_obuf[n] = (this->*_inpro[n])(index<0>()));
+		}
+    template <size_t D_>
+    reference	dereference(selector<D_, false>) const
+		{
+		    const auto	n = _n;
+		    _obuf[n] = (this->*_inpro[n])(index<0>());
+		    _ibuf[n] = *super::base();
+		    switch (++_n)
+		    {
+		      case 1:
+			resize_values(val_is_array());
+			break;
+		      case D:
+			_n = 0;
+			break;
+		      default:
+			break;
+		    }
+		    return _obuf[n];
+		}
+
+    void	set_inpro(index<D>)
+		{
+		}
+    template <size_t N_>
+    void	set_inpro(index<N_>)
+		{
+		    _inpro[N_] = &iir_filter_iterator::inpro<N_>;
+		    set_inpro(index<N_+1>());
+		}
+    
+    template <size_t N_>
+    value_type	inpro(index<D-1>) const
+		{
+		    constexpr size_t	K  = (N_ + D - 1)%D;
+		    constexpr size_t	Ki = (K + (FWD ? 1 : 0))%D;
+		    return _co[D-1]*_obuf[K] + _ci[D-1]*_ibuf[Ki];
+		}
+    template <size_t N_, size_t I_>
+    value_type	inpro(index<I_>) const
+		{
+		    constexpr size_t	J  = (N_ + I_)%D;
+		    constexpr size_t	Ji = (J + (FWD ? 1 : 0))%D;
+		    return _co[I_]*_obuf[J] + _ci[I_]*_ibuf[Ji]
+			 + inpro<N_>(index<I_+1>());
+		}
+
+    void	resize_values(std::true_type) const
+		{
+		    if (_ibuf[0].size() != _ibuf[D-1].size())
+		    {
+			for (size_t i = 1; i < D; ++i)
+			    _ibuf[i] = _ibuf[0];
+			for (size_t i = 0; i < D; ++i)
+			    _obuf[i] = _ibuf[0];
+		    }
+		}
+    void	resize_values(std::false_type) const
+		{
 		}
     
   private:
+    using	fptr = value_type (iir_filter_iterator::*)(index<0>) const;
+
+    std::array<fptr, D>	_inpro;	//!< 内積関数へのポインタテーブル
     const COEFF		_ci;	//!< 先頭の入力フィルタ係数を指す反復子
     const COEFF		_co;	//!< 先頭の出力フィルタ係数を指す反復子
     mutable buf_type	_ibuf;	//!< 過去D時点の入力データ
     mutable buf_type	_obuf;	//!< 過去D時点の出力データ
-    mutable size_t	_i;
+    mutable size_t	_n;
 };
 
 //! infinite impulse response filter反復子を生成する
@@ -300,7 +277,7 @@ template <size_t D, bool FWD, class T, class COEFF, class ITER>
 iir_filter_iterator<D, FWD, COEFF, ITER, T>
 make_iir_filter_iterator(ITER iter, COEFF ci, COEFF co)
 {
-    return iir_filter_iterator<D, FWD, COEFF, ITER, T>(iter, ci, co);
+    return {iter, ci, co};
 }
 
 /************************************************************************
@@ -310,8 +287,8 @@ make_iir_filter_iterator(ITER iter, COEFF ci, COEFF co)
 template <size_t D, class T=float> class IIRFilter
 {
   public:
-    typedef T				coeff_type;
-    typedef std::array<T, D>		coeffs_type;
+    using coeff_type	= T;
+    using coeffs_type	= std::array<T, D>;
     
     IIRFilter&	initialize(const T c[D+D])				;
     void	limitsF(T& limit0F, T& limit1F, T& limit2F)	const	;
@@ -418,7 +395,7 @@ IIRFilter<D, T>::limitsB(T& limit0B, T& limit1B, T& limit2B) const
 template <size_t D, class T> template <class IN, class OUT> OUT
 IIRFilter<D, T>::forward(IN ib, IN ie, OUT out) const
 {
-    typedef typename std::iterator_traits<OUT>::value_type	value_type;
+    using value_type	= iterator_substance<OUT>;
     
     return std::copy(make_iir_filter_iterator<D, true, value_type>(
 			 ib, _ci.begin(), _co.begin()),
@@ -437,7 +414,7 @@ IIRFilter<D, T>::forward(IN ib, IN ie, OUT out) const
 template <size_t D, class T> template <class IN, class OUT> OUT
 IIRFilter<D, T>::backward(IN ib, IN ie, OUT oe) const
 {
-    typedef typename std::iterator_traits<OUT>::value_type	value_type;
+    using value_type	= iterator_substance<OUT>;
     
     return std::copy(make_iir_filter_iterator<D, false, value_type>(
 			 ib, _ci.rbegin(), _co.rbegin()),
@@ -464,11 +441,11 @@ IIRFilter<D, T>::outLength(size_t inLength)
 template <size_t D, class T=float> class BidirectionalIIRFilter
 {
   private:
-    typedef IIRFilter<D, T>			iirf_type;
+    using iirf_type	= IIRFilter<D, T>;
     
   public:
-    typedef typename iirf_type::coeff_type	coeff_type;
-    typedef typename iirf_type::coeffs_type	coeffs_type;
+    using coeff_type	= typename iirf_type::coeff_type;
+    using coeffs_type	= typename iirf_type::coeffs_type;
     
   //! 微分の階数
     enum Order
@@ -624,24 +601,17 @@ BidirectionalIIRFilter<D, T>::limits(T& limit0, T& limit1, T& limit2) const
 template <size_t D, class T> template <class IN, class OUT> inline OUT
 BidirectionalIIRFilter<D, T>::convolve(IN ib, IN ie, OUT out) const
 {
-    typedef typename std::iterator_traits<OUT>::value_type	value_type;
-#if defined(SIMD)
-    typedef Array<value_type, 0, simd::allocator<value_type> >	buf_type;
-#else
-    typedef Array<value_type>					buf_type;
-#endif
-    typedef typename buf_type::iterator				buf_iterator;
+    auto	oute = out;
+    std::advance(oute, std::distance(ib, ie));
     
-    buf_type	bufF(std::distance(ib, ie)), bufB(bufF.size());
-
-    _iirF.forward(ib, ie, bufF.begin());
     _iirB.backward(std::reverse_iterator<IN>(ie),
 		   std::reverse_iterator<IN>(ib),
-		   std::reverse_iterator<buf_iterator>(bufB.end()));
-    return std::transform(bufF.cbegin(), bufF.cend(), bufB.cbegin(),
-			  out, std::plus<value_type>());
-}
+		   std::reverse_iterator<OUT>(oute));
+    _iirF.forward(ib, ie, make_assignment_iterator(
+			      out, [](auto&& y, const auto& x){ y += x; }));
 
+    return oute;
+}
 //! 与えられた長さの入力データ列に対する出力データ列の長さを返す
 /*!
   \param inLength	入力データ列の長さ
@@ -657,18 +627,19 @@ BidirectionalIIRFilter<D, T>::outLength(size_t inLength)
 *  class BidirectionalIIRFilter2<D, T>					*
 ************************************************************************/
 //! 2次元両側Infinite Inpulse Response Filterを表すクラス
+#if 1
 template <size_t D, class T=float>
 class BidirectionalIIRFilter2
     : public SeparableFilter2<BidirectionalIIRFilter<D, T> >
 {
   private:
-    typedef BidirectionalIIRFilter<D, T>	biir_type;
-    typedef SeparableFilter2<biir_type>		super;
+    using biir_type	= BidirectionalIIRFilter<D, T>;
+    using super		= SeparableFilter2<biir_type>;
 
   public:
-    typedef typename biir_type::coeff_type	coeff_type;
-    typedef typename biir_type::coeffs_type	coeffs_type;
-    typedef typename biir_type::Order		Order;
+    using coeff_type	= typename biir_type::coeff_type;
+    using coeffs_type	= typename biir_type::coeffs_type;
+    using Order		= typename biir_type::Order;
     
   public:
     BidirectionalIIRFilter2&
@@ -727,6 +698,98 @@ BidirectionalIIRFilter2<D, T>::initialize(const T cHF[], Order orderH,
 
     return *this;
 }
+#else
+template <size_t D, class T=float>
+class BidirectionalIIRFilter2
+{
+  private:
+    using biir_type	= BidirectionalIIRFilter<D, T>;
 
+  public:
+    using coeff_type	= typename biir_type::coeff_type;
+    using coeffs_type	= typename biir_type::coeffs_type;
+    using Order		= typename biir_type::Order;
+    
+  public:
+    BidirectionalIIRFilter2&
+			initialize(const T cHF[], const T cHB[],
+				   const T cVF[], const T cVB[])	;
+    BidirectionalIIRFilter2&
+			initialize(const T cHF[], Order orderH,
+				   const T cVF[], Order orderV)		;
+
+    const coeffs_type&	ciHF()		const	{ return _filterH.ciF(); }
+    const coeffs_type&	coHF()		const	{ return _filterH.coF(); }
+    const coeffs_type&	ciHB()		const	{ return _filterH.ciB(); }
+    const coeffs_type&	coHB()		const	{ return _filterH.coB(); }
+    const coeffs_type&	ciVF()		const	{ return _filterV.ciF(); }
+    const coeffs_type&	coVF()		const	{ return _filterV.coF(); }
+    const coeffs_type&	ciVB()		const	{ return _filterV.ciB(); }
+    const coeffs_type&	coVB()		const	{ return _filterV.coB(); }
+    size_t	grainSize()		const	{ return 1; }
+    void	setGrainSize(size_t gs)		{ }
+
+    template <class IN, class OUT>
+    void	convolve(IN ib, IN ie, OUT out)	const	;
+
+  private:
+    biir_type	_filterH;
+    biir_type	_filterV;
+};
+    
+//! フィルタのz変換係数をセットする
+/*!
+  \param cHF	横方向前進z変換係数
+  \param cHB	横方向後退z変換係数
+  \param cVF	縦方向前進z変換係数
+  \param cVB	縦方向後退z変換係数
+  \return	このフィルタ自身
+*/
+template <size_t D, class T> inline BidirectionalIIRFilter2<D, T>&
+BidirectionalIIRFilter2<D, T>::initialize(const T cHF[], const T cHB[],
+					  const T cVF[], const T cVB[])
+{
+    _filterH.initialize(cHF, cHB);
+    _filterV.initialize(cVF, cVB);
+
+    return *this;
+}
+
+//! フィルタのz変換係数をセットする
+/*!
+  \param cHF	横方向前進z変換係数
+  \param orderH 横方向微分階数
+  \param cVF	縦方向前進z変換係数
+  \param orderV	縦方向微分階数
+  \return	このフィルタ自身
+*/
+template <size_t D, class T> inline BidirectionalIIRFilter2<D, T>&
+BidirectionalIIRFilter2<D, T>::initialize(const T cHF[], Order orderH,
+					  const T cVF[], Order orderV)
+{
+    _filterH.initialize(cHF, orderH);
+    _filterV.initialize(cVF, orderV);
+
+    return *this;
+}
+
+template <size_t D, class T> template <class IN, class OUT> void
+BidirectionalIIRFilter2<D, T>::convolve(IN ib, IN ie, OUT out) const
+{
+    using buf_type = Array2<value_t<iterator_value<OUT> > >;
+
+    if (ib == ie)
+	return;
+    
+    buf_type	buf(std::distance(ib, ie), _filterH.outLength(std::size(*ib)));
+    _filterV.convolve(ib, ie, buf.begin());
+
+    for (const auto& row : buf)
+    {
+	_filterH.convolve(row.cbegin(), row.cend(), std::begin(*out));
+	++out;
+    }
+}
+#endif
 }
 #endif	// !__TU_IIRFILTER_H

@@ -12,22 +12,21 @@ VPATH		=
 IDLS		=
 MOCHDRS		=
 
-INCDIRS		= -I../.. -I$(PREFIX)/include
+INCDIRS		= -I../..
 CPPFLAGS	= -DNDEBUG
 CFLAGS		= -O3
 NVCCFLAGS	= -g
-ifneq ($(findstring icpc,$(CXX)),)
-#  CFLAGS	= -O3
-  NVCCFLAGS	= -O			# must < -O2
-#  CPPFLAGS     += -DSSE3
+ifeq ($(shell arch), armv7l)
+  CPPFLAGS     += -DNEON
+else ifeq ($(shell arch), aarch64)
+  CPPFLAGS     += -DNEON
+else
+  CPPFLAGS     += -DAVX2
+  CFLAGS       += -march=core-avx2
 endif
 CCFLAGS		= $(CFLAGS)
 
 LIBS		=
-ifneq ($(findstring darwin,$(OSTYPE)),)
-  LIBS	       += -framework IOKit -framework CoreFoundation \
-		  -framework CoreServices
-endif
 
 LINKER		= $(CXX)
 
@@ -43,9 +42,9 @@ EXTHDRS		= ../../TU/Array++.h \
 		../../TU/BoxFilter.h \
 		../../TU/Filter2.h \
 		../../TU/GuidedFilter.h \
-		../../TU/functional.h \
+		../../TU/algorithm.h \
 		../../TU/iterator.h \
-		../../TU/pair.h \
+		../../TU/range.h \
 		../../TU/tuple.h \
 		../../TU/types.h
 HDRS		=
@@ -59,5 +58,5 @@ OBJS		= main.o
 include $(PROJECT)/lib/common.mk
 ###
 main.o: ../../TU/types.h ../../TU/GuidedFilter.h ../../TU/BoxFilter.h \
-	../../TU/Filter2.h ../../TU/iterator.h ../../TU/tuple.h \
-	../../TU/functional.h ../../TU/pair.h ../../TU/Array++.h
+	../../TU/Filter2.h ../../TU/iterator.h ../../TU/Array++.h \
+	../../TU/range.h ../../TU/algorithm.h ../../TU/tuple.h

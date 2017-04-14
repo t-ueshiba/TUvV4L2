@@ -12,7 +12,7 @@ VPATH		=
 IDLS		=
 MOCHDRS		=
 
-INCDIRS		= -I../.. -I$(PREFIX)/include
+INCDIRS		= -I../..
 CPPFLAGS	= -DNDEBUG
 CFLAGS		= -g
 NVCCFLAGS	= -g
@@ -24,10 +24,6 @@ endif
 CCFLAGS		= $(CFLAGS)
 
 LIBS		=
-ifneq ($(findstring darwin,$(OSTYPE)),)
-  LIBS	       += -framework IOKit -framework CoreFoundation \
-		  -framework CoreServices
-endif
 
 LINKER		= $(CXX)
 
@@ -45,9 +41,8 @@ EXTHDRS		= ../../TU/Array++.h \
 		../../TU/Vector++.h \
 		../../TU/WeightedMedianFilter.h \
 		../../TU/algorithm.h \
-		../../TU/functional.h \
 		../../TU/iterator.h \
-		../../TU/pair.h \
+		../../TU/range.h \
 		../../TU/tuple.h \
 		../../TU/types.h
 HDRS		=
@@ -61,6 +56,6 @@ OBJS		= main.o
 include $(PROJECT)/lib/common.mk
 ###
 main.o: ../../TU/WeightedMedianFilter.h ../../TU/Quantizer.h \
-	../../TU/Vector++.h ../../TU/Array++.h ../../TU/iterator.h \
-	../../TU/tuple.h ../../TU/functional.h ../../TU/pair.h \
-	../../TU/algorithm.h ../../TU/Profiler.h ../../TU/types.h
+	../../TU/Vector++.h ../../TU/Array++.h ../../TU/range.h \
+	../../TU/algorithm.h ../../TU/tuple.h ../../TU/iterator.h \
+	../../TU/Profiler.h ../../TU/types.h

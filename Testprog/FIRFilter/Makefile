@@ -18,17 +18,15 @@ CFLAGS		= -O3
 NVCCFLAGS	= -g
 ifeq ($(shell arch), armv7l)
   CPPFLAGS     += -DNEON
+else ifeq ($(shell arch), aarch64)
+  CPPFLAGS     += -DNEON
 else
   CPPFLAGS     += -DAVX2
   CFLAGS       += -march=core-avx2
 endif
 CCFLAGS		= $(CFLAGS)
 
-LIBS		= -lTUTools++ -ltbb
-#ifneq ($(findstring darwin,$(OSTYPE)),)
-#  LIBS	       += -framework IOKit -framework CoreFoundation \
-#		  -framework CoreServices
-#endif
+LIBS		= -lTUNewTools++ -ltbb
 
 LINKER		= $(CXX)
 
@@ -43,15 +41,14 @@ SUFFIX		= .cc:sC .cpp:sC .cu:sC
 EXTHDRS		= ../../TU/Array++.h \
 		../../TU/FIRFilter.h \
 		../../TU/FIRGaussianConvolver.h \
-		../../TU/Geometry++.h \
 		../../TU/Image++.h \
-		../../TU/Minimize.h \
 		../../TU/Profiler.h \
 		../../TU/SeparableFilter2.h \
 		../../TU/Vector++.h \
-		../../TU/functional.h \
+		../../TU/algorithm.h \
 		../../TU/iterator.h \
 		../../TU/pair.h \
+		../../TU/range.h \
 		../../TU/tuple.h \
 		../../TU/types.h
 HDRS		=
@@ -64,8 +61,8 @@ OBJS		= main.o
 #include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
-main.o: ../../TU/Image++.h ../../TU/types.h ../../TU/Geometry++.h \
-	../../TU/Vector++.h ../../TU/Array++.h ../../TU/iterator.h \
-	../../TU/tuple.h ../../TU/functional.h ../../TU/pair.h \
-	../../TU/Minimize.h ../../TU/FIRGaussianConvolver.h \
-	../../TU/FIRFilter.h ../../TU/SeparableFilter2.h ../../TU/Profiler.h
+main.o: ../../TU/Image++.h ../../TU/types.h ../../TU/pair.h \
+	../../TU/Vector++.h ../../TU/Array++.h ../../TU/range.h \
+	../../TU/algorithm.h ../../TU/tuple.h ../../TU/iterator.h \
+	../../TU/FIRGaussianConvolver.h ../../TU/FIRFilter.h \
+	../../TU/SeparableFilter2.h ../../TU/Profiler.h

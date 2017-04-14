@@ -1,3 +1,6 @@
+/*
+ *  $Id$
+ */
 #include "TU/simd/transform.h"
 #include "TU/simd/load_iterator.h"
 #include "TU/simd/store_iterator.h"
@@ -5,18 +8,27 @@
 
 namespace TU
 {
-struct sum
+class sum
 {
-    template <class HEAD>
-    auto	operator ()(const boost::tuples::cons<
-				      HEAD, boost::tuples::null_type>& x) const
+  private:
+    template <class... T, size_t I>
+    auto	exec(const std::tuple<T...>& x, std::index_sequence<I>) const
 		{
-		    return x.get_head();
+		    return std::get<I>(x);
 		}
-    template <class HEAD, class TAIL>
-    auto	operator ()(const boost::tuples::cons<HEAD, TAIL>& x) const
+    template <class... T, size_t I, size_t J, size_t... IDX>
+    auto	exec(const std::tuple<T...>& x,
+		     std::index_sequence<I, J, IDX...>) const
 		{
-		    return x.get_head() + (*this)(x.get_tail());
+		    return std::get<I>(x)
+			 + exec(x, std::index_sequence<J, IDX...>());
+		}
+    
+  public:
+    template <class... T>
+    auto	operator ()(const std::tuple<T...>& x) const
+		{
+		    return exec(x, std::make_index_sequence<sizeof...(T)>());
 		}
 };
 
@@ -27,7 +39,7 @@ doJob()
 {
     using	namespace std;
 
-    typedef boost::tuple<vec<T>, vec<T>, vec<T> >	target_type;
+    typedef std::tuple<vec<T>, vec<T>, vec<T> >	target_type;
     
     S0	x[] = { 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
 	       16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31};

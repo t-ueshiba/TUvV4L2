@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id$
+ *  $Id: NDTree++.h 1937 2016-02-20 02:46:39Z ueshiba $
  */
 /*!
   \file		NDTree++.h
@@ -416,7 +416,7 @@ NDTree<T, D>::erase(const position_type& pos)
     }
 
   // _rootが子を1つだけ持つ枝ならば，子を_rootに付け替えることにより降階する．
-    for (Branch* b; b = _root->branch(); )	// _rootが枝ならば...
+    for (Branch* b; (b = _root->branch()); )	// _rootが枝ならば...
     {
 	size_t	idx;
 	Node*	child = b->descend(idx);	// 1段分の降階を試みる．
@@ -624,7 +624,7 @@ NDTree<T, D>::Iterator<S>::operator ++()
 	_len = _fringe.top().len;		// およびセル長を
 	_fringe.pop();				// popする．
 
-	if (_leaf = node->leaf())		// popしたノードが葉であれば...
+	if ((_leaf = node->leaf()))		// popしたノードが葉であれば...
 	    break;				// インクリメント後の位置に到達
 	
 	Branch* branch = node->branch();	// popしたノードは枝

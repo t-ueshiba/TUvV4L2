@@ -1,50 +1,30 @@
 /*
- *  平成14-24年（独）産業技術総合研究所 著作権所有
- *  
- *  創作者：植芝俊夫
- *
- *  本プログラムは（独）産業技術総合研究所の職員である植芝俊夫が創作し，
- *  （独）産業技術総合研究所が著作権を所有する秘密情報です．著作権所有
- *  者による許可なしに本プログラムを使用，複製，改変，第三者へ開示する
- *  等の行為を禁止します．
- *  
- *  このプログラムによって生じるいかなる損害に対しても，著作権所有者お
- *  よび創作者は責任を負いません。
- *
- *  Copyright 2002-2012.
- *  National Institute of Advanced Industrial Science and Technology (AIST)
- *
- *  Creator: Toshio UESHIBA
- *
- *  [AIST Confidential and all rights reserved.]
- *  This program is confidential. Any using, copying, changing or
- *  giving any information concerning with this program to others
- *  without permission by the copyright holder are strictly prohibited.
- *
- *  [No Warranty.]
- *  The copyright holder or the creator are not responsible for any
- *  damages caused by using this program.
- *  
  *  $Id: functional.h 1775 2014-12-24 06:08:59Z ueshiba $
  */
 /*!
-  \file		tuple.h
-  \brief	boost::tupleの用途拡張のためのユティリティ
+  \file		pair.h
+  \brief	std::pairの用途拡張のためのユティリティ
 */
 #ifndef __TU_PAIR_H
 #define __TU_PAIR_H
 
 #include <utility>
 #include <iostream>
-#include "TU/functional.h"	// is_convertible<T, C<ARGS...> >
 
 namespace TU
 {
 /************************************************************************
-*  struct is_pair<T>							*
+*  predicate is_pair<T>							*
 ************************************************************************/
+namespace detail
+{
+  template <class S, class T>
+  std::true_type	check_pair(std::pair<S, T>)			;
+  std::false_type	check_pair(...)					;
+}	// namespace detail
+
 template <class T>
-using is_pair = is_convertible<T, std::pair>;
+using is_pair = decltype(detail::check_pair(std::declval<T>()));
 
 /************************************************************************
 *  struct pair_traits<PAIR>						*
@@ -53,16 +33,16 @@ template <class T>
 struct pair_traits
 {
     static constexpr size_t	size = 1;
-    typedef T						leftmost_type;
-    typedef T						rightmost_type;
+    using leftmost_type		= T;
+    using rightmost_type	= T;
 };
 template <class S, class T>
 struct pair_traits<std::pair<S, T> >
 {
-    static constexpr size_t	size = pair_traits<S>::size
+    constexpr static size_t	size = pair_traits<S>::size
 				     + pair_traits<T>::size;
-    typedef typename pair_traits<S>::leftmost_type	leftmost_type;
-    typedef typename pair_traits<T>::rightmost_type	rightmost_type;
+    using leftmost_type		= typename pair_traits<S>::leftmost_type;
+    using rightmost_type	= typename pair_traits<S>::rightmost_type;
 };
 
 /************************************************************************
@@ -73,18 +53,18 @@ namespace detail
   template <class T, size_t N>
   struct pair_tree
   {
-      typedef std::pair<typename pair_tree<T, (N>>1)>::type,
-			typename pair_tree<T, (N>>1)>::type>	type;
+      using type	= std::pair<typename pair_tree<T, (N>>1)>::type,
+				    typename pair_tree<T, (N>>1)>::type>;
   };
   template <class T>
   struct pair_tree<T, 1>
   {
-      typedef T							type;
+      using type	= T;
   };
   template <class T>
   struct pair_tree<T, 0>
   {
-      typedef T							type;
+      using type	= T;
   };
 }	// namespace detail
 

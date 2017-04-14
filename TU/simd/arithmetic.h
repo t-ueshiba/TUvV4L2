@@ -4,6 +4,7 @@
 #if !defined(__TU_SIMD_ARITHMETIC_H)
 #define __TU_SIMD_ARITHMETIC_H
 
+#include "TU/tuple.h"
 #include "TU/simd/vec.h"
 #include "TU/simd/logical.h"
 
@@ -68,98 +69,48 @@ template <class T> vec<T>	diff(vec<T> x, vec<T> y)		;
 /************************************************************************
 *  Arithmetic operators for vec tuples					*
 ************************************************************************/
-namespace detail
+template <class L, class R,
+	  std::enable_if_t<any_tuple<L, R>::value>* = nullptr> inline auto
+min(const L& l, const R& r)
 {
-  struct generic_min
-  {
-      template <class T_>
-      vec<T_>	operator ()(vec<T_> x, vec<T_> y) const	{ return min(x, y); }
-  };
-
-  struct generic_max
-  {
-      template <class T_>
-      vec<T_>	operator ()(vec<T_> x, vec<T_> y) const	{ return max(x, y); }
-  };
-
-  struct generic_avg
-  {
-      template <class T_>
-      vec<T_>	operator ()(vec<T_> x, vec<T_> y) const	{ return avg(x, y); }
-  };
-
-  struct generic_sub_avg
-  {
-      template <class T_>
-      vec<T_>	operator ()(vec<T_> x, vec<T_> y) const	{return sub_avg(x, y);}
-  };
-
-  struct generic_abs
-  {
-      template <class T_>
-      vec<T_>	operator ()(vec<T_> x)		const	{return abs(x);}
-  };
-
-  struct generic_diff
-  {
-      template <class T_>
-      vec<T_>	operator ()(vec<T_> x, vec<T_> y) const	{ return diff(x, y); }
-  };
-}
-    
-template <class S, class T,
-	  typename std::enable_if<
-	      (boost::tuples::is_tuple<S>::value ||
-	       boost::tuples::is_tuple<T>::value)>::type* = nullptr>
-inline auto
-min(const S& x, const T& y)
-    -> decltype(boost::tuples::cons_transform(detail::generic_min(), x, y))
-{
-    return boost::tuples::cons_transform(detail::generic_min(), x, y);
+    return tuple_transform([](auto x, auto y){ return min(x, y); }, l, r);
 }
 
-template <class S, class T,
-	  typename std::enable_if<
-	      (boost::tuples::is_tuple<S>::value ||
-	       boost::tuples::is_tuple<T>::value)>::type* = nullptr>
-inline auto
-max(const S& x, const T& y)
-    -> decltype(boost::tuples::cons_transform(detail::generic_max(), x, y))
+template <class L, class R,
+	  std::enable_if_t<any_tuple<L, R>::value>* = nullptr> inline auto
+max(const L& l, const R& r)
 {
-    return boost::tuples::cons_transform(detail::generic_max(), x, y);
+    return tuple_transform([](auto x, auto y){ return max(x, y); }, l, r);
 }
 
-template <class HEAD, class TAIL> inline auto
-avg(const boost::tuples::cons<HEAD, TAIL>& x,
-    const boost::tuples::cons<HEAD, TAIL>& y)
-    -> decltype(boost::tuples::cons_transform(detail::generic_avg(), x, y))
+template <class L, class R,
+	  std::enable_if_t<any_tuple<L, R>::value>* = nullptr> inline auto
+avg(const L& l, const R& r)
 {
-    return boost::tuples::cons_transform(detail::generic_avg(), x, y);
-}
-    
-template <class HEAD, class TAIL> inline auto
-sub_avg(const boost::tuples::cons<HEAD, TAIL>& x,
-	const boost::tuples::cons<HEAD, TAIL>& y)
-    -> decltype(boost::tuples::cons_transform(detail::generic_sub_avg(), x, y))
-{
-    return boost::tuples::cons_transform(detail::generic_sub_avg(), x, y);
+    return tuple_transform([](auto x, auto y){ return avg(x, y); }, l, r);
 }
 
-template <class HEAD, class TAIL> inline auto
-abs(const boost::tuples::cons<HEAD, TAIL>& x)
-    -> decltype(boost::tuples::cons_transform(detail::generic_abs(), x))
+template <class L, class R,
+	  std::enable_if_t<any_tuple<L, R>::value>* = nullptr> inline auto
+sub_avg(const L& l, const R& r)
 {
-    return boost::tuples::cons_transform(detail::generic_abs(), x);
+    return tuple_transform([](auto x, auto y){ return sub_avg(x, y); }, l, r);
 }
-    
-template <class HEAD, class TAIL> inline auto
-diff(const boost::tuples::cons<HEAD, TAIL>& x,
-     const boost::tuples::cons<HEAD, TAIL>& y)
-    -> decltype(boost::tuples::cons_transform(detail::generic_diff(), x, y))
+
+template <class L, class R,
+	  std::enable_if_t<any_tuple<L, R>::value>* = nullptr> inline auto
+abs(const L& l, const R& r)
 {
-    return boost::tuples::cons_transform(detail::generic_diff(), x, y);
+    return tuple_transform([](auto x, auto y){ return abs(x, y); }, l, r);
 }
-    
+
+template <class L, class R,
+	  std::enable_if_t<any_tuple<L, R>::value>* = nullptr> inline auto
+diff(const L& l, const R& r)
+{
+    return tuple_transform([](auto x, auto y){ return diff(x, y); }, l, r);
+}
+
 }	// namespace simd
 }	// namespace TU
 

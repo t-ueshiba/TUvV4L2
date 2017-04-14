@@ -5,6 +5,7 @@
 #define __TU_SIMD_CVTDOWN_ITERATOR_H
 
 #include "TU/iterator.h"
+#include "TU/functional.h"
 #include "TU/simd/cvt.h"
 
 namespace TU

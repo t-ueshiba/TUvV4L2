@@ -34,8 +34,6 @@
 #ifndef __TU_DP_H
 #define __TU_DP_H
 
-#include <iterator>
-#include <algorithm>
 #include "TU/Array++.h"
 
 namespace TU
@@ -52,11 +50,9 @@ template <class DOM, class T>
 class DP
 {
   public:
-    typedef typename std::iterator_traits<DOM>
-			::value_type::const_iterator	argument_iterator;
-    typedef typename std::iterator_traits<argument_iterator>
-			::value_type			argument_type;
-    typedef T						value_type;
+    using argument_iterator	= typename iterator_value<DOM>::const_iterator;
+    using argument_type		= iterator_value<argument_iterator>;
+    using value_type		= T;
 
   private:
     struct Node

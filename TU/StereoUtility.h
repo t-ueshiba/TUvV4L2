@@ -106,24 +106,18 @@ class MinIdx
 ************************************************************************/
 template <class COL, class T>
 class diff_iterator
-    : public boost::iterator_adaptor<
-	diff_iterator<COL, T>,
-	fast_zip_iterator<
-	    boost::tuples::cons<
-		COL, boost::tuples::cons<COL, boost::tuples::null_type> > >,
-	Array<T>,
-	boost::use_default,
-	const Array<T>&>
+    : public boost::iterator_adaptor<diff_iterator<COL, T>,
+				     zip_iterator<std::tuple<COL, COL> >,
+				     Array<T>,
+				     boost::use_default,
+				     const Array<T>&>
 {
   private:
-    typedef boost::iterator_adaptor<
-	diff_iterator<COL, T>,
-	fast_zip_iterator<
-	    boost::tuples::cons<
-		COL, boost::tuples::cons<COL, boost::tuples::null_type> > >,
-	Array<T>,
-	boost::use_default,
-	const Array<T>&>				super;
+    typedef boost::iterator_adaptor<diff_iterator<COL, T>,
+				    fast_zip_iterator<std::tuple<COL, COL> >,
+				    Array<T>,
+				    boost::use_default,
+				    const Array<T>&>		super;
 
   public:
     typedef typename super::value_type			value_type;
@@ -140,8 +134,8 @@ class diff_iterator
     reference	dereference() const
 		{
 		    const auto	iter_tuple = super::base().get_iterator_tuple();
-		    const auto	colL = *boost::get<0>(iter_tuple);
-		    auto	colR =  boost::get<1>(iter_tuple);
+		    const auto	colL = *std::get<0>(iter_tuple);
+		    auto	colR =  std::get<1>(iter_tuple);
 		    for (auto& val : _P)
 		    {
 			val = std::min(T(diff(colL, *colR)), _thresh);
@@ -161,25 +155,24 @@ class diff_iterator
 ************************************************************************/
 namespace detail
 {
-    template <class ITER, class A>
-    class matching_proxy
-    {
-      public:
-	typedef A				argument_type;
-	typedef matching_proxy			self;
+  template <class ITER, class A>
+  class matching_proxy
+  {
+    public:
+      using	argument_type = A;
 	
-      public:
-		matching_proxy(const ITER& iter)	:_iter(iter)	{}
+    public:
+			matching_proxy(const ITER& iter) :_iter(iter)	{}
 
-	self&	operator =(const argument_type& R)
-		{
-		    _iter.read(R);
-		    return *this;
-		}
+      matching_proxy&	operator =(const argument_type& R)
+			{
+			    _iter.read(R);
+			    return *this;
+			}
 	
-      private:
-	const ITER&	_iter;
-    };
+    private:
+      const ITER&	_iter;
+  };
 }
     
 template <class OUT, class A>

@@ -1,32 +1,3 @@
-/*
- *  平成14-19年（独）産業技術総合研究所 著作権所有
- *  
- *  創作者：植芝俊夫
- *
- *  本プログラムは（独）産業技術総合研究所の職員である植芝俊夫が創作し，
- *  （独）産業技術総合研究所が著作権を所有する秘密情報です．著作権所有
- *  者による許可なしに本プログラムを使用，複製，改変，第三者へ開示する
- *  等の行為を禁止します．
- *  
- *  このプログラムによって生じるいかなる損害に対しても，著作権所有者お
- *  よび創作者は責任を負いません。
- *
- *  Copyright 2002-2007.
- *  National Institute of Advanced Industrial Science and Technology (AIST)
- *
- *  Creator: Toshio UESHIBA
- *
- *  [AIST Confidential and all rights reserved.]
- *  This program is confidential. Any using, copying, changing or
- *  giving any information concerning with this program to others
- *  without permission by the copyright holder are strictly prohibited.
- *
- *  [No Warranty.]
- *  The copyright holder or the creator are not responsible for any
- *  damages caused by using this program.
- *  
- *  $Id: Array++.h 1785 2015-02-14 05:43:15Z ueshiba $
- */
 /*!
   \file		StereoBase.h
   \brief	ステレオマッチングクラスの定義と実装
@@ -57,149 +28,150 @@
 
 namespace TU
 {
+  //template <class ITER>
+  //using decayed_iterator_value = tuple_decay_t<iterator_value<ITER> >;
+template <class ITER>
+using subiterator = iterator_t<decayed_iterator_value<ITER> >;
+    
 /************************************************************************
 *  struct Diff<T>							*
 ************************************************************************/
 template <class T>
 struct Diff
 {
-    typedef typename std::conditional<
-	std::is_integral<T>::value, int, T>::type	result_type;
-    
     Diff(T x, T thresh)	:_x(x), _thresh(thresh)		{}
-    
-    result_type	operator ()(T y) const
+
+#if defined(SIMD)
+    auto	operator ()(T y) const
+		{
+		    using signed_type	= std::make_signed_t<
+					      typename T::element_type>;
+		    using namespace	simd;
+
+		    return cast<signed_type>(min(diff(_x, y), _thresh));
+		}
+#else
+    auto	operator ()(T y) const
 		{
 		    return std::min(diff(_x, y), _thresh);
 		}
-    result_type	operator ()(boost::tuple<T, T> y) const
+#endif
+    auto	operator ()(std::tuple<T, T> y) const
 		{
-		    return (*this)(boost::get<0>(y))
-			 + (*this)(boost::get<1>(y));
+		    return (*this)(std::get<0>(y)) + (*this)(std::get<1>(y));
 		}
     
   private:
     const T	_x;
     const T	_thresh;
 };
-    
-#if defined(SIMD)
-template <class T>
-struct Diff<simd::vec<T> >
-{
-    typedef typename std::make_signed<T>::type		signed_type;
-    typedef simd::vec<signed_type>			result_type;
-
-    Diff(simd::vec<T> x, simd::vec<T> thresh)	:_x(x), _thresh(thresh)	{}
-    
-    result_type	operator ()(simd::vec<T> y) const
-		{
-		    using namespace	simd;
-
-		    return cast<signed_type>(min(diff(_x, y), _thresh));
-		}
-    result_type	operator ()(boost::tuple<simd::vec<T>, simd::vec<T> > y) const
-		{
-		    return (*this)(boost::get<0>(y))
-			 + (*this)(boost::get<1>(y));
-		}
-
-  private:
-    const simd::vec<T>	_x;
-    const simd::vec<T>	_thresh;
-};
-#endif
 
 /************************************************************************
-*  struct Minus<T>							*
+*  struct Minus								*
 ************************************************************************/
-template <class T>
 struct Minus
 {
-    typedef typename std::conditional<
-	std::is_integral<T>::value, int, T>::type	result_type;
-    
-    result_type	operator ()(T x, T y) const
+    template <class T>
+    auto	operator ()(T x, T y) const
 		{
-		    return result_type(x) - result_type(y);
+		    return x - y;
 		}
-};
-    
 #if defined(SIMD)
-template <class T>
-struct Minus<simd::vec<T> >
-{
-    typedef typename std::make_signed<T>::type		signed_type;
-    typedef simd::vec<signed_type>			result_type;
-
-    result_type	operator ()(simd::vec<T> x, simd::vec<T> y) const
+    template <class T>
+    auto	operator ()(simd::vec<T> x, simd::vec<T> y) const
 		{
+		    using signed_type	= std::make_signed_t<T>;
+		    
 		    return simd::cast<signed_type>(x) -
 			   simd::cast<signed_type>(y);
 		}
-};
 #endif
-
-template <class HEAD, class TAIL>
-struct Minus<boost::tuples::cons<HEAD, TAIL> >
-{
-    typedef decltype(boost::tuples::cons_transform(
-			 Minus<HEAD>(),
-			 std::declval<boost::tuples::cons<HEAD, TAIL> >(),
-			 std::declval<boost::tuples::cons<HEAD, TAIL> >()))
-								result_type;
-
-    result_type	operator ()(const boost::tuples::cons<HEAD, TAIL>& x,
-			    const boost::tuples::cons<HEAD, TAIL>& y) const
+    template <class... T>
+    auto	operator ()(std::tuple<T...> x, std::tuple<T...> y) const
 		{
-		    return boost::tuples::cons_transform(Minus<HEAD>(), x, y);
+		    return tuple_transform(Minus(), x, y);
 		}
 };
-
+    
 /************************************************************************
 *  struct Blend<T>							*
 ************************************************************************/
 template <class T>
 struct Blend
 {
-    typedef boost::tuple<T, T>	argument_type;
-    typedef T			result_type;
-    
     Blend(T alpha)	:_alpha(alpha)					{}
 
-    result_type	operator ()(T x, T y) const
+    auto	operator ()(T x, T y) const
 		{
 		    return x + _alpha*(y - x);
 		}
-    result_type	operator ()(const argument_type& args) const
+    auto	operator ()(std::tuple<T, T> args) const
 		{
-		    return (*this)(boost::get<0>(args), boost::get<1>(args));
+		    return (*this)(std::get<0>(args), std::get<1>(args));
 		}
 
   private:
     const T	_alpha;
 };
-    
+
 /************************************************************************
-*  col2ptr(COL)								*
+*  make_col_load_iterator(COL)						*
 ************************************************************************/
-template <class COL> inline COL
-col2ptr(COL col)
+template <class COL> inline auto
+make_col_load_iterator(COL col)
 {
+#if defined(SIMD)
+    return simd::make_load_iterator(col);
+#else
     return col;
+#endif
 }
     
 template <class ITER_TUPLE> inline auto
-col2ptr(const fast_zip_iterator<ITER_TUPLE>& col)
-    -> decltype(make_fast_zip_iterator(
-		    boost::make_tuple(
-			boost::get<0>(col.get_iterator_tuple()),
-			boost::get<1>(col.get_iterator_tuple()).operator ->())))
+make_col_load_iterator(const zip_iterator<ITER_TUPLE>& col)
 {
-    return make_fast_zip_iterator(
-	       boost::make_tuple(
-		   boost::get<0>(col.get_iterator_tuple()),
-		   boost::get<1>(col.get_iterator_tuple()).operator ->()));
+#if defined(SIMD)
+    return simd::make_load_iterator(
+	       make_zip_iterator(
+		   std::make_tuple(
+		       std::get<0>(col.get_iterator_tuple()),
+		       std::get<1>(col.get_iterator_tuple()).operator ->())));
+#else
+    return make_zip_iterator(
+	       std::make_tuple(
+		   std::get<0>(col.get_iterator_tuple()),
+		   std::get<1>(col.get_iterator_tuple()).operator ->()));
+#endif
+}
+    
+/************************************************************************
+*  make_col_store_iterator(COL)						*
+************************************************************************/
+template <class COL> inline auto
+make_col_store_iterator(COL col)
+{
+#if defined(SIMD)
+    return simd::make_store_iterator(col);
+#else
+    return col;
+#endif
+}
+    
+template <class ITER_TUPLE> inline auto
+make_col_store_iterator(const zip_iterator<ITER_TUPLE>& col)
+{
+#if defined(SIMD)
+    return simd::make_store_iterator(
+	       make_zip_iterator(
+		   std::make_tuple(
+		       std::get<0>(col.get_iterator_tuple()),
+		       std::get<1>(col.get_iterator_tuple()).operator ->())));
+#else
+    return make_zip_iterator(
+	       std::make_tuple(
+		   std::get<0>(col.get_iterator_tuple()),
+		   std::get<1>(col.get_iterator_tuple()).operator ->()));
+#endif
 }
     
 /************************************************************************
@@ -210,12 +182,12 @@ class dummy_iterator
     : public boost::iterator_adaptor<dummy_iterator<ITER>, ITER>
 {
   private:
-    typedef boost::iterator_adaptor<dummy_iterator, ITER>	super;
+    using super	= boost::iterator_adaptor<dummy_iterator, ITER>;
 
   public:
-    typedef typename super::difference_type	difference_type;
+    using	typename super::difference_type;
 
-    friend class				boost::iterator_core_access;
+    friend	class boost::iterator_core_access;
 
   public:
     dummy_iterator(ITER iter)	:super(iter)	{}
@@ -247,7 +219,7 @@ struct Idx
 template <class T>
 struct Idx<simd::vec<T> > : simd::vec<T>
 {
-    typedef simd::vec<T>	super;
+    using super	= simd::vec<T>;
     
 		Idx()	:super(std::make_index_sequence<super::size>())	{}
     void	operator ++()		{ *this += super(super::size); }
@@ -258,29 +230,28 @@ struct Idx<simd::vec<T> > : simd::vec<T>
 *  class mask_iterator<ITER, RV_ITER>					*
 ************************************************************************/
 template <class ITER, class RV_ITER>
-class mask_iterator
-    : public boost::iterator_adaptor<
-		 mask_iterator<ITER, RV_ITER>,
-		 ITER,
-		 tuple_replace<iterator_value<RV_ITER>, bool>,
-		 boost::single_pass_traversal_tag,
-		 tuple_replace<iterator_value<RV_ITER>, bool> >
+class mask_iterator : public boost::iterator_adaptor<
+				 mask_iterator<ITER, RV_ITER>,
+				 ITER,
+				 tuple_replace<iterator_value<RV_ITER>, bool>,
+				 boost::single_pass_traversal_tag,
+				 tuple_replace<iterator_value<RV_ITER>, bool> >
 {
   private:
-    typedef iterator_value<RV_ITER>			rv_type;
-    typedef boost::iterator_adaptor<
-		mask_iterator,
-		ITER,
-		tuple_replace<rv_type, bool>,
-		boost::single_pass_traversal_tag,
-		tuple_replace<rv_type, bool> >		super;
-    typedef tuple_head<rv_type>				element_type;
+    using super		= boost::iterator_adaptor<
+			      mask_iterator,
+			      ITER,
+			      tuple_replace<iterator_value<RV_ITER>, bool>,
+			      boost::single_pass_traversal_tag,
+			      tuple_replace<iterator_value<RV_ITER>, bool> >;
+    using rv_type	= decayed_iterator_value<RV_ITER>;
+    using element_type	= tuple_head<rv_type>;
     
   public:
-    typedef typename super::difference_type		difference_type;
-    typedef typename super::reference			reference;
+    using	typename super::difference_type;
+    using	typename super::reference;
 
-    friend class	boost::iterator_core_access;
+    friend	class boost::iterator_core_access;
 
   public:
 		mask_iterator(ITER R, RV_ITER RminRV)
@@ -301,7 +272,7 @@ class mask_iterator
     template <class VEC_>
     void	init(element_type val, VEC_& x)
 		{
-		    x = boost::make_tuple(val, val);
+		    x = std::make_tuple(val, val);
 		}
     
     void	update(element_type R, bool& mask)
@@ -324,7 +295,7 @@ class mask_iterator
     template <class VEC_>
     void	update(element_type R, VEC_& mask)
 		{
-		    using 	boost::get;
+		    using 	std::get;
 
 		    element_type	RminR = get<0>(*_RminRV),
 					RminV = get<1>(*_RminRV);
@@ -406,39 +377,41 @@ namespace simd
 	    mask_iterator<ITER, RV_ITER>,
 	    ITER,
 	    tuple_replace<
-		iterator_value<RV_ITER>,
+		decayed_iterator_value<RV_ITER>,
 		vec<mask_type<typename tuple_head<
-				  iterator_value<RV_ITER> >::element_type> > >,
+				  decayed_iterator_value<
+				      RV_ITER> >::element_type> > >,
 	    boost::single_pass_traversal_tag,
 	    tuple_replace<
-		iterator_value<RV_ITER>,
+		decayed_iterator_value<RV_ITER>,
 		vec<mask_type<typename tuple_head<
-				  iterator_value<RV_ITER> >::element_type> > > >
+				  decayed_iterator_value<
+				      RV_ITER> >::element_type> > > >
 #  else
   template <class T, class ITER, class RV_ITER>
   class mask_iterator
       : public boost::iterator_adaptor<
 	    mask_iterator<T, ITER, RV_ITER>,
 	    ITER,
-	    tuple_replace<iterator_value<RV_ITER>, vec<T> >,
+	    tuple_replace<decayed_iterator_value<RV_ITER>, vec<T> >,
 	    boost::single_pass_traversal_tag,
-	    tuple_replace<iterator_value<RV_ITER>, vec<T> > >
+	    tuple_replace<decayed_iterator_value<RV_ITER>, vec<T> > >
 #  endif
   {
     private:
-      typedef iterator_value<RV_ITER>				score_vec;
-      typedef typename tuple_head<score_vec>::element_type	score_element;
-      typedef mask_type<score_element>				S;
-      typedef tuple_replace<score_vec, vec<S> >			mask_vec;
+      using score_vec	  = decayed_iterator_value<RV_ITER>;
+      using score_element = typename tuple_head<score_vec>::element_type;
+      using S		  = mask_type<score_element>;
+      using mask_vec	  = tuple_replace<score_vec, vec<S> >;
 #  if defined(WITHOUT_CVTDOWN)
-      typedef S							T;
+      using T		  = S;
 #endif
-      typedef boost::iterator_adaptor<
-		  mask_iterator,
-		  ITER,
-		  tuple_replace<score_vec, vec<T> >,
-		  boost::single_pass_traversal_tag,
-		  tuple_replace<score_vec, vec<T> > >		super;
+      using super	= boost::iterator_adaptor<
+			      mask_iterator,
+			      ITER,
+			      tuple_replace<score_vec, vec<T> >,
+			      boost::single_pass_traversal_tag,
+			      tuple_replace<score_vec, vec<T> > >;
 
       template <class T_, size_t I_=vec<T_>::size/2> static inline int
 		minIdx(vec<T_> d, vec<T_> x,
@@ -457,10 +430,10 @@ namespace simd
 		}
       
     public:
-      typedef typename super::difference_type		difference_type;
-      typedef typename super::reference			reference;
+      using	typename super::difference_type;
+      using	typename super::reference;
 
-      friend class	boost::iterator_core_access;
+      friend	class boost::iterator_core_access;
 
     public:
 		mask_iterator(ITER R, RV_ITER RminRV)
@@ -470,7 +443,7 @@ namespace simd
 		     _RminL(std::numeric_limits<score_element>::max()),
 		     _RminRV(RminRV),
 		     _nextRV(init(std::numeric_limits<score_element>::max(),
-				  boost::tuples::is_tuple<mask_vec>()))
+				  is_tuple<mask_vec>()))
 		{
 		}
       int	dL()	const	{ return minIdx(_dminL, _RminL); }
@@ -482,17 +455,17 @@ namespace simd
 		{
 		    return vec<score_element>(val);
 		}
-      static boost::tuple<vec<score_element>, vec<score_element> >
+      static std::tuple<vec<score_element>, vec<score_element> >
 		init(score_element val, std::true_type)
 		{
-		    return boost::make_tuple(vec<score_element>(val),
-					     vec<score_element>(val));
+		    return std::make_tuple(vec<score_element>(val),
+					   vec<score_element>(val));
 		}
 
     // mask と mask tuple に対するupdate
       template <class T_>
-      typename std::enable_if<(vec<T_>::size == vec<S>::size),
-			      tuple_replace<mask_vec, vec<T_> > >::type
+      std::enable_if_t<(vec<T_>::size == vec<S>::size),
+		       tuple_replace<mask_vec, vec<T_> > >
 		cvtdown()
 		{
 		    const auto	R = *super::base();
@@ -513,8 +486,8 @@ namespace simd
 		}
 #  if !defined(WITHOUT_CVTDOWN)
       template <class T_>
-      typename std::enable_if<(vec<T_>::size > vec<S>::size),
-			      tuple_replace<mask_vec, vec<T_> > >::type
+      std::enable_if_t<(vec<T_>::size > vec<S>::size),
+		       tuple_replace<mask_vec, vec<T_> > >
 		cvtdown()
 		{
 		    using	A = cvt_above_type<T_, S, true>;
@@ -559,13 +532,13 @@ namespace simd
   {
       using namespace 	boost;
 
-      return make_tuple(select(get<0>(mask), index, get<0>(dminRV)),
-			select(get<1>(mask), index, get<1>(dminRV)));
+      return std::make_tuple(select(get<0>(mask), index, get<0>(dminRV)),
+			     select(get<1>(mask), index, get<1>(dminRV)));
   }
 }	// end of namespace simd
 #else
 template <class S, class T, class U> inline auto
-fast_select(const S& s, const T& x, const U& y) -> decltype(select(s, x, y))
+fast_select(const S& s, const T& x, const U& y)
 {
     return select(s, x, y);
 }
@@ -707,13 +680,13 @@ class StereoBase : public Profiler<ENABLE_PROFILER>
     class CorrectDisparity
     {
       public:
-	typedef typename std::iterator_traits<DMIN>::value_type	argument_type;
-	typedef DISP						result_type;
+	using argument_type = typename std::iterator_traits<DMIN>::value_type;
+	using result_type   = DISP;
 
       private:
-	typedef typename std::is_floating_point<result_type>::type
-								is_floating_point;
-	typedef std::integral_constant<bool, HOR_BACKMATCH>	hor_backmatch;
+	using is_floating_point = typename std::is_floating_point<result_type>
+					      ::type;
+	using hor_backmatch	= std::integral_constant<bool, HOR_BACKMATCH>;
 	
       public:
 	CorrectDisparity(DMIN dminR, DELTA delta,
@@ -815,7 +788,7 @@ StereoBase<STEREO>::selectDisparities(DMIN dminL, DMIN dminLe, DMIN dminR,
 {
     typedef typename std::iterator_traits<COL_D>::value_type	DISP;
     
-    const Parameters&	params = _stereo.getParameters();
+    const auto&	params = _stereo.getParameters();
     
     if (params.doHorizontalBackMatch)
 	std::transform(dminL, dminLe, colD,
@@ -838,7 +811,7 @@ StereoBase<STEREO>::pruneDisparities(DMINV dminV,
     {
 	if (*colD != 0)
 	{
-	    const Parameters&	params = _stereo.getParameters();
+	    const auto&		params = _stereo.getParameters();
 	    const size_t	dL = params.disparityMax - size_t(*colD);
 	    const size_t	dV = *(dminV.operator ->() + dL);
 	    if (diff(dL, dV) > params.disparityInconsistency)

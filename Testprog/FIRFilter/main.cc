@@ -54,7 +54,7 @@ doJob1(COEFF alpha, int niter)
     Image<pixel_type>		in;
     in.restore(cin);
     
-    ImageLine<value_type>	out(in.width());
+    Array<value_type>		out(in.width());
     Profiler<>			profiler(1);
     FIRGaussianConvolver<>	convolver(alpha);
 

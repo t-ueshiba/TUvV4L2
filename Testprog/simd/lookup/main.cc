@@ -12,8 +12,6 @@ doJob()
     using	std::cout;
     using	std::endl;
     
-    typedef Array2<Array<P> >	array2_type;
-
     P		p[] = { 0,  1,  2,  3,  4,  5,  6,  7,
 			8,  9, 10, 11, 12, 13, 14, 15,
 		       16, 17, 18, 19, 20, 21, 22, 23,
@@ -26,10 +24,10 @@ doJob()
     auto	idx = load(i);
     cout << lookup(p, idx) << endl;
 
-    array2_type	a(p, 8, 8);
+    auto	a = make_dense_range(p, 8, 8);
     T		j[] = {7, 5, 3, 1, 6, 4, 2, 0, 1, 3, 5, 7, 0, 2, 4, 6};
     auto	col = load(j);
-    cout << lookup(a.data(), idx, col, a.ncol()) << endl << endl;
+    cout << lookup(p, idx, col, size<1>(a)) << endl << endl;
 }
     
 }

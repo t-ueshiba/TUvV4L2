@@ -42,9 +42,9 @@ SUFFIX		= .cc:sC .cpp:sC .cu:sC
 EXTHDRS		= ../../TU/Array++.h \
 		../../TU/Manip.h \
 		../../TU/NDTree++.h \
-		../../TU/functional.h \
+		../../TU/algorithm.h \
 		../../TU/iterator.h \
-		../../TU/pair.h \
+		../../TU/range.h \
 		../../TU/tuple.h \
 		../../TU/types.h
 HDRS		=
@@ -57,6 +57,6 @@ OBJS		= main.o
 #include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
-main.o: ../../TU/NDTree++.h ../../TU/Array++.h ../../TU/iterator.h \
-	../../TU/tuple.h ../../TU/functional.h ../../TU/pair.h \
+main.o: ../../TU/NDTree++.h ../../TU/Array++.h ../../TU/range.h \
+	../../TU/algorithm.h ../../TU/tuple.h ../../TU/iterator.h \
 	../../TU/Manip.h ../../TU/types.h

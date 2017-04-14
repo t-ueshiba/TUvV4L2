@@ -21,17 +21,17 @@ main()
 	cerr << "\n i: inner product, addition, subtraction"
 	     << "\n o: outer product"
 	     << "\n p: partial vector"
-	     << "\n I: inverse matrix"
-	     << "\n G: generalized inverse matrix"
-	     << "\n A: adjoint matrix"
-	     << "\n E: eigen vector & eigen value"
-	     << "\n S: sigular value decomposition"
-	  //	     << "\n C: matrix type conversion"
 	     << "\n P: partial matrix"
-	     << "\n T: tridiagonalize matrix"
-	     << "\n B: bidiagonalize matrix"
-	     << "\n Q: QR decomposition of a matrix"
+	     << "\n I: inverse matrix"
+	     << "\n A: adjoint matrix"
 	     << "\n L: Cholesky decomposition of a matrix"
+	     << "\n Q: QR decomposition of a matrix"
+	     << "\n T: tridiagonalize matrix"
+	     << "\n E: eigen vector & eigen value"
+	     << "\n B: bidiagonalize matrix"
+	     << "\n S: sigular value decomposition"
+	     << "\n G: generalized inverse matrix"
+	  //	     << "\n C: matrix type conversion"
 	     << "\nSelect function >> ";
 	char	c;
 	if (!(cin >> c))
@@ -50,7 +50,8 @@ main()
 		 << "v   = " << v
 		 << "u.v = " << u * v << '\n'
 		 << "u+v = " << u + v
-		 << "u-v = " << u - v << endl;
+		 << "u-v = " << u - v
+		 << endl;
 	    break;
 
 	  case 'o':
@@ -60,7 +61,8 @@ main()
 	    cin >> v;
 	    cout << "u   = " << u
 		 << "v   = " << v
-		 << "u^v = " << (u ^ v) << endl;
+		 << "u^v = " << (u ^ v)
+		 << endl;
 	    break;
 
 	  case 'p':
@@ -74,68 +76,10 @@ main()
 	    int d;
 	    cin >> d;
 	    cout << "u = " << u
-		 << "u(" << i << ", " << d << ") = " << u(i, d) << endl;
+		 << "u(" << i << ", " << d << ") = " << u(i, d)
+		 << endl;
 	  }
 	    break;
-
-	  case 'I':
-	    cerr << " A >> ";
-	    cin >> A;
-	    B = A.inv();
-	    cout << "--- A ---\n"	    << A
-		 << "--- A.inv() ---\n"	    << B
-		 << "--- A * A.inv() ---\n" << A * B << endl;
-	    break;
-
-	  case 'G':
-	    cerr << " A >> ";
-	    cin >> A;
-	    B = A.pinv();
-	    cout << "--- A ---\n"		<< A
-		 << "--- A.pinv(...) --\n"	<< B
-		 << "--- A * A.pinv(...) ---\n" << A * B
-		 << "--- A.pinv(...) * A ---\n" << B * A << endl;
-	    break;
-
-	  case 'A':
-	    cerr << " A >> ";
-	    cin >> A;
-	    B = A.adj();
-	    cout << "--- A ---\n"	    << A
-		 << "--- A.adj() ---\n"	    << B
-		 << "--- A * A.adj() ---\n" << A * B << endl;
-	    break;
-
-	  case 'E':
-	    cerr << " A >> ";
-	    cin >> A;
-	    B = A.eigen(u, true);
-	    cout << "--- A ---\n"	   << A
-		 << "--- Ut * U ---\n"	   << B * B.trns()
-		 << "--- Ut * A * U ---\n" << B * A * B.trns()
-		 << "  Eigen-values = "	   << u << endl;
-	    break;
-
-	  case 'S':
-	  {
-	    cerr << " A >> ";
-	    cin >> A;
-	    SVDecomposition<double> svd(A);
-	    cout << "--- A ---\n"	   << A
-		 << "--- Ut * U ---\n"	   << svd.Ut() * svd.Ut().trns()
-		 << "--- Vt * V ---\n"	   << svd.Vt() * svd.Vt().trns()
-		 << "--- Vt * A * U ---\n" << svd.Vt() * A * svd.Ut().trns()
-		 << "  Singular-values = " << svd.diagonal() << endl;
-	  }
-	    break;
-
-	  /*	  case 'C':
-	    cerr << " A >> ";
-	    cin >> A;
-	    F = A;
-	    cout << "--- A ---\n" << A
-		 << "--- F ---\n" << F << endl;
-		 break;*/
 
 	  case 'P':
 	  {
@@ -144,46 +88,52 @@ main()
 	    cerr << " i >> ";
 	    int i;
 	    cin >> i;
-	    cerr << " j >> ";
-	    int j;
-	    cin >> j;
 	    cerr << " r >> ";
 	    int r;
 	    cin >> r;
+	    cerr << " j >> ";
+	    int j;
+	    cin >> j;
 	    cerr << " c >> ";
 	    int c;
 	    cin >> c;
 	    cout << "--- A ---\n" << A
-		 << "--- A(" << i << ", " << j
-		 << ", " << r << ", " << c << ") ---\n"
-		 << A(i, j, r, c) << endl;
+		 << "--- A(" << i << ", " << r
+		 << ", " << j << ", " << c << ") ---\n"
+		 << A(i, r, j, c)
+		 << endl;
 	  }
 	    break;  
 	    
-	  case 'T':
-	  {
+	  case 'I':
 	    cerr << " A >> ";
 	    cin >> A;
-	    TriDiagonal<double> tri(A);
-	    cout << "--- A ---\n"	   << A
-		 << "--- Ut * U ---\n"	   << tri.Ut() * tri.Ut().trns()
-		 << "--- Ut * A * U ---\n" << tri.Ut() * A * tri.Ut().trns()
-		 << "  Diagonal     = "	   << tri.diagonal()
-		 << "  Off-diagonal = "	   << tri.off_diagonal() << endl;
-	  }
+	    B = inverse(A);
+	    cout << "--- A ---\n"	       << A
+		 << "--- inverse(A) ---\n"     << B
+		 << "--- A * inverse(A) ---\n" << A * B
+		 << endl;
 	    break;
-	    
-	  case 'B':
-	  {
+
+	  case 'A':
 	    cerr << " A >> ";
 	    cin >> A;
-	    BiDiagonal<double> bi(A);
-	    cout << "--- A ---\n"	   << A
-		 << "--- Ut * U ---\n"	   << bi.Ut() * bi.Ut().trns()
-		 << "--- Vt * V ---\n"	   << bi.Vt() * bi.Vt().trns()
-		 << "--- Vt * A * U ---\n" << bi.Vt() * A * bi.Ut().trns()
-		 << "  Diagonal     = "	   << bi.diagonal()
-		 << "  Off-diagonal = "	   << bi.off_diagonal() << endl;
+	    B = adjoint(A);
+	    cout << "--- A ---\n"	       << A
+		 << "--- adjoint(A) ---\n"     << B
+		 << "--- A * adjoint(A) ---\n" << A * B
+		 << endl;
+	    break;
+
+	  case 'L':
+	  {
+	      cerr << " A >> ";
+	      cin >> A;
+	      B = cholesky(A);
+	      cout << "--- A ---\n"	 << A
+		   << "--- Lt ---\n"	 << B
+		   << "--- L * Lt ---\n" << transpose(B) * B
+		   << endl;
 	  }
 	    break;
 
@@ -193,22 +143,87 @@ main()
 	      cin >> A;
 	      QRDecomposition<double> qr(A);
 	      cout << "--- A ---\n"	 << A
-		   << "--- Qt * Q ---\n" << qr.Qt() * qr.Qt().trns()
+		   << "--- Qt * Q ---\n" << qr.Qt() * transpose(qr.Qt())
 		   << "--- Rt ---\n"	 << qr.Rt()
-		   << "--- Rt * Qt ---\n" << qr.Rt() * qr.Qt() << endl;
+		   << "--- Rt * Qt ---\n" << qr.Rt() * qr.Qt()
+		   << endl;
 	  }
 	    break;
 
-	  case 'L':
+	  case 'T':
 	  {
-	      cerr << " A >> ";
-	      cin >> A;
-	      B = A.cholesky();
-	      cout << "--- A ---\n"	 << A
-		   << "--- Lt ---\n"	 << B
-		   << "--- L * Lt ---\n" << B.trns() * B << endl;
+	    cerr << " A >> ";
+	    cin >> A;
+	    TriDiagonal<double> tri(A);
+	    cout << "--- A ---\n"	   << A
+		 << "--- Ut * U ---\n"	   << (tri.Ut() *
+						       transpose(tri.Ut()))
+		 << "--- Ut * A * U ---\n" << (tri.Ut() * A *
+						       transpose(tri.Ut()))
+		 << "  Diagonal     = "	   << tri.diagonal()
+		 << "  Off-diagonal = "	   << tri.off_diagonal()
+		 << endl;
 	  }
 	    break;
+
+	  case 'E':
+	    cerr << " A >> ";
+	    cin >> A;
+	    B = eigen(A, u, true);
+	    cout << "--- A ---\n"	   << A
+		 << "--- Ut * U ---\n"	   << B * transpose(B)
+		 << "--- Ut * A * U ---\n" << B * A * transpose(B)
+		 << "  Eigen-values = "	   << u
+		 << endl;
+	    break;
+
+	  case 'B':
+	  {
+	    cerr << " A >> ";
+	    cin >> A;
+	    BiDiagonal<double> bi(A);
+	    cout << "--- A ---\n"	   << A
+		 << "--- Ut * U ---\n"	   << bi.Ut() * transpose(bi.Ut())
+		 << "--- Vt * V ---\n"	   << bi.Vt() * transpose(bi.Vt())
+		 << "--- Vt * A * U ---\n" << bi.Vt() * A * transpose(bi.Ut())
+		 << "  Diagonal     = "	   << bi.diagonal()
+		 << "  Off-diagonal = "	   << bi.off_diagonal()
+		 << endl;
+	  }
+	    break;
+
+	  case 'S':
+	  {
+	    cerr << " A >> ";
+	    cin >> A;
+	    SVDecomposition<double> svd(A);
+	    cout << "--- A ---\n"	   << A
+		 << "--- Ut * U ---\n"	   << svd.Ut() * transpose(svd.Ut())
+		 << "--- Vt * V ---\n"	   << svd.Vt() * transpose(svd.Vt())
+		 << "--- Vt * A * U ---\n" << svd.Vt() * A * transpose(svd.Ut())
+		 << "  Singular-values = " << svd.diagonal()
+		 << endl;
+	  }
+	    break;
+
+	  case 'G':
+	    cerr << " A >> ";
+	    cin >> A;
+	    B = pseudo_inverse(A);
+	    cout << "--- A ---\n"		      << A
+		 << "--- pseudo_inverse(A) --\n"      << B
+		 << "--- A * pseudo_inverse(A) ---\n" << A * B
+		 << "--- pseudo_inverse(A) * A ---\n" << B * A
+		 << endl;
+	    break;
+
+	  /*	  case 'C':
+	    cerr << " A >> ";
+	    cin >> A;
+	    F = A;
+	    cout << "--- A ---\n" << A
+		 << "--- F ---\n" << F << endl;
+		 break;*/
 	}
 	}
 	catch (std::exception& err)

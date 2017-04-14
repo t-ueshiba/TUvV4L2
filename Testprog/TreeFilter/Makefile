@@ -12,7 +12,7 @@ VPATH		=
 IDLS		=
 MOCHDRS		=
 
-INCDIRS		= -I../.. -I$(PREFIX)/include
+INCDIRS		= -I../..
 CPPFLAGS	= -DNDEBUG -DPRINT
 CFLAGS		= -O
 NVCCFLAGS	= -g
@@ -42,9 +42,9 @@ SUFFIX		= .cc:sC .cpp:sC .cu:sC
 EXTHDRS		= ../../TU/Array++.h \
 		../../TU/Profiler.h \
 		../../TU/TreeFilter.h \
-		../../TU/functional.h \
+		../../TU/algorithm.h \
 		../../TU/iterator.h \
-		../../TU/pair.h \
+		../../TU/range.h \
 		../../TU/tuple.h \
 		../../TU/types.h
 HDRS		=
@@ -57,6 +57,6 @@ OBJS		= main.o
 #include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
-main.o: ../../TU/Array++.h ../../TU/iterator.h ../../TU/tuple.h \
-	../../TU/functional.h ../../TU/pair.h ../../TU/TreeFilter.h \
+main.o: ../../TU/Array++.h ../../TU/range.h ../../TU/algorithm.h \
+	../../TU/tuple.h ../../TU/iterator.h ../../TU/TreeFilter.h \
 	../../TU/Profiler.h ../../TU/types.h

@@ -12,7 +12,7 @@ VPATH		=
 IDLS		=
 MOCHDRS		=
 
-INCDIRS		= -I../.. -I$(PREFIX)/include
+INCDIRS		= -I../..
 CPPFLAGS	= -DNDEBUG
 CFLAGS		= -g
 NVCCFLAGS	= -g
@@ -24,10 +24,6 @@ endif
 CCFLAGS		= $(CFLAGS)
 
 LIBS		=
-ifneq ($(findstring darwin,$(OSTYPE)),)
-  LIBS	       += -framework IOKit -framework CoreFoundation \
-		  -framework CoreServices
-endif
 
 LINKER		= $(CXX)
 
@@ -42,9 +38,9 @@ SUFFIX		= .cc:sC .cpp:sC .cu:sC
 EXTHDRS		= ../../TU/Array++.h \
 		../../TU/BoxFilter.h \
 		../../TU/Filter2.h \
-		../../TU/functional.h \
+		../../TU/algorithm.h \
 		../../TU/iterator.h \
-		../../TU/pair.h \
+		../../TU/range.h \
 		../../TU/tuple.h
 HDRS		=
 SRCS		= main.cc
@@ -57,5 +53,5 @@ OBJS		= main.o
 include $(PROJECT)/lib/common.mk
 ###
 main.o: ../../TU/BoxFilter.h ../../TU/Filter2.h ../../TU/iterator.h \
-	../../TU/tuple.h ../../TU/functional.h ../../TU/pair.h \
-	../../TU/Array++.h
+	../../TU/Array++.h ../../TU/range.h ../../TU/algorithm.h \
+	../../TU/tuple.h

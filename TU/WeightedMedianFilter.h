@@ -25,8 +25,8 @@ template <class S, class T>
 class ExpDiff
 {
   public:
-    typedef S	argument_type;
-    typedef T	result_type;
+    using argument_type	= S;
+    using result_type	= T;
 
   public:
 		ExpDiff(T sigma=1) :_nsigma(-sigma)	{}
@@ -64,8 +64,8 @@ template <class W>
 class WeightedMedianFilterBase
 {
   public:
-    typedef typename W::result_type	weight_type;
-    typedef Array<weight_type>		warray_type;
+    using weight_type	= typename W::result_type;
+    using warray_type	= Array<weight_type>;
     
   protected:
     class Bin : public boost::intrusive::list_base_hook<>
@@ -148,7 +148,7 @@ class WeightedMedianFilterBase
 	mutable weight_type		_weighted_sum;	// cache
     };
 
-    class HistogramArray : public Array2<Histogram>
+    class HistogramArray : public Array<Histogram>
     {
       public:
 		HistogramArray()	:_median(0)	{}
@@ -156,7 +156,9 @@ class WeightedMedianFilterBase
 	
 	void	resize(size_t nbinsI, size_t nbinsG)
 		{
-		    Array2<Histogram>::resize(nbinsI, nbinsG);
+		    Array<Histogram>::resize(nbinsI);
+		    for (auto& h : *this)
+			h.resize(nbinsG);
 		    clear();
 		}
 	void	add(size_t idxI, size_t idxG)
@@ -239,8 +241,8 @@ class WeightedMedianFilterBase
     
   protected:
     template <class T>
-    void		setWeights(const QuantizerBase<T>& quantizer)	;
-    const warray_type&	weights(size_t i)	const	{ return _weights[i]; }
+    void	setWeights(const QuantizerBase<T>& quantizer)		;
+    auto	weights(size_t i)	const	{ return _weights[i]; }
     
   private:
     const W&		_wfunc;
@@ -248,7 +250,7 @@ class WeightedMedianFilterBase
     size_t		_nbinsI;
     size_t		_nbinsG;
     bool		_initialized;
-    Array2<warray_type>	_weights;	// weight function
+    Array2<weight_type>	_weights;	// weight function
 };
 
 template <class W> inline
@@ -284,10 +286,10 @@ template <class T, class W>
 class WeightedMedianFilter : public detail::WeightedMedianFilterBase<W>
 {
   private:
-    typedef T					value_type;
-    typedef typename W::argument_type		guide_type;
-    typedef detail::WeightedMedianFilterBase<W>	super;
-    typedef typename super::HistogramArray	HistogramArray;
+    using value_type		= T;
+    using guide_type		= typename W::argument_type;
+    using super			= detail::WeightedMedianFilterBase<W>;
+    using HistogramArray	= typename super::HistogramArray;
 
   public:
     WeightedMedianFilter(const W& wfunc=W(), size_t winSize=3,
@@ -353,11 +355,11 @@ class WeightedMedianFilter2 : public detail::WeightedMedianFilterBase<W>,
 			      public Profiler<CLOCK>
 {
   private:
-    typedef T					value_type;
-    typedef typename W::argument_type		guide_type;
-    typedef detail::WeightedMedianFilterBase<W>	super;
-    typedef Profiler<CLOCK>			pf_type;
-    typedef typename super::HistogramArray	HistogramArray;
+    using value_type		= T;
+    using guide_type		= typename W::argument_type;
+    using super			= detail::WeightedMedianFilterBase<W>;
+    using pf_type		= Profiler<CLOCK>;
+    using HistogramArray	= typename super::HistogramArray;
 #if defined(USE_TBB)
     template <class ROW_I, class ROW_G, class ROW_O>
     class Filter
@@ -391,25 +393,23 @@ class WeightedMedianFilter2 : public detail::WeightedMedianFilterBase<W>,
   // counting_iterator に対しては使えないので，独自に定義
     template <class ITER>
     class reverse_iterator
-	: public boost::iterator_adaptor<
-		     reverse_iterator<ITER>,
-		     ITER,
-		     boost::use_default,
-		     boost::use_default,
-		     typename std::iterator_traits<ITER>::value_type>
+	: public boost::iterator_adaptor<reverse_iterator<ITER>,
+					 ITER,
+					 boost::use_default,
+					 boost::use_default,
+					 iterator_value<ITER> >
     {
       private:
-	typedef boost::iterator_adaptor<
-		    reverse_iterator,
-		    ITER,
-		    boost::use_default,
-		    boost::use_default,
-		    typename std::iterator_traits<ITER>::value_type>	super;
+	typedef boost::iterator_adaptor<reverse_iterator,
+					ITER,
+					boost::use_default,
+					boost::use_default,
+					iterator_value<ITER> >	super;
 
       public:
-	typedef typename super::reference	reference;
-	typedef typename super::difference_type	difference_type;
-	friend class				boost::iterator_core_access;
+	using		typename super::reference;
+	using		typename super::difference_type;
+	friend class	boost::iterator_core_access;
 
       public:
 	reverse_iterator(const ITER& iter)	:super(iter)	{}
@@ -499,8 +499,8 @@ template <class ROW_I, class ROW_G, class ROW_O> void
 WeightedMedianFilter2<T, W, CLOCK>::filter(ROW_I rowI, ROW_I rowIe,
 					ROW_G rowG, ROW_O rowO) const
 {
-    typedef boost::counting_iterator<size_t>	col_iterator;
-    typedef reverse_iterator<col_iterator>	rcol_iterator;
+    using col_iterator	= boost::counting_iterator<size_t>;
+    using rcol_iterator	= reverse_iterator<col_iterator>;
 
     pf_type::start(2);
     auto		endI = rowI;

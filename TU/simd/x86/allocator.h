@@ -19,15 +19,7 @@ template <class T>
 class allocator
 {
   public:
-    typedef T		value_type;
-    typedef T*		pointer;
-    typedef const T*	const_pointer;
-    typedef T&		reference;
-    typedef const T&	const_reference;
-    typedef size_t	size_type;
-    typedef ptrdiff_t	difference_type;
-
-    template <class T_>	struct rebind	{ typedef allocator<T_>	other; };
+    using value_type	= T;
 
     template <class T_>
     struct align
@@ -39,47 +31,32 @@ class allocator
     {
 	constexpr static size_t	value = sizeof(vec<T_>);
     };
+    template <class... T_>
+    struct align<std::tuple<vec<T_>...> >
+    {
+	constexpr static size_t	value = sizeof(vec<std::common_type_t<T_...> >);
+    };
     
   public:
-			allocator()				{}
-    template <class U>	allocator(const allocator<U>&)		{}
+		allocator()						{}
 
-    static pointer	allocate(size_type n,
-				 typename std::allocator<void>
-					     ::const_pointer=nullptr)
-			{
-			    if (n == 0)
-				return nullptr;
+    static T*	allocate(std::size_t n)
+		{
+		    if (n == 0)
+			return nullptr;
 			    
-			    pointer	p = static_cast<pointer>(
-						_mm_malloc(sizeof(value_type)*n,
-							   align<T>::value));
-			    if (p == nullptr)
-				throw std::bad_alloc();
-			    return p;
-			}
-    static void		deallocate(pointer p, size_type)
-			{
-			    if (p != nullptr)
-				_mm_free(p);
-			}
-    static void		construct(pointer p, const_reference val)
-			{
-			    new(p) value_type(val);
-			}
-    static void		destroy(pointer p)
-			{
-			    p->~value_type();
-			}
-    constexpr
-    static size_type	max_size()
-			{
-			    return std::numeric_limits<size_type>::max()
-				 / sizeof(value_type);
-			}
-    static pointer	address(reference r)			{ return &r; }
-    static const_pointer
-			address(const_reference r)		{ return &r; }
+		    auto	p = static_cast<T*>(
+					_mm_malloc(sizeof(value_type)*n,
+						   align<T>::value));
+		    if (p == nullptr)
+			throw std::bad_alloc();
+		    return p;
+		}
+    static void	deallocate(T* p, std::size_t)
+		{
+		    if (p != nullptr)
+			_mm_free(p);
+		}
 };
     
 }	// namespace simd

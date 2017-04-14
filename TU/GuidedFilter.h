@@ -1,32 +1,3 @@
-/*
- *  平成14-24年（独）産業技術総合研究所 著作権所有
- *  
- *  創作者：植芝俊夫
- *
- *  本プログラムは（独）産業技術総合研究所の職員である植芝俊夫が創作し，
- *  （独）産業技術総合研究所が著作権を所有する秘密情報です．著作権所有
- *  者による許可なしに本プログラムを使用，複製，改変，第三者へ開示する
- *  等の行為を禁止します．
- *  
- *  このプログラムによって生じるいかなる損害に対しても，著作権所有者お
- *  よび創作者は責任を負いません。
- *
- *  Copyright 2002-2012.
- *  National Institute of Advanced Industrial Science and Technology (AIST)
- *
- *  Creator: Toshio UESHIBA
- *
- *  [AIST Confidential and all rights reserved.]
- *  This program is confidential. Any using, copying, changing or
- *  giving any information concerning with this program to others
- *  without permission by the copyright holder are strictly prohibited.
- *
- *  [No Warranty.]
- *  The copyright holder or the creator are not responsible for any
- *  damages caused by using this program.
- *  
- *  $Id$
- */
 /*!
   \file		GuidedFilter.h
   \brief	guided filterに関するクラスの定義と実装
@@ -46,145 +17,92 @@ template <class T>
 class GuidedFilter : public BoxFilter
 {
   public:
-    typedef T				value_type;
-    typedef element_t<value_type>	guide_type;
+    using value_type	= T;
+    using guide_type	= element_t<value_type>;
+    using Params4	= std::tuple<value_type, guide_type,
+				     value_type, guide_type>;
+    using Params2	= std::tuple<value_type, value_type>;
+    using Coeffs	= std::tuple<value_type, value_type>;
     
-    class Params : public boost::tuple<value_type, guide_type,
-				       value_type, guide_type>
+    struct init_params
     {
-      private:
-	typedef boost::tuple<value_type, guide_type,
-			     value_type, guide_type>	super;
-	
-      public:
-	typedef boost::tuple<value_type, value_type>	result_type;
-	
-	struct Init
-	{
-	    typedef Params	result_type;
-	    
-	    template <class TUPLE_>
-	    result_type	operator ()(const TUPLE_& t) const
-			{
-			    return Params(boost::get<0>(t), boost::get<1>(t));
-			}
-	};
-	
-      public:
-	Params(const value_type& p=value_type(), guide_type g=0)
-	    :super(p, g, p*g, g*g)				{}
-    
-	result_type	coeffs(size_t n, guide_type sq_e) const
-			{
-			    using 	boost::get;
-
-			    const auto&	a = (n*get<2>(*this)
-					     - get<0>(*this)*get<1>(*this))
-					  / (n*(get<3>(*this) + n*sq_e)
-					     -  get<1>(*this)*get<1>(*this));
-			    const auto&	b = (get<0>(*this) - a*get<1>(*this))/n;
-
-			    return result_type(a, b);
-			}
-    };
-    
-    class SimpleParams : public boost::tuple<value_type, value_type>
-    {
-      private:
-	typedef boost::tuple<value_type, value_type>	super;
-	
-      public:
-	typedef boost::tuple<value_type, value_type>	result_type;
-	
-	struct Init
-	{
-	    typedef SimpleParams	result_type;
-	    
-	    template <class IN_>
-	    result_type	operator ()(const IN_& p) const
-			{
-			    return result_type(p);
-			}
-	};
-	
-      public:
-	SimpleParams(const value_type& p=value_type()) :super(p, p*p)	{}
-
-	result_type	coeffs(size_t n, guide_type sq_e) const
-			{
-			    using 	boost::get;
-			    
-			    auto	var = n*get<1>(*this)
-					    - get<0>(*this)*get<0>(*this);
-			    auto	a = var/(var + n*n*sq_e);
-			    auto	b = (get<0>(*this) - a*get<0>(*this))/n;
-			    
-			    return result_type(a, b);
-			}
+	template <class IN_, class GUIDE_>
+	auto	operator ()(std::tuple<IN_, GUIDE_> t) const
+		{
+		    using	std::get;
+		    
+		    return Params4(get<0>(t),		get<1>(t),
+				   get<0>(t)*get<1>(t), get<1>(t)*get<1>(t));
+		}
+	template <class IN_>
+	auto	operator ()(IN_ p) const
+		{
+		    return Params2(p, p*p);
+		}
     };
 
-    class Coeff : public boost::tuple<value_type, value_type>
+    class init_coeffs
     {
       public:
-	typedef boost::tuple<value_type, value_type>	super;
+	init_coeffs(size_t n, guide_type e)	:_n(n), _sq_e(e*e)	{}
 	
-	template <class PARAMS_>
-	class Init
-	{
-	  public:
-	    typedef PARAMS_	argument_type;
-	    typedef Coeff	result_type;
+	auto	operator ()(const Params4& params) const
+		{
+		    using 	std::get;
 
-	  public:
-	    Init(size_t n, guide_type e)	:_n(n), _sq_e(e*e)	{}
-
-	    result_type	operator ()(const argument_type& params) const
-			{
-			    return result_type(params.coeffs(_n, _sq_e));
-			}
-
-	  private:
-	    const size_t	_n;
-	    const guide_type	_sq_e;
-	};
-
-	class Trans
-	{
-	  public:
-	    typedef Coeff	second_argument_type;
-	    typedef void	result_type;
+		    const auto	a = (_n*get<2>(params) -
+				     get<0>(params)*get<1>(params))
+				  / (_n*(get<3>(params) + _n*_sq_e) -
+				     get<1>(params)*get<1>(params));
+		    return Coeffs(a, (get<0>(params) - a*get<1>(params))/_n);
+		}
+	auto	operator ()(const Params2& params) const
+		{
+		    using	std::get;
+		    
+		    const auto	var = _n*get<1>(params)
+				    - get<0>(params)*get<0>(params);
+		    const auto	a   = var/(var + _n*_n*_sq_e);
+		    return Coeffs(a, (get<0>(params) - a*get<0>(params))/_n);
+		}
 	
-	  public:
-	    Trans(size_t n)	:_n(n)					{}
+      private:
+	const size_t		_n;
+	const guide_type	_sq_e;
+    };
 
-	    template <class TUPLE_>
-	    result_type	operator ()(TUPLE_&& t, const Coeff& coeffs) const
-			{
-			    boost::get<1>(t)
-				= coeffs.trans(boost::get<0>(t), _n);
-			}
-	
-	  private:
-	    const size_t	_n;
-	};
-
+    class trans_guides
+    {
       public:
-	Coeff()								{}
-	Coeff(const super& initial_coeffs)	:super(initial_coeffs)	{}
-    
-	template <class GUIDE_>
-	value_type	trans(const GUIDE_& g, size_t n) const
-			{
-			    return (boost::get<0>(*this)*g +
-				    boost::get<1>(*this))/n;
-			}
+	trans_guides(size_t n)	:_n(n)					{}
+
+	template <class GUIDE_, class OUT_>
+	void	operator ()(std::tuple<GUIDE_, OUT_> t,
+			    const Coeffs& coeffs) const
+		{
+		    using	std::get;
+		    
+		    get<1>(t) = (get<0>(coeffs)*get<0>(t) + get<1>(coeffs))/_n;
+		}
+	template <class IN_, class GUIDE_, class OUT_>
+	void	operator ()(std::tuple<std::tuple<IN_, GUIDE_>, OUT_> t,
+			    const Coeffs& coeffs) const
+		{
+		    using	std::get;
+		    
+		    get<1>(t) = (get<0>(coeffs)*get<1>(get<0>(t)) +
+				 get<1>(coeffs))/_n;
+		}
+	
+      private:
+	const size_t	_n;
     };
     
   private:
-    typedef BoxFilter	super;
+    using super	= BoxFilter;
 
   public:
-    GuidedFilter(size_t w, guide_type e) :super(w), _e(e)	{}
+    GuidedFilter(size_t w, guide_type e) :super(w), _e(e)		{}
 
     guide_type	epsilon()		const	{return _e;}
     GuidedFilter&
@@ -192,9 +110,9 @@ class GuidedFilter : public BoxFilter
     
     template <class IN, class GUIDE, class OUT>
     void	convolve(IN ib, IN ie,
-			 GUIDE gb, GUIDE ge, OUT out)	const	;
+			 GUIDE gb, GUIDE ge, OUT out)		const	;
     template <class IN, class OUT>
-    void	convolve(IN ib, IN ie, OUT out)		const	;
+    void	convolve(IN ib, IN ie, OUT out)			const	;
 
     size_t	outLength(size_t inLen) const
 		{
@@ -216,28 +134,23 @@ class GuidedFilter : public BoxFilter
 template <class T> template <class IN, class GUIDE, class OUT> void
 GuidedFilter<T>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out) const
 {
-    typedef Array<Coeff>				carray_type;
-    typedef typename Params::Init			params_init;
-    typedef typename Coeff::template Init<Params>	coeff_init;
-    typedef typename Coeff::Trans			coeff_trans;
-    
   // guided filterの2次元係数ベクトルを計算する．
-    carray_type	c(super::outLength(std::distance(ib, ie)));
+    Array<Coeffs>	c(super::outLength(std::distance(ib, ie)));
     super::convolve(boost::make_transform_iterator(
-			make_fast_zip_iterator(boost::make_tuple(ib, gb)),
-			params_init()),
+			make_zip_iterator(std::make_tuple(ib, gb)),
+			init_params()),
 		    boost::make_transform_iterator(
-			make_fast_zip_iterator(boost::make_tuple(ie, ge)),
-			params_init()),
+			make_zip_iterator(std::make_tuple(ie, ge)),
+			init_params()),
 		    make_assignment_iterator(c.begin(),
-					     coeff_init(winSize(), _e)));
+					     init_coeffs(winSize(), _e)));
     
   // 係数ベクトルの平均値を求め，それによってガイドデータ列を線型変換する．
     std::advance(gb, winSize() - 1);
     super::convolve(c.begin(), c.end(),
-		    make_assignment2_iterator(
-			make_fast_zip_iterator(boost::make_tuple(gb, out)),
-			coeff_trans(winSize())));
+		    make_assignment_iterator(
+			make_zip_iterator(std::make_tuple(gb, out)),
+			trans_guides(winSize())));
 }
 
 //! 1次元入力データ列にguided filterを適用する
@@ -252,24 +165,19 @@ GuidedFilter<T>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out) const
 template <class T> template <class IN, class OUT> void
 GuidedFilter<T>::convolve(IN ib, IN ie, OUT out) const
 {
-    typedef Array<Coeff>				carray_type;
-    typedef typename SimpleParams::Init			params_init;
-    typedef typename Coeff::template Init<SimpleParams>	coeff_init;
-    typedef typename Coeff::Trans			coeff_trans;
-
   // guided filterの2次元係数ベクトルを計算する．
-    carray_type	c(super::outLength(std::distance(ib, ie)));
-    super::convolve(boost::make_transform_iterator(ib, params_init()),
-		    boost::make_transform_iterator(ie, params_init()),
+    Array<Coeffs>	c(super::outLength(std::distance(ib, ie)));
+    super::convolve(boost::make_transform_iterator(ib, init_params()),
+		    boost::make_transform_iterator(ie, init_params()),
 		    make_assignment_iterator(c.begin(),
-					     coeff_init(winSize(), _e)));
-    
+					     init_coeffs(winSize(), _e)));
+
   // 係数ベクトルの平均値を求め，それによって入力データ列を線型変換する．
     std::advance(ib, winSize() - 1);
     super::convolve(c.begin(), c.end(),
-		    make_assignment2_iterator(
-			make_fast_zip_iterator(boost::make_tuple(ib, out)),
-			coeff_trans(winSize())));
+		    make_assignment_iterator(
+			make_zip_iterator(std::make_tuple(ib, out)),
+			trans_guides(winSize())));
 }
 
 /************************************************************************
@@ -280,14 +188,15 @@ template <class T>
 class GuidedFilter2 : private BoxFilter2
 {
   public:
-    typedef T							value_type;
-    typedef element_t<value_type>				guide_type;
-    typedef typename GuidedFilter<value_type>::Params		Params;
-    typedef typename GuidedFilter<value_type>::SimpleParams	SimpleParams;
-    typedef typename GuidedFilter<value_type>::Coeff		Coeff;
+    using value_type	= T;
+    using guide_type	= element_t<value_type>;
+    using Coeffs	= typename GuidedFilter<value_type>::Coeffs;
+    using init_params	= typename GuidedFilter<value_type>::init_params;
+    using init_coeffs	= typename GuidedFilter<value_type>::init_coeffs;
+    using trans_guides	= typename GuidedFilter<value_type>::trans_guides;
     
   private:
-    typedef BoxFilter2						super;
+    using super		= BoxFilter2;
 
   public:
     GuidedFilter2(size_t wrow, size_t wcol, guide_type e)
@@ -325,37 +234,40 @@ class GuidedFilter2 : private BoxFilter2
 template <class T> template <class IN, class GUIDE, class OUT> void
 GuidedFilter2<T>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out) const
 {
-    typedef Array2<Array<Coeff> >			carray2_type;
-    typedef typename Params::Init			params_init;
-    typedef typename Coeff::template Init<Params>	coeff_init;
-    typedef typename Coeff::Trans			coeff_trans;
-
     if (ib == ie)
 	return;
     
     const auto		n = rowWinSize() * colWinSize();
-    carray2_type	c(super::outRowLength(std::distance(ib, ie)),
+    Array2<Coeffs>	c(super::outRowLength(std::distance(ib, ie)),
 			  super::outColLength(std::distance(std::begin(*ib),
 							    std::end(*ib))));
 
   // guided filterの2次元係数ベクトルを計算する．
-    super::convolve(make_row_transform_iterator(
-			make_fast_zip_iterator(boost::make_tuple(ib, gb)),
-			params_init()),
-		    make_row_transform_iterator(
-			make_fast_zip_iterator(boost::make_tuple(ie, ge)),
-			params_init()),
-		    make_row_uniarg_iterator<assignment_iterator>(
-			c.begin(), coeff_init(n, _e)));
+    super::convolve(make_range_iterator(
+			boost::make_transform_iterator(
+			    std::begin(std::make_tuple(*ib, *gb)),
+			    init_params()),
+			ib.stride(), ib.size()),
+		    make_range_iterator(
+			boost::make_transform_iterator(
+			    std::begin(std::make_tuple(*ie, *ge)),
+			    init_params()),
+			ie.stride(), ie.size()),
+		    make_range_iterator(
+			make_assignment_iterator(c.begin()->begin(),
+						 init_coeffs(n, _e)),
+			c.begin().stride(), c.begin().size()));
 
   // 係数ベクトルの平均値を求め，それによってガイドデータ列を線型変換する．
     std::advance(gb,  rowWinSize() - 1);
     std::advance(out, rowWinSize() - 1);
     super::convolve(c.begin(), c.end(),
-		    make_row_uniarg_iterator<assignment2_iterator>(
-			colWinSize() - 1, 0,
-			make_fast_zip_iterator(boost::make_tuple(gb, out)),
-			coeff_trans(n)));
+		    make_range_iterator(
+			make_assignment_iterator(
+			    std::begin(std::make_tuple(*gb, *out))
+			    + colWinSize() - 1,
+			    trans_guides(n)),
+			out.stride(), out.size()));
 }
 
 //! 2次元入力データにguided filterを適用する
@@ -368,35 +280,38 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out) const
 template <class T> template <class IN, class OUT> void
 GuidedFilter2<T>::convolve(IN ib, IN ie, OUT out) const
 {
-    typedef Array2<Array<Coeff> >			carray2_type;
-    typedef typename SimpleParams::Init			params_init;
-    typedef typename Coeff::template Init<SimpleParams>	coeff_init;
-    typedef typename Coeff::Trans			coeff_trans;
-
     if (ib == ie)
 	return;
     
     const auto		n = rowWinSize() * colWinSize();
-    carray2_type	c(super::outRowLength(std::distance(ib, ie)),
+    Array2<Coeffs>	c(super::outRowLength(std::distance(ib, ie)),
 			  super::outColLength(std::distance(std::begin(*ib),
 							    std::end(*ib))));
 
   // guided filterの2次元係数ベクトルを計算する．
-    super::convolve(make_row_transform_iterator(ib, params_init()),
-		    make_row_transform_iterator(ie, params_init()),
-		    make_row_uniarg_iterator<assignment_iterator>(
-			c.begin(), coeff_init(n, _e)));
+    super::convolve(make_range_iterator(
+			boost::make_transform_iterator(std::begin(*ib),
+						       init_params()),
+			ib.stride(), ib.size()),
+		    make_range_iterator(
+			boost::make_transform_iterator(std::begin(*ie),
+						       init_params()),
+			ie.stride(), ie.size()),
+		    make_range_iterator(
+			make_assignment_iterator(c.begin()->begin(),
+						 init_coeffs(n, _e)),
+			c.begin().stride(), c.begin().size()));
 
-    std::cout << "--- c ---\n" << c;
-    
   // 係数ベクトルの平均値を求め，それによって入力データ列を線型変換する．
     std::advance(ib,  rowWinSize() - 1);
     std::advance(out, rowWinSize() - 1);
     super::convolve(c.begin(), c.end(),
-		    make_row_uniarg_iterator<assignment2_iterator>(
-			colWinSize() - 1, 0,
-			make_fast_zip_iterator(boost::make_tuple(ib, out)),
-			coeff_trans(n)));
+		    make_range_iterator(
+			make_assignment_iterator(
+			    std::begin(std::make_tuple(*ib, *out))
+			    + colWinSize() - 1,
+			    trans_guides(n)),
+			out.stride(), out.size()));
 }
 
 }

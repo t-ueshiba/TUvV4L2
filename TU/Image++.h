@@ -1,5 +1,5 @@
 /*
- *  $Id$
+ *  $Id: Image++.h 2268 2017-03-01 06:42:18Z ueshiba $
  */
 /*!
   \file		Image++.h
@@ -11,7 +11,8 @@
 #include <cstring>		// for memcpy()
 #include <boost/operators.hpp>
 #include "TU/types.h"
-#include "TU/Geometry++.h"
+#include "TU/pair.h"
+#include "TU/Vector++.h"
 
 namespace TU
 {
@@ -72,13 +73,13 @@ class ColorConverter
 		    return val >> 10;
 		}
     template <class T>
-    static typename std::enable_if<std::is_integral<T>::value, T>::type
+    static std::enable_if_t<std::is_integral<T>::value, T>
 		round(float val)
 		{
 		    return T(::round(val));
 		}
     template <class T>
-    static typename std::enable_if<std::is_floating_point<T>::value, T>::type
+    static std::enable_if_t<std::is_floating_point<T>::value, T>
 		round(float val)
 		{
 		    return T(val);
@@ -101,7 +102,7 @@ extern const ColorConverter	colorConverter;
 ************************************************************************/
 struct RGB
 {
-    typedef u_char	element_type;
+    using element_type = u_char;
     
     RGB(element_type rr, element_type gg, element_type bb)
 	:r(rr), g(gg), b(bb)						{}
@@ -111,7 +112,7 @@ struct RGB
 
 struct BGR
 {
-    typedef u_char	element_type;
+    using element_type = u_char;
     
     BGR(element_type rr, element_type gg, element_type bb)
 	:b(bb), g(gg), r(rr)						{}
@@ -121,7 +122,7 @@ struct BGR
 
 struct RGBA
 {
-    typedef u_char	element_type;
+    using element_type = u_char;
     
     RGBA(element_type rr, element_type gg, element_type bb,
 	 element_type aa=255)	:r(rr), g(gg), b(bb), a(aa)		{}
@@ -131,7 +132,7 @@ struct RGBA
 
 struct ABGR
 {
-    typedef u_char	element_type;
+    using element_type = u_char;
     
     ABGR(element_type rr, element_type gg, element_type bb,
 	 element_type aa=255)	:a(aa), b(bb), g(gg), r(rr)		{}
@@ -141,7 +142,7 @@ struct ABGR
 
 struct ARGB
 {
-    typedef u_char	element_type;
+    using element_type = u_char;
     
     ARGB(element_type rr, element_type gg, element_type bb,
 	 element_type aa=255)	:a(aa), r(rr), g(gg), b(bb)		{}
@@ -151,7 +152,7 @@ struct ARGB
 
 struct BGRA
 {
-    typedef u_char	element_type;
+    using element_type = u_char;
     
     BGRA(element_type rr, element_type gg, element_type bb,
 	 element_type aa=255)	:b(bb), g(gg), r(rr), a(aa)		{}
@@ -170,7 +171,7 @@ struct RGB_ : public E, boost::additive<RGB_<E>,
 			boost::multiplicative<RGB_<E>, float,
 			boost::equality_comparable<RGB_<E> > > >
 {
-    typedef typename E::element_type	element_type;
+    using	typename E::element_type;
     
     RGB_()				:E(0, 0, 0)			{}
     RGB_(element_type rr, element_type gg, element_type bb)
@@ -181,7 +182,9 @@ struct RGB_ : public E, boost::additive<RGB_<E>,
     RGB_(const RGB_<detail::BGR>& p)	:E(p.r, p.g, p.b)		{}
     template <class E_>
     RGB_(const RGB_<E_>& p)		:E(p.r, p.g, p.b, p.a)		{}
-    template <class T_>
+    template <class T_,
+	      std::enable_if_t<std::is_convertible<T_, element_type>::value>*
+	      = nullptr>
     RGB_(const T_& p)
 	:E(element_type(p), element_type(p), element_type(p))		{}
     RGB_(const YUV444& p)						;
@@ -191,8 +194,7 @@ struct RGB_ : public E, boost::additive<RGB_<E>,
     using	E::b;
 
     template <class T_,
-	      typename std::enable_if<std::is_arithmetic<T_>::value>::type*
-	      = nullptr>
+	      std::enable_if_t<std::is_arithmetic<T_>::value>* = nullptr>
 		operator T_() const
 		{
 		    return detail::colorConverter.y<T_>(r, g, b);
@@ -246,7 +248,7 @@ operator <<(std::ostream& out, const RGB_<E>& p)
 *  struct RGB								*
 ************************************************************************/
 //! Red, Green, Blue（各8bit）の順で並んだカラー画素
-typedef RGB_<detail::RGB>	RGB;
+using RGB = RGB_<detail::RGB>;
 
 template <> template <class E1> inline
 RGB_<detail::RGB>::RGB_(const RGB_<E1>& p) :detail::RGB(p.r, p.g, p.b)	{}
@@ -279,7 +281,7 @@ operator <<(std::ostream& out, const RGB& p)
 *  struct BGR								*
 ************************************************************************/
 //! Blue, Green, Red（各8bit）の順で並んだカラー画素
-typedef RGB_<detail::BGR>	BGR;
+using BGR = RGB_<detail::BGR>;
 
 template <> template <class E1> inline
 RGB_<detail::BGR>::RGB_(const RGB_<E1>& p) :detail::BGR(p.r, p.g, p.b)	{}
@@ -312,13 +314,13 @@ operator <<(std::ostream& out, const BGR& p)
 *  struct RGBA, ABGR, ARGB, BGRA					*
 ************************************************************************/
 //! Red, Green, Blue, Alpha（各8bit）の順で並んだカラー画素
-typedef RGB_<detail::RGBA>	RGBA;
+using RGBA = RGB_<detail::RGBA>;
 //! Alpha, Blue, Green, Red（各8bit）の順で並んだカラー画素
-typedef RGB_<detail::ABGR>	ABGR;
+using ABGR = RGB_<detail::ABGR>;
 //! Alpha, Red, Green, Blue（各8bit）の順で並んだカラー画素
-typedef RGB_<detail::ARGB>	ARGB;
+using ARGB = RGB_<detail::ARGB>;
 //! Blue, Green, Red, Alpha（各8bit）の順で並んだカラー画素
-typedef RGB_<detail::BGRA>	BGRA;
+using BGRA = RGB_<detail::BGRA>;
 
 /************************************************************************
 *  struct YUV444, YUV422, YUYV422, YUV411				*
@@ -326,23 +328,24 @@ typedef RGB_<detail::BGRA>	BGRA;
 //! U, Y, V（各8bit）の順で並んだカラー画素
 struct YUV444
 {
-    typedef u_char	element_type;
-    
+    using element_type = u_char;
+
     YUV444(element_type yy=0, element_type uu=128, element_type vv=128)
-	:u(uu), y(yy), v(vv)						{}
+		    :u(uu), y(yy), v(vv)				{}
     template <class E>
     YUV444(const RGB_<E>& p)
-	:y(detail::colorConverter.y<element_type>(p.r, p.g, p.b))
+		    :y(detail::colorConverter.y<element_type>(p.r, p.g, p.b))
 		{
 		    u = detail::colorConverter.u(p.b, y);
 		    v = detail::colorConverter.v(p.r, y);
 		}
-    template <class T>
+    template <class T,
+	      std::enable_if_t<std::is_convertible<T, element_type>::value>*
+	      = nullptr>
     YUV444(const T& p)	:u(128), y(p), v(128)				{}
     
     template <class T,
-	      typename std::enable_if<std::is_arithmetic<T>::value>::type*
-	      = nullptr>
+	      std::enable_if_t<std::is_arithmetic<T>::value>* = nullptr>
 		operator T()			const	{return T(y);}
     bool	operator ==(const YUV444& yuv)	const	{return (u == yuv.u &&
 								 y == yuv.y &&
@@ -383,14 +386,13 @@ struct YUYV422;
 //! [U, Y0], [V, Y1]（各8bit）の順で並んだカラー画素(16bits/pixel)
 struct YUV422
 {
-    typedef u_char	element_type;
+    using element_type = u_char;
 
     YUV422(element_type yy=0, element_type xx=128)	:x(xx), y(yy)	{}
     YUV422(const YUYV422& p)						;
 
     template <class T,
-	      typename std::enable_if<std::is_arithmetic<T>::value>::type*
-	      = nullptr>
+	      std::enable_if_t<std::is_arithmetic<T>::value>* = nullptr>
 		operator T()			const	{return T(y);}
     bool	operator ==(const YUV422& p)	const	{return (x == p.x &&
 								 y == p.y);}
@@ -419,14 +421,13 @@ operator <<(std::ostream& out, const YUV422& yuv)
 //! [Y0, U], [Y1, V]（各8bit）の順で並んだカラー画素(16bits/pixel)
 struct YUYV422
 {
-    typedef u_char	element_type;
+    using element_type = u_char;
 
     YUYV422(element_type yy=0, element_type xx=128)	:y(yy), x(xx)	{}
     YUYV422(const YUV422& p)				:y(p.y), x(p.x)	{}
 
     template <class T,
-	      typename std::enable_if<std::is_arithmetic<T>::value>::type*
-	      = nullptr>
+	      std::enable_if_t<std::is_arithmetic<T>::value>* = nullptr>
 		operator T()			const	{return T(y);}
     bool	operator ==(const YUYV422& p)	const	{return (y == p.y &&
 								 x == p.x);}
@@ -458,11 +459,12 @@ YUV422::YUV422(const YUYV422& p)  :x(p.x), y(p.y)	{}
 //! [U, Y0, Y1], [V, Y2, Y3]（各8bit）の順で並んだカラー画素(12bits/pixel)
 struct YUV411
 {
-    typedef u_char	element_type;
+    using element_type = u_char;
 
     YUV411(element_type yy0=0, element_type yy1=0, element_type xx=128)
 	:x(xx), y0(yy0), y1(yy1)					{}
-    template <class T>
+    template <class T,
+	      std::enable_if_t<std::is_arithmetic<T>::value>* = nullptr>
     YUV411(const T& p)	:x(128), y0(p), y1((&p)[1])			{}
 
     bool	operator ==(const YUV411& p)	const	{return (x  == p.x  &&
@@ -496,11 +498,10 @@ operator <<(std::ostream& out, const YUV411& yuv)
 ************************************************************************/
 namespace detail
 {
-  template <class ITER, class T=typename std::iterator_traits<ITER>::value_type>
+  template <class ITER, class T=iterator_value<ITER> >
   class pixel_proxy
   {
     public:
-      using self	= pixel_proxy;
       using value_type	= T;
 
       static constexpr size_t	npixels = 1;
@@ -509,7 +510,7 @@ namespace detail
       pixel_proxy(const ITER& iter)	:_iter(const_cast<ITER&>(iter))	{}
 
       template <class ITER_, class T_>
-      self&		operator =(const pixel_proxy<ITER_, T_>& proxy)
+      pixel_proxy&	operator =(const pixel_proxy<ITER_, T_>& proxy)
 			{
 			    using N = std::integral_constant<
 					  size_t,
@@ -557,7 +558,6 @@ namespace detail
   class pixel_proxy<ITER, YUV422>
   {
     public:
-      using self		= pixel_proxy;
       using value_type		= TU::pair_tree<YUV444, 2>;
       using element_type	= YUV422::element_type;
       
@@ -567,7 +567,7 @@ namespace detail
       pixel_proxy(const ITER& iter)	:_iter(const_cast<ITER&>(iter))	{}
 
       template <class ITER_, class T_>
-      self&		operator =(const pixel_proxy<ITER_, T_>& proxy)
+      pixel_proxy&	operator =(const pixel_proxy<ITER_, T_>& proxy)
 			{
 			    constexpr size_t
 				Np = pixel_proxy<ITER_, T_>::npixels;
@@ -598,8 +598,7 @@ namespace detail
 			}
 
     private:
-      template <class T_>
-      typename std::enable_if<!is_pair<T_>::value>::type
+      template <class T_> std::enable_if_t<!is_pair<T_>::value>
 			assign(const std::pair<T_, T_>& val)
 			{
 			    YUV444	val0(val.first);
@@ -607,8 +606,7 @@ namespace detail
 			    *(++_iter) = {element_type(val.second), val0.v};
 			    ++_iter;
 			}
-      template <class T_>
-      typename std::enable_if<is_pair<T_>::value>::type
+      template <class T_> std::enable_if_t<is_pair<T_>::value>
 			assign(const std::pair<T_, T_>& val)
 			{
 			    assign(val.first);
@@ -623,7 +621,6 @@ namespace detail
   class pixel_proxy<ITER, YUYV422>
   {
     public:
-      using self		= pixel_proxy;
       using value_type		= TU::pair_tree<YUV444, 2>;
       using element_type	= YUYV422::element_type;
       
@@ -633,7 +630,7 @@ namespace detail
       pixel_proxy(const ITER& iter)	:_iter(const_cast<ITER&>(iter))	{}
 
       template <class ITER_, class T_>
-      self&		operator =(const pixel_proxy<ITER_, T_>& proxy)
+      pixel_proxy&	operator =(const pixel_proxy<ITER_, T_>& proxy)
 			{
 			    constexpr size_t
 				Np = pixel_proxy<ITER_, T_>::npixels;
@@ -664,8 +661,7 @@ namespace detail
 			}
 
     private:
-      template <class T_>
-      typename std::enable_if<!is_pair<T_>::value>::type
+      template <class T_> std::enable_if_t<!is_pair<T_>::value>
 			assign(const std::pair<T_, T_>& val)
 			{
 			    YUV444	val0(val.first);
@@ -673,8 +669,7 @@ namespace detail
 			    *(++_iter) = {element_type(val.second), val0.v};
 			    ++_iter;
 			}
-      template <class T_>
-      typename std::enable_if<is_pair<T_>::value>::type
+      template <class T_> std::enable_if_t<is_pair<T_>::value>
 			assign(const std::pair<T_, T_>& val)
 			{
 			    assign(val.first);
@@ -689,7 +684,6 @@ namespace detail
   class pixel_proxy<ITER, YUV411>
   {
     public:
-      using self		= pixel_proxy;
       using value_type		= TU::pair_tree<YUV444, 4>;
       using element_type	= YUV411::element_type;
       
@@ -699,7 +693,7 @@ namespace detail
       pixel_proxy(const ITER& iter)	:_iter(const_cast<ITER&>(iter))	{}
 
       template <class ITER_, class T_>
-      self&		operator =(const pixel_proxy<ITER_, T_>& proxy)
+      pixel_proxy&	operator =(const pixel_proxy<ITER_, T_>& proxy)
 			{
 			    constexpr size_t
 				Np = pixel_proxy<ITER_, T_>::npixels;
@@ -953,8 +947,7 @@ bayerDecodeBorderRowGXYG(IN inX, IN inXe, IN inY, OUT out, C X, C Y)
 template <class IN, class OUT> OUT
 bayerDecodeRGGB(IN in, IN ie, OUT out)
 {
-    using	COLOR = typename std::iterator_traits<OUT>::value_type
-							  ::value_type;
+    using	COLOR = typename iterator_value<OUT>::value_type;
 
     if (in == ie)
 	return out;
@@ -990,8 +983,7 @@ bayerDecodeRGGB(IN in, IN ie, OUT out)
 template <class IN, class OUT> OUT
 bayerDecodeBGGR(IN in, IN ie, OUT out)
 {
-    using	COLOR = typename std::iterator_traits<OUT>::value_type
-							  ::value_type;
+    using	COLOR = typename iterator_value<OUT>::value_type;
 
     if (in == ie)
 	return out;
@@ -1027,8 +1019,7 @@ bayerDecodeBGGR(IN in, IN ie, OUT out)
 template <class IN, class OUT> OUT
 bayerDecodeGRBG(IN in, IN ie, OUT out)
 {
-    using	COLOR = typename std::iterator_traits<OUT>::value_type
-							  ::value_type;
+    using	COLOR = typename iterator_value<OUT>::value_type;
 
     if (in == ie)
 	return out;
@@ -1064,8 +1055,7 @@ bayerDecodeGRBG(IN in, IN ie, OUT out)
 template <class IN, class OUT> OUT
 bayerDecodeGBRG(IN in, IN ie, OUT out)
 {
-    using	COLOR = typename std::iterator_traits<OUT>::value_type
-							  ::value_type;
+    using	COLOR = typename iterator_value<OUT>::value_type;
 
     if (in == ie)
 	return out;
@@ -1099,92 +1089,13 @@ bayerDecodeGBRG(IN in, IN ie, OUT out)
 }
 
 /************************************************************************
-*  class Array<YUV411, 0, ALLOC>					*
-************************************************************************/
-template <class ALLOC>
-class Array<YUV411, 0, ALLOC> : public Buf<YUV411, 0, ALLOC>
-{
-  private:
-    typedef Buf<YUV411, 0, ALLOC>	super;
-
-  public:
-    typedef typename super::value_type	value_type;
-    typedef typename super::pointer	pointer;
-    
-  public:
-    explicit		Array(size_t d=0)		:super(d/2)	{}
-			Array(pointer p, size_t d)	:super(p, d/2)	{}
-    Array&		operator =(const YUV411& c)
-			{
-			    super::fill(begin(), end(), c);
-			    return *this;
-			}
-    
-    using		super::data;
-    using		super::begin;
-    using		super::cbegin;
-    using		super::end;
-    using		super::cend;
-
-    size_t		size() const
-			{
-			    return 2*super::size();
-			}
-    bool		resize(size_t d)
-			{
-			    return super::resize(d/2);
-			}
-    void		resize(pointer p, size_t d)
-			{
-			    super::resize(p, d/2);
-			}
-    std::istream&	restore(std::istream& in)
-			{
-			    in.read(reinterpret_cast<char*>(data()),
-				    sizeof(value_type) * super::size());
-			    return in;
-			}
-    std::ostream&	save(std::ostream& out) const
-			{
-			    out.write(reinterpret_cast<const char*>(data()),
-				      sizeof(value_type) * super::size());
-			    return out;
-			}
-    void		init()
-			{
-			}
-};
-
-template <> inline size_t
-Array2<Array<YUV411> >::stride() const
-{
-    return (size() == 0 ? 0 :
-	    size() == 1 ? _ncol/2 : (_buf.size() - _ncol/2)/(size() - 1));
-}
-    
-template <> inline size_t
-Array2<Array<YUV411> >::stride(size_t unit) const
-{
-    constexpr size_t	siz = sizeof(YUV411);
-
-    if (unit == 0)
-	unit = 1;
-    const auto	n = lcm(siz, unit)/siz;
-
-    return n*((_ncol/2 + n - 1)/n);
-}
-    
-template <class T, class ALLOC=std::allocator<T> >
-using ImageLine = Array<T, 0, ALLOC>;
-    
-/************************************************************************
 *  class ImageBase:	basic image class				*
 ************************************************************************/
 //! 画素の2次元配列として定義されたあらゆる画像の基底となるクラス
-class __PORT ImageBase
+class ImageBase
 {
   public:
-    typedef Matrix<double, 3, 4>	matrix34_type;
+    using matrix34_type	= Matrix<double, 3, 4>;
     
   //! 外部記憶に読み書きする際の画素のタイプ
     enum Type
@@ -1330,15 +1241,15 @@ ImageBase::npixelsToBorder(size_t u, size_t v, size_t dir) const
   \param ALLOC	アロケータの型
 */
 template <class T, class ALLOC=std::allocator<T> >
-class Image : public Array2<ImageLine<T, ALLOC> >, public ImageBase
+class Image : public Array2<T, 0, 0, ALLOC>, public ImageBase
 {
   private:
-    typedef Array2<ImageLine<T, ALLOC> >		super;
+    using super	= Array2<T, 0, 0, ALLOC>;
 
     template <class L>
     struct Colormap : public Array<L>
     {
-	typedef L					result_type;
+	using result_type = L;
 
 	Colormap(size_t d)	:Array<L>(d)		{}
 	
@@ -1346,46 +1257,27 @@ class Image : public Array2<ImageLine<T, ALLOC> >, public ImageBase
     };
     
   public:
-    typedef typename super::element_type		element_type;
-    typedef typename super::pointer			pointer;
+    using	typename super::element_type;
+    using	typename super::pointer;
 
   public:
   //! 幅と高さを指定して画像を生成する．
   /*!
     \param w	画像の幅
     \param h	画像の高さ
-    \param unit	1行あたりのバイト数がこの値の倍数になる
   */
-    explicit Image(size_t w=0, size_t h=0, size_t unit=1)
-	:super(h, w, unit), ImageBase()				{}
+    explicit Image(size_t w=0, size_t h=0)
+	:super(h, w), ImageBase()				{}
 
-  //! 外部の領域と幅および高さを指定して画像を生成する．
+  //! 幅と高さとpaddingを指定して画像を生成する．
   /*!
-    \param p	外部領域へのポインタ
     \param w	画像の幅
     \param h	画像の高さ
+    \param unit	1行あたりのバイト数がこの値の倍数になる
   */
-    Image(pointer p, size_t w, size_t h)
-	:super(p, h, w), ImageBase()				{}
+    explicit Image(size_t w, size_t h, size_t unit)
+	:super(unit, h, w), ImageBase()				{}
 
-  //! 指定された画像の部分画像を生成する．
-  /*!
-    \param i	元の画像
-    \param u	部分画像の左上端の横座標
-    \param v	部分画像の左上端の縦座標
-    \param w	部分画像の幅
-    \param h	部分画像の高さ
-  */
-    Image(Image& i, size_t u, size_t v, size_t w, size_t h)
-	:super(i, v, u, h, w), ImageBase(i)			{}
-
-    Image&	operator =(const element_type& c)		;
-    const Image	operator ()(size_t u, size_t v,
-			    size_t w, size_t h)		const	;
-    Image	operator ()(size_t u, size_t v,
-			    size_t w, size_t h)			;
-
-#if !defined(__NVCC__)
   //! 他の配列と同一要素を持つ画像を作る（コピーコンストラクタの拡張）．
   /*!
     コピーコンストラクタを定義しないと自動的に作られてしまうので，
@@ -1393,9 +1285,8 @@ class Image : public Array2<ImageLine<T, ALLOC> >, public ImageBase
     しなければならない．
     \param expr	コピー元の配列
   */
-    template <class E,
-	      typename std::enable_if<is_range<E>::value>::type* = nullptr>
-    Image(const E& expr)
+    template <class E_, std::enable_if_t<rank<E_>() == 2>* = nullptr>
+    Image(const E_& expr)
 	:super(expr), ImageBase()				{}
 
   //! 他の配列を自分に代入する（標準代入演算子の拡張）．
@@ -1405,22 +1296,32 @@ class Image : public Array2<ImageLine<T, ALLOC> >, public ImageBase
     \param expr		コピー元の配列
     \return		この配列
   */
-    template <class E>
-    typename std::enable_if<is_range<E>::value, Image&>::type
-		operator =(const E& expr)
+    template <class E_> std::enable_if_t<rank<E_>() == 2, Image&>
+		operator =(const E_& expr)
 		{
 		    super::operator =(expr);
 		    return *this;
 		}
-#endif	// !__NVCC__
+
+    template <class T_> std::enable_if_t<rank<T_>() == 0, Image&>
+		operator =(const T_& c)
+		{
+		    super::operator =(c);
+		    return *this;
+		}
     
-  //! 指定された位置の画素にアクセスする．
+    using	super::begin;
+    using	super::end;
+    using	super::rbegin;
+    using	super::rend;
+
+//! 指定された位置の画素にアクセスする．
   /*!
     \param p	画素の位置
     \return	指定された画素
   */
     template <class S>
-    const T&	operator ()(const Point2<S>& p)
+    const T&	operator ()(const Array<S, 2>& p)
 					const	{return (*this)[p[1]][p[0]];}
 
   //! 指定された位置の画素にアクセスする．
@@ -1429,19 +1330,11 @@ class Image : public Array2<ImageLine<T, ALLOC> >, public ImageBase
     \return	指定された画素
   */
     template <class S>
-    T&		operator ()(const Point2<S>& p)	{return (*this)[p[1]][p[0]];}
+    T&		operator ()(const Array<S, 2>& p)
+						{return (*this)[p[1]][p[0]];}
     
     size_t	width()			const	{return super::ncol();}
     size_t	height()		const	{return super::nrow();}
-
-    using	super::begin;
-    using	super::cbegin;
-    using	super::end;
-    using	super::cend;
-    using	super::rbegin;
-    using	super::crbegin;
-    using	super::rend;
-    using	super::crend;
 
     std::istream&	restore(std::istream& in)			;
     std::ostream&	save(std::ostream& out,
@@ -1468,41 +1361,6 @@ class Image : public Array2<ImageLine<T, ALLOC> >, public ImageBase
     virtual void	_resize(size_t h, size_t w, const TypeInfo&)	;
 };
 
-template <class T, class ALLOC> inline Image<T, ALLOC>&
-Image<T, ALLOC>::operator =(const element_type& c)
-{
-    super::operator =(c);
-    return *this;
-}
-    
-//! この画像の部分画像を生成する．
-/*!
-  \param u	部分画像の左上端の横座標
-  \param v	部分画像の左上端の縦座標
-  \param w	部分画像の幅
-  \param h	部分画像の高さ
-  \return	生成された部分画像
-*/
-template <class T, class ALLOC> inline const Image<T, ALLOC>
-Image<T, ALLOC>::operator ()(size_t u, size_t v, size_t w, size_t h) const
-{
-    return Image(const_cast<Image&>(*this), u, v, w, h);
-}
-    
-//! この画像の部分画像を生成する．
-/*!
-  \param u	部分画像の左上端の横座標
-  \param v	部分画像の左上端の縦座標
-  \param w	部分画像の幅
-  \param h	部分画像の高さ
-  \return	生成された部分画像
-*/
-template <class T, class ALLOC> inline Image<T, ALLOC>
-Image<T, ALLOC>::operator ()(size_t u, size_t v, size_t w, size_t h)
-{
-    return Image(*this, u, v, w, h);
-}
-    
 //! 入力ストリームから画像を読み込む．
 /*!
   \param in	入力ストリーム
@@ -1627,24 +1485,24 @@ Image<T, ALLOC>::restoreRows(std::istream& in, const TypeInfo& typeInfo)
     Array<S>		buf(width());
     if (typeInfo.bottomToTop)
     {
-	for (auto line = rbegin(); line != rend(); ++line)
+	for (auto row = rbegin(); row != rend(); ++row)
 	{
 	    if (!buf.restore(in) || !in.ignore(npads))
 		break;
 	    std::copy(make_pixel_iterator(buf.cbegin()),
 		      make_pixel_iterator(buf.cend()),
-		      make_pixel_iterator(line->begin()));
+		      make_pixel_iterator(std::begin(*row)));
 	}
     }
     else
     {
-	for (auto line = begin(); line != end(); ++line)
+	for (auto row = begin(); row != end(); ++row)
 	{
 	    if (!buf.restore(in) || !in.ignore(npads))
 		break;
 	    std::copy(make_pixel_iterator(buf.cbegin()),
 		      make_pixel_iterator(buf.cend()),
-		      make_pixel_iterator(line->begin()));
+		      make_pixel_iterator(std::begin(*row)));
 	}
     }
 
@@ -1662,7 +1520,7 @@ Image<T, ALLOC>::restoreAndLookupRows(std::istream& in,
     Array<S>		buf(width());
     if (typeInfo.bottomToTop)
     {
-	for (auto line = rbegin(); line != rend(); ++line)    
+	for (auto row = rbegin(); row != rend(); ++row)    
 	{
 	    if (!buf.restore(in) || !in.ignore(npads))
 		break;
@@ -1670,12 +1528,12 @@ Image<T, ALLOC>::restoreAndLookupRows(std::istream& in,
 					      buf.cbegin(), colormap)),
 		      make_pixel_iterator(boost::make_transform_iterator(
 					      buf.cend(), colormap)),
-		      make_pixel_iterator(line->begin()));
+		      make_pixel_iterator(std::begin(*row)));
 	}
     }
     else
     {
-	for (auto line = begin(); line != end(); ++line)    
+	for (auto row = begin(); row != end(); ++row)
 	{
 	    if (!buf.restore(in) || !in.ignore(npads))
 		break;
@@ -1683,7 +1541,7 @@ Image<T, ALLOC>::restoreAndLookupRows(std::istream& in,
 					      buf.cbegin(), colormap)),
 		      make_pixel_iterator(boost::make_transform_iterator(
 					      buf.cend(), colormap)),
-		      make_pixel_iterator(line->begin()));
+		      make_pixel_iterator(std::begin(*row)));
 	}
     }
 
@@ -1704,10 +1562,10 @@ Image<T, ALLOC>::saveRows(std::ostream& out, Type type) const
     Array<D>		buf(width());
     if (typeInfo.bottomToTop)
     {
-	for (auto line = crbegin(); line != crend(); ++line)
+	for (auto row = rbegin(); row != rend(); ++row)
 	{
-	    std::copy(make_pixel_iterator(line->cbegin()),
-		      make_pixel_iterator(line->cend()),
+	    std::copy(make_pixel_iterator(std::begin(*row)),
+		      make_pixel_iterator(std::end(*row)),
 		      make_pixel_iterator(buf.begin()));
 	    if (!buf.save(out) || !pad.save(out))
 		break;
@@ -1715,10 +1573,10 @@ Image<T, ALLOC>::saveRows(std::ostream& out, Type type) const
     }
     else
     {
-	for (auto line = cbegin(); line != cend(); ++line)
+	for (auto row = begin(); row != end(); ++row)
 	{
-	    std::copy(make_pixel_iterator(line->cbegin()),
-		      make_pixel_iterator(line->cend()),
+	    std::copy(make_pixel_iterator(std::begin(*row)),
+		      make_pixel_iterator(std::end(*row)),
 		      make_pixel_iterator(buf.begin()));
 	    if (!buf.save(out) || !pad.save(out))
 		break;
@@ -1768,11 +1626,11 @@ Image<T, ALLOC>::_resize(size_t h, size_t w, const TypeInfo&)
 class GenericImage : public ImageBase
 {
   private:
-    typedef Array2<Array<u_char> >	array2_type;
+    using array2_type = Array2<char>;
 
   public:
-    typedef array2_type::pointer	pointer;
-    typedef array2_type::const_pointer	const_pointer;
+    using pointer	= array2_type::pointer;
+    using const_pointer	= array2_type::const_pointer;
     
   public:
   //! 総称画像を生成する．

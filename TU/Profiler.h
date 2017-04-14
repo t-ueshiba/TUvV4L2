@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id$
+ *  $Id: Profiler.h 1966 2016-04-17 07:04:48Z ueshiba $
  */
 /*!
   \file		Profiler.h

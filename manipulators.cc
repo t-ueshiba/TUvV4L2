@@ -25,7 +25,7 @@
  *  The copyright holder or the creator are not responsible for any
  *  damages caused by using this program.
  *  
- *  $Id$
+ *  $Id: manipulators.cc 1202 2012-09-25 00:03:13Z ueshiba $
  */
 #include <iostream>
 #include "TU/Manip.h"

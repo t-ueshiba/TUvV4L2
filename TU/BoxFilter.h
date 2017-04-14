@@ -1,32 +1,3 @@
-/*
- *  平成14-24年（独）産業技術総合研究所 著作権所有
- *  
- *  創作者：植芝俊夫
- *
- *  本プログラムは（独）産業技術総合研究所の職員である植芝俊夫が創作し，
- *  （独）産業技術総合研究所が著作権を所有する秘密情報です．著作権所有
- *  者による許可なしに本プログラムを使用，複製，改変，第三者へ開示する
- *  等の行為を禁止します．
- *  
- *  このプログラムによって生じるいかなる損害に対しても，著作権所有者お
- *  よび創作者は責任を負いません。
- *
- *  Copyright 2002-2012.
- *  National Institute of Advanced Industrial Science and Technology (AIST)
- *
- *  Creator: Toshio UESHIBA
- *
- *  [AIST Confidential and all rights reserved.]
- *  This program is confidential. Any using, copying, changing or
- *  giving any information concerning with this program to others
- *  without permission by the copyright holder are strictly prohibited.
- *
- *  [No Warranty.]
- *  The copyright holder or the creator are not responsible for any
- *  damages caused by using this program.
- *  
- *  $Id$
- */
 /*!
   \file		BoxFilter.h
   \brief	box filterに関するクラスの定義と実装
@@ -34,7 +5,6 @@
 #ifndef	__TU_BOXFILTER_H
 #define	__TU_BOXFILTER_H
 
-#include <algorithm>
 #include "TU/Filter2.h"
 #include "TU/Array++.h"
 
@@ -47,7 +17,7 @@ namespace TU
 /*!
   \param ITER	コンテナ中の要素を指す定数反復子の型
 */
-template <class ITER, class T=iterator_value<ITER> >
+template <class ITER, class T=iterator_substance<ITER> >
 class box_filter_iterator
     : public boost::iterator_adaptor<box_filter_iterator<ITER, T>,
 				     ITER,			// base
@@ -55,14 +25,14 @@ class box_filter_iterator
 				     boost::single_pass_traversal_tag>
 {
   private:
-    typedef boost::iterator_adaptor<box_filter_iterator,
-				    ITER,
-				    T,
-				    boost::single_pass_traversal_tag>	super;
+    using super = boost::iterator_adaptor<box_filter_iterator,
+					  ITER,
+					  T,
+					  boost::single_pass_traversal_tag>;
 		    
   public:
-    typedef typename super::value_type	value_type;
-    typedef typename super::reference	reference;
+    using	typename super::value_type;
+    using	typename super::reference;
 
     friend class	boost::iterator_core_access;
 
@@ -100,35 +70,12 @@ class box_filter_iterator
 		}
     
   private:
-    typedef is_range<value_type>	value_is_expr;
-
-    template <class VITER_, class ITER_>
-    static void	update(const VITER_& val,
-		       const ITER_& curr, const ITER_& head, std::false_type)
-		{
-		    *val += (*curr - *head);
-		}
-    template <class VITER_, class ITER_>
-    static void	update(const VITER_& val,
-		       const ITER_& curr, const ITER_& head, std::true_type)
-		{
-		    typedef subiterator<VITER_>			iterator;
-		    typedef is_range<
-			typename std::iterator_traits<
-			    iterator>::value_type>		value_is_expr;
-		    
-		    auto	c = curr->cbegin();
-		    auto	h = head->cbegin();
-		    for (iterator v = val->begin(), ve = val->end();
-			 v != ve; ++v, ++c, ++h)
-			update(v, c, h, value_is_expr());
-		}
-
     reference	dereference() const
 		{
 		    if (!_valid)
 		    {
-			update(&_val, super::base(), _head, value_is_expr());
+			_val += (*super::base() - *_head);
+		      //(_val += *super::base()) -= *_head;
 			++_head;
 			_valid = true;
 		    }
@@ -142,7 +89,7 @@ class box_filter_iterator
 #ifdef TU_BOX_FILTER_ITERATOR_CONSERVATIVE
 		    if (!_valid)
 		    {
-			update(&_val, super::base(), _head, value_is_expr());
+			_val += (*super::base() - *_head);
 			++_head;
 		    }
 		    else
@@ -163,16 +110,11 @@ class box_filter_iterator
   \return	box filter反復子
 */
 template <class T=void, class ITER>
-box_filter_iterator<ITER,
-		    typename std::conditional<std::is_void<T>::value,
-					      iterator_value<ITER>, T>::type>
+box_filter_iterator<ITER, std::conditional_t<std::is_void<T>::value,
+					     iterator_substance<ITER>, T> >
 make_box_filter_iterator(ITER iter, size_t w=0)
 {
-    typedef typename std::conditional<std::is_void<T>::value,
-				      iterator_value<ITER>,
-				      T>::type		value_type;
-    
-    return box_filter_iterator<ITER, value_type>(iter, w);
+    return {iter, w};
 }
 
 /************************************************************************
@@ -328,8 +270,7 @@ class BoxFilter2 : public Filter2<BoxFilter2>
 template <class IN, class OUT> void
 BoxFilter2::convolveRows(IN ib, IN ie, OUT out) const
 {
-    typedef Array<iterator_value<subiterator<IN> > >	row_type;
-    typedef box_filter_iterator<IN, row_type>		row_iterator;
+    using row_iterator	= box_filter_iterator<IN>;
 
     if (std::distance(ib, ie) < rowWinSize())
 	throw std::runtime_error("BoxFilter2::convolveRows(): not enough rows!");
