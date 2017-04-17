@@ -181,8 +181,7 @@ test_external_allocator(BUF buf)
     
     std::cout << "*** external allocator test ***" << std::endl;
     
-    Array2<value_type, 0, 0, external_allocator<value_type> >
-	a2(buf.data(), buf.size()/6, 6);
+    Array2<value_type>	a2(buf.data(), buf.size()/6, 6);
   //slice(a2[0], 1, 3) = {1000, 2000, 300};
     slice<2, 3>(a2, 1, 2) = {{100, 200, 300}, {400, 500, 600}};
     std::cout << "--- a2(" << print_sizes_and_strides(a2) << ") ---\n" << a2;
