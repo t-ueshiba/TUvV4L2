@@ -82,17 +82,6 @@ HDRS		= TU/Array++.h \
 		TU/Vector++.h \
 		TU/Warp.h \
 		TU/WeightedMedianFilter.h \
-		TU/YetPorted/CCSImage.h \
-		TU/YetPorted/ComplexImage.h \
-		TU/YetPorted/CorrectIntensity.h \
-		TU/YetPorted/Feature.h \
-		TU/YetPorted/FeatureMatch.h \
-		TU/YetPorted/Heap.h \
-		TU/YetPorted/IntegralImage.h \
-		TU/YetPorted/Mesh++.h \
-		TU/YetPorted/PSTree.h \
-		TU/YetPorted/Ransac.h \
-		TU/YetPorted/SURFCreator.h \
 		TU/algorithm.h \
 		TU/fdstream.h \
 		TU/functional.h \

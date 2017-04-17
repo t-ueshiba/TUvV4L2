@@ -12,7 +12,7 @@ VPATH		=
 IDLS		=
 MOCHDRS		=
 
-INCDIRS		= -I. -I$(PREFIX)/include
+INCDIRS		= -I../../.. -I$(PREFIX)/include
 CPPFLAGS	= -DNDEBUG
 CFLAGS		= -g -O
 NVCCFLAGS	= -g
@@ -39,22 +39,22 @@ INCDIR		= $(PREFIX)/include
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC .cpp:sC .cu:sC
-EXTHDRS		= /usr/local/include/TU/Array++.h \
-		/usr/local/include/TU/Geometry++.h \
-		/usr/local/include/TU/Image++.h \
-		/usr/local/include/TU/List.h \
-		/usr/local/include/TU/Manip.h \
-		/usr/local/include/TU/Minimize.h \
-		/usr/local/include/TU/Profiler.h \
-		/usr/local/include/TU/Quantizer.h \
-		/usr/local/include/TU/Vector++.h \
-		/usr/local/include/TU/WeightedMedianFilter.h \
-		/usr/local/include/TU/algorithm.h \
-		/usr/local/include/TU/functional.h \
-		/usr/local/include/TU/iterator.h \
-		/usr/local/include/TU/pair.h \
-		/usr/local/include/TU/tuple.h \
-		/usr/local/include/TU/types.h \
+EXTHDRS		= ../../../TU/Array++.h \
+		../../../TU/Geometry++.h \
+		../../../TU/Image++.h \
+		../../../TU/List.h \
+		../../../TU/Manip.h \
+		../../../TU/Minimize.h \
+		../../../TU/Profiler.h \
+		../../../TU/Quantizer.h \
+		../../../TU/Vector++.h \
+		../../../TU/WeightedMedianFilter.h \
+		../../../TU/algorithm.h \
+		../../../TU/iterator.h \
+		../../../TU/pair.h \
+		../../../TU/range.h \
+		../../../TU/tuple.h \
+		../../../TU/types.h \
 		/usr/local/include/TU/v/App.h \
 		/usr/local/include/TU/v/CanvasPane.h \
 		/usr/local/include/TU/v/CanvasPaneDC.h \
@@ -76,18 +76,16 @@ OBJS		= main.o
 #include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
-main.o: /usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
-	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
-	/usr/local/include/TU/tuple.h /usr/local/include/TU/functional.h \
-	/usr/local/include/TU/pair.h /usr/local/include/TU/Minimize.h \
-	/usr/local/include/TU/algorithm.h /usr/local/include/TU/v/App.h \
-	/usr/local/include/TU/v/TUv++.h /usr/local/include/TU/v/Colormap.h \
-	/usr/local/include/TU/List.h /usr/local/include/TU/v/Widget-Xaw.h \
+main.o: ../../../TU/Image++.h ../../../TU/types.h ../../../TU/pair.h \
+	../../../TU/Vector++.h ../../../TU/Array++.h ../../../TU/range.h \
+	../../../TU/algorithm.h ../../../TU/iterator.h ../../../TU/tuple.h \
+	/usr/local/include/TU/v/App.h /usr/local/include/TU/v/TUv++.h \
+	../../../TU/List.h ../../../TU/Geometry++.h ../../../TU/Minimize.h \
+	/usr/local/include/TU/v/Widget-Xaw.h \
+	/usr/local/include/TU/v/Colormap.h \
 	/usr/local/include/TU/v/CmdWindow.h /usr/local/include/TU/v/CmdPane.h \
 	/usr/local/include/TU/v/CanvasPane.h \
 	/usr/local/include/TU/v/CanvasPaneDC.h /usr/local/include/TU/v/XDC.h \
-	/usr/local/include/TU/v/DC.h /usr/local/include/TU/Manip.h \
-	/usr/local/include/TU/v/Menu.h \
-	/usr/local/include/TU/WeightedMedianFilter.h \
-	/usr/local/include/TU/Quantizer.h /usr/local/include/TU/Profiler.h
+	/usr/local/include/TU/v/DC.h ../../../TU/Manip.h \
+	/usr/local/include/TU/v/Menu.h ../../../TU/WeightedMedianFilter.h \
+	../../../TU/Quantizer.h ../../../TU/Profiler.h

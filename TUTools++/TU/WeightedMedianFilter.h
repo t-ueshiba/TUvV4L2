@@ -48,7 +48,7 @@ class ExpDiff
 		    v[0] = T(x.r) - T(y.r);
 		    v[1] = T(x.g) - T(y.g);
 		    v[2] = T(x.b) - T(y.b);
-		    return std::exp(v.length() / _nsigma);
+		    return std::exp(length(v) / _nsigma);
 		}
 
   private:
