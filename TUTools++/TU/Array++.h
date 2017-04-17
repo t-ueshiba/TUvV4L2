@@ -13,33 +13,6 @@
 namespace TU
 {
 /************************************************************************
-*  class external_allocator<T>						*
-************************************************************************/
-template <class T>
-class external_allocator
-{
-  public:
-    using value_type	= T;
-    
-  public:
-		external_allocator(T* p, std::size_t size)
-		    :_p(p), _size(size)					{}
-
-    T*		allocate(std::size_t n)
-		{
-		    if (n > _size)
-			throw std::runtime_error("TU::external_allocator<T>::allocate(): too large memory requested!");
-			    
-		    return _p;
-		}
-    static void	deallocate(T*, std::size_t)				{}
-
-  private:
-    T* const		_p;
-    const std::size_t	_size;
-};
-    
-/************************************************************************
 *  class BufTraits<T>							*
 ************************************************************************/
 template <class T, class ALLOC>
@@ -245,13 +218,13 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
   public:
   // 標準コンストラクタ/代入演算子およびデストラクタ
 		Buf()
-		    :_stride(0), _capacity(0), _p(super::null())
+		    :_stride(0), _capacity(0), _ext(false), _p(super::null())
 		{
 		    _sizes.fill(0);
 		}
 		Buf(const Buf& b)
 		    :_sizes(b._sizes), _stride(b._stride),
-		     _capacity(b._capacity), _p(alloc(_capacity))
+		     _capacity(b._capacity), _ext(false), _p(alloc(_capacity))
 		{
 		    copy<0>(b.begin(), size(), begin());
 		}
@@ -266,7 +239,7 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 		}
 		Buf(Buf&& b)
 		    :_sizes(b._sizes), _stride(b._stride),
-		     _capacity(b._capacity), _p(b._p)
+		     _capacity(b._capacity), _ext(b._ext), _p(b._p)
 		{
 		  // b の 破壊時に this->_p がdeleteされることを防ぐ．
 		    b._p = super::null();
@@ -276,6 +249,7 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 		    _sizes    = b._sizes;
 		    _stride   = b._stride;
 		    _capacity = b._capacity;
+		    _ext      = b._ext;
 		    _p        = b._p;
 		    
 		  // b の 破壊時に this->_p がdeleteされることを防ぐ．
@@ -293,25 +267,47 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 		    :_sizes(sizes),
 		     _stride(stride ? stride : _sizes[D-1]),
 		     _capacity(capacity(axis<0>())),
+		     _ext(false),
 		     _p(alloc(_capacity))
 		{
 		}
     void	resize(const sizes_type& sizes, size_t stride=0)
 		{
+		    if (stride == 0)
+			stride = sizes[D-1];
+		    
+		    if ((stride == _stride) && (sizes == _sizes))
+			return;
+
 		    free(_p, _capacity);
 		    _sizes    = sizes;
-		    _stride   = (stride ? stride : _sizes[D-1]);
+		    _stride   = stride;
 		    _capacity = capacity(axis<0>());
+		    _ext      = false;
 		    _p	      = alloc(_capacity);
 		}
 
-		Buf(pointer p, const sizes_type& sizes, size_t stride=0)
+  // 外部記憶領域および各軸のサイズと最終軸のストライドを指定したコンストラクタと
+  // リサイズ関数
+    explicit	Buf(pointer p, const sizes_type& sizes, size_t stride=0)
 		    :_sizes(sizes),
 		     _stride(stride ? stride : _sizes[D-1]),
 		     _capacity(capacity(axis<0>())),
-		     _allocator(p, _capacity),
-		     _p(alloc(_capacity))
+		     _ext(true),
+		     _p(p)
 		{
+		}
+    void	resize(pointer p, const sizes_type& sizes, size_t stride=0)
+		{
+		    if (stride == 0)
+			stride = sizes[D-1];
+		    
+		    free(_p, _capacity);
+		    _sizes    = sizes;
+		    _stride   = stride;
+		    _capacity = capacity(axis<0>());
+		    _ext      = true;
+		    _p	      = p;
 		}
 
     const auto&	sizes()		const	{ return _sizes; }
@@ -379,7 +375,7 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 		}
     void	free(pointer p, size_t siz)
 		{
-		    if (p != super::null())
+		    if (!_ext && p != super::null())
 		    {
 			for (pointer q = p, qe = q + siz; q != qe; ++q)
 			    allocator_traits::destroy(_allocator, q);
@@ -459,6 +455,7 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
     size_t		_stride;	//!< 最終軸のストライド
     size_t		_capacity;	//!< バッファ中に収めらる総要素数
     allocator_type	_allocator;	//!< 要素を確保するアロケータ
+    bool		_ext;		//!< _p が外部記憶領域なら true
     pointer		_p;		//!< 先頭要素へのポインタ
 };
     
@@ -571,19 +568,40 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 		}
 
     template <class... SIZES_,
-	      std::enable_if_t<sizeof...(SIZES_) == D>* = nullptr>
+	      std::enable_if_t<
+		  sizeof...(SIZES_) == D &&
+		  all<std::is_integral, std::tuple<SIZES_...> >::value>*
+	      = nullptr>
     explicit	array(pointer p, SIZES_... sizes)
 		    :super(p, {to_size(sizes)...})
 		{
 		}
-
+    template <class... SIZES_>
+    std::enable_if_t<sizeof...(SIZES_) == D &&
+		     all<std::is_integral, std::tuple<SIZES_...> >::value>
+		resize(pointer p, SIZES_... sizes)
+		{
+		    super::resize(p, {to_size(sizes)...});
+		}
+	    
     template <class... SIZES_,
-	      std::enable_if_t<sizeof...(SIZES_) == D>* = nullptr>
+	      std::enable_if_t<
+		  sizeof...(SIZES_) == D &&
+		  all<std::is_integral, std::tuple<SIZES_...> >::value>*
+	      = nullptr>
     explicit	array(pointer p, size_t unit, SIZES_... sizes)
 		    :super(p, {to_size(sizes)...}, to_stride(unit, sizes...))
 		{
 		}
-
+    template <class... SIZES_>
+    std::enable_if_t<sizeof...(SIZES_) == D &&
+		     all<std::is_integral, std::tuple<SIZES_...> >::value>
+		resize(pointer p, size_t unit, SIZES_... sizes)
+		{
+		    super::resize(p, {to_size(sizes)...},
+				  to_stride(unit, sizes...));
+		}
+	    
     template <class T_> std::enable_if_t<rank<T_>() == 0, array&>
 		operator =(const T_& c)
 		{
@@ -606,7 +624,6 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
     using	super::data;
     using	super::begin;
     using	super::end;
-
 
     template <class... IS_>
     auto	operator ()(IS_... is)

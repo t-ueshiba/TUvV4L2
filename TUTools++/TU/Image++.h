@@ -1289,6 +1289,12 @@ class Image : public Array2<T, 0, 0, ALLOC>, public ImageBase
     Image(const E_& expr)
 	:super(expr), ImageBase()				{}
 
+    Image(pointer p, size_t w, size_t h)
+	:super(p, h, w), ImageBase()				{}
+    
+    Image(pointer p, size_t unit, size_t w, size_t h)
+	:super(p, unit, h, w), ImageBase()			{}
+    
   //! 他の配列を自分に代入する（標準代入演算子の拡張）．
   /*!
     標準代入演算子を定義しないと自動的に作られてしまうので，この代入演算子が
