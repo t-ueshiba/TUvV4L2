@@ -33,7 +33,7 @@ namespace v
 ************************************************************************/
 enum	{c_Sigma, c_Normalization, c_Saturation};
 
-static int	range[][3] = {{1, 255, 2}, {1, 255, 1}};
+static float	range[][3] = {{1, 255, 2}, {1, 255, 1}};
 static CmdDef	Cmds[] =
 {
     {C_Slider, c_Sigma,		11, "Sigma:",		range[0], CA_None,

@@ -19,7 +19,7 @@ namespace v
 ************************************************************************/
 enum	{c_WinSize, c_Sigma, c_Saturation};
 
-static int	range[][3] = {{1, 64, 1}, {1, 255, 2}, {1, 255, 1}};
+static float	range[][3] = {{1, 64, 1}, {1, 255, 2}, {1, 255, 1}};
 static CmdDef	Cmds[] =
 {
     {C_Slider, c_WinSize,	 5, "Window size:",	range[0], CA_None,

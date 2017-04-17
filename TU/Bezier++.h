@@ -1,32 +1,3 @@
-/*
- *  平成14-19年（独）産業技術総合研究所 著作権所有
- *  
- *  創作者：植芝俊夫
- *
- *  本プログラムは（独）産業技術総合研究所の職員である植芝俊夫が創作し，
- *  （独）産業技術総合研究所が著作権を所有する秘密情報です．著作権所有
- *  者による許可なしに本プログラムを使用，複製，改変，第三者へ開示する
- *  等の行為を禁止します．
- *  
- *  このプログラムによって生じるいかなる損害に対しても，著作権所有者お
- *  よび創作者は責任を負いません。
- *
- *  Copyright 2002-2007.
- *  National Institute of Advanced Industrial Science and Technology (AIST)
- *
- *  Creator: Toshio UESHIBA
- *
- *  [AIST Confidential and all rights reserved.]
- *  This program is confidential. Any using, copying, changing or
- *  giving any information concerning with this program to others
- *  without permission by the copyright holder are strictly prohibited.
- *
- *  [No Warranty.]
- *  The copyright holder or the creator are not responsible for any
- *  damages caused by using this program.
- *  
- *  $Id: Bezier++.h 2022 2016-10-17 01:02:39Z ueshiba $
- */
 /*!
   \file		Bezier++.h
   \brief	Bezier曲線およびBezier曲面に関連するクラスの定義と実装
@@ -322,15 +293,10 @@ BezierSurface<C>::BezierSurface(size_t p, size_t q)
 */
 template <class C>
 BezierSurface<C>::BezierSurface(const coord_array2& b)
-    :_c(b.nrow(), b.ncol())
+    :_c(b)
 {
     for (size_t j = 0; j <= vDegree(); ++j)
-    {
-	_curves[j]._c.resize(_c[j].data(), uDegree() + 1);
-	
-	for (size_t i = 0; i <= uDegree(); ++i)
-	    _c[j][i] = b[j][i];
-    }
+	_curves[j]._c.resize(_c[j].begin(), uDegree() + 1);
 }
 
 //! 指定したパラメータ値に対応する曲面上の点を調べる．
@@ -348,10 +314,11 @@ BezierSurface<C>::operator ()(element_type u, element_type v) const
     return vCurve(v);
 }
  
-typedef BezierSurface<Vector3f>	BezierSurface3f;
-typedef BezierSurface<Vector4f>	RationalBezierSurface3f;
-typedef BezierSurface<Vector3d>	BezierSurface3d;
-typedef BezierSurface<Vector4d>	RationalBezierSurface3d;
+using BezierSurface3f		= BezierSurface<Vector3f>;
+using RationalBezierSurface3f	= BezierSurface<Vector4f>;
+using BezierSurface3d		= BezierSurface<Vector3d>;
+using RationalBezierSurface3d	= BezierSurface<Vector4d>;
+
  
 }
 #endif	// !__TU_BEZIERPP_H
