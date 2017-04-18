@@ -56,9 +56,9 @@ class BSplineKnots
   public:
     BSplineKnots(size_t deg, element_type us, element_type ue)		;
     
-    size_t	degree()		 const	{return _degree;}
-    size_t	M()			 const	{return size()-1;}
-    size_t	L()			 const	{return M()-degree()-degree();}
+    auto	degree()		 const	{return _degree;}
+    auto	M()			 const	{return size()-1;}
+    auto	L()			 const	{return M()-degree()-degree();}
     size_t	findSpan(element_type u) const	;
     size_t	leftmost(size_t k)	 const	;
     size_t	rightmost(size_t k)	 const	;
@@ -67,14 +67,14 @@ class BSplineKnots
     knot_array	basis(element_type u, size_t& I)		 const	;
     knot_array2	derivatives(element_type u, size_t K, size_t& I) const	;
 
-    size_t	insertKnot(element_type u)		;
-    size_t	removeKnot(size_t k)			;
-    void	elevateDegree()				{++_degree;}
+    size_t	insertKnot(element_type u)	;
+    size_t	removeKnot(size_t k)		;
+    void	elevateDegree()			{++_degree;}
 
-    size_t		size()			const	{return _knots.size();}
-    const element_type*	data()			const	{return _knots.data();}
-    element_type&	operator [](size_t i)		{return _knots[i];}
-    const element_type&	operator [](size_t i)	const	{return _knots[i];}
+    auto	size()			const	{return _knots.size();}
+    auto	data()			const	{return _knots.data();}
+    auto&	operator [](size_t i)		{return _knots[i];}
+    const auto&	operator [](size_t i)	const	{return _knots[i];}
     
   private:
     knot_array	_knots;
@@ -102,8 +102,6 @@ BSplineKnots<T>::BSplineKnots(size_t deg, element_type us, element_type ue)
 template <class T> size_t
 BSplineKnots<T>::findSpan(element_type u) const
 {
-    using namespace	std;
-    
     if (u == _knots[M()-degree()])	// special case
 	return M()-degree()-1;
 
@@ -120,7 +118,7 @@ BSplineKnots<T>::findSpan(element_type u) const
 	    return mid;
     }
 
-    throw out_of_range("TU::BSplineKnots<T>::findSpan: given parameter is out of range!");
+    throw std::out_of_range("TU::BSplineKnots<T>::findSpan: given parameter is out of range!");
     
     return 0;
 }
@@ -306,19 +304,16 @@ class BSplineCurve
     explicit BSplineCurve(size_t degree,
 			  element_type us=0, element_type ue=1)	;
 
-    static size_t
-		dim()				{return coord_type::size();}
+    static auto	dim()				{ return coord_type::size(); }
 
-    size_t	degree()		const	{return _knots.degree();}
-    size_t	M()			const	{return _knots.M();}
-    size_t	L()			const	{return _knots.L();}
-    size_t	N()			const	{return _c.size()-1;}
-    element_type
-		knot(int i)		const	{return _knots[i];}
-    size_t	multiplicity(size_t k)	const	{return
-						     _knots.multiplicity(k);}
-    const knots_type&
-		knots()			const	{return _knots;}
+    auto	degree()		const	{ return _knots.degree(); }
+    auto	M()			const	{ return _knots.M(); }
+    auto	L()			const	{ return _knots.L(); }
+    auto	N()			const	{ return _c.size()-1; }
+    auto	knot(int i)		const	{ return _knots[i]; }
+    auto	multiplicity(size_t k)	const	{ return
+						     _knots.multiplicity(k); }
+    const auto&	knots()			const	{ return _knots; }
 
     coord_type	operator ()(element_type u)		const	;
     coord_array	derivatives(element_type u, size_t K)	const	;
@@ -326,25 +321,19 @@ class BSplineCurve
     size_t	insertKnot(element_type u)	;
     size_t	removeKnot(size_t k)		;
     void	elevateDegree()			;
-    const element_type*	data()			const	{return _c[0].data();}
-    coord_type&		operator [](size_t i)		{return _c[i];}
-    const coord_type&	operator [](size_t i)	const	{return _c[i];}
-    bool		operator ==(const BSplineCurve& b) const
-			{
-			    return _c == b._c;
-			}
-    bool		operator !=(const BSplineCurve& b) const
-			{
-			    return _c != b._c;
-			}
-    std::ostream&	save(std::ostream& out) const
-			{
-			    return _c.save(out);
-			}
-    std::istream&	restore(std::istream& in)
-			{
-			    return _c.restore(in);
-			}
+    auto	data()			const	{ return _c[0].data(); }
+    auto&	operator [](size_t i)		{ return _c[i]; }
+    const auto&	operator [](size_t i)	const	{ return _c[i]; }
+    auto	operator ==(const BSplineCurve& b) const
+		{
+		    return _c == b._c;
+		}
+    auto	operator !=(const BSplineCurve& b) const
+		{
+		    return _c != b._c;
+		}
+    auto&	save(std::ostream& out)	const	{ return _c.save(out); }
+    auto&	restore(std::istream& in)	{ return _c.restore(in); }
 
   private:
     coord_array	_c;
@@ -542,28 +531,24 @@ class BSplineSurface
 		   element_type us=0, element_type ue=1,
 		   element_type vs=0, element_type ve=1)	;
 
-    static size_t	dim()			{return coord_type::size();}
+    static auto	dim()			{ return coord_type::size(); }
 
-    size_t	uDegree()		const	{return _uKnots.degree();}
-    size_t	uM()			const	{return _uKnots.M();}
-    size_t	uL()			const	{return _uKnots.L();}
-    size_t	uN()			const	{return ncol()-1;}
-    size_t	vDegree()		const	{return _vKnots.degree();}
-    size_t	vM()			const	{return _vKnots.M();}
-    size_t	vL()			const	{return _vKnots.L();}
-    size_t	vN()			const	{return nrow()-1;}
-    element_type
-		uKnot(int i)		const	{return _uKnots[i];}
-    element_type
-		vKnot(int j)		const	{return _vKnots[j];}
-    size_t	uMultiplicity(int k)	const	{return
-						     _uKnots.multiplicity(k);}
-    size_t	vMultiplicity(int l)	const	{return
-						     _vKnots.multiplicity(l);}
-    const knots_type&
-		uKnots()		const	{return _uKnots;}
-    const knots_type&
-		vKnots()		const	{return _vKnots;}
+    auto	uDegree()		const	{ return _uKnots.degree(); }
+    auto	uM()			const	{ return _uKnots.M(); }
+    auto	uL()			const	{ return _uKnots.L(); }
+    auto	uN()			const	{ return ncol()-1; }
+    auto	vDegree()		const	{ return _vKnots.degree(); }
+    auto	vM()			const	{ return _vKnots.M(); }
+    auto	vL()			const	{ return _vKnots.L(); }
+    auto	vN()			const	{ return nrow()-1; }
+    auto	uKnot(int i)		const	{ return _uKnots[i]; }
+    auto	vKnot(int j)		const	{ return _vKnots[j]; }
+    auto	uMultiplicity(int k)	const	{ return
+						     _uKnots.multiplicity(k); }
+    auto	vMultiplicity(int l)	const	{ return
+						     _vKnots.multiplicity(l); }
+    const auto&	uKnots()		const	{ return _uKnots; }
+    const auto&	vKnots()		const	{ return _vKnots; }
 
     coord_type	operator ()(element_type u,
 			    element_type v)	const	;
@@ -578,33 +563,32 @@ class BSplineSurface
     void	uElevateDegree()			;
     void	vElevateDegree()			;
 
-    const element_type*	data()		const	{return _c[0][0].data();}
-    auto		operator [](size_t i)	const	{return _c[i];}
-    size_t		ncol()			const	{return _c.ncol();}
-    size_t		nrow()			const	{return _c.nrow();}
-    bool		operator ==(const BSplineSurface& b) const
-			{
-			    return _c == b._c;
-			}
-    bool		operator !=(const BSplineSurface& b) const
-			{
-			    return _c != b._c;
-			}
-    std::ostream&	save(std::ostream& out) const
-			{
-			    return _c.save(out);
-			}
-    std::istream&	restore(std::istream& in)
-			{
-			    return _c.restore(in);
-			}
+    auto	data()			const	{ return _c[0][0].data(); }
+    auto	operator [](size_t i)		{ return _c[i]; }
+    auto	operator [](size_t i)	const	{ return _c[i]; }
+    auto	ncol()			const	{ return _c.ncol(); }
+    auto	nrow()			const	{ return _c.nrow(); }
+    auto	operator ==(const BSplineSurface& b) const
+		{
+		    return _c == b._c;
+		}
+    auto	operator !=(const BSplineSurface& b) const
+		{
+		    return _c != b._c;
+		}
+    auto&	save(std::ostream& out)	const	{ return _c.save(out); }
+    auto&	restore(std::istream& in)	{ return _c.restore(in); }
     
-    friend std::istream&
-    operator >>(std::istream& in, BSplineSurface& b)
-	{return in >> b._c;}
-    friend std::ostream&
-    operator <<(std::ostream& out, const BSplineSurface& b)
-	{return out << b._c;}
+    friend auto&
+		operator >>(std::istream& in, BSplineSurface& b)
+		{
+		    return in >> b._c;
+		}
+    friend auto&
+		operator <<(std::ostream& out, const BSplineSurface& b)
+		{
+		    return out << b._c;
+		}
 
   private:
     coord_array2	_c;
