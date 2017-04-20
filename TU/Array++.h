@@ -271,13 +271,13 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 		     _p(alloc(_capacity))
 		{
 		}
-    void	resize(const sizes_type& sizes, size_t stride=0)
+    bool	resize(const sizes_type& sizes, size_t stride=0)
 		{
 		    if (stride == 0)
 			stride = sizes[D-1];
 		    
 		    if ((stride == _stride) && (sizes == _sizes))
-			return;
+			return false;
 
 		    free(_p, _capacity);
 		    _sizes    = sizes;
@@ -285,6 +285,8 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 		    _capacity = capacity(axis<0>());
 		    _ext      = false;
 		    _p	      = alloc(_capacity);
+
+		    return true;
 		}
 
   // 外部記憶領域および各軸のサイズと最終軸のストライドを指定したコンストラクタと
@@ -510,10 +512,10 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 		}
     template <class... SIZES_>
     std::enable_if_t<sizeof...(SIZES_) == D &&
-		     all<std::is_integral, std::tuple<SIZES_...> >::value>
+		     all<std::is_integral, std::tuple<SIZES_...> >::value, bool>
 		resize(SIZES_... sizes)
 		{
-		    super::resize({to_size(sizes)...});
+		    return super::resize({to_size(sizes)...});
 		}
     
     template <class... SIZES_,
@@ -527,11 +529,11 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 		}
     template <class... SIZES_>
     std::enable_if_t<sizeof...(SIZES_) == D &&
-		     all<std::is_integral, std::tuple<SIZES_...> >::value>
+		     all<std::is_integral, std::tuple<SIZES_...> >::value, bool>
 		resize(size_t unit, SIZES_... sizes)
 		{
-		    super::resize({to_size(sizes)...},
-				  to_stride(unit, sizes...));
+		    return super::resize({to_size(sizes)...},
+					 to_stride(unit, sizes...));
 		}
 
     template <class E_,
