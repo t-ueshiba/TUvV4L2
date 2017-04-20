@@ -58,6 +58,7 @@ HDRS		= TU/Array++.h \
 		TU/ICIA.h \
 		TU/IIRFilter.h \
 		TU/Image++.h \
+		TU/IntegralImage.h \
 		TU/List.h \
 		TU/Manip.h \
 		TU/Minimize.h \
@@ -68,6 +69,7 @@ HDRS		= TU/Array++.h \
 		TU/Profiler.h \
 		TU/Quantizer.h \
 		TU/Random.h \
+		TU/Ransac.h \
 		TU/Rectify.h \
 		TU/SADStereo.h \
 		TU/SHOT602.h \
