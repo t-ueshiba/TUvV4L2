@@ -75,7 +75,6 @@ class box_filter_iterator
 		    if (!_valid)
 		    {
 			_val += (*super::base() - *_head);
-		      //(_val += *super::base()) -= *_head;
 			++_head;
 			_valid = true;
 		    }
@@ -270,13 +269,12 @@ class BoxFilter2 : public Filter2<BoxFilter2>
 template <class IN, class OUT> void
 BoxFilter2::convolveRows(IN ib, IN ie, OUT out) const
 {
-    using row_iterator	= box_filter_iterator<IN>;
-
     if (std::distance(ib, ie) < rowWinSize())
 	throw std::runtime_error("BoxFilter2::convolveRows(): not enough rows!");
     
-    for (row_iterator row(ib, _rowWinSize), rowe(ie); row != rowe; ++row, ++out)
-	_colFilter.convolve(row->begin(), row->end(), out->begin());
+    for (box_filter_iterator<IN> row(ib, _rowWinSize), rowe(ie);
+	 row != rowe; ++row, ++out)
+	_colFilter.convolve(std::begin(*row), std::end(*row), std::begin(*out));
 }
 
 }
