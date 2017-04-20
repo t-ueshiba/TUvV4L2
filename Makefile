@@ -19,7 +19,7 @@ NVCCFLAGS	= -O
 ifeq ($(shell arch), armv7l)
   CPPFLAGS     += -DNEON
 else
-  CPPFLAGS     += -DSSE3
+  CPPFLAGS     += -DSSE4
 endif
 CCFLAGS		= $(CFLAGS)
 
