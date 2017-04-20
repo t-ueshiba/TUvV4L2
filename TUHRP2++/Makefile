@@ -10,7 +10,8 @@ LIBRARY		= lib$(shell basename $(PWD))
 VPATH		=
 
 IDLS		= ForwardKinematicsService.idl ReachingService.idl \
-		  SequencePlayerService.idl WalkGeneratorService.idl
+		  SequencePlayerService.idl 
+		 #WalkGeneratorService.idl
 MOCHDRS		=
 
 INCDIRS		= -I. -I$(PREFIX)/include
@@ -22,7 +23,7 @@ ifeq ($(shell arch), armv7l)
 else ifeq ($(shell arch), aarch64)
   CPPFLAGS     += -DNEON
 else
-  CPPFLAGS     += -DSSE3
+  CPPFLAGS     += -DSSE4
 endif
 CCFLAGS		= $(CFLAGS)
 
@@ -72,4 +73,5 @@ HRP2.o: TU/HRP2++.h /usr/local/include/TU/Vector++.h \
 	/usr/local/include/TU/tuple.h /usr/local/include/TU/functional.h \
 	/usr/local/include/TU/range.h /usr/local/include/TU/pair.h \
 	bodyinfo_HRP3.h misc.h /usr/include/math.h bodyinfo_HRP2toHRP3.h \
-	bodyinfo_HRP2YH.h bodyinfo_HRP2SH.h bodyinfo_HRP2DOF7.h
+	bodyinfo_HRP2YH.h bodyinfo_HRP2SH.h bodyinfo_HRP2KAI.h \
+	bodyinfo_HRP2DOF7.h

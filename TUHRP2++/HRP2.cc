@@ -21,12 +21,22 @@
 #  include "bodyinfo_HRP2YH.h"
 #elif defined(HRP2SH)
 #  include "bodyinfo_HRP2SH.h"
+#elif defined(HRP2KAI)
+#  include "bodyinfo_HRP2KAI.h"
+#  define R_WRIST_P	RARM_JOINT6
+#  define L_WRIST_P	LARM_JOINT6
+#  define RARM_HAND	"RARM_JOINT7"
+#  define LARM_HAND	"LARM_JOINT7"
 #else
 #  include "bodyinfo_HRP2DOF7.h"
 #endif
 
 #if !defined(HALF_SITTING_WAIST_HEIGHT)
 #  define HALF_SITTING_WAIST_HEIGHT	(LEG_LINK_LEN1*cos(HALF_SITTING_HIP_ANGLE)+LEG_LINK_LEN2*cos(HALF_SITTING_ANKLE_ANGLE)+ANKLE_HEIGHT)
+#endif
+
+#if defined(deg2rad)
+#  undef deg2rad
 #endif
 
 namespace TU
@@ -75,7 +85,10 @@ deg2rad(T deg)
 ************************************************************************/
 HRP2::HRP2(int argc, char* argv[], const char* linkName, u_int capacity)
     :_ior(0),
-     _reaching(0), _motion(0), _seqplayer(0), _fk(0), _walkgenerator(0),
+     _reaching(0), _motion(0), _seqplayer(0), _fk(0),
+#ifdef HAVE_WALKGENERATOR
+     _walkgenerator(0),
+#endif
      _getRealPose(*this, linkName, capacity), _executeCommand(*this),
      _verbose(false)
 {
@@ -90,13 +103,13 @@ HRP2::setup(bool isLeftHand, bool isLaterMode)
 {
     using namespace	std;
 
-  // $B94B+@_Dj(B
+  // 拘束設定
     bool	constrained[] = {true, true, true, true, true, true};
     double	weights[]     = {10.0, 10.0, 10.0, 10.0, 10.0, 10.0};
     if (!SelectTaskDofs(isLeftHand, constrained, weights))
 	throw runtime_error("HRP2Client::SelectTaskDofs() failed!!");
 
-  // $B;HMQ$9$k<+M3EY$r@_Dj(B
+  // 使用する自由度を設定
     bool	usedDofs[] =
 		{
 		    true, true, true, true, true, true,		// right leg
@@ -121,19 +134,19 @@ HRP2::setup(bool isLeftHand, bool isLaterMode)
     if (!SelectUsedDofs(usedDofs))
 	throw runtime_error("HRP2Client::SelectUsedDofs() failed!!");
 
-  // $B%Y!<%9$H$J$k%j%s%/$r@_Dj(B
+  // ベースとなるリンクを設定
     if (!SelectBaseLink(RLEG_END))
 	throw runtime_error("HRP2Client::SelectBaseLink() failed!!");
 
-  // Later$B%b!<%I$^$?$O(BImmediate$B%b!<%I$K@_Dj(B
+  // LaterモードまたはImmediateモードに設定
     if (!SelectExecutionMode(isLaterMode))
 	throw runtime_error("HRP2Client::SelectExecutionMode() failed!!");
 
-  // $BH?BPB&$N<j$r6/@)E*$K(Bdeselect$B$7!$=jK>$N<j$r(Bselect$B$9$k!%(B
+  // 反対側の手を強制的にdeselectし，所望の手をselectする．
     DeSelectArm(!isLeftHand);
     SelectArm(isLeftHand);
 
-  // $B%9%l%C%I$r5/F0$9$k!%(B
+  // スレッドを起動する．
     _getRealPose.run();
     _executeCommand.run();
 }
@@ -611,6 +624,7 @@ HRP2::head_rotate(int yaw, int pitch)
     seqplay(EXCEPTHEAD);
 }
 
+#ifdef HAVE_WALKGENERATOR
 /*
  *  functions for WalkGeneratorService
  */
@@ -635,6 +649,7 @@ HRP2::arcTo(double x, double y, double theta) const
     }
     return;
 } 
+#endif
 
 /*
  *  private member functions
@@ -663,10 +678,10 @@ HRP2::init(int argc, char* argv[])
 	}
     ::opterr = 1;
     
-  // ORB$B$r<hF@(B
+  // ORBを取得
     CORBA::ORB_var	orb = CORBA::ORB_init(argc, argv);;
 
-  // NamingServer$B$r<hF@(B
+  // NamingServerを取得
     RTC::CorbaNaming*	naming;
     try
     {
@@ -678,24 +693,24 @@ HRP2::init(int argc, char* argv[])
 	return false;
     }
     
-  // ReachingService$B$r<hF@(B
+  // ReachingServiceを取得
     isSuccess(_reaching = getService<ReachingService>("Reaching",
 						      orb, naming),
 	      " to get ReachingService.", 0);
     
     
-  // SequencePlayerService$B$r<hF@(B
+  // SequencePlayerServiceを取得
     isSuccess(_seqplayer = getService<SequencePlayerService>("SequencePlayer",
 							     orb, naming),
 	      " to get SequencePlayerService.", 0);
 
-  // ForwardKinematicsService$B$r<hF@(B
+  // ForwardKinematicsServiceを取得
     isSuccess(_fk = getService<ForwardKinematicsService>("ForwardKinematics",
 							 orb, naming),
 	      " to get ForwardKinematicsService.", 0);
 
 #if HAVE_WALKGENERATOR
-  // WalkGeneratorService$B$r<hF@(B
+  // WalkGeneratorServiceを取得
     isSuccess(_walkgenerator = getService<WalkGeneratorService>("WalkGenerator",
 								orb, naming),
 	      " to get WalkGeneratorService.", 0);
@@ -784,7 +799,7 @@ HRP2::getService(const std::string& name,
     using namespace	OpenHRP;
     using namespace	std;
     
-  // RTC$B$r<hF@(B
+  // RTCを取得
     RTC::CorbaConsumer<RTC::RTObject>	rtc;
     try
     {
@@ -797,7 +812,7 @@ HRP2::getService(const std::string& name,
 	return 0;
     }
 
-  // Service$B$r<hF@(B
+  // Serviceを取得
     if (!getServiceIOR(rtc, std::string((name + "Service").c_str())))
     {
 	cerr << "TU::HRP2: FAILED to get IOR of " << name << "Service."
@@ -814,7 +829,7 @@ HRP2::getServiceIOR(RTC::CorbaConsumer<RTC::RTObject> rtc,
 {
     using namespace	std;
     
-  // TargetRTC$B$N%]!<%H%j%9%H$r<hF@(B
+  // TargetRTCのポートリストを取得
     RTC::PortServiceList	ports = *(rtc->get_ports());
     if (ports.length() <= 0)
     {
@@ -950,10 +965,10 @@ HRP2::GetRealPoseThread::GetRealPoseThread(const HRP2& hrp2,
 HRP2::GetRealPoseThread::~GetRealPoseThread()
 {
     pthread_mutex_lock(&_mutex);
-    _quit = true;			// $B=*N;%U%i%0$rN)$F$k(B
+    _quit = true;			// 終了フラグを立てる
     pthread_mutex_unlock(&_mutex);
 
-    pthread_join(_thread, NULL);	// $B;R%9%l%C%I$N=*N;$rBT$D(B
+    pthread_join(_thread, NULL);	// 子スレッドの終了を待つ
     pthread_mutex_destroy(&_mutex);
 }
 
@@ -968,9 +983,9 @@ HRP2::GetRealPoseThread::run()
 bool
 HRP2::GetRealPoseThread::operator ()(Time time, TimedPose& D) const
 {
-  // $BM?$($i$l$?;~9o$h$j$b8e$N%]!<%:$,F@$i$l$k$^$GBT$D!%(B
-    TimedPose	after;		// time$B$h$j$b8e$N;~9o$G<hF@$5$l$?%]!<%:(B
-    for (;;)			// $B$rH/8+$9$k$^$GBT$D!%(B
+  // 与えられた時刻よりも後のポーズが得られるまで待つ．
+    TimedPose	after;		// timeよりも後の時刻で取得されたポーズ
+    for (;;)			// を発見するまで待つ．
     {
 #if 0
 	using namespace	std;
@@ -985,29 +1000,29 @@ HRP2::GetRealPoseThread::operator ()(Time time, TimedPose& D) const
 	pthread_mutex_unlock(&_mutex);
     }
 
-  // $B%j%s%0%P%C%U%!$r2a5n$KAL$j!$M?$($i$l$?;~9o$h$j$bA0$N%]!<%:$rC5$9!%(B
+  // リングバッファを過去に遡り，与えられた時刻よりも前のポーズを探す．
     BOOST_REVERSE_FOREACH (const TimedPose& pose, _poses)
     {
-	if (pose.t <= time)	// time$B$ND>A0$N%]!<%:$J$i$P!%!%!%(B
+	if (pose.t <= time)	// timeの直前のポーズならば．．．
 	{
-	  // pose$B$H(Bafter$B$N$&$A!$$=$N;~9o$,(Btime$B$K6a$$J}$rJV$9!%(B
+	  // poseとafterのうち，その時刻がtimeに近い方を返す．
 	    if ((time - pose.t) < (after.t - time))
-	    {			// time$B$,(Bafter$B$h$j$b(Bpose$B$N;~9o$K6a$1$l$P!%!%!%(B
+	    {			// timeがafterよりもposeの時刻に近ければ．．．
 		D = pose;
 	    }
-	    else		// time$B$,(Bpose$B$h$j$b(Bafter$B$N;~9o$K6a$1$l$P!%!%!%(B
+	    else		// timeがposeよりもafterの時刻に近ければ．．．
 	    {
 		D = after;
 	    }
 	    pthread_mutex_unlock(&_mutex);
 
-	    return true;	// time$B$r64$`#2$D$N%]!<%:$rH/8+$7$?(B
+	    return true;	// timeを挟む２つのポーズを発見した
 	}
 	after = pose;
     }
     pthread_mutex_unlock(&_mutex);
 
-    return false;		// time$B$ND>A0$N%]!<%:$rH/8+$G$-$J$+$C$?(B
+    return false;		// timeの直前のポーズを発見できなかった
 }
 
 void
@@ -1033,18 +1048,18 @@ HRP2::GetRealPoseThread::mainLoop()
     for (;;)
     {
 	pthread_mutex_lock(&_mutex);
-	bool	quit = _quit;		// $BL?Na$r<hF@(B
+	bool	quit = _quit;		// 命令を取得
 	pthread_mutex_unlock(&_mutex);
-	if (quit)			// $B=*N;L?Na$J$i$P(B...
-	    break;			// $BC&=P(B
+	if (quit)			// 終了命令ならば...
+	    break;			// 脱出
 
 	TimedPose	D;
 	if (_hrp2.GetRealPose(const_cast<char*>(_linkName.c_str()), D))
-	{					// $B%]!<%:F~NO@.8y!)(B
+	{					// ポーズ入力成功？
 	    if (_poses.empty() || (D.t != _poses.back().t))
 	    {
 		pthread_mutex_lock(&_mutex);
-		_poses.push_back(D);		// $B%j%s%0%P%C%U%!$KF~$l$k(B
+		_poses.push_back(D);		// リングバッファに入れる
 		pthread_mutex_unlock(&_mutex);
 	    }
 	}
@@ -1076,11 +1091,11 @@ HRP2::ExecuteCommandThread::ExecuteCommandThread(const HRP2& hrp2)
 HRP2::ExecuteCommandThread::~ExecuteCommandThread()
 {
     pthread_mutex_lock(&_mutex);
-    _quit = true;			// $B=*N;L?Na$r%;%C%H(B
-    pthread_cond_signal(&_cond);	// $B;R%9%l%C%I$K=*N;L?Na$rAw$k(B
+    _quit = true;			// 終了命令をセット
+    pthread_cond_signal(&_cond);	// 子スレッドに終了命令を送る
     pthread_mutex_unlock(&_mutex);
 
-    pthread_join(_thread, NULL);	// $B;R%9%l%C%I$N=*N;$rBT$D(B
+    pthread_join(_thread, NULL);	// 子スレッドの終了を待つ
     pthread_cond_destroy(&_cond);
     pthread_mutex_destroy(&_mutex);
 }
@@ -1097,8 +1112,8 @@ void
 HRP2::ExecuteCommandThread::operator ()(Command command) const
 {
     pthread_mutex_lock(&_mutex);
-    _commands.push(command);		// $B%3%^%s%I$r%-%e!<$KF~$l$k(B
-    pthread_cond_signal(&_cond);	// $B;R%9%l%C%I$K<B9TL?Na$rAw$k(B
+    _commands.push(command);		// コマンドをキューに入れる
+    pthread_cond_signal(&_cond);	// 子スレッドに実行命令を送る
     pthread_mutex_unlock(&_mutex);
 }
 
@@ -1106,8 +1121,8 @@ void
 HRP2::ExecuteCommandThread::wait() const
 {
     pthread_mutex_lock(&_mutex);
-    while (!_commands.empty())		// $BA4%3%^%s%I$N<B9T$,40N;$9$k$^$G(B
-	pthread_cond_wait(&_cond, &_mutex);	// $BBT$D(B
+    while (!_commands.empty())		// 全コマンドの実行が完了するまで
+	pthread_cond_wait(&_cond, &_mutex);	// 待つ
     pthread_mutex_unlock(&_mutex);
 }
 
@@ -1115,10 +1130,10 @@ bool
 HRP2::ExecuteCommandThread::isCompleted() const
 {
     pthread_mutex_lock(&_mutex);
-    bool	empty = _commands.empty();	// $B%-%e!<$,6u!)(B
+    bool	empty = _commands.empty();	// キューが空？
     pthread_mutex_unlock(&_mutex);
 
-    return empty;			// $B%-%e!<$,6u$J$i$P<B9T40N;(B
+    return empty;			// キューが空ならば実行完了
 }
     
 void*
@@ -1127,17 +1142,17 @@ HRP2::ExecuteCommandThread::mainLoop()
     pthread_mutex_lock(&_mutex);
     for (;;)
     {
-	pthread_cond_wait(&_cond, &_mutex);	// $B?F$+$i$NL?Na$rBT$D(B
-	if (_quit)				// $B%9%l%C%I=*N;L?Na$J$i$P(B...
-	    break;				// $B%k!<%W$rC&=P(B
-	else if (!_commands.empty())		// $B<B9TL?Na$J$i$P(B...
+	pthread_cond_wait(&_cond, &_mutex);	// 親からの命令を待つ
+	if (_quit)				// スレッド終了命令ならば...
+	    break;				// ループを脱出
+	else if (!_commands.empty())		// 実行命令ならば...
 	{
-	    Command	command = _commands.front();	// $B:G8E$N%3%^%s%I(B
+	    Command	command = _commands.front();	// 最古のコマンド
 	    pthread_mutex_unlock(&_mutex);
-	    (_hrp2.*command)(true);		// $B:G8E$N%3%^%s%I$r<B9T(B
+	    (_hrp2.*command)(true);		// 最古のコマンドを実行
 	    pthread_mutex_lock(&_mutex);
-	    _commands.pop();			// $B:G8E$N%3%^%s%I$r<N$F$k(B
-	    pthread_cond_signal(&_cond);	// $B?F$K<B9T$,40N;$7$?$3$H$rDLCN(B
+	    _commands.pop();			// 最古のコマンドを捨てる
+	    pthread_cond_signal(&_cond);	// 親に実行が完了したことを通知
 	}
     }
     pthread_mutex_unlock(&_mutex);

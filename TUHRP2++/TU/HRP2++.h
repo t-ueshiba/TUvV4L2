@@ -19,7 +19,9 @@
 #include "ReachingService.hh"
 #include "SequencePlayerService.hh"
 #include "ForwardKinematicsService.hh"
-#include "WalkGeneratorService.hh"
+#ifdef HAVE_WALKGENERATOR
+#  include "WalkGeneratorService.hh"
+#endif
 #include <pthread.h>
 #include <string>
 #include <queue>
@@ -53,10 +55,10 @@ class HRP2
 	HANDS, LEFTHAND, RIGHTHAND, DESIREDMASK, EXCEPTHEAD
     };
 
-  //! HRP2¤ÎÆÃÄê¤Î´ØÀá¤Î»ÑÀª¤ò¾ï»ş´Æ»ë¤¹¤ë¥¹¥ì¥Ã¥É
+  //! HRP2ã®ç‰¹å®šã®é–¢ç¯€ã®å§¿å‹¢ã‚’å¸¸æ™‚ç›£è¦–ã™ã‚‹ã‚¹ãƒ¬ãƒƒãƒ‰
   /*!
-   *  »ÑÀª¤ò¥ê¥ó¥°¥Ğ¥Ã¥Õ¥¡¤ËÊİÂ¸¤·¡¤¥¯¥é¥¤¥¢¥ó¥È¤ÎÍ×µá¤Ë±ş¤¸¤Æ»ØÄê¤µ¤ì¤¿»ş¹ï¤Ë¤â¤Ã¤È¤â
-   *  ¶á¤¤»ş¹ï¤Ë¤ª¤±¤ë»ÑÀª¤òÊÖ¤¹¡¥
+   *  å§¿å‹¢ã‚’ãƒªãƒ³ã‚°ãƒãƒƒãƒ•ã‚¡ã«ä¿å­˜ã—ï¼Œã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆã®è¦æ±‚ã«å¿œã˜ã¦æŒ‡å®šã•ã‚ŒãŸæ™‚åˆ»ã«ã‚‚ã£ã¨ã‚‚
+   *  è¿‘ã„æ™‚åˆ»ã«ãŠã‘ã‚‹å§¿å‹¢ã‚’è¿”ã™ï¼
    */
     class GetRealPoseThread
     {
@@ -81,10 +83,10 @@ class HRP2
 	pthread_t				_thread;
     };
 
-  //! HRP2¤Î°ú¿ô¤ò»ı¤¿¤Ê¤¤¥³¥Ş¥ó¥É¤ò¼Â¹Ô¤¹¤ë¥¹¥ì¥Ã¥É
+  //! HRP2ã®å¼•æ•°ã‚’æŒãŸãªã„ã‚³ãƒãƒ³ãƒ‰ã‚’å®Ÿè¡Œã™ã‚‹ã‚¹ãƒ¬ãƒƒãƒ‰
   /*!
-   *  HRP2¤¬ÌÜÉ¸ÃÍ¤ËÅşÃ£¤¹¤ë¤Ş¤Ç¸Æ½ĞÂ¦¤ËÀ©¸æ¤òÊÖ¤µ¤Ê¤¤¥³¥Ş¥ó¥É¤Ë¤Ä¤¤¤Æ¡¤¤³¤ì¤òÆÈÎ©¤·¤¿
-   *  ¥¹¥ì¥Ã¥É¤ÇÁö¤é¤»¤ë¤³¤È¤Ë¤è¤ê¡¤¥³¥Ş¥ó¥É¼Â¹ÔÃæ¤Ë¥Û¥¹¥ÈÂ¦¤¬ÊÌ¤Îºî¶È¤ò¹Ô¤¨¤ë¤è¤¦¤Ë¤¹¤ë¡¥
+   *  HRP2ãŒç›®æ¨™å€¤ã«åˆ°é”ã™ã‚‹ã¾ã§å‘¼å‡ºå´ã«åˆ¶å¾¡ã‚’è¿”ã•ãªã„ã‚³ãƒãƒ³ãƒ‰ã«ã¤ã„ã¦ï¼Œã“ã‚Œã‚’ç‹¬ç«‹ã—ãŸ
+   *  ã‚¹ãƒ¬ãƒƒãƒ‰ã§èµ°ã‚‰ã›ã‚‹ã“ã¨ã«ã‚ˆã‚Šï¼Œã‚³ãƒãƒ³ãƒ‰å®Ÿè¡Œä¸­ã«ãƒ›ã‚¹ãƒˆå´ãŒåˆ¥ã®ä½œæ¥­ã‚’è¡Œãˆã‚‹ã‚ˆã†ã«ã™ã‚‹ï¼
    */
     class ExecuteCommandThread
     {
@@ -173,10 +175,11 @@ class HRP2
     void	go_handopeningpos(bool isLeft, double ang)	const	;
     void	chest_rotate(int yaw, int pitch)			;
     void	head_rotate(int yaw, int pitch)				;
-
+#ifdef HAVE_WALKGENERATOR
   // WalkGeneratorService
     void	walkTo(double x, double y, double theta)	const	;
     void	arcTo(double x, double y, double theta)		const	;
+#endif
     
   private:
     bool	init(int argc, char* argv[])				;
@@ -195,8 +198,9 @@ class HRP2
     OpenHRP::ReachingService::motion_var	_motion;
     OpenHRP::SequencePlayerService_var		_seqplayer;
     OpenHRP::ForwardKinematicsService_var	_fk;
+#ifdef HAVE_WALKGENERATOR
     OpenHRP::WalkGeneratorService_var		_walkgenerator;
-
+#endif
     OpenHRP::dSequence				_posture[4];
     OpenHRP::bSequence				_mask[5];
 
