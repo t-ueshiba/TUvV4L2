@@ -127,10 +127,11 @@ class Buf : public BufTraits<T, ALLOC>
 			throw std::logic_error("Buf<T, ALLOC, SIZE, SIZES...>::Buf(): mismatched size!");
 		    init(typename std::is_arithmetic<value_type>::type());
 		}
-    void	resize(const sizes_type& sizes, size_t=0)
+    bool	resize(const sizes_type& sizes, size_t=0)
 		{
 		    if (!check_sizes(sizes, axis<D>()))
 			throw std::logic_error("Buf<T, ALLOC, SIZE, SIZES...>::resize(): mismatched size!");
+		    return false;
 		}
 
     template <size_t I_=0>

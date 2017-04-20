@@ -23,9 +23,9 @@ static CmdDef	Cmds[] =
 {
     {C_Slider, c_WinSize,	 11, "Window size:",	range[0], CA_None,
      0, 0, 1, 1, 0},
-    {C_Slider, c_Regularization, 60, "Regularization:",	range[1], CA_None,
+    {C_Slider, c_Regularization, 32, "Regularization:",	range[1], CA_None,
      1, 0, 1, 1, 0},
-    {C_Slider, c_Saturation,    256, "Saturation:",     range[2], CA_None,
+    {C_Slider, c_Saturation,    255, "Saturation:",     range[2], CA_None,
      2, 0, 1, 1, 0},
     EndOfCmds
 };

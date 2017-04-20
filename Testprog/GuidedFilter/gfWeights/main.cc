@@ -169,6 +169,7 @@ MyCmdWindow<T>::showWeights(size_t u, size_t v)
 		  guide.begin(), guide.end(), out.begin());
     _weights = slice(out, vc - w + 1, out.height() - w + 1,
 			  uc - w + 1, out.width()  - w + 1);
+  //_weights = out;
 #endif
     _weightsCanvas.setSize(2*w - 1, 2*w - 1);
     _weightsCanvas.repaintUnderlay();

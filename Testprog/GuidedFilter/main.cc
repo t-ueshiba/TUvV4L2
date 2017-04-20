@@ -35,10 +35,7 @@ main(int argc, char* argv[])
 
     GuidedFilter<float>	gf(w, e);
   //gf.convolve(a.begin(), a.end(), b.begin(), b.end(), c.begin() + w - 1);
-  //gf.convolve(a.begin(), a.end(), c.begin() + w - 1);
-
-    auto		ab = std::make_tuple(std::cref(a), std::cref(b));
-    gf.convolve(std::begin(ab), std::end(ab), c.begin() + w - 1);
+    gf.convolve(a.begin(), a.end(), c.begin() + w - 1);
     cout << c;
 
   // guided filterを2つの2D arrayに適用する．
@@ -50,11 +47,8 @@ main(int argc, char* argv[])
     Array2<float>	C(A.nrow(), A.ncol());
 
     GuidedFilter2<float>	gf2(w, w, e);
-    gf2.convolve(A.begin(), A.end(), B.begin(), B.end(), C.begin());
+  //gf2.convolve(A.begin(), A.end(), B.begin(), B.end(), C.begin());
     gf2.convolve(A.begin(), A.end(), C.begin());
-
-    auto	AB = std::make_tuple(std::cref(A), std::cref(B));
-  //gf2.convolve(std::begin(AB), std::end(AB), C.begin());
     cout << C;
 
     return 0;
