@@ -333,12 +333,12 @@ square(ITER begin, ARG arg)
 {
     return detail::square(begin, arg, std::integral_constant<size_t, N>());
 }
-    
+
 template <class T> inline std::enable_if_t<std::is_arithmetic<T>::value, T>
 square(const T& val)
 {
     return detail::square(val);
 }
-
+    
 }	// namespace TU
 #endif	// !__TU_ALGORITHM_H

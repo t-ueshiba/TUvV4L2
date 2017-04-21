@@ -125,12 +125,12 @@ IntegralImage<T>::initialize(const Image<S>& image)
     (*this)[0] = 0;					// 0行目はすべて0
     for (size_t v = 1; v < height(); ++v)
     {
-	T*		dst = (*this)[v].data();
+	T*		dst = (*this)[v].begin();
 	*dst = 0;					// 0列目は0
 
-	const S*	src = image[v-1].data();
+	const S*	src = image[v-1].begin();
 	T		val = 0;			// この行のこの画素までの和
-	const T*	prv = (*this)[v-1].data();	// 1行上
+	const T*	prv = (*this)[v-1].begin();	// 1行上
 	const T* const	end = dst + width();
 	while (++dst < end)
 	    *dst = (val += *src++) + *(++prv);
@@ -322,20 +322,20 @@ DiagonalIntegralImage<T>::initialize(const Image<S>& image)
     super::resize(image.height(), image.width());
     
     Array<T>	K(width() + height() - 1), L(width() + height() - 1);
-    for (size_t i = 0; i < K.dim(); ++i)
+    for (size_t i = 0; i < K.size(); ++i)
 	K[i] = L[i] = 0;
     
     for (size_t v = 0; v < height(); ++v)
     {
-	const S*	src = image[v].data();
-	T		*dst = (*this)[v].data(),
+	const S*	src = image[v].begin();
+	T		*dst = (*this)[v].begin(),
 			*kp = &K[height() - 1 - v], *lp = &L[v];
 	if (v == 0)
 	    for (const T* const end = dst + width(); dst < end; )
 		*dst++ = *kp++ = *lp++ = *src++;
 	else
 	{
-	    const T*	prv = (*this)[v-1].data();
+	    const T*	prv = (*this)[v-1].begin();
 	    for (const T* const end = dst + width(); dst < end; )
 	    {
 		*dst++ = *src + *kp + *lp + *prv++;
