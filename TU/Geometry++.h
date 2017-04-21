@@ -868,7 +868,7 @@ inline auto
 Projectivity<T, DO, DI>::square_distance(const std::pair<IN, OUT>& pair) const
     -> element_type
 {
-    return square_distance((*this)(pair.first), pair.second);
+    return TU::square_distance((*this)(pair.first), pair.second);
 }
     
 //! 入力点に射影変換を適用した点と出力点の距離を返す．

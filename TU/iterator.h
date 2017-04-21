@@ -151,15 +151,15 @@ class transform_iterator2
     : public boost::iterator_adaptor<
 		 transform_iterator2<FUNC, ITER0, ITER1>,
 		 ITER0,
-		 typename std::result_of<FUNC(iterator_reference<ITER0>,
-					      iterator_reference<ITER1>)>::type,
+		 std::result_of_t<FUNC(iterator_reference<ITER0>,
+				       iterator_reference<ITER1>)>,
 		 boost::use_default,
-		 typename std::result_of<FUNC(iterator_reference<ITER0>,
-					      iterator_reference<ITER1>)>::type>
+		 std::result_of_t<FUNC(iterator_reference<ITER0>,
+				       iterator_reference<ITER1>)> >
 {
   private:
-    using ref	= typename std::result_of<FUNC(iterator_reference<ITER0>,
-					       iterator_reference<ITER1>)>::type;
+    using ref	= std::result_of_t<FUNC(iterator_reference<ITER0>,
+					iterator_reference<ITER1>)>;
     using super	= boost::iterator_adaptor<transform_iterator2,
 					  ITER0,
 					  ref,
@@ -291,7 +291,6 @@ namespace detail
 			    *_iter ^= _func(val);
 			    return *this;
 			}
-
 
     private:
       const ITER&	_iter;

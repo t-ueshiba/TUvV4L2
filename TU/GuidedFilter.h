@@ -253,8 +253,6 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out) const
 			make_assignment_iterator(c.begin()->begin(),
 						 init_coeffs(n, _e)),
 			c.begin().stride(), c.begin().size()));
-
-    std::cout << "--- c ---\n" << c;
     
   // 係数ベクトルの平均値を求め，それによってガイドデータ列を線型変換する．
     std::advance(gb,  rowWinSize() - 1);
