@@ -90,7 +90,7 @@ class ConstNormConstraint
   */
     matrix_type	derivative(const argument_type& x) const
 		{
-		    const auto	y = make_range(x.data(), x.capacity());
+		    const auto	y = serialize(x);
 		    matrix_type	L(1, y.size());
 		    L[0] = 2 * y;
 		    return L;

@@ -90,15 +90,23 @@ namespace TU
 /************************************************************************
 *  type aliases								*
 ************************************************************************/
+//! 反復子が指す型
 template <class ITER>
 using iterator_value	  = typename std::iterator_traits<ITER>::value_type;
+
+//! 反復子が指す型への参照
 template <class ITER>
 using iterator_reference  = typename std::iterator_traits<ITER>::reference;
+
+//! 反復子が指す型へのポインタ
 template <class ITER>
 using iterator_pointer	  = typename std::iterator_traits<ITER>::pointer;
+    
+//! 2つの反復子間の差を表す型
 template <class ITER>
 using iterator_difference = typename std::iterator_traits<ITER>
 					::difference_type;
+//! 反復子のカテゴリ
 template <class ITER>
 using iterator_category	  = typename std::iterator_traits<ITER>
 					::iterator_category;
