@@ -16,6 +16,8 @@ SUBDIR	= BandMatrix		\
 	  TreeFilter		\
 	  Vector		\
 	  WeightedMedianFilter	\
+	  array			\
+	  tuple			\
 	  simd
 
 TARGETS	= all clean depend

@@ -110,23 +110,23 @@ namespace detail
       return 3;
   }
 
-  template <class E> inline size_t
+  template <class E> inline auto
   size(const E& expr, std::integral_constant<size_t, 0>)
   {
       return std::size(expr);
   }
-  template <size_t I, class E> inline size_t
+  template <size_t I, class E> inline auto
   size(const E& expr, std::integral_constant<size_t, I>)
   {
       return size(*std::begin(expr), std::integral_constant<size_t, I-1>());
   }
 
-  template <class E> inline size_t
+  template <class E> inline auto
   stride(const E& expr, std::integral_constant<size_t, 1>)
   {
       return std::begin(expr).stride();
   }
-  template <size_t I, class E> inline size_t
+  template <size_t I, class E> inline auto
   stride(const E& expr, std::integral_constant<size_t, I>)
   {
       return stride(*std::begin(expr), std::integral_constant<size_t, I-1>());
@@ -161,7 +161,8 @@ size0()
   \param E	式の型
   \return	軸Iの要素数
  */
-template <size_t I, class E> inline std::enable_if_t<rank<E>() != 0, size_t>
+template <size_t I, class E, std::enable_if_t<rank<E>() != 0>* = nullptr>
+inline auto
 size(const E& expr)
 {
     return detail::size(expr, std::integral_constant<size_t, I>());
@@ -173,7 +174,8 @@ size(const E& expr)
   \param E	式の型
   \return	軸Iのストライド
  */
-template <size_t I, class E> inline std::enable_if_t<rank<E>() != 0, size_t>
+template <size_t I, class E, std::enable_if_t<rank<E>() != 0>* = nullptr>
+inline auto
 stride(const E& expr)
 {
     return detail::stride(expr, std::integral_constant<size_t, I>());
@@ -299,7 +301,7 @@ operator <<(std::ostream& out, const sizes_and_strides_holder<E>& holder)
 //! 先頭要素を指す反復子と要素数によって指定される範囲(レンジ)を表すクラス
 /*!
   \param ITER	反復子の型
-  \param SIZE	レンジに含まれる要素数(0ならば可変長)
+  \param SIZE	レンジサイズ(0ならば可変長)
 */
 template <class ITER, size_t SIZE=0>
 class range
@@ -470,7 +472,7 @@ class range<ITER, 0>
 
 //! 固定長レンジを生成する
 /*!
-  \param SIZE	レンジ長
+  \param SIZE	レンジサイズ
   \param iter	レンジの先頭要素を指す反復子
 */
 template <size_t SIZE, class ITER> inline range<ITER, SIZE>
@@ -482,7 +484,7 @@ make_range(ITER iter)
 //! 可変長レンジを生成する
 /*!
   \param iter	レンジの先頭要素を指す反復子
-  \param size	レンジの要素数
+  \param size	レンジサイズ
 */
 template <size_t SIZE=0, class ITER> inline range<ITER, SIZE>
 make_range(ITER iter, size_t size)
@@ -509,30 +511,30 @@ operator <<(std::ostream& out, const range<ITER, SIZE>& r)
 ************************************************************************/
 namespace detail
 {
-  template <size_t STRIDE, size_t SIZE>
+  template <ptrdiff_t STRIDE, size_t SIZE>
   struct stride_and_size
   {
-      constexpr static size_t	stride()	{ return STRIDE; }
-      constexpr static size_t	size()		{ return SIZE; }
+      constexpr static auto	stride()	{ return STRIDE; }
+      constexpr static auto	size()		{ return SIZE; }
   };
   template <size_t SIZE>
   struct stride_and_size<0, SIZE>
   {
-      stride_and_size(size_t stride)
+      stride_and_size(ptrdiff_t stride)
 	  :_stride(stride)			{}
-      size_t			stride() const	{ return _stride; }
-      constexpr static size_t	size()		{ return SIZE; }
+      auto			stride() const	{ return _stride; }
+      constexpr static auto	size()		{ return SIZE; }
 
     private:
-      size_t	_stride;
+      ptrdiff_t	_stride;
   };
-  template <size_t STRIDE>
+  template <ptrdiff_t STRIDE>
   struct stride_and_size<STRIDE, 0>
   {
       stride_and_size(size_t size)
 	  :_size(size)				{}
-      constexpr static size_t	stride()	{ return STRIDE; }
-      size_t			size()	 const	{ return _size; }
+      constexpr static auto	stride()	{ return STRIDE; }
+      auto			size()	 const	{ return _size; }
 
     private:
       size_t	_size;
@@ -540,13 +542,13 @@ namespace detail
   template <>
   struct stride_and_size<0, 0>
   {
-      stride_and_size(size_t stride, size_t size)
+      stride_and_size(ptrdiff_t stride, size_t size)
 	  :_stride(stride), _size(size)		{}
-      size_t			stride() const	{ return _stride; }
-      size_t			size()	 const	{ return _size; }
+      auto			stride() const	{ return _stride; }
+      auto			size()	 const	{ return _size; }
 
     private:
-      size_t	_stride;
+      ptrdiff_t	_stride;
       size_t	_size;
   };
 }	// namespace detail
@@ -555,9 +557,9 @@ namespace detail
 /*!
   \param ITER	配列の要素を指す反復子の型
   \param STRIDE	インクリメントしたときに進める要素数(0ならば可変)
-  \param SIZE	レンジ長(0ならば可変長)
+  \param SIZE	レンジサイズ(0ならば可変長)
 */
-template <class ITER, size_t STRIDE, size_t SIZE>
+template <class ITER, ptrdiff_t STRIDE, size_t SIZE>
 class range_iterator
     : public boost::iterator_adaptor<range_iterator<ITER, STRIDE, SIZE>,
 				     ITER,
@@ -581,28 +583,28 @@ class range_iterator
     friend class	boost::iterator_core_access;
 	  
   public:
-    template <size_t STRIDE_=STRIDE, size_t SIZE_=SIZE,
+    template <ptrdiff_t STRIDE_=STRIDE, size_t SIZE_=SIZE,
 	      std::enable_if_t<(STRIDE_ != 0) && (SIZE_ != 0)>* = nullptr>
 		range_iterator(ITER iter)
 		    :super(iter), ss()					{}
-    template <size_t STRIDE_=STRIDE, size_t SIZE_=SIZE,
+    template <ptrdiff_t STRIDE_=STRIDE, size_t SIZE_=SIZE,
 	      std::enable_if_t<(STRIDE_ == 0) && (SIZE_ != 0)>* = nullptr>
-		range_iterator(ITER iter, size_t stride)
+		range_iterator(ITER iter, ptrdiff_t stride)
 		    :super(iter), ss(stride)				{}
-    template <size_t STRIDE_=STRIDE, size_t SIZE_=SIZE,
+    template <ptrdiff_t STRIDE_=STRIDE, size_t SIZE_=SIZE,
 	      std::enable_if_t<(STRIDE_ != 0) && (SIZE_ == 0)>* = nullptr>
 		range_iterator(ITER iter, size_t size)
 		    :super(iter), ss(size)				{}
-    template <size_t STRIDE_=STRIDE, size_t SIZE_=SIZE,
+    template <ptrdiff_t STRIDE_=STRIDE, size_t SIZE_=SIZE,
 	      std::enable_if_t<(STRIDE_ == 0) && (SIZE_ == 0)>* = nullptr>
-		range_iterator(ITER iter, size_t stride, size_t size)
+		range_iterator(ITER iter, ptrdiff_t stride, size_t size)
 		    :super(iter), ss(stride, size)			{}
 
     template <class ITER_,
 	      std::enable_if_t<std::is_convertible<ITER_, ITER>::value>*
 	      = nullptr>
 		range_iterator(
-		    const range_iterator<ITER_, SIZE, STRIDE>& iter)
+		    const range_iterator<ITER_, STRIDE, SIZE>& iter)
 		    :super(iter), ss(iter)				{}
 
     using	ss::size;
@@ -615,31 +617,30 @@ class range_iterator
 		}
     void	increment()
 		{
-		    super::base_reference() += difference_type(stride());
+		    super::base_reference() += stride();
 		}
     void	decrement()
 		{
-		    super::base_reference() -= difference_type(stride());
+		    super::base_reference() -= stride();
 		}
     void	advance(difference_type n)
 		{
-		    super::base_reference() += n*difference_type(stride());
+		    super::base_reference() += n*stride();
 		}
     difference_type
 		distance_to(const range_iterator& iter) const
 		{
-		    return (iter.base() - super::base())
-			 / difference_type(stride());
+		    return (iter.base() - super::base()) / stride();
 		}
 };
 
 //! 固定長レンジを指し，インクリメント時に固定した要素数だけ進める反復子を生成する
 /*!
   \param STRIDE	インクリメント時に進める要素数
-  \param SIZE	レンジ長
+  \param SIZE	レンジサイズ
   \param iter	レンジの先頭要素を指す反復子
 */
-template <size_t STRIDE, size_t SIZE, class ITER>
+template <ptrdiff_t STRIDE, size_t SIZE, class ITER>
 inline range_iterator<ITER, STRIDE, SIZE>
 make_range_iterator(ITER iter)
 {
@@ -648,12 +649,13 @@ make_range_iterator(ITER iter)
 
 //! 固定長レンジを指し，インクリメント時に指定した要素数だけ進める反復子を生成する
 /*!
-  \param SIZE	レンジ長
+  \param SIZE	レンジサイズ
   \param iter	レンジの先頭要素を指す反復子
   \param stride	インクリメント時に進める要素数
 */
-template <size_t SIZE, class ITER> inline range_iterator<ITER, 0, SIZE>
-make_range_iterator(ITER iter, size_t stride)
+template <size_t SIZE, class ITER>
+inline range_iterator<ITER, 0, SIZE>
+make_range_iterator(ITER iter, ptrdiff_t stride)
 {
     return {iter, stride};
 }
@@ -662,10 +664,10 @@ make_range_iterator(ITER iter, size_t stride)
 /*!
   \param iter	レンジの先頭要素を指す反復子
   \param stride	インクリメント時に進める要素数
-  \param size	レンジ長
+  \param size	レンジサイズ
 */
 template <class ITER> inline range_iterator<ITER, 0, 0>
-make_range_iterator(ITER iter, size_t stride, size_t size)
+make_range_iterator(ITER iter, ptrdiff_t stride, size_t size)
 {
     return {iter, stride, size};
 }
@@ -676,8 +678,8 @@ make_range_iterator(ITER iter, size_t stride, size_t size)
 //! 多次元固定長レンジを指し，インクリメント時に固定したブロック数だけ進める反復子を生成する
 /*!
   \param STRIDE	インクリメント時に進める最上位軸のブロック数
-  \param SIZE	最上位軸のレンジ長
-  \param SS	2番目以降の軸の{ストライド, レンジ長}の並び
+  \param SIZE	最上位軸のレンジサイズ
+  \param SS	2番目以降の軸の{ストライド, レンジサイズ}の並び
   \param iter	レンジの先頭要素を指す反復子
 */
 template <size_t STRIDE, size_t SIZE, size_t... SS, class ITER,
@@ -701,8 +703,8 @@ make_range(ITER iter)
 ************************************************************************/
 //! 多次元固定長レンジを指し，インクリメント時に指定したブロック数だけ進める反復子を生成する
 /*!
-  \param SIZE		最上位軸のレンジ長
-  \param SIZES		2番目以降の軸のレンジ長の並び
+  \param SIZE		最上位軸のレンジサイズ
+  \param SIZES		2番目以降の軸のレンジサイズの並び
   \param stride		最上位軸のストライド
   \param strides	2番目以降の軸のストライドの並び
   \param iter		レンジの先頭要素を指す反復子
@@ -710,7 +712,7 @@ make_range(ITER iter)
 template <size_t SIZE, size_t... SIZES, class ITER, class... STRIDES,
 	  std::enable_if_t<sizeof...(SIZES) == sizeof...(STRIDES)>* = nullptr>
 inline auto
-make_range_iterator(ITER iter, size_t stride, STRIDES... strides)
+make_range_iterator(ITER iter, ptrdiff_t stride, STRIDES... strides)
 {
     return make_range_iterator<SIZE>(
 	       make_range_iterator<SIZES...>(iter, strides...), stride);
@@ -731,11 +733,11 @@ make_range(ITER iter, STRIDES... strides)
 /*!
   \param iter		レンジの先頭要素を指す反復子
   \param stride		最上位軸のストライド
-  \param size		最上位軸のレンジ長
-  \param ss		2番目以降の軸の{ストライド, レンジ長}の並び
+  \param size		最上位軸のレンジサイズ
+  \param ss		2番目以降の軸の{ストライド, レンジサイズ}の並び
 */
 template <class ITER, class... SS> inline auto
-make_range_iterator(ITER iter, size_t stride, size_t size, SS... ss)
+make_range_iterator(ITER iter, ptrdiff_t stride, size_t size, SS... ss)
 {
     return make_range_iterator(make_range_iterator(iter, ss...),
 			       stride, size);

@@ -89,6 +89,54 @@ struct any_tuple<ARG, ARGS...>
 				    any_tuple<ARGS...>::value)>		{};
     
 /************************************************************************
+*  type alias: tuple_head<T>						*
+************************************************************************/
+namespace detail
+{
+  template <class T>
+  struct tuple_head
+  {
+      using type = T;
+  };
+  template <class... T>
+  struct tuple_head<std::tuple<T...> >
+  {
+      using type = std::tuple_element_t<0, std::tuple<T...> >;
+  };
+}	// namespace detail
+    
+//! 与えられた型がtupleならばその先頭要素の型を，そうでなければ元の型を返す．
+/*!
+  \param T	その先頭要素の型を調べるべき型
+*/
+template <class T>
+using tuple_head = typename detail::tuple_head<T>::type;
+
+/************************************************************************
+*  type alias: tuple_replace<S, T>					*
+************************************************************************/
+namespace detail
+{
+  template <class S, class T>
+  struct tuple_replace : std::conditional<std::is_void<T>::value, S, T>
+  {
+  };
+  template <class... S, class T>
+  struct tuple_replace<std::tuple<S...>, T>
+  {
+      using type = std::tuple<typename tuple_replace<S, T>::type...>;
+  };
+}	// namespace detail
+    
+//! 与えられた型がtupleならばその全要素の型を，そうでなければ元の型自身を別の型で置き換える．
+/*!
+  \param S	要素型置換の対象となる型
+  \param T	置換後の要素の型．voidならば置換しない．
+*/
+template <class S, class T=void>
+using tuple_replace = typename detail::tuple_replace<S, T>::type;
+
+/************************************************************************
 *  make_reference_wrapper(T&&)						*
 ************************************************************************/
 //! 与えられた値の型に応じて実引数を生成する
@@ -301,14 +349,14 @@ class zip_iterator
   public:
     using	typename super::reference;
     using	typename super::difference_type;
-
+    
   public:
-    zip_iterator(ITER_TUPLE iter_tuple)
-	:_iter_tuple(iter_tuple)		{}
+		zip_iterator(ITER_TUPLE iter_tuple)
+		    :_iter_tuple(iter_tuple)		{}
 
     const ITER_TUPLE&
-		get_iterator_tuple()	const	{ return _iter_tuple; }
-    
+		get_iterator_tuple()		const	{ return _iter_tuple; }
+
   private:
     reference	dereference() const
 		{
@@ -691,56 +739,4 @@ operator <<(ostream& out, const tuple<T...>& t)
 }
 
 }	// namespace std
-
-namespace TU
-{
-/************************************************************************
-*  type alias: tuple_head<T>						*
-************************************************************************/
-namespace detail
-{
-  template <class T>
-  struct tuple_head
-  {
-      using type = T;
-  };
-  template <class... T>
-  struct tuple_head<std::tuple<T...> >
-  {
-      using type = std::tuple_element_t<0, std::tuple<T...> >;
-  };
-}	// namespace detail
-    
-//! 与えられた型がtupleならばその先頭要素の型を，そうでなければ元の型を返す．
-/*!
-  \param T	その先頭要素の型を調べるべき型
-*/
-template <class T>
-using tuple_head = typename detail::tuple_head<T>::type;
-
-/************************************************************************
-*  type alias: tuple_replace<S, T>					*
-************************************************************************/
-namespace detail
-{
-  template <class S, class T>
-  struct tuple_replace : std::conditional<std::is_void<T>::value, S, T>
-  {
-  };
-  template <class... S, class T>
-  struct tuple_replace<std::tuple<S...>, T>
-  {
-      using type = std::tuple<typename tuple_replace<S, T>::type...>;
-  };
-}	// namespace detail
-    
-//! 与えられた型がtupleならばその全要素の型を，そうでなければ元の型自身を別の型で置き換える．
-/*!
-  \param S	要素型置換の対象となる型
-  \param T	置換後の要素の型．voidならば置換しない．
-*/
-template <class S, class T=void>
-using tuple_replace = typename detail::tuple_replace<S, T>::type;
-
-}	// namespace TU
 #endif	// !__TU_TUPLE_H

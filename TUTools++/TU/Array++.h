@@ -137,7 +137,7 @@ class Buf : public BufTraits<T, ALLOC>
     template <size_t I_=0>
     constexpr static auto	size()		{ return siz<I_>::value; }
     template <size_t I_=D-1>
-    constexpr static auto	stride()	{ return siz<I_>::value; }
+    constexpr static ptrdiff_t	stride()	{ return siz<I_>::value; }
     constexpr static auto	nrow()		{ return siz<0>::value; }
     constexpr static auto	ncol()		{ return siz<1>::value; }
     constexpr static auto	capacity()	{ return Capacity; }
@@ -317,7 +317,7 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
     template <size_t I_=0>
     auto	size()		const	{ return _sizes[I_]; }
     template <size_t I_=D-1>
-    auto	stride()	const	{ return stride_impl(axis<I_>()); }
+    ptrdiff_t	stride()	const	{ return stride_impl(axis<I_>()); }
     auto	capacity()	const	{ return _capacity; }
     auto	nrow()		const	{ return _sizes[0]; }
     auto	ncol()		const	{ return _sizes[1]; }
@@ -355,8 +355,8 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
     
   private:
     template <size_t I_>
-    auto	stride_impl(axis<I_>)		const	{ return _sizes[I_]; }
-    auto	stride_impl(axis<D-1>)		const	{ return _stride; }
+    ptrdiff_t	stride_impl(axis<I_>)		const	{ return _sizes[I_]; }
+    ptrdiff_t	stride_impl(axis<D-1>)		const	{ return _stride; }
 
     size_t	capacity(axis<D-1>) const
 		{
@@ -455,7 +455,7 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 
   private:
     sizes_type		_sizes;		//!< 各軸の要素数
-    size_t		_stride;	//!< 最終軸のストライド
+    ptrdiff_t		_stride;	//!< 最終軸のストライド
     size_t		_capacity;	//!< バッファ中に収めらる総要素数
     allocator_type	_allocator;	//!< 要素を確保するアロケータ
     bool		_ext;		//!< _p が外部記憶領域なら true
@@ -795,7 +795,7 @@ size(const array<T, ALLOC, SIZE, SIZES...>& a)
   \return	第 I 軸のストライド
  */
 template <size_t I, class T, class ALLOC, size_t SIZE, size_t... SIZES>
-inline size_t
+inline ptrdiff_t
 stride(const array<T, ALLOC, SIZE, SIZES...>& a)
 {
     return a.template stride<I>();

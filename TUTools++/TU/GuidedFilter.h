@@ -17,7 +17,7 @@ template <class T>
 class GuidedFilter : public BoxFilter
 {
   public:
-    using value_type	= T;
+    using value_type	= T;		// Tは array や simd::vec かも？
     using guide_type	= element_t<value_type>;
     using Params4	= std::tuple<value_type, guide_type,
 				     value_type, guide_type>;
@@ -82,12 +82,7 @@ class GuidedFilter : public BoxFilter
 		{
 		    using	std::get;
 		    
-		    std::cout << "Coeffs = " << coeffs;
-		    
 		    get<1>(t) = (get<0>(coeffs)*get<0>(t) + get<1>(coeffs))/_n;
-
-		    std::cout << ", guide = " << get<0>(t)
-			      << ", out = " << get<1>(t) << std::endl;
 		}
 	
       private:
@@ -221,6 +216,7 @@ class GuidedFilter2 : private BoxFilter2
 
 //! 2次元入力データと2次元ガイドデータにguided filterを適用する
 /*!
+  入力データとガイドデータおよび出力先のストライドは同一でなければならない．
   \param ib	2次元入力データの先頭の行を示す反復子
   \param ie	2次元入力データの末尾の次の行を示す反復子
   \param gb	2次元ガイドデータの先頭の行を示す反復子
@@ -232,7 +228,10 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out) const
 {
     if (ib == ie)
 	return;
-    
+
+    if ((ib.stride() != gb.stride()) || (ib.stride() != out.stride()))
+	throw std::runtime_error("GuidedFilter2<T>::convolve(): unmatched stride!");
+
     const auto		n = rowWinSize() * colWinSize();
     Array2<Coeffs>	c(super::outRowLength(std::distance(ib, ie)),
 			  super::outColLength(std::distance(std::begin(*ib),
@@ -269,6 +268,7 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out) const
 //! 2次元入力データにguided filterを適用する
 /*!
   ガイドデータは与えられた2次元入力データに同一とする．
+  入力データと出力先のストライドは同一でなければならない．
   \param ib	2次元入力データの先頭の行を示す反復子
   \param ie	2次元入力データの末尾の次の行を示す反復子
   \param out	guided filterを適用したデータの出力先の先頭行を示す反復子
@@ -278,7 +278,10 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, OUT out) const
 {
     if (ib == ie)
 	return;
-    
+
+    if (ib.stride() != out.stride())
+	throw std::runtime_error("GuidedFilter2<T>::convolve(): unmatched stride!");
+
     const auto		n = rowWinSize() * colWinSize();
     Array2<Coeffs>	c(super::outRowLength(std::distance(ib, ie)),
 			  super::outColLength(std::distance(std::begin(*ib),
