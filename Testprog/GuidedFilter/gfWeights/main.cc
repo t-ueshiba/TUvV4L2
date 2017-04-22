@@ -148,8 +148,8 @@ MyCmdWindow<T>::showWeights(size_t u, size_t v)
     const size_t	vc = (v < w - 1 ? w - 1 :
 			      v > _guide.height() - w + 1 ?
 			      _guide.height() - w + 1 : v);
-    Image<float>	in(_guide.width(), _guide.height()),
-			out(in.width(), in.height());
+    Image<T>		in(_guide.width(), _guide.height());
+    Image<float>	out(in.width(), in.height());
     in[v][u] = 255;
     _gf2.convolve(in.begin(), in.end(),
 		  _guide.begin(), _guide.end(), out.begin());
@@ -159,17 +159,17 @@ MyCmdWindow<T>::showWeights(size_t u, size_t v)
 			ue = std::min(u + 2*w - 1, _guide.width()),
 			vb = std::max(v,  2*w - 2) - 2*w + 2,
 			ve = std::min(v + 2*w - 1, _guide.height());
-    Image<float>	in(ue - ub, ve - vb), out(in.width(), in.height());
+    Image<T>		in(ue - ub, ve - vb);
+    Image<float>	out(in.width(), in.height());
     const size_t	uc = (u < w - 1 ? w - 1 : u < 2*w - 2 ? u : 2*w - 2),
 			vc = (v < w - 1 ? w - 1 : v < 2*w - 2 ? v : 2*w - 2);
     in[vc][uc] = 255;
-  //const Image<float>	guide = slice(_guide, vb, in.height(), ub, in.width());
+  //const Image<T>	guide = slice(_guide, vb, in.height(), ub, in.width());
     const auto		guide = slice(_guide, vb, in.height(), ub, in.width());
     _gf2.convolve(in.begin(), in.end(),
 		  guide.begin(), guide.end(), out.begin());
     _weights = slice(out, vc - w + 1, out.height() - w + 1,
 			  uc - w + 1, out.width()  - w + 1);
-  //_weights = out;
 #endif
     _weightsCanvas.setSize(2*w - 1, 2*w - 1);
     _weightsCanvas.repaintUnderlay();

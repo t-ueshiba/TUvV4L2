@@ -330,13 +330,13 @@ class assignment_iterator
 
   public:
     using	typename super::reference;
-
+    
   public:
     assignment_iterator(const ITER& iter, const FUNC& func=FUNC())
 	:super(iter), _func(func)			{}
 
-    const FUNC&	functor()			const	{ return _func; }
-	
+    const auto&	functor()			const	{ return _func; }
+
   private:
     reference	dereference() const
 		{
