@@ -19,7 +19,8 @@ NVCCFLAGS	= -g
 ifneq ($(findstring icpc,$(CXX)),)
   CFLAGS	= -O3
   NVCCFLAGS	= -O			# must < -O2
-  CPPFLAGS     += -DSSE3
+  CPPFLAGS     += -DSSE4
+  CFLAGS       += -msse4
 endif
 CCFLAGS		= $(CFLAGS)
 

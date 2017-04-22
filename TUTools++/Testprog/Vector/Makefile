@@ -16,6 +16,14 @@ INCDIRS		= -I../..
 CPPFLAGS	= -DNDEBUG -DTU_DEBUG
 CFLAGS		= -g
 NVCCFLAGS	= -g
+ifeq ($(shell arch), armv7l)
+  CPPFLAGS     += -DNEON
+else ifeq ($(shell arch), aarch64)
+  CPPFLAGS     += -DNEON
+else
+  CPPFLAGS     += -DSSE4
+  CFLAGS       += -msse4
+endif
 CCFLAGS		= $(CFLAGS)
 
 LIBS		=

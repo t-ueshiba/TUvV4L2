@@ -16,12 +16,14 @@ INCDIRS		= -I../../.. -I$(PREFIX)/include
 CPPFLAGS	= -DNDEBUG
 CFLAGS		= -O3
 NVCCFLAGS	= -g
-ifneq ($(findstring icpc,$(CXX)),)
-  CFLAGS	= -O3
-  NVCCFLAGS	= -O			# must < -O2
-  CPPFLAGS     += -DSSE3
+ifeq ($(shell arch), armv7l)
+  CPPFLAGS     += -DNEON
+else ifeq ($(shell arch), aarch64)
+  CPPFLAGS     += -DNEON
+else
+  CPPFLAGS     += -DSSE4
+  CFLAGS       += -msse4
 endif
-CCFLAGS		= $(CFLAGS)
 
 LIBS		= -lTUv++ -lTUTools++ -lXaw3d -lXt -lXext -lXmu -lX11 #-ltbb
 ifneq ($(findstring darwin,$(OSTYPE)),)

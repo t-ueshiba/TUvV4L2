@@ -15,12 +15,13 @@ MOCHDRS		=
 INCDIRS		= -I../..
 CPPFLAGS	= -DNDEBUG #-DWITHOUT_CVTDOWN
 CFLAGS		= -g -O3
-ifeq ($(shell arch),armv7l)
+ifeq ($(shell arch), armv7l)
   CPPFLAGS     += -DNEON
 else ifeq ($(shell arch), aarch64)
   CPPFLAGS     += -DNEON
 else
-  CPPFLAGS     += -DSSE3
+  CPPFLAGS     += -DSSE4
+  CFLAGS       += -msse4
 endif
 CCFLAGS		= $(CFLAGS)
 

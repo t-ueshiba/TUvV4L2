@@ -17,13 +17,13 @@ CPPFLAGS	= -DNDEBUG -DUSE_TBB -DDISPLAY_2D -DDISPLAY_3D \
 		#-DNO_RV -DUSE_VIDEO1394 -DDIRECT_CAPTURE
 CFLAGS		= -O3
 NVCCFLAGS	= -O
-ifeq ($(shell arch),armv7l)
+ifeq ($(shell arch), armv7l)
   CPPFLAGS     += -DNEON
 else ifeq ($(shell arch), aarch64)
   CPPFLAGS     += -DNEON
 else
-  CPPFLAGS     += -DSSE3
-#  CFLAGS       += -march=core-avx2
+  CPPFLAGS     += -DSSE4
+  CFLAGS       += -msse4
 endif
 CCFLAGS		= $(CFLAGS)
 
