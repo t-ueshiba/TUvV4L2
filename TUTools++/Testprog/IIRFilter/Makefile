@@ -26,7 +26,7 @@ else
 endif
 CCFLAGS		= $(CFLAGS)
 
-LIBS		= -lTUNewTools++ -ltbb -ltbbmalloc
+LIBS		= -lTUTools++ -ltbb -ltbbmalloc
 
 LINKER		= $(CXX)
 
