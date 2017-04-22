@@ -264,7 +264,7 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 		}
 
   // 各軸のサイズと最終軸のストライドを指定したコンストラクタとリサイズ関数
-    explicit	Buf(const sizes_type& sizes, size_t stride=0)
+    explicit	Buf(const sizes_type& sizes, ptrdiff_t stride=0)
 		    :_sizes(sizes),
 		     _stride(stride ? stride : _sizes[D-1]),
 		     _capacity(capacity(axis<0>())),
@@ -272,7 +272,7 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 		     _p(alloc(_capacity))
 		{
 		}
-    bool	resize(const sizes_type& sizes, size_t stride=0)
+    bool	resize(const sizes_type& sizes, ptrdiff_t stride=0)
 		{
 		    if (stride == 0)
 			stride = sizes[D-1];
@@ -292,7 +292,7 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 
   // 外部記憶領域および各軸のサイズと最終軸のストライドを指定したコンストラクタと
   // リサイズ関数
-    explicit	Buf(pointer p, const sizes_type& sizes, size_t stride=0)
+    explicit	Buf(pointer p, const sizes_type& sizes, ptrdiff_t stride=0)
 		    :_sizes(sizes),
 		     _stride(stride ? stride : _sizes[D-1]),
 		     _capacity(capacity(axis<0>())),
@@ -300,7 +300,7 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 		     _p(p)
 		{
 		}
-    void	resize(pointer p, const sizes_type& sizes, size_t stride=0)
+    void	resize(pointer p, const sizes_type& sizes, ptrdiff_t stride=0)
 		{
 		    if (stride == 0)
 			stride = sizes[D-1];
@@ -734,7 +734,8 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 		    return sizs;
 		}
     
-    static auto	to_stride(size_t unit, size_t size)
+    static ptrdiff_t
+		to_stride(size_t unit, size_t size)
 		{
 		    constexpr auto	elmsiz = sizeof(element_type);
 
@@ -745,7 +746,8 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 		    return n*((size + n - 1)/n);
 		}
     template <class... SIZES_>
-    static auto	to_stride(size_t unit, size_t size, SIZES_... sizes)
+    static ptrdiff_t
+		to_stride(size_t unit, size_t size, SIZES_... sizes)
 		{
 		    return to_stride(unit, sizes...);
 		}
