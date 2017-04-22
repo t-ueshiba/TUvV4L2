@@ -12,16 +12,18 @@ VPATH		=
 IDLS		=
 MOCHDRS		=
 
-INCDIRS		= -I. -I$(PREFIX)/include
+INCDIRS		= -I../../.. -I$(PREFIX)/include
 CPPFLAGS	= -DNDEBUG -DUSE_TBB
 CFLAGS		= -O3
 NVCCFLAGS	= -g
-ifneq ($(findstring icpc,$(CXX)),)
-  CFLAGS	= -O3
-  NVCCFLAGS	= -O			# must < -O2
-  CPPFLAGS     += -DSSE3
+ifeq ($(shell arch), armv7l)
+  CPPFLAGS     += -DNEON
+else ifeq ($(shell arch), aarch64)
+  CPPFLAGS     += -DNEON
+else
+  CPPFLAGS     += -DSSE4
+  CFLAGS       += -msse4
 endif
-CCFLAGS		= $(CFLAGS)
 
 LIBS		= -lTUTools++ -ltbb
 ifneq ($(findstring darwin,$(OSTYPE)),)

@@ -22,7 +22,7 @@ else ifeq ($(shell arch), aarch64)
 #  CPPFLAGS     += -DNEON
 else
   CPPFLAGS     += -DSSE4
-  CFLAGS       += -march=core-avx2
+  CFLAGS       += -msse4
 endif
 CCFLAGS		= $(CFLAGS)
 
