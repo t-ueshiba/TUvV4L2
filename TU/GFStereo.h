@@ -37,10 +37,10 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
     {
 	init_params(Score g)	:_g(g)					{}
 
-	ScoreVecTuple	operator ()(ScoreVec p) const
-			{
-			    return {p, _g * p};
-			}
+	auto	operator ()(ScoreVec p) const
+		{
+		    return ScoreVecTuple(p, _g * p);
+		}
 	
       private:
 	const ScoreVec	_g;
@@ -51,11 +51,11 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
 	init_params2(Score g, Score blend)
 	    :init_params(g), _blend(blend)				{}
 	
-	ScoreVecTuple	operator ()(std::tuple<const ScoreVec&,
-					       const ScoreVec&> pp) const
-			{
-			    return init_params::operator ()(_blend(pp));
-			}
+	auto	operator ()(std::tuple<const ScoreVec&,
+			    const ScoreVec&> pp) const
+		{
+		    return init_params::operator ()(_blend(pp));
+		}
 	
       private:
 	const Blend<ScoreVec>	_blend;
@@ -65,15 +65,15 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
     {
 	update_params(Score gn, Score gp)	:_gn(gn), _gp(gp)	{}
 
-	ScoreVecTuple	operator ()(ScoreVec pn, ScoreVec pp) const
-			{
-			    return {pn - pp, _gn * pn - _gp * pp};
-			}
-	ScoreVecTuple	operator ()(std::tuple<const ScoreVec&,
-					       const ScoreVec&> p) const
-			{
-			    return (*this)(std::get<0>(p), std::get<1>(p));
-			}
+	auto	operator ()(ScoreVec pn, ScoreVec pp) const
+		{
+		    return ScoreVecTuple(pn - pp, _gn * pn - _gp * pp);
+		}
+	auto	operator ()(std::tuple<const ScoreVec&,
+		const ScoreVec&> p) const
+		{
+		    return (*this)(std::get<0>(p), std::get<1>(p));
+		}
 
       private:
 	const ScoreVec	_gn;
@@ -85,15 +85,15 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
 	update_params2(Score gn, Score gp, Score blend)
 	    :update_params(gn, gp), _blend(blend)			{}
 
-	ScoreVecTuple	operator ()(std::tuple<const ScoreVec&,
-					       const ScoreVec&,
-					       const ScoreVec&,
-					       const ScoreVec&> p) const
-			{
-			    return update_params::operator ()(
-				       _blend(std::get<0>(p), std::get<1>(p)),
-				       _blend(std::get<2>(p), std::get<3>(p)));
-			}
+	auto	operator ()(std::tuple<const ScoreVec&,
+				       const ScoreVec&,
+				       const ScoreVec&,
+				       const ScoreVec&> p) const
+		{
+		    return update_params::operator ()(
+				_blend(std::get<0>(p), std::get<1>(p)),
+				_blend(std::get<2>(p), std::get<3>(p)));
+		}
 
       private:
 	const Blend<ScoreVec>	_blend;
@@ -104,13 +104,12 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
 	init_coeffs(Score g_avg, Score g_sqavg, Score e)
 	    :_g_avg(g_avg), _g_rvar(1/(g_sqavg - g_avg*g_avg + e*e))	{}
 
-	ScoreVecTuple	operator ()(const ScoreVecTuple& params) const
-			{
-			    const auto	a = (std::get<1>(params) -
-					     std::get<0>(params)*_g_avg)
-					  * _g_rvar;
-			    return {a, std::get<0>(params) - a*_g_avg};
-			}
+	auto	operator ()(const ScoreVecTuple& params) const
+		{
+		    const auto	a = (std::get<1>(params) -
+				     std::get<0>(params)*_g_avg) * _g_rvar;
+		    return ScoreVecTuple(a, std::get<0>(params) - a*_g_avg);
+		}
 
       private:
 	const ScoreVec	_g_avg;
@@ -121,11 +120,10 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
     {
 	trans_guides(Score g) :_g(g)					{}
 
-	ScoreVec	operator ()(const ScoreVecTuple& coeffs) const
-			{
-			    return std::get<0>(coeffs) * _g
-				 + std::get<1>(coeffs);
-			}
+	auto	operator ()(const ScoreVecTuple& coeffs) const
+		{
+		    return std::get<0>(coeffs) * _g + std::get<1>(coeffs);
+		}
 	
       private:
 	const ScoreVec	_g;
