@@ -827,6 +827,12 @@ operator >>(std::istream& in, array<T, ALLOC, SIZE, SIZES...>& a)
     return a.get(in);
 }
 
+template <class T, class ALLOC, size_t SIZE, size_t... SIZES> inline auto
+serialize(const array<T, ALLOC, SIZE, SIZES...>& a)
+{
+    return make_range(a.data(), a.capacity());
+}
+
 /************************************************************************
 *  substance_t<E, PRED>							*
 ************************************************************************/
@@ -860,6 +866,7 @@ namespace detail
   };
 }	// namespace detail
 
+//! 反復子が指す型. ただし，それがrangeならば，そのrangeが表現する配列型
 template <class ITER>
 using iterator_substance
 	  = typename detail::substance_t<decayed_iterator_value<ITER>,
