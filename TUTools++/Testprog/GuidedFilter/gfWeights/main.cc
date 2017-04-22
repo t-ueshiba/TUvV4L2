@@ -164,8 +164,8 @@ MyCmdWindow<T>::showWeights(size_t u, size_t v)
     const size_t	uc = (u < w - 1 ? w - 1 : u < 2*w - 2 ? u : 2*w - 2),
 			vc = (v < w - 1 ? w - 1 : v < 2*w - 2 ? v : 2*w - 2);
     in[vc][uc] = 255;
-  //const Image<T>	guide = slice(_guide, vb, in.height(), ub, in.width());
-    const auto		guide = slice(_guide, vb, in.height(), ub, in.width());
+    const Image<T>	guide = slice(_guide, vb, in.height(), ub, in.width());
+  //const auto		guide = slice(_guide, vb, in.height(), ub, in.width());
     _gf2.convolve(in.begin(), in.end(),
 		  guide.begin(), guide.end(), out.begin());
     _weights = slice(out, vc - w + 1, out.height() - w + 1,
