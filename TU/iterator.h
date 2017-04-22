@@ -219,7 +219,7 @@ make_transform_iterator2(ITER0 iter0, ITER1 iter1, FUNC func)
 }
     
 /************************************************************************
-*  class assignment_iterator<FUNC, ITER, VAL>				*
+*  class assignment_iterator<FUNC, ITER>				*
 ************************************************************************/
 //! libTUTools++ のクラスや関数の実装の詳細を収める名前空間
 namespace detail
@@ -311,21 +311,21 @@ namespace detail
   \param FUNC	変換を行う関数オブジェクトの型
   \param ITER	変換結果の代入先を指す反復子
 */
-template <class FUNC, class ITER, class VAL=iterator_value<ITER> >
+template <class FUNC, class ITER>
 class assignment_iterator
-    : public boost::iterator_adaptor<assignment_iterator<FUNC, ITER, VAL>,
+    : public boost::iterator_adaptor<assignment_iterator<FUNC, ITER>,
 				     ITER,
-				     VAL,
+				     iterator_value<ITER>,
 				     iterator_category<ITER>,
 				     detail::assignment_proxy<FUNC, ITER> >
 {
   private:
     using super	= boost::iterator_adaptor<
-		      assignment_iterator,
-		      ITER,
-		      VAL,
-		      iterator_category<ITER>,
-		      detail::assignment_proxy<FUNC, ITER> >;
+			assignment_iterator,
+			ITER,
+			iterator_value<ITER>,
+			iterator_category<ITER>,
+			detail::assignment_proxy<FUNC, ITER> >;
     friend	class boost::iterator_core_access;
 
   public:
@@ -347,10 +347,7 @@ class assignment_iterator
     FUNC 	_func;	// 代入を可能にするためconstは付けない
 };
     
-template <class VAL=void, class FUNC, class ITER>
-inline assignment_iterator<FUNC, ITER,
-			   std::conditional_t<std::is_void<VAL>::value,
-					      iterator_value<ITER>, VAL> >
+template <class FUNC, class ITER> inline assignment_iterator<FUNC, ITER>
 make_assignment_iterator(const ITER& iter, const FUNC& func=FUNC())
 {
     return {iter, func};
