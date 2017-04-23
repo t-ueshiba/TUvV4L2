@@ -262,7 +262,7 @@ Object::Widget::position() const
 {
     Position	x, y;
     XtVaGetValues(_widget, XtNx, &x, XtNy, &y, nullptr);
-    return Point2<int>(x, y);
+    return Point2<int>({x, y});
 }
 
 u_long

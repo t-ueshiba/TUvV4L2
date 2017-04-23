@@ -419,7 +419,7 @@ MyCmdWindow<STEREO, CAMERAS, PIXEL, DISP>::MyCmdWindow(App&	 parentApp,
 
 #if defined(COLOR)
   // カラー画像の場合は，フォーマットをYUV422とし基準カメラ以外の画像サイズを半分にする．
-    for (size_t i = 0; i < cameras.dim(); ++i)
+    for (size_t i = 0; i < cameras.size(); ++i)
 	_cameras[i].setFormatAndFrameRate((i == 0 ?
 					   IIDCCamera::YUV422_640x480 :
 					   IIDCCamera::YUV422_320x240),
@@ -819,7 +819,7 @@ MyCmdWindow<STEREO, CAMERAS, PIXEL, DISP>::restoreCalibration()
     if (!in)
 	throw runtime_error("Failed to open camera calibration file!!");
     for (_nimages = 0;
-	 (_nimages < 3) && (_nimages < _cameras.dim()); ++_nimages)
+	 (_nimages < 3) && (_nimages < _cameras.size()); ++_nimages)
     {
 	Image<pixel_type>&	image = _images[_nimages];
 	
@@ -858,7 +858,7 @@ MyCmdWindow<STEREO, CAMERAS, PIXEL, DISP>::initializeRectification()
 			    _stereo.getParameters().disparitySearchWidth,
 			    _stereo.getParameters().disparityMax);
 	_rectifiedImages[2].P  = _rectify.H(2) * _images[2].P;
-	_rectifiedImages[2].P /= _rectifiedImages[2].P[2](0, 3).length();
+	_rectifiedImages[2].P /= length(slice(_rectifiedImages[2].P[2], 0, 3));
 #if defined(DISPLAY_2D) && !defined(NO_RV)
 	_canvasV.resize(align16(_rectify.width(2)),
 			align16(_rectify.height(2)));
@@ -867,10 +867,10 @@ MyCmdWindow<STEREO, CAMERAS, PIXEL, DISP>::initializeRectification()
     _disparityMap.resize(_rectify.height(0), _rectify.width(0));
     
     _rectifiedImages[0].P  = _rectify.H(0) * _images[0].P;
-    _rectifiedImages[0].P /= _rectifiedImages[0].P[2](0, 3).length();
+    _rectifiedImages[0].P /= length(slice(_rectifiedImages[0].P[2], 0, 3));
     _disparityMap.P = _rectifiedImages[0].P;
     _rectifiedImages[1].P  = _rectify.H(1) * _images[1].P;
-    _rectifiedImages[1].P /= _rectifiedImages[1].P[2](0, 3).length();
+    _rectifiedImages[1].P /= length(slice(_rectifiedImages[1].P[2], 0, 3));
 #if defined(DISPLAY_2D)
     _canvasL.resize(align16(_rectify.width(0)), align16(_rectify.height(0)));
 #  if !defined(NO_RV)
@@ -891,9 +891,11 @@ MyCmdWindow<STEREO, CAMERAS, PIXEL, DISP>::initializeRectification()
     tR[1] = -Pr[1][3];
     tR[2] = -Pr[2][3];
     tR[3] = 1.0;
-    tR(0, 3).solve(Pr(0, 0, 3, 3).trns());	// the right camera center
+  // the right camera center    
+    solve(transpose(slice(Pr, 0, 3, 0, 3)), slice(tR, 0, 3));
+    
     const Matrix34d&	Pl = _rectifiedImages[0].P;
-    _b = (Pl[0]*tR) / Pl[2](0, 3).length() / 1000;
+    _b = (Pl[0]*tR) / length(slice(Pl[2], 0, 3)) / 1000;
 
     float	range[3];
     range[0] = 100 * _b / _stereo.getParameters().disparityMax;
@@ -970,8 +972,8 @@ MyCmdWindow<STEREO, CAMERAS, PIXEL, DISP>::scaleDisparity()
 
     for (int v = 0; v < _disparityMap.height(); ++v)
     {
-	const disparity_type*	src = _disparityMap[v].data();
-	u_char*			dst = _disparityMapUC[v].data();
+	const disparity_type*	src = _disparityMap[v].begin();
+	u_char*			dst = _disparityMapUC[v].begin();
 	u_char* const		end = dst + _disparityMapUC.width();
 #if 0
       //#if defined(SSE)
