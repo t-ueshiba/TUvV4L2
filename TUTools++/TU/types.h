@@ -4,7 +4,8 @@
 /*!
   \mainpage	libTUTools++ - 配列，ベクトル，行列，画像等の基本的なデータ型とそれに付随したアルゴリズムを収めたライブラリ
   \anchor	libTUTools
-
+  \author	Toshio UESHIBA
+  
   \section copyright 著作権
   平成14-19年（独）産業技術総合研究所 著作権所有
 
@@ -37,7 +38,8 @@
   に付随したアルゴリズムを収めたライブラリである．現在実装されている主
   要なクラスおよび関数はおおまかに以下の分野に分類される．
 
-  <b>1次元および2次元配列</b>
+  <b>多次元配列</b>
+  - #TU::array
   - #TU::Array
   - #TU::Array2
 
@@ -70,7 +72,6 @@
   - #TU::DP
 
   <b>点，直線，平面等の幾何要素とその変換</b>
-  - #TU::Point1
   - #TU::Point2
   - #TU::Point3
   - #TU::HyperPlane
@@ -78,8 +79,6 @@
   - #TU::Projectivity
   - #TU::Affinity
   - #TU::Rigidity
-  - #TU::Homography
-  - #TU::Affinity2
   - #TU::BoundingBox
   
   <b>投影の幾何</b>
@@ -101,7 +100,6 @@
   - #TU::YUV444
   - #TU::YUV422
   - #TU::YUV411
-  - #TU::ImageLine
   - #TU::Image
   - #TU::GenericImage
   - #TU::ComplexImage
@@ -111,7 +109,6 @@
   <b>画像処理</b>
   - #TU::Rectify
   - #TU::EdgeDetector
-  - #TU::CorrectIntensity
   - #TU::IntegralImage
   - #TU::DiagonalIntegralImage
   
@@ -137,7 +134,6 @@
 
   <b>特殊データ構造</b>
   - #TU::List
-  - #TU::Heap
   - #TU::PSTree
   - #TU::NDTree
   
@@ -154,10 +150,6 @@
   - #TU::Mesh
 
   <b>アルゴリズム</b>
-  - #std::min(const T&, const T&, const T&)
-  - #std::min(const T&, const T&, const T&, const T&)
-  - #std::max(const T&, const T&, const T&)
-  - #std::max(const T&, const T&, const T&, const T&)
   - #TU::pull_if(Iter, Iter, Pred)
   - #TU::diff(const T&, const T&)
   - #TU::op3x3(Iterator begin, Iterator end, OP op)
@@ -167,12 +159,6 @@
   - #TU::mopClose(Iterator begin, Iterator end, size_t niter)
 
   <b>関数オブジェクト</b>
-  - #TU::generic_function
-  - #TU::generic_binary_function
-  - #TU::plus
-  - #TU::minus
-  - #TU::multiplies
-  - #TU::divides
   - #TU::identity
   - #TU::plus_assign
   - #TU::minus_assign
@@ -182,16 +168,10 @@
   - #TU::bit_and_assign
   - #TU::bit_or_assign
   - #TU::bit_xor_assign
-  - #TU::equal_to
-  - #TU::not_equal_to
-  - #TU::less
-  - #TU::greater
-  - #TU::less_equal
-  - #TU::greater_equal
   - #TU::square()
   - #TU::length()
-  - #TU::sqdist()
-  - #TU::dist()
+  - #TU::square_distance()
+  - #TU::distance()
   - #TU::gcd()
   - #TU::lcm()
 
@@ -199,14 +179,11 @@
   - #TU::make_mbr_iterator()
   - #TU::make_first_iterator()
   - #TU::make_second_iterator()
-  - #TU::fast_zip_iterator
+  - #TU::zip_iterator
   - #TU::assignment_iterator
-  - #TU::assignment2_iterator
-  - #TU::row_iterator
   - #TU::row2col
   - #TU::column_iterator
   - #TU::ring_iterator
-  - #TU::multiplex_iterator
   - #TU::box_filter_iterator
   - #TU::iir_filter_iterator
   

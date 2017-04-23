@@ -1,5 +1,6 @@
 /*!
   \file		iterator.h
+  \author	Toshio UESHIBA
   \brief	各種反復子の定義と実装
 */
 #ifndef __TU_ITERATOR_H
@@ -235,9 +236,9 @@ namespace detail
       static auto	check_func(ITER iter, T_&& val, FUNC func)
 			    -> decltype(*iter = func(val), std::false_type());
       template <class T_>
-      using	is_binary_func = decltype(check_func(std::declval<ITER>(),
-						     std::declval<T_>(),
-						     std::declval<FUNC>()));
+      using is_binary_func	= decltype(check_func(std::declval<ITER>(),
+						      std::declval<T_>(),
+						      std::declval<FUNC>()));
       
     public:
       assignment_proxy(const ITER& iter, const FUNC& func)
