@@ -92,16 +92,19 @@ DrawThreeD::initialize(const Matrix34d& Pl, const Matrix34d& Pr, float gap)
     t[1] = -Pr[1][3];
     t[2] = -Pr[2][3];
     t[3] = 1.0;
-    t(0, 3).solve(Pr(0, 0, 3, 3).trns());	// t = camera center of Pr.
-    Matrix33d	Tt = (Pl[0] * t) * Pl(0, 0, 3, 3).trns().inv();
-    _Mt[0](0, 3) = Tt[0];
-    _Mt[1](0, 3) = Tt[1];
+  // t = camera center of Pr.    
+    solve(transpose(slice(Pr, 0, 3, 0, 3)), slice(t, 0, 3));
+
+    Matrix33d	Tt = (Pl[0] * t) * inverse(transpose(slice(Pl, 0, 3, 0, 3)));
+    slice(_Mt[0], 0, 3) = Tt[0];
+    slice(_Mt[1], 0, 3) = Tt[1];
     t[0] = -Pl[0][3];
     t[1] = -Pl[1][3];
     t[2] = -Pl[2][3];
-    t(0, 3).solve(Pl(0, 0, 3, 3).trns());	// t = camera center of Pl.
+  // t = camera center of Pl.    
+    solve(transpose(slice(Pl, 0, 3, 0, 3)), slice(t, 0, 3));
     _Mt[2] = t;
-    _Mt[3](0, 3) = Tt[2];
+    slice(_Mt[3], 0, 3) = Tt[2];
 
     _gap = gap;
 }
@@ -119,13 +122,14 @@ DrawThreeD::draw(const Image<D>& disparityMap, const Image<T>& image)
 
     for (size_t v = 1; v < disparityMap.height(); ++v)
     {
-	const size_t		width = disparityMap.width();
-	const ImageLine<T>	&imgp = image[v-1], &imgq = image[v];
-	const ImageLine<D>	&mapp = disparityMap[v-1],
-				&mapq = disparityMap[v];
-	D			dp_prev = 0, dq_prev = 0;
-	Vertex* const		vertex0 = (Vertex*)_vertices.data();
-	Vertex*			vertex  = vertex0;
+	const auto	width = disparityMap.width();
+	const auto&	imgp = image[v-1];
+	const auto&	imgq = image[v];
+	const auto&	mapp = disparityMap[v-1];
+	const auto&	mapq = disparityMap[v];
+	D		dp_prev = 0, dq_prev = 0;
+	Vertex* const	vertex0 = (Vertex*)_vertices.data();
+	Vertex*		vertex  = vertex0;
 	for (size_t u = 0; u < width; ++u)
 	{
 	    const D	dp = mapp[u], dq = mapq[u];
@@ -191,12 +195,12 @@ DrawThreeD::draw(const Image<D>& disparityMap, const Image<T>& image,
 #endif
     for (size_t v = 1; v < disparityMap.height(); ++v)
     {
-	const size_t		width = disparityMap.width();
-	const ImageLine<D>	&mapp = disparityMap[v-1],
-				&mapq = disparityMap[v];
-	D			dp_prev = 0.0, dq_prev = 0.0;
-	Vertex* const		vertex0 = (Vertex*)_vertices.data();
-	Vertex*			vertex  = vertex0;
+	const size_t	width = disparityMap.width();
+	const auto&	mapp = disparityMap[v-1];
+	const auto&	mapq = disparityMap[v];
+	D		dp_prev = 0.0, dq_prev = 0.0;
+	Vertex* const	vertex0 = (Vertex*)_vertices.data();
+	Vertex*		vertex  = vertex0;
 	for (size_t u = 0; u < width; ++u)
 	{
 	    const D	dp = mapp[u], dq = mapq[u];
@@ -270,12 +274,12 @@ DrawThreeD::draw(const Image<D>& disparityMap)
 
     for (size_t v = 1; v < disparityMap.height(); ++v)
     {
-	const size_t		width = disparityMap.width();
-	const ImageLine<D>	&mapp = disparityMap[v-1],
-				&mapq = disparityMap[v];
-	D			dp_prev = 0.0, dq_prev = 0.0;
-	F*			vertex0 = (F*)_vertices.data();
-	F*			vertex  = vertex0;
+	const size_t	width = disparityMap.width();
+	const auto&	mapp = disparityMap[v-1];
+	const auto&	mapq = disparityMap[v];
+	D		dp_prev = 0.0, dq_prev = 0.0;
+	F*		vertex0 = (F*)_vertices.data();
+	F*		vertex  = vertex0;
 	
 	for (size_t u = 0; u < width; ++u)
 	{
@@ -315,7 +319,7 @@ DrawThreeD::draw(const Image<D>& disparityMap)
 template <class F> void
 DrawThreeD::resize(size_t width)
 {
-    if (2*sizeof(F)*width != _vertices.dim())
+    if (2*sizeof(F)*width != _vertices.size())
 	_vertices.resize(2*sizeof(F)*width);
     glInterleavedArrays(format<F>(), 0, _vertices.data());
 }

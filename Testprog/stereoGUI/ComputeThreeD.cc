@@ -43,13 +43,13 @@ ComputeThreeD::ComputeThreeD(const Matrix34d& Pl, const Matrix34d& Pr)
     tR[1] = -Pr[1][3];
     tR[2] = -Pr[2][3];
     tR[3] = 1.0;
-    tR(0, 3).solve(Pr(0, 0, 3, 3).trns());
+    solve(transpose(slice(Pr, 0, 3, 0, 3)), slice(tR, 0, 3));
 
   // Compute the transformation matrix.
     Matrix44d	Minv;
-    Minv(0, 0, 3, 4) = Pl;
-    Minv[3][3]	     = Pl[0] * tR;
-    _Mt	= Minv.inv().trns();
+    slice(Minv, 0, 3, 0, 4) = Pl;
+    Minv[3][3] = Pl[0] * tR;
+    _Mt	= transpose(inverse(Minv));
 }
 	
 Point3d
@@ -60,9 +60,9 @@ ComputeThreeD::operator ()(int u, int v, float d) const
     x[1] = v;
     x[2] = 1.0;
     x[3] = d;
-    x *= _Mt;
+    x = evaluate(x * _Mt);
     
-    return x.inhomogeneous();
+    return inhomogeneous(x);
 }
 
 }

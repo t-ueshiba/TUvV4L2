@@ -1,4 +1,5 @@
 SUBDIR	= BandMatrix		\
+	  Bezier		\
 	  BoxFilter		\
 	  BoxFilter2		\
 	  DP			\
@@ -13,12 +14,18 @@ SUBDIR	= BandMatrix		\
 	  Random		\
 	  Serial		\
 	  Sparse		\
+	  Spline		\
 	  TreeFilter		\
 	  Vector		\
 	  WeightedMedianFilter	\
 	  array			\
 	  tuple			\
-	  simd
+	  simd			\
+	  stereoGUI		\
+	  stereoIIDC		\
+	  stereoTest		\
+	  stereoTime		\
+	  stereoV4L2
 
 TARGETS	= all clean depend
 

@@ -411,14 +411,14 @@ MyCmdWindow<STEREO, PIXEL, DISP>::initializeRectification()
 			    _stereo.getParameters().disparitySearchWidth,
 			    _stereo.getParameters().disparityMax);
 	_rectifiedImages[2].P  = _rectify.H(2) * _images[2].P;
-	_rectifiedImages[2].P /= _rectifiedImages[2].P[2](0, 3).length();
+	_rectifiedImages[2].P /= length(slice(_rectifiedImages[2].P[2], 0, 3));
 	_canvasV.resize(_rectify.width(2), _rectify.height(2));
     }
     _rectifiedImages[0].P  = _rectify.H(0) * _images[0].P;
-    _rectifiedImages[0].P /= _rectifiedImages[0].P[2](0, 3).length();
+    _rectifiedImages[0].P /= length(slice(_rectifiedImages[0].P[2], 0, 3));
     _disparityMap.P = _rectifiedImages[0].P;
     _rectifiedImages[1].P  = _rectify.H(1) * _images[1].P;
-    _rectifiedImages[1].P /= _rectifiedImages[1].P[2](0, 3).length();
+    _rectifiedImages[1].P /= length(slice(_rectifiedImages[1].P[2], 0, 3));
     _canvasL.resize(_rectify.width(0), _rectify.height(0));
     _canvasR.resize(_rectify.width(1), _rectify.height(1));
     _canvasD.resize(_rectify.width(0), _rectify.height(0));
@@ -434,9 +434,10 @@ MyCmdWindow<STEREO, PIXEL, DISP>::initializeRectification()
     tR[1] = -Pr[1][3];
     tR[2] = -Pr[2][3];
     tR[3] = 1.0;
-    tR(0, 3).solve(Pr(0, 0, 3, 3).trns());	// the right camera center
+  // the right camera center    
+    solve(transpose(slice(Pr, 0, 3, 0, 3)), slice(tR, 0, 3));
     const Matrix34d&	Pl = _rectifiedImages[0].P;
-    _b  = (Pl[0]*tR) / Pl[2](0, 3).length() / 1000.0;
+    _b  = (Pl[0]*tR) / length(slice(Pl[2], 0, 3)) / 1000.0;
 
   // Display depth range of measurement.
     int			range[3];

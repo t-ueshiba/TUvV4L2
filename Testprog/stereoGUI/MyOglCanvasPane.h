@@ -125,6 +125,8 @@ MyOglCanvasPaneBase<D>::setDrawMode(DrawMode drawMode)
 	glDisable(GL_TEXTURE_2D);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	break;
+      default:
+	break;
     }
 }
     
@@ -283,6 +285,8 @@ MyOglCanvasPane<D, T>::repaintUnderlay()
 	break;
       case super::Mesh:
 	_draw.template draw<DrawThreeD::V3F>(_disparityMap);
+	break;
+      default:
 	break;
     }
 
