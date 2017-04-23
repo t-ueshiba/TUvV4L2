@@ -115,10 +115,11 @@ main(int argc, char* argv[])
     bool		textureMapping		= false;
     double		parallax		= -1.0;
     size_t		grainSize		= DEFAULT_GRAINSIZE;
+    bool		sync			= false;
     
   // コマンド行の解析．
     extern char*	optarg;
-    for (int c; (c = getopt(argc, argv, "GHVc:p:s:xq:g:h")) != -1; )
+    for (int c; (c = getopt(argc, argv, "GHVc:p:s:xq:g:Sh")) != -1; )
 	switch (c)
 	{
 	  case 'G':
@@ -147,6 +148,9 @@ main(int argc, char* argv[])
 	    break;
 	  case 'g':
 	    grainSize = atoi(optarg);
+	    break;
+	  case 'S':
+	    sync = true;
 	    break;
 	  case 'h':
 	    usage(argv[0]);
@@ -204,7 +208,7 @@ main(int argc, char* argv[])
 #if defined(DISPLAY_3D)
 		      vinfo, textureMapping, parallax,
 #endif
-		      cameras, params, scale);
+		      cameras, params, scale, sync);
 
 	  // GUIのイベントループ．
 	    vapp.run();
@@ -223,7 +227,7 @@ main(int argc, char* argv[])
 #if defined(DISPLAY_3D)
 		      vinfo, textureMapping, parallax,
 #endif
-		      cameras, params, scale);
+		      cameras, params, scale, sync);
 
 	  // GUIのイベントループ．
 	    vapp.run();

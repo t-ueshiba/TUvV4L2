@@ -170,7 +170,7 @@ syncedSnap(CAMERAS&& cameras, uint64_t maxSkew=1000)
     for (auto camera = std::begin(cameras); camera != std::end(cameras);
 	 ++camera)
     {
-	timestamps.push_back({camera->getTimestamp(), camera});
+	timestamps.push_back({camera->arrivaltime(), camera});
 	if (timestamps.back() > last)
 	    last = timestamps.back();
     }
@@ -188,7 +188,7 @@ syncedSnap(CAMERAS&& cameras, uint64_t maxSkew=1000)
       // ヒープから取り除いたタイムスタンプに対応するカメラから画像を取得して
       // 新たなタイムスタンプを得る．
 	auto&	back = timestamps.back();
-	back.first = back.second->snap().getTimestamp();
+	back.first = back.second->snap().arrivaltime();
 
       // これが最も遅いタイムスタンプになるので，lastに記録する．
 	last = back;
