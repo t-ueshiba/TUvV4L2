@@ -54,7 +54,7 @@ static CmdDef MainMenu[] =
     EndOfCmds
 };
 
-static int  range[] = {0, 100, 50};
+static float  range[] = {0, 2, 0.1};
 
 static CmdDef subCmds[] =
 {
@@ -323,7 +323,7 @@ MyCmdWindow::callback(CmdId id, CmdVal val)
 	break;
 
       case c_Slider:
-	_canvas0.dc().setZoom(val, range[2]).repaintAll();
+	_canvas0.dc().setZoom(val.f()).repaintAll();
 	break;
       
       case c_Button:

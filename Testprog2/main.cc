@@ -84,7 +84,7 @@ MyCmdWindow::callback(CmdId id, CmdVal val)
     switch (id)
     {
       case c_Slider:
-	_canvas.dc().setZoom(val.f).repaintAll();
+	_canvas.dc().setZoom(val.f()).repaintAll();
 	break;
     }
 }
