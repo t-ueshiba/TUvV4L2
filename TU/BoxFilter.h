@@ -176,7 +176,7 @@ BoxFilter::convolve(IN ib, IN ie, OUT out) const
 class BoxFilter2 : public Filter2<BoxFilter2>
 {
   private:
-    typedef Filter2<BoxFilter2>	super;
+    using super	= Filter2<BoxFilter2>;
     
   public:
     using	super::grainSize;

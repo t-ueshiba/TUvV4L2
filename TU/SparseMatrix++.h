@@ -51,7 +51,7 @@ template <class T, bool SYM=false>
 class SparseMatrix
 {
   public:
-    typedef T		element_type;		//!< 成分の型
+    using element_type	= T;		//!< 成分の型
 
   private:
     template <class S>
