@@ -30,10 +30,10 @@ template <class T>
 class BlockDiagonalMatrix : public Array<Matrix<T> >
 {
   private:
-    typedef Array<Matrix<T> >	super;
+    using super		= Array<Matrix<T> >;
     
   public:
-    typedef T			element_type;
+    using element_type	= T;
     
   public:
   //! 指定された個数の小行列から成るブロック対角行列を生成する．

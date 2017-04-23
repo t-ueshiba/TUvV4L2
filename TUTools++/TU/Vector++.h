@@ -644,10 +644,10 @@ template <class T>
 class Householder : public Array2<T>
 {
   private:
-    using super		= Array2<T>;
+    using super	= Array2<T>;
     
   public:
-    using element_type	= T;
+    using	typename super::element_type;
     
   private:
     Householder(size_t dd, size_t d)
@@ -934,7 +934,7 @@ template <class T>
 class Rotation
 {
   public:
-    typedef T	element_type;	//!< 成分の型
+    using element_type	= T;	//!< 成分の型
     
   public:
   //! 2次元超平面内での回転を生成する

@@ -50,7 +50,7 @@ template <class T>
 class IntegralImage : public Image<T>
 {
   private:
-    typedef Image<T>	super;
+    using super	= Image<T>;
 
 #ifdef USE_TBB
     template <class S>
@@ -248,7 +248,7 @@ IntegralImage<T>::originalHeight() const
 template <class T>
 class DiagonalIntegralImage : public Image<T>
 {
-    typedef Image<T>	super;
+    using super	= Image<T>;
 
 #ifdef USE_TBB
     template <class S>
