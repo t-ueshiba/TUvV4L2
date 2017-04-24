@@ -530,10 +530,10 @@ namespace simd
   template <class MASK, class T, class DMIN_RV> inline DMIN_RV
   fast_select(const MASK& mask, simd::vec<T> index, const DMIN_RV& dminRV)
   {
-      using namespace 	boost;
+      using namespace 	std;
 
-      return std::make_tuple(select(get<0>(mask), index, get<0>(dminRV)),
-			     select(get<1>(mask), index, get<1>(dminRV)));
+      return make_tuple(select(get<0>(mask), index, get<0>(dminRV)),
+			select(get<1>(mask), index, get<1>(dminRV)));
   }
 }	// end of namespace simd
 #else
