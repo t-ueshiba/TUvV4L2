@@ -7,7 +7,7 @@
 
 #include <tuple>
 #include <iostream>
-#include <boost/iterator/iterator_facade.hpp>
+#include "TU/iterator.h"	// for std::rbegin(), std::rend() before C++14
 
 namespace TU
 {

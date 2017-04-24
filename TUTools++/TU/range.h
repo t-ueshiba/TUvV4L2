@@ -8,7 +8,6 @@
 #include <cassert>
 #include <initializer_list>
 #include "TU/algorithm.h"	// for copy<N>(IN, ARG, OUT), etc...
-#include "TU/iterator.h"
 #include "TU/tuple.h"		// required before defining iterator_t<E>
 
 namespace TU

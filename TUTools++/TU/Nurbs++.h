@@ -49,9 +49,9 @@ template <class T>
 class BSplineKnots
 {
   public:
-    typedef T				element_type;
-    typedef Array<element_type>		knot_array;
-    typedef Array2<element_type>	knot_array2;
+    using element_type	= T;
+    using knot_array	= Array<element_type>;
+    using knot_array2	= Array2<element_type>;
     
   public:
     BSplineKnots(size_t deg, element_type us, element_type ue)		;
@@ -293,12 +293,12 @@ template <class C>
 class BSplineCurve
 {
   public:
-    typedef C					coord_type;
-    typedef Array<coord_type>			coord_array;
-    typedef typename coord_type::element_type	element_type;
-    typedef BSplineKnots<element_type>		knots_type;
-    typedef typename knots_type::knot_array	knot_array;
-    typedef typename knots_type::knot_array2	knot_array2;
+    using coord_type	= C;
+    using coord_array	= Array<coord_type>;
+    using element_type	= typename coord_type::element_type;
+    using knots_type	= BSplineKnots<element_type>;
+    using knot_array	= typename knots_type::knot_array;
+    using knot_array2	= typename knots_type::knot_array2;
     
   public:
     explicit BSplineCurve(size_t degree,
@@ -498,14 +498,14 @@ BSplineCurve<C>::elevateDegree()
 	    removeKnot(k);
 }
 
-typedef BSplineCurve<Vector<float, 2> >		BSplineCurve2f;
-typedef BSplineCurve<Vector<float, 3> >		RationalBSplineCurve2f;
-typedef BSplineCurve<Vector<float, 3> >		BSplineCurve3f;
-typedef BSplineCurve<Vector<float, 4> >		RationalBSplineCurve3f;
-typedef BSplineCurve<Vector<double, 2> >	BSplineCurve2d;
-typedef BSplineCurve<Vector<double, 3> >	RationalBSplineCurve2d;
-typedef BSplineCurve<Vector<double, 3> >	BSplineCurve3d;
-typedef BSplineCurve<Vector<double, 4> >	RationalBSplineCurve3d;
+using BSplineCurve2f		= BSplineCurve<Vector<float, 2> >;
+using RationalBSplineCurve2f	= BSplineCurve<Vector<float, 3> >;
+using BSplineCurve3f		= BSplineCurve<Vector<float, 3> >;
+using RationalBSplineCurve3f	= BSplineCurve<Vector<float, 4> >;
+using BSplineCurve2d		= BSplineCurve<Vector<double, 2> >;
+using RationalBSplineCurve2d	= BSplineCurve<Vector<double, 3> >;
+using BSplineCurve3d		= BSplineCurve<Vector<double, 3> >;
+using RationalBSplineCurve3d	= BSplineCurve<Vector<double, 4> >;
     
 /************************************************************************
 *  class BSplineSurface<C>						*
@@ -519,13 +519,13 @@ template <class C>
 class BSplineSurface
 {
   public:
-    typedef C					coord_type;
-    typedef Array<coord_type>			coord_array;
-    typedef Array2<coord_type>			coord_array2;
-    typedef typename coord_type::element_type	element_type;
-    typedef BSplineKnots<element_type>		knots_type;
-    typedef typename knots_type::knot_array	knot_array;
-    typedef typename knots_type::knot_array2	knot_array2;
+    using coord_type	= C;
+    using coord_array	= Array<coord_type>;
+    using coord_array2	= Array2<coord_type>;
+    using element_type	= typename coord_type::element_type;
+    using knots_type	= BSplineKnots<element_type>;
+    using knot_array	= typename knots_type::knot_array;
+    using knot_array2	= typename knots_type::knot_array2;
     
     BSplineSurface(size_t uDegree, size_t vDegree,
 		   element_type us=0, element_type ue=1,
@@ -579,12 +579,12 @@ class BSplineSurface
     auto&	save(std::ostream& out)	const	{ return _c.save(out); }
     auto&	restore(std::istream& in)	{ return _c.restore(in); }
     
-    friend auto&
+    friend std::istream&
 		operator >>(std::istream& in, BSplineSurface& b)
 		{
 		    return in >> b._c;
 		}
-    friend auto&
+    friend std::ostream&
 		operator <<(std::ostream& out, const BSplineSurface& b)
 		{
 		    return out << b._c;
@@ -906,10 +906,10 @@ BSplineSurface<C>::vElevateDegree()
 	    vRemoveKnot(l);
 }
 
-typedef BSplineSurface<Vector3f>	BSplineSurface3f;
-typedef BSplineSurface<Vector4f>	RationalBSplineSurface3f;
-typedef BSplineSurface<Vector3d>	BSplineSurface3d;
-typedef BSplineSurface<Vector4d>	RationalBSplineSurface3d;
+using BSplineSurface3f		= BSplineSurface<Vector3f>;
+using RationalBSplineSurface3f	= BSplineSurface<Vector4f>;
+using BSplineSurface3d		= BSplineSurface<Vector3d>;
+using RationalBSplineSurface3d	= BSplineSurface<Vector4d>;
 
 }
 #endif	// !__TU_NURBSPP_H
