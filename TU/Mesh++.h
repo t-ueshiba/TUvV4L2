@@ -609,11 +609,12 @@ Mesh<V, F, M>::saveSTL(std::ostream& out) const
 	coord[0] = f->v(0);
 	coord[1] = f->v(1);
 	coord[2] = f->v(2);
-	Vector3f	normal = ((coord[1] - coord[0]) ^
-				  (coord[2] - coord[0])).normal();
-	out.write((char*)&normal, sizeof(normal));
-	out.write((char*)coord,   sizeof(coord));
-	
+	Vector3f	norm = (coord[1] - coord[0]) ^ (coord[2] - coord[0]);
+	normalize(norm);
+
+	out.write((char*)&norm, sizeof(norm));
+	out.write((char*)coord, sizeof(coord));
+
 	char	delimiter[2];
 	out.write(delimiter, sizeof(delimiter));
     }
