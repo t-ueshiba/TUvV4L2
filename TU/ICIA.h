@@ -140,9 +140,7 @@ ICIA<MAP>::operator ()(const IMAGE& src, const IMAGE& dst, MAP& f,
     -> value_type
 {
 #ifdef ICIA_DEBUG
-    using namespace	std;
-    
-    cout << 'M' << 2 << endl;
+    std::cout << 'M' << 2 << std::endl;
     src.saveHeader(cout, ImageBase::RGB_24);
     src.saveHeader(cout, ImageBase::U_CHAR);
 #endif
@@ -162,7 +160,8 @@ ICIA<MAP>::operator ()(const IMAGE& src, const IMAGE& dst, MAP& f,
 	    params_type	g;
 	    const auto	sqr_new = sqrerr(src, dst, f, g, u0, v0, w, h);
 #ifdef _DEBUG
-	    cerr << "[" << setw(2) << n << "] sqr = " << sqr_new << endl;
+	    std::cerr << "[" << std::setw(2) << n << "] sqr = " << sqr_new
+		      << std::endl;
 #endif
 	    f.compose(Minv*g);
 	    if (fabs(sqr - sqr_new) <= _params.tol*(sqr_new + sqr + 1.0e-7))
@@ -183,7 +182,7 @@ ICIA<MAP>::operator ()(const IMAGE& src, const IMAGE& dst, MAP& f,
 	params_type	g;
 	auto		sqr = sqrerr(src, dst, f, g, u0, v0, w, h);
 #ifdef _DEBUG
-	cerr << "     sqr = " << sqr << endl;
+	std::cerr << "     sqr = " << sqr << std::endl;
 #endif
 	value_type	lambda = 1.0e-4;
 	for (size_t n = 0; n < _params.niter_max; ++n)	// L-M反復
@@ -198,9 +197,9 @@ ICIA<MAP>::operator ()(const IMAGE& src, const IMAGE& dst, MAP& f,
 	    params_type	g_new;
 	    const auto	sqr_new = sqrerr(src, dst, f_new, g_new, u0, v0, w, h);
 #ifdef _DEBUG	    
-	    cerr << "[" << setw(2) << n << "] sqr = " << sqr_new
+	    std::cerr << "[" << std::setw(2) << n << "] sqr = " << sqr_new
 		 << ", sqr_old = " << sqr
-		 << ",\tlambda = " << lambda << endl;
+		 << ",\tlambda = " << lambda << std::endl;
 #endif
 	    if (sqr_new <= sqr)		// 二乗誤差が減少するか調べる．
 	    {
