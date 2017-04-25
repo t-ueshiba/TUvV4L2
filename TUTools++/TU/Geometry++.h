@@ -789,7 +789,9 @@ Projectivity<T, DO, DI>::fit(ITER_ begin, ITER_ end, bool refine)
 template <class T, size_t DO, size_t DI> inline Projectivity<T, DO, DI>
 Projectivity<T, DO, DI>::inverse() const
 {
-    return inverse(*this);
+    Projectivity	inv;
+    inv.set(TU::inverse(*this));
+    return inv;
 }
     
 //! この射影変換のパラメータ数を返す．
@@ -1112,13 +1114,14 @@ class Affinity : public Projectivity<T, DO, DI>
     void		set(const E_& expr)
 			{
 			    base_type::set(expr);
-			    fill((*this)[outDim()], 0);
+			    (*this)[outDim()] = 0;
 			    (*this)[outDim()][inDim()] = 1;
 			}
     
     using		base_type::base_type;
     using		base_type::inDim;
     using		base_type::outDim;
+    using		base_type::operator ();
     
     template <class ITER_>
     void		fit(ITER_ begin, ITER_ end)			;
@@ -1183,14 +1186,14 @@ Affinity<T, DO, DI>::fit(ITER_ begin, ITER_ end)
 	N += x % x;
 	c += x;
 	for (size_t j = 0; j < ydim; ++j)
-	    v(j*xdim, xdim) += y[j]*x;
-	v(xydim2, ydim) += y;
+	    slice(v, j*xdim, xdim) += y[j]*x;
+	slice(v, xydim2, ydim) += y;
     }
     Matrix<element_type, DO*DI1, DO*DI1> W(xydim2 + ydim, xydim2 + ydim);
     for (size_t j = 0; j < ydim; ++j)
     {
-	W(j*xdim, xdim, j*xdim, xdim) = N;
-	W[xydim2 + j](j*xdim, xdim)   = c;
+	slice(W, j*xdim, j*xdim, xdim, xdim) = N;
+	slice(W[xydim2 + j], j*xdim, xdim)   = c;
 	W[xydim2 + j][xydim2 + j]     = ndata;
     }
     symmetrize(W);
@@ -1251,7 +1254,9 @@ Affinity<T, DO, DI>::ndataMin() const
 template <class T, size_t DO, size_t DI> inline Affinity<T, DO, DI>
 Affinity<T, DO, DI>::inverse() const
 {
-    return inverse(*this);
+    Affinity	inv;
+    inv.set(TU::inverse(*this));
+    return inv;
 }
     
 template <class T, size_t DO, size_t DI>

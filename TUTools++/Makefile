@@ -61,6 +61,7 @@ HDRS		= TU/Array++.h \
 		TU/IntegralImage.h \
 		TU/List.h \
 		TU/Manip.h \
+		TU/Mesh++.h \
 		TU/Minimize.h \
 		TU/Movie.h \
 		TU/NDTree++.h \
@@ -199,10 +200,10 @@ include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
 ColorConverter.o: TU/Image++.h TU/types.h TU/pair.h TU/Vector++.h \
-	TU/Array++.h TU/range.h TU/algorithm.h TU/iterator.h TU/tuple.h
+	TU/Array++.h TU/range.h TU/algorithm.h TU/tuple.h TU/iterator.h
 EdgeDetector.o: TU/EdgeDetector.h TU/Image++.h TU/types.h TU/pair.h \
-	TU/Vector++.h TU/Array++.h TU/range.h TU/algorithm.h TU/iterator.h \
-	TU/tuple.h TU/Geometry++.h TU/Minimize.h TU/simd/simd.h \
+	TU/Vector++.h TU/Array++.h TU/range.h TU/algorithm.h TU/tuple.h \
+	TU/iterator.h TU/Geometry++.h TU/Minimize.h TU/simd/simd.h \
 	TU/simd/config.h TU/simd/vec.h TU/simd/type_traits.h \
 	TU/simd/x86/type_traits.h TU/simd/arm/type_traits.h TU/simd/x86/vec.h \
 	TU/simd/x86/arch.h TU/simd/arm/vec.h TU/simd/arm/arch.h \
@@ -227,9 +228,9 @@ EdgeDetector.o: TU/EdgeDetector.h TU/Image++.h TU/types.h TU/pair.h \
 	TU/simd/shift_iterator.h TU/simd/BufTraits.h TU/simd/zero.h
 FIRGaussianCoefficients.o: TU/FIRGaussianConvolver.h TU/FIRFilter.h \
 	TU/SeparableFilter2.h TU/Array++.h TU/range.h TU/algorithm.h \
-	TU/iterator.h TU/tuple.h
+	TU/tuple.h TU/iterator.h
 GaussianCoefficients.o: TU/GaussianConvolver.h TU/Vector++.h TU/Array++.h \
-	TU/range.h TU/algorithm.h TU/iterator.h TU/tuple.h TU/IIRFilter.h \
+	TU/range.h TU/algorithm.h TU/tuple.h TU/iterator.h TU/IIRFilter.h \
 	TU/SeparableFilter2.h TU/simd/simd.h TU/simd/config.h TU/simd/vec.h \
 	TU/simd/type_traits.h TU/simd/x86/type_traits.h \
 	TU/simd/arm/type_traits.h TU/simd/x86/vec.h TU/simd/x86/arch.h \
@@ -254,16 +255,16 @@ GaussianCoefficients.o: TU/GaussianConvolver.h TU/Vector++.h TU/Array++.h \
 	TU/simd/shift_iterator.h TU/simd/BufTraits.h TU/simd/zero.h \
 	TU/Minimize.h
 GenericImage.o: TU/Image++.h TU/types.h TU/pair.h TU/Vector++.h \
-	TU/Array++.h TU/range.h TU/algorithm.h TU/iterator.h TU/tuple.h
+	TU/Array++.h TU/range.h TU/algorithm.h TU/tuple.h TU/iterator.h
 ImageBase.o: TU/Image++.h TU/types.h TU/pair.h TU/Vector++.h TU/Array++.h \
-	TU/range.h TU/algorithm.h TU/iterator.h TU/tuple.h TU/Camera++.h \
+	TU/range.h TU/algorithm.h TU/tuple.h TU/iterator.h TU/Camera++.h \
 	TU/Geometry++.h TU/Minimize.h TU/Manip.h
 PM16C_04.o: TU/PM16C_04.h TU/Serial.h TU/fdstream.h TU/types.h TU/Manip.h
 Random.o: TU/Random.h TU/types.h
 Rectify.o: TU/Rectify.h TU/Warp.h TU/Image++.h TU/types.h TU/pair.h \
-	TU/Vector++.h TU/Array++.h TU/range.h TU/algorithm.h TU/iterator.h \
-	TU/tuple.h TU/Camera++.h TU/Geometry++.h TU/Minimize.h TU/simd/simd.h \
-	TU/simd/config.h TU/simd/vec.h TU/simd/type_traits.h \
+	TU/Vector++.h TU/Array++.h TU/range.h TU/algorithm.h TU/tuple.h \
+	TU/iterator.h TU/Camera++.h TU/Geometry++.h TU/Minimize.h \
+	TU/simd/simd.h TU/simd/config.h TU/simd/vec.h TU/simd/type_traits.h \
 	TU/simd/x86/type_traits.h TU/simd/arm/type_traits.h TU/simd/x86/vec.h \
 	TU/simd/x86/arch.h TU/simd/arm/vec.h TU/simd/arm/arch.h \
 	TU/simd/allocator.h TU/simd/x86/allocator.h TU/simd/arm/allocator.h \
