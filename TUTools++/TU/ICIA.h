@@ -141,8 +141,8 @@ ICIA<MAP>::operator ()(const IMAGE& src, const IMAGE& dst, MAP& f,
 {
 #ifdef ICIA_DEBUG
     std::cout << 'M' << 2 << std::endl;
-    src.saveHeader(cout, ImageBase::RGB_24);
-    src.saveHeader(cout, ImageBase::U_CHAR);
+    src.saveHeader(std::cout, ImageBase::RGB_24);
+    src.saveHeader(std::cout, ImageBase::U_CHAR);
 #endif
     start(2);
 

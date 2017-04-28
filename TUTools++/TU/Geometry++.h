@@ -1164,51 +1164,37 @@ class Affinity : public Projectivity<T, DO, DI>
 template<class T, size_t DO, size_t DI> template <class ITER_> void
 Affinity<T, DO, DI>::fit(ITER_ begin, ITER_ end)
 {
+  // 入力点列の正規化
+    const Normalize<element_type, DI>	normalize(make_first_iterator(begin),
+						  make_first_iterator(end));
+    
   // 充分な個数の点対があるか？
-    const size_t	ndata = std::distance(begin, end);
+    const size_t			ndata = std::distance(begin, end);
     if (ndata == 0)		// beginが有効か？
 	throw std::invalid_argument("Affinity::fit(): 0-length input data!!");
-    const auto		xdim = begin->first.size();
+    const auto				xdim = normalize.spaceDim();
     if (ndata < xdim + 1)	// 行列のサイズが未定なのでndataMin()は無効
 	throw std::invalid_argument("Affinity::fit(): not enough input data!!");
 
   // データ行列の計算
-    const auto				ydim   = begin->second.size();
-    const auto				xydim2 = xdim*ydim;
-    Matrix<element_type, DI, DI>	N(xdim, xdim);
-    Vector<element_type, DI>		c(xdim);
-    Vector<element_type, DO*DI1>	v(xydim2 + ydim);
+    const auto				ydim = begin->second.size();
+    Matrix<element_type, DI1, DI1>	M(xdim + 1, xdim + 1);
+    Matrix<element_type, DO,  DI1>	N(ydim,     xdim + 1);
     for (auto iter = begin; iter != end; ++iter)
     {
-	const auto&	x = iter->first;
-	const auto&	y = iter->second;
-
-	N += x % x;
-	c += x;
-	for (size_t j = 0; j < ydim; ++j)
-	    slice(v, j*xdim, xdim) += y[j]*x;
-	slice(v, xydim2, ydim) += y;
+	const auto	x = normalize.normalizeP(iter->first);
+	M += x % x;
+	N += iter->second % x;
     }
-    Matrix<element_type, DO*DI1, DO*DI1> W(xydim2 + ydim, xydim2 + ydim);
-    for (size_t j = 0; j < ydim; ++j)
-    {
-	slice(W, j*xdim, j*xdim, xdim, xdim) = N;
-	slice(W[xydim2 + j], j*xdim, xdim)   = c;
-	W[xydim2 + j][xydim2 + j]     = ndata;
-    }
-    symmetrize(W);
-
-  // W*u = vを解いて変換パラメータを求める．
-    solve(W, v);
+    const auto	Minv = TU::inverse(M);
 
   // 変換行列をセットする．
-    base_type::resize(ydim + 1, xdim + 1);
-    slice(*this, 0, ydim, 0, xdim) = make_dense_range(v.data(), ydim, xdim);
     for (size_t j = 0; j < ydim; ++j)
-	(*this)[j][xdim] = v[xydim2 + j];
-    for (size_t i = 0; i < xdim; ++i)
-	(*this)[ydim][i] = 0;
-    (*this)[ydim][xdim] = 1;
+    {
+	(*this)[j] = Minv * N[j];
+	slice((*this)[j], 0, xdim) /= normalize.scale();
+	(*this)[j][xdim] -= slice((*this)[j], 0, xdim) * normalize.centroid();
+    }
 }
 
 //! このアフィン変換の並行移動部分を表現するベクトルを返す．
@@ -1456,7 +1442,7 @@ Rigidity<T, D>::fit(ITER_ begin, ITER_ end)
   // 点群間の剛体変換の計算
     SVDecomposition<element_type>	svd(A);
     base_type::resize(d + 1, d + 1);
-    slice(*this, 0, d, 0, d) = transpose(svd.Ut()) * svd.Vt();
+    (*this)(0, d, 0, d) = transpose(svd.Ut()) * svd.Vt();
     for (size_t i = 0; i < d; ++i)
 	(*this)[i][d] = yc[i] - slice((*this)[i], 0, d) * xc;
     (*this)[d][d] = 1;
