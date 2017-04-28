@@ -86,20 +86,18 @@ typename PointSet::Container
 ransac(const PointSet& pointSet, Model& model, Conform conform,
        double hitRate=0.99)
 {
-    using namespace	std;
-    
     typedef typename PointSet::Container	Container;
 
-    if (distance(pointSet.begin(), pointSet.end()) < model.ndataMin())
-	throw runtime_error("ransac<PointSet, Model>: not enough points in the given point set!!");
+    if (std::distance(pointSet.begin(), pointSet.end()) < model.ndataMin())
+	throw std::runtime_error("ransac<PointSet, Model>: not enough points in the given point set!!");
     
   // 与えられたhitRate，PointSetに含まれるinlierの割合およびModelの生成に
   // 要する最少点数から，サンプリングの必要回数を求める．
     if (hitRate < 0.0 || hitRate >= 1.0)
-	throw invalid_argument("ransac<PointSet, Model>: given hit rate is not within [0, 1)!!");
+	throw std::invalid_argument("ransac<PointSet, Model>: given hit rate is not within [0, 1)!!");
     const double	inlierRate = pointSet.inlierRate();
     if (inlierRate < 0.0 || inlierRate >= 1.0)
-	throw invalid_argument("ransac<PointSet, Model>: inlier rate is not within [0, 1)!!");
+	throw std::invalid_argument("ransac<PointSet, Model>: inlier rate is not within [0, 1)!!");
     double	tmp = 1.0;
     for (size_t n = model.ndataMin(); n-- > 0; )
 	tmp *= inlierRate;
@@ -115,8 +113,15 @@ ransac(const PointSet& pointSet, Model& model, Conform conform,
 	const Container&	minimalSet = pointSet.sample(model.ndataMin());
 
       // サンプルした点からモデルを生成する．
-	model.fit(minimalSet.begin(), minimalSet.end());
-
+	try
+	{
+	    model.fit(minimalSet.begin(), minimalSet.end());
+	}
+	catch (const std::runtime_error& err)	// 当てはめに失敗したら
+	{					// (ex. 特異な点配置など)
+	    continue;				// 再度サンプルする.
+	}
+	
       // 全点の中で生成したモデルに適合する(inlier)ものを集める．
 	inliers->clear();
 	for (typename PointSet::const_iterator iter = pointSet.begin();
