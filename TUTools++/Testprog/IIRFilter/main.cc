@@ -59,7 +59,7 @@ main(int argc, char* argv[])
     
     float		alpha = 1.0;
     bool		gaussian = false;
-    size_t		grainSize = 1;
+    size_t		grainSize = 100;
     extern char*	optarg;
     for (int c; (c = getopt(argc, argv, "a:Gg:")) != -1; )
 	switch (c)

@@ -38,7 +38,7 @@ warpImage(const Image<T>& image, Image<T>& warpedImage, const Map& map)
     using point_type	= typename Map::point_type;
     using element_type	= typename point_type::element_type;
     
-    auto			inv = map.inverse();
+    const auto			inv = map.inverse();
     BoundingBox<point_type>	bbox;
     bbox.expand(inv(0,		   0))
 	.expand(inv(image.width(), 0))
@@ -60,7 +60,7 @@ warpImage(const Image<T>& image, Image<T>& warpedImage, const Map& map)
 	auto	y = evaluate(v * Ht[1] + Ht[2]);
 	for (size_t u = 0; u < warpedImage.width(); ++u)
 	{
-	    point_type	p({y[0]/y[2], y[1]/y[2]});
+	    point_type	p{y[0]/y[2], y[1]/y[2]};
 	    if (0 <= p[0] && p[0] <= width1 && 0 <= p[1] && p[1] <= height1)
 		warpedImage[v][u] = at(image, p[0], p[1]);
 
@@ -88,12 +88,12 @@ integrateImages(const Image<T>& image0, const Image<T>& image1,
     Point2i	origin = warpImage(image1, warpedImage, map);
     
     BoundingBox<Point2i>	bbox;
-    bbox.expand(Point2i({0, 0}))
-	.expand(Point2i({element_type(image0.width()),
-			 element_type(image0.height())}))
+    bbox.expand(Point2i{0, 0})
+	.expand(Point2i{element_type(image0.width()),
+			element_type(image0.height())})
 	.expand(origin)
-	.expand(Point2i({element_type(origin[0] + warpedImage.width()),
-			 element_type(origin[1] + warpedImage.height())}));
+	.expand(Point2i{element_type(origin[0] + warpedImage.width()),
+			element_type(origin[1] + warpedImage.height())});
 
     Image<RGB>	result(bbox.width(), bbox.height());
     int		offset_u = -bbox.min(0), offset_v = -bbox.min(1);
@@ -148,7 +148,7 @@ doJob(const Image<T> images[2],
     MatchImage	matchImage;
     Point2i	delta = matchImage.initializeH(images, images + 2);
     matchImage.drawMatches(matchSet.begin(), matchSet.end(),
-			   delta, Point2i({0, 0}), true);
+			   delta, Point2i{0, 0}, true);
     matchImage.save(cout);
 
     if (refine)
