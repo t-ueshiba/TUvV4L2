@@ -54,11 +54,11 @@ MatchImage::initializeH(IMG begin, IMG end)
     }
 
     if (nimages > 2)
-	return Point2i({element_type(width() / nimages), 0});
+	return {element_type(width() / nimages), 0};
     else if (nimages == 2)
-	return Point2i({element_type((++begin)->width()), 0});
+	return {element_type((++begin)->width()), 0};
     else
-	return Point2i({0, 0});
+	return {0, 0};
 }
 
 template <class IMG> Point2i
@@ -84,11 +84,11 @@ MatchImage::initializeV(IMG begin, IMG end)
     }
 
     if (nimages > 2)
-	return Point2i({element_type(0), element_type(height() / nimages)});
+	return {element_type(0), element_type(height() / nimages)};
     else if (nimages == 2)
-	return Point2i({element_type(0), element_type((++begin)->height())});
+	return {element_type(0), element_type((++begin)->height())};
     else
-	return Point2i({element_type(0), element_type(0)});
+	return {element_type(0), element_type(0)};
 }
 
 template <class MATCH> MatchImage&
