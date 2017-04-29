@@ -25,6 +25,30 @@ class SeparableFilter2
 #if defined(USE_TBB)
   private:
     template <class IN_, class OUT_>
+    class ConvolveRows
+    {
+      public:
+	ConvolveRows(F const& filter, IN_ in, OUT_ out)
+	    :_filter(filter), _in(in), _out(out)			{}
+
+	void	operator ()(const tbb::blocked_range<size_t>& r) const
+		{
+		    auto	in = _in;
+		    auto	ie = _in;
+		    std::advance(in, r.begin());
+		    std::advance(ie, r.end());
+		    for (auto col = r.begin(); in != ie; ++in, ++col)
+			_filter.convolve(in->begin(), in->end(),
+					 make_vertical_iterator(_out, col));
+		}
+
+      private:
+	const F   	_filter;  // cache等の内部状態を持ち得るので参照は不可
+	const IN_ 	_in;
+	const OUT_	_out;
+    };
+
+    template <class IN_, class OUT_>
     class ConvolveV
     {
       public:
@@ -114,9 +138,10 @@ SeparableFilter2<F>::convolve(IN_ ib, IN_ ie, OUT_ out) const
     if (ib == ie)
 	return;
 
+#if defined(CACHE_FRIENDLY)
     buf_type	buf(_filterV.outLength(std::distance(ib, ie)), std::size(*ib));
 
-#if defined(USE_TBB)
+#  if defined(USE_TBB)
     using convolveV	= ConvolveV<IN_, typename buf_type::iterator>;
     using convolveH	= ConvolveH<typename buf_type::const_iterator, OUT_>;
 
@@ -124,13 +149,35 @@ SeparableFilter2<F>::convolve(IN_ ib, IN_ ie, OUT_ out) const
 		      convolveV(_filterV, ib, ie, buf.begin()));
     tbb::parallel_for(tbb::blocked_range<size_t>(0, buf.nrow(), _grainSize),
 		      convolveH(_filterH, buf.cbegin(), out));
-#else
+#  else
     _filterV.convolve(ib, ie, buf.begin());
     for (const auto& row : buf)
     {
 	_filterH.convolve(row.begin(), row.end(), std::begin(*out));
 	++out;
     }
+#  endif
+#else
+    buf_type	buf(_filterH.outLength(std::size(*ib)), std::distance(ib, ie));
+
+#  if defined(USE_TBB)
+    using convolveH	= ConvolveRows<IN_, typename buf_type::iterator>;
+    using convolveV	= ConvolveRows<typename buf_type::const_iterator, OUT_>;
+
+    tbb::parallel_for(tbb::blocked_range<size_t>(0, buf.ncol(), _grainSize),
+		      convolveH(_filterH, ib, buf.begin()));
+    tbb::parallel_for(tbb::blocked_range<size_t>(0, buf.nrow(), _grainSize),
+		      convolveV(_filterV, buf.cbegin(), out));
+#  else
+    size_t	col = 0;
+    for (; ib != ie; ++ib)
+	_filterH.convolve(std::begin(*ib), std::end(*ib),
+			  make_vertical_iterator(buf.begin(), col++));
+    col = 0;
+    for (const auto& row : buf)
+	_filterV.convolve(row.cbegin(), row.cend(),
+			  make_vertical_iterator(out, col++));
+#  endif
 #endif
 }
 
