@@ -34,11 +34,11 @@ class SeparableFilter2
 	void	operator ()(const tbb::blocked_range<size_t>& r) const
 		{
 		    auto	in = _in;
-		    auto	ie = _in;
 		    std::advance(in, r.begin());
+		    auto	ie = _in;
 		    std::advance(ie, r.end());
 		    for (auto col = r.begin(); in != ie; ++in, ++col)
-			_filter.convolve(in->begin(), in->end(),
+			_filter.convolve(std::begin(*in), std::end(*in),
 					 make_vertical_iterator(_out, col));
 		}
 
@@ -85,8 +85,8 @@ class SeparableFilter2
 	void	operator ()(const tbb::blocked_range<size_t>& r) const
 		{
 		    auto	in = _in;
-		    auto	ie = _in;
 		    std::advance(in, r.begin());
+		    auto	ie = _in;
 		    std::advance(ie, r.end());
 		    auto	out = _out;
 		    std::advance(out, r.begin());

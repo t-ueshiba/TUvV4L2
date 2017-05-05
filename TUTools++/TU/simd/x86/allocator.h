@@ -4,9 +4,9 @@
 #if !defined(__TU_SIMD_X86_ALLOCATOR_H)
 #define __TU_SIMD_X86_ALLOCATOR_H
 
-#include <limits>
 #include <new>			// for std::bad_alloc()
 #include <type_traits>
+#include <boost/align/aligned_alloc.hpp>
 
 namespace TU
 {
@@ -24,7 +24,7 @@ class allocator
     template <class T_>
     struct align
     {
-	constexpr static size_t	value = sizeof(T_);
+	constexpr static size_t	value = sizeof(vec<T_>);
     };
     template <class T_>
     struct align<vec<T_> >
@@ -46,8 +46,9 @@ class allocator
 			return nullptr;
 			    
 		    auto	p = static_cast<T*>(
-					_mm_malloc(sizeof(value_type)*n,
-						   align<T>::value));
+					boost::alignment::aligned_alloc(
+					    align<T>::value,
+					    sizeof(value_type)*n));
 		    if (p == nullptr)
 			throw std::bad_alloc();
 		    return p;
@@ -55,7 +56,7 @@ class allocator
     static void	deallocate(T* p, std::size_t)
 		{
 		    if (p != nullptr)
-			_mm_free(p);
+			boost::alignment::aligned_free(p);
 		}
 };
     

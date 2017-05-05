@@ -13,7 +13,7 @@ IDLS		=
 MOCHDRS		=
 
 INCDIRS		= -I../../.. -I$(PREFIX)/include
-CPPFLAGS	= -DNDEBUG -DUSE_TBB
+CPPFLAGS	= -DNDEBUG #-DUSE_TBB
 CFLAGS		= -O3
 NVCCFLAGS	= -g
 ifeq ($(shell arch), armv7l)
@@ -24,6 +24,7 @@ else
   CPPFLAGS     += -DSSE4
   CFLAGS       += -msse4
 endif
+CCFLAGS		= $(CFLAGS)
 
 LIBS		= -lTUTools++ -ltbb
 ifneq ($(findstring darwin,$(OSTYPE)),)
@@ -41,20 +42,19 @@ INCDIR		= $(PREFIX)/include
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC .cpp:sC .cu:sC
-EXTHDRS		= /usr/local/include/TU/Array++.h \
-		/usr/local/include/TU/BoxFilter.h \
-		/usr/local/include/TU/Filter2.h \
-		/usr/local/include/TU/Geometry++.h \
-		/usr/local/include/TU/GuidedFilter.h \
-		/usr/local/include/TU/Image++.h \
-		/usr/local/include/TU/Minimize.h \
-		/usr/local/include/TU/Profiler.h \
-		/usr/local/include/TU/Vector++.h \
-		/usr/local/include/TU/functional.h \
-		/usr/local/include/TU/iterator.h \
-		/usr/local/include/TU/pair.h \
-		/usr/local/include/TU/tuple.h \
-		/usr/local/include/TU/types.h
+EXTHDRS		= ../../../TU/Array++.h \
+		../../../TU/BoxFilter.h \
+		../../../TU/Filter2.h \
+		../../../TU/GuidedFilter.h \
+		../../../TU/Image++.h \
+		../../../TU/Profiler.h \
+		../../../TU/Vector++.h \
+		../../../TU/algorithm.h \
+		../../../TU/iterator.h \
+		../../../TU/pair.h \
+		../../../TU/range.h \
+		../../../TU/tuple.h \
+		../../../TU/types.h
 HDRS		=
 SRCS		= main.cc
 OBJS		= main.o
@@ -65,11 +65,8 @@ OBJS		= main.o
 #include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
-main.o: /usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
-	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
-	/usr/local/include/TU/tuple.h /usr/local/include/TU/functional.h \
-	/usr/local/include/TU/pair.h /usr/local/include/TU/Minimize.h \
-	/usr/local/include/TU/GuidedFilter.h \
-	/usr/local/include/TU/BoxFilter.h /usr/local/include/TU/Filter2.h \
-	/usr/local/include/TU/Profiler.h
+main.o: ../../../TU/Image++.h ../../../TU/types.h ../../../TU/pair.h \
+	../../../TU/Vector++.h ../../../TU/Array++.h ../../../TU/range.h \
+	../../../TU/algorithm.h ../../../TU/tuple.h ../../../TU/iterator.h \
+	../../../TU/GuidedFilter.h ../../../TU/BoxFilter.h \
+	../../../TU/Filter2.h ../../../TU/Profiler.h
