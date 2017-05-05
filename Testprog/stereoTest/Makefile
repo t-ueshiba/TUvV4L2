@@ -22,6 +22,8 @@ else ifeq ($(shell arch), aarch64)
 else
   CPPFLAGS     += -DSSE4
   CFLAGS       += -msse4
+#  CPPFLAGS     += -DAVX2
+#  CFLAGS       += -mavx2
 endif
 CCFLAGS		= $(CFLAGS)
 

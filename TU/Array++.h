@@ -23,34 +23,7 @@ struct BufTraits
     using const_iterator	= typename allocator_traits::const_pointer;
     
   protected:
-    static auto	null()
-		{
-		    return nullptr;
-		}
-    
-    template <class IN_, class OUT_>
-    static OUT_	copy(IN_ in, IN_ ie, OUT_ out)
-		{
-		    return std::copy(in, ie, out);
-		}
-
-    template <class IN_, class OUT_>
-    static OUT_	copy(IN_ in, size_t n, OUT_ out)
-		{
-		    return std::copy_n(in, n, out);
-		}
-
-    template <class T_>
-    static void	fill(iterator in, iterator ie, const T_& c)
-		{
-		    std::fill(in, ie, c);
-		}
-
-    template <class T_>
-    static void	fill(iterator in, size_t n, const T_& c)
-		{
-		    std::fill_n(in, n, c);
-		}
+    static auto	null()		{ return nullptr; }
 };
 
 /************************************************************************
@@ -876,6 +849,11 @@ namespace detail
     public:
       using type = typename array_t<E1,
 				    (size0<E1>() == 0 ? 0 : size0<E>())>::type;
+  };
+  template <class... E, template <class> class PRED>
+  struct substance_t<std::tuple<E...>, PRED, false>
+  {
+      using type = std::tuple<typename substance_t<E, PRED>::type...>;
   };
 }	// namespace detail
 

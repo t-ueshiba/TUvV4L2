@@ -133,12 +133,13 @@ main(int argc, char* argv[])
     size_t	windowSize		= 0;
     size_t	disparitySearchWidth	= 0;
     size_t	disparityMax		= 0;
+    float	blend			= 0;
     size_t	grainSize		= DEFAULT_GRAINSIZE;
     size_t	ntrials			= 5;
     
   // コマンド行の解析．
     extern char*	optarg;
-    for (int c; (c = getopt(argc, argv, "GHVp:d:s:BCW:D:M:g:n:")) != EOF; )
+    for (int c; (c = getopt(argc, argv, "GHVp:d:s:BCW:D:M:b:g:n:")) != EOF; )
 	switch (c)
 	{
 	  case 'G':
@@ -174,6 +175,9 @@ main(int argc, char* argv[])
 	  case 'M':
 	    disparityMax = atoi(optarg);
 	    break;
+	  case 'b':
+	    blend = atof(optarg);
+	    break;
 	  case 'g':
 	    grainSize = atoi(optarg);
 	    break;
@@ -201,6 +205,7 @@ main(int argc, char* argv[])
 		params.disparitySearchWidth = disparitySearchWidth;
 	    params.doHorizontalBackMatch = doHorizontalBackMatch;
 	    params.doVerticalBackMatch	 = doVerticalBackMatch;
+	    params.blend		 = blend;
 	    params.grainSize		 = grainSize;
 
 	    doJob<GFStereoType, u_char>(in, params, scale, binocular, ntrials);
@@ -218,6 +223,7 @@ main(int argc, char* argv[])
 		params.disparitySearchWidth = disparitySearchWidth;
 	    params.doHorizontalBackMatch = doHorizontalBackMatch;
 	    params.doVerticalBackMatch	 = doVerticalBackMatch;
+	    params.blend		 = blend;
 	    params.grainSize		 = grainSize;
 
 	    doJob<SADStereoType, u_char>(in, params, scale, binocular, ntrials);

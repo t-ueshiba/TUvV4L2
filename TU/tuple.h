@@ -18,7 +18,7 @@ namespace TU
 /*!
   \param PRED	適用する述語
   \param TUPLE	適用対象となる std::tuple
-*/ 
+*/
 template <template <class> class PRED, class TUPLE>
 struct all;
 template <template <class> class PRED>
@@ -451,16 +451,6 @@ namespace detail
       template <class T_>
       auto	operator ()(T_&& x)	const	{ return std::end(x); }
   };
-  struct generic_rbegin
-  {
-      template <class T_>
-      auto	operator ()(T_&& x)	const	{ return std::rbegin(x); }
-  };
-  struct generic_rend
-  {
-      template <class T_>
-      auto	operator ()(T_&& x)	const	{ return std::rend(x); }
-  };
 }	// namespace detail
     
 template <class TUPLE,
@@ -482,27 +472,45 @@ end(TUPLE&& t)
   //return TU::make_zip_iterator(TU::tuple_transform(
   //				     t, [](auto&& x){ return end(x); }));
 }
-    
+
 template <class TUPLE,
 	  enable_if_t<TU::all_has_begin<TUPLE>::value>* = nullptr> inline auto
 rbegin(TUPLE&& t)
 {
-    return TU::make_zip_iterator(TU::tuple_transform(detail::generic_rbegin(),
-						     t));
-  //return TU::make_zip_iterator(TU::tuple_transform(
-  //				     [](auto&& x){ return rbegin(x); }, t));
+    return make_reverse_iterator(end(t));
 }
 
 template <class TUPLE,
 	  enable_if_t<TU::all_has_begin<TUPLE>::value>* = nullptr> inline auto
 rend(TUPLE&& t)
 {
-    return TU::make_zip_iterator(TU::tuple_transform(detail::generic_rend(),
-						     t));
-  //return TU::make_zip_iterator(TU::tuple_transform(
-  //[](auto&& x){ return rend(x); } t));
+    return make_reverse_iterator(begin(t));
 }
-    
+
+template <class... T> inline auto
+cbegin(const std::tuple<T...>& t)
+{
+    return begin(t);
+}
+
+template <class... T> inline auto
+cend(const std::tuple<T...>& t)
+{
+    return end(t);
+}
+
+template <class... T> inline auto
+crbegin(const std::tuple<T...>& t)
+{
+    return rbegin(t);
+}
+
+template <class... T> inline auto
+crend(const std::tuple<T...>& t)
+{
+    return rend(t);
+}
+
 template <class... T> inline size_t
 size(const tuple<T...>& t)
 {

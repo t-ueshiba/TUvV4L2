@@ -30,6 +30,14 @@ namespace detail
 template <class E>
 using iterator_t = decltype(detail::check_begin(std::declval<E>()));
 
+//! 式が持つ逆反復子の型を返す
+/*!
+  \param E	式の型
+  \return	E が逆反復子を持てばその型，持たなければ void
+*/
+template <class E>
+using reverse_iterator_t = std::reverse_iterator<iterator_t<E> >;
+
 //! 式が持つ反復子が指す型を返す
 /*!
   反復子を持たない式を与えるとコンパイルエラーとなる.
