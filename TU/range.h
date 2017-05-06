@@ -650,7 +650,7 @@ make_range_iterator(ITER iter)
 */
 template <size_t SIZE, class ITER>
 inline range_iterator<ITER, 0, SIZE>
-make_range_iterator(ITER iter, ptrdiff_t stride)
+make_range_iterator(ITER iter, iterator_difference<ITER> stride)
 {
     return {iter, stride};
 }
@@ -662,7 +662,7 @@ make_range_iterator(ITER iter, ptrdiff_t stride)
   \param size	レンジサイズ
 */
 template <class ITER> inline range_iterator<ITER, 0, 0>
-make_range_iterator(ITER iter, ptrdiff_t stride, size_t size)
+make_range_iterator(ITER iter, iterator_difference<ITER> stride, size_t size)
 {
     return {iter, stride, size};
 }
@@ -707,7 +707,8 @@ make_range(ITER iter)
 template <size_t SIZE, size_t... SIZES, class ITER, class... STRIDES,
 	  std::enable_if_t<sizeof...(SIZES) == sizeof...(STRIDES)>* = nullptr>
 inline auto
-make_range_iterator(ITER iter, ptrdiff_t stride, STRIDES... strides)
+make_range_iterator(ITER iter,
+		    iterator_difference<ITER> stride, STRIDES... strides)
 {
     return make_range_iterator<SIZE>(
 	       make_range_iterator<SIZES...>(iter, strides...), stride);
@@ -732,7 +733,8 @@ make_range(ITER iter, STRIDES... strides)
   \param ss		2番目以降の軸の{ストライド, レンジサイズ}の並び
 */
 template <class ITER, class... SS> inline auto
-make_range_iterator(ITER iter, ptrdiff_t stride, size_t size, SS... ss)
+make_range_iterator(ITER iter,
+		    iterator_difference<ITER> stride, size_t size, SS... ss)
 {
     return make_range_iterator(make_range_iterator(iter, ss...),
 			       stride, size);
