@@ -352,7 +352,12 @@ class zip_iterator
     
   public:
 		zip_iterator(ITER_TUPLE iter_tuple)
-		    :_iter_tuple(iter_tuple)		{}
+		    :_iter_tuple(iter_tuple)				{}
+    template <class ITER_TUPLE_,
+	      std::enable_if_t<
+		  std::is_convertible<ITER_TUPLE_, ITER_TUPLE>::value>* = nullptr>
+		zip_iterator(const zip_iterator<ITER_TUPLE_>& iter)
+		    :_iter_tuple(iter.get_iterator_tuple())		{}
 
     const ITER_TUPLE&
 		get_iterator_tuple()		const	{ return _iter_tuple; }
@@ -380,8 +385,10 @@ class zip_iterator
 		{
 		    tuple_for_each([n](auto& x){ x += n; }, _iter_tuple);
 		}
-    difference_type
-		distance_to(const zip_iterator& iter) const
+    template <class ITER_TUPLE_>
+    std::enable_if_t<std::is_convertible<ITER_TUPLE_, ITER_TUPLE>::value,
+		     difference_type>
+		distance_to(const zip_iterator<ITER_TUPLE_>& iter) const
 		{
 		    return std::get<0>(iter.get_iterator_tuple())
 			 - std::get<0>(_iter_tuple);

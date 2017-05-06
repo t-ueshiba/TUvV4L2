@@ -427,7 +427,7 @@ GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 				       std::make_tuple(
 					   std::cbegin(*rowR),
 					   make_vertical_iterator(rowV, cV))),
-				   rowLp->cbegin(),
+				   std::cbegin(*rowLp),
 				   make_zip_iterator(
 				       std::make_tuple(
 					   std::cbegin(*rowRp),
