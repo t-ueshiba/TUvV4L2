@@ -164,7 +164,7 @@ size0()
     
 //! 与えられた式について，指定された軸の要素数を返す
 /*!
-  \param I	軸を指定するindex
+  \param I	軸を指定するindex (0 <= I < Dimension)
   \param E	式の型
   \return	軸Iの要素数
  */
@@ -177,7 +177,7 @@ size(const E& expr)
 
 //! 与えられた式について，指定された軸のストライドを返す
 /*!
-  \param I	軸を指定するindex
+  \param I	軸を指定するindex (1 <= I < Dimension)
   \param E	式の型
   \return	軸Iのストライド
  */
@@ -521,13 +521,14 @@ namespace detail
   template <ptrdiff_t STRIDE, size_t SIZE>
   struct stride_and_size
   {
+      stride_and_size(ptrdiff_t, size_t)	{}
       constexpr static auto	stride()	{ return STRIDE; }
       constexpr static auto	size()		{ return SIZE; }
   };
   template <size_t SIZE>
   struct stride_and_size<0, SIZE>
   {
-      stride_and_size(ptrdiff_t stride)
+      stride_and_size(ptrdiff_t stride, size_t)
 	  :_stride(stride)			{}
       auto			stride() const	{ return _stride; }
       constexpr static auto	size()		{ return SIZE; }
@@ -538,7 +539,7 @@ namespace detail
   template <ptrdiff_t STRIDE>
   struct stride_and_size<STRIDE, 0>
   {
-      stride_and_size(size_t size)
+      stride_and_size(ptrdiff_t, size_t size)
 	  :_size(size)				{}
       constexpr static auto	stride()	{ return STRIDE; }
       auto			size()	 const	{ return _size; }
@@ -590,21 +591,8 @@ class range_iterator
     friend class	boost::iterator_core_access;
 	  
   public:
-    template <ptrdiff_t STRIDE_=STRIDE, size_t SIZE_=SIZE,
-	      std::enable_if_t<(STRIDE_ != 0) && (SIZE_ != 0)>* = nullptr>
-		range_iterator(ITER iter)
-		    :super(iter), ss()					{}
-    template <ptrdiff_t STRIDE_=STRIDE, size_t SIZE_=SIZE,
-	      std::enable_if_t<(STRIDE_ == 0) && (SIZE_ != 0)>* = nullptr>
-		range_iterator(ITER iter, ptrdiff_t stride)
-		    :super(iter), ss(stride)				{}
-    template <ptrdiff_t STRIDE_=STRIDE, size_t SIZE_=SIZE,
-	      std::enable_if_t<(STRIDE_ != 0) && (SIZE_ == 0)>* = nullptr>
-		range_iterator(ITER iter, size_t size)
-		    :super(iter), ss(size)				{}
-    template <ptrdiff_t STRIDE_=STRIDE, size_t SIZE_=SIZE,
-	      std::enable_if_t<(STRIDE_ == 0) && (SIZE_ == 0)>* = nullptr>
-		range_iterator(ITER iter, ptrdiff_t stride, size_t size)
+		range_iterator(ITER iter,
+			       ptrdiff_t stride=STRIDE, size_t size=SIZE)
 		    :super(iter), ss(stride, size)			{}
 
     template <class ITER_,

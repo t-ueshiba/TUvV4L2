@@ -114,7 +114,7 @@ class diff_iterator
 {
   private:
     typedef boost::iterator_adaptor<diff_iterator<COL, T>,
-				    fast_zip_iterator<std::tuple<COL, COL> >,
+				    zip_iterator<std::tuple<COL, COL> >,
 				    Array<T>,
 				    boost::use_default,
 				    const Array<T>&>		super;
@@ -149,6 +149,12 @@ class diff_iterator
     mutable value_type	_P;
     const T		_thresh;
 };
+
+template <class COL, class T> inline diff_iterator<COL, T>
+make_diff_iterator(zip_iterator<std::tuple<COL, COL> > iter, size_t dsw, T thresh)
+{
+    return {iter, dsw, thresh};
+}
 
 /************************************************************************
 *  class matching_iterator<ITER, A>					*
