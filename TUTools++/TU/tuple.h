@@ -311,7 +311,7 @@ make_unarizer(FUNC func)
 }
     
 /************************************************************************
-*  class zip_iterator<ITER_TUPLE>					*
+*  class zip_iterator<ITER_TUPLE, DIFF>					*
 ************************************************************************/
 namespace detail
 {
@@ -322,17 +322,18 @@ namespace detail
   };
 }	// namespace detail
     
-template <class ITER_TUPLE>
+template <class ITER_TUPLE, class DIFF=ptrdiff_t>
 class zip_iterator
     : public boost::iterator_facade<
-	  zip_iterator<ITER_TUPLE>,
+	  zip_iterator<ITER_TUPLE, DIFF>,
 	  decltype(tuple_transform(detail::generic_dereference(),
 				   std::declval<ITER_TUPLE>())),
 	  typename std::iterator_traits<
 	      typename std::tuple_element<0, ITER_TUPLE>::type>
 			  ::iterator_category,
 	  decltype(tuple_transform(detail::generic_dereference(),
-				   std::declval<ITER_TUPLE>()))>
+				   std::declval<ITER_TUPLE>())),
+	  DIFF>
 {
   private:
     using super = boost::iterator_facade<
@@ -381,24 +382,48 @@ class zip_iterator
 		{
 		    tuple_for_each([](auto& x){ --x; }, _iter_tuple);
 		}
-    void	advance(difference_type n)
+    template <class DIFF_>
+    std::enable_if_t<!is_tuple<DIFF_>::value>
+		advance(DIFF_ n)
 		{
 		    tuple_for_each([n](auto& x){ x += n; }, _iter_tuple);
 		}
-    template <class ITER_TUPLE_>
-    std::enable_if_t<std::is_convertible<ITER_TUPLE_, ITER_TUPLE>::value,
+    template <class DIFF_>
+    std::enable_if_t<is_tuple<DIFF_>::value>
+		advance(DIFF_ n)
+		{
+		    tuple_for_each([](auto& x, auto d){ x += d; },
+				   _iter_tuple, n);
+		}
+    template <class ITER_TUPLE_, class DIFF_>
+    std::enable_if_t<std::is_convertible<ITER_TUPLE_, ITER_TUPLE>::value &&
+		     std::is_convertible<DIFF_, DIFF>::value &&
+		     !is_tuple<DIFF_>::value,
 		     difference_type>
-		distance_to(const zip_iterator<ITER_TUPLE_>& iter) const
+		distance_to(const zip_iterator<ITER_TUPLE_, DIFF_>& iter) const
 		{
 		    return std::get<0>(iter.get_iterator_tuple())
 			 - std::get<0>(_iter_tuple);
+		}
+    template <class ITER_TUPLE_, class DIFF_>
+    std::enable_if_t<std::is_convertible<ITER_TUPLE_, ITER_TUPLE>::value &&
+		     std::is_convertible<DIFF_, DIFF>::value &&
+		     is_tuple<DIFF_>::value,
+		     difference_type>
+		distance_to(const zip_iterator<ITER_TUPLE_, DIFF_>& iter) const
+		{
+		    return iter.get_iterator_tuple() - _iter_tuple;
 		}
 
   private:
     ITER_TUPLE	_iter_tuple;
 };
 
-template <class ITER_TUPLE> inline zip_iterator<ITER_TUPLE>
+template <class DIFF=ptrdiff_t, class ITER_TUPLE>
+inline zip_iterator<ITER_TUPLE,
+		    std::conditional_t<std::is_void<DIFF>::value,
+				       tuple_replace<ITER_TUPLE, ptrdiff_t>,
+				       DIFF> >
 make_zip_iterator(ITER_TUPLE iter_tuple)
 {
     return {iter_tuple};

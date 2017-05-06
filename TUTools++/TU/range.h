@@ -592,7 +592,8 @@ class range_iterator
 	  
   public:
 		range_iterator(ITER iter,
-			       ptrdiff_t stride=STRIDE, size_t size=SIZE)
+			       iterator_difference<ITER> stride=STRIDE,
+			       size_t size=SIZE)
 		    :super(iter), ss(stride, size)			{}
 
     template <class ITER_,
