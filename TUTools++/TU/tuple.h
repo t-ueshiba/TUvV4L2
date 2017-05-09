@@ -323,45 +323,42 @@ namespace detail
 }	// namespace detail
     
 template <class ITER_TUPLE, class DIFF=ptrdiff_t>
-class zip_iterator
-    : public boost::iterator_facade<
-	  zip_iterator<ITER_TUPLE, DIFF>,
-	  decltype(tuple_transform(detail::generic_dereference(),
-				   std::declval<ITER_TUPLE>())),
-	  typename std::iterator_traits<
-	      typename std::tuple_element<0, ITER_TUPLE>::type>
-			  ::iterator_category,
-	  decltype(tuple_transform(detail::generic_dereference(),
-				   std::declval<ITER_TUPLE>())),
-	  DIFF>
+class zip_iterator : public boost::iterator_facade<
+			zip_iterator<ITER_TUPLE>,
+			decltype(tuple_transform(detail::generic_dereference(),
+						 std::declval<ITER_TUPLE>())),
+			iterator_category<tuple_head<ITER_TUPLE> >,
+			decltype(tuple_transform(detail::generic_dereference(),
+						 std::declval<ITER_TUPLE>()))>
 {
   private:
     using super = boost::iterator_facade<
-		      zip_iterator,
-		      decltype(tuple_transform(detail::generic_dereference(),
-					       std::declval<ITER_TUPLE>())),
-		      typename std::iterator_traits<
-			  typename std::tuple_element<0, ITER_TUPLE>::type>
-				      ::iterator_category,
-		      decltype(tuple_transform(detail::generic_dereference(),
-					       std::declval<ITER_TUPLE>()))>;
+			zip_iterator,
+			decltype(tuple_transform(detail::generic_dereference(),
+						 std::declval<ITER_TUPLE>())),
+			iterator_category<tuple_head<ITER_TUPLE> >,
+			decltype(tuple_transform(detail::generic_dereference(),
+						 std::declval<ITER_TUPLE>()))>;
     friend	class boost::iterator_core_access;
     
   public:
-    using	typename super::reference;
-    using	typename super::difference_type;
+    using		typename super::reference;
+    using		typename super::difference_type;
+    using stride_t    = tuple_replace<ITER_TUPLE, ptrdiff_t>;
     
   public:
 		zip_iterator(ITER_TUPLE iter_tuple)
 		    :_iter_tuple(iter_tuple)				{}
     template <class ITER_TUPLE_,
 	      std::enable_if_t<
-		  std::is_convertible<ITER_TUPLE_, ITER_TUPLE>::value>* = nullptr>
+		  std::is_convertible<ITER_TUPLE_, ITER_TUPLE>::value>*
+	      = nullptr>
 		zip_iterator(const zip_iterator<ITER_TUPLE_>& iter)
 		    :_iter_tuple(iter.get_iterator_tuple())		{}
 
     const ITER_TUPLE&
-		get_iterator_tuple()		const	{ return _iter_tuple; }
+		get_iterator_tuple()	const	{ return _iter_tuple; }
+    void	advance(stride_t stride)	{ _iter_tuple += stride; }
 
   private:
     reference	dereference() const
@@ -376,17 +373,17 @@ class zip_iterator
 		}
     void	increment()
 		{
-		    tuple_for_each([](auto& x){ ++x; }, _iter_tuple);
+		    ++_iter_tuple;
 		}
     void	decrement()
 		{
-		    tuple_for_each([](auto& x){ --x; }, _iter_tuple);
+		    --_iter_tuple;
 		}
     template <class DIFF_>
     std::enable_if_t<!is_tuple<DIFF_>::value>
 		advance(DIFF_ n)
 		{
-		    tuple_for_each([n](auto& x){ x += n; }, _iter_tuple);
+		    _iter_tuple += n;
 		}
     template <class DIFF_>
     std::enable_if_t<is_tuple<DIFF_>::value>
@@ -403,7 +400,7 @@ class zip_iterator
 		distance_to(const zip_iterator<ITER_TUPLE_, DIFF_>& iter) const
 		{
 		    return std::get<0>(iter.get_iterator_tuple())
-			 - std::get<0>(_iter_tuple);
+		  	 - std::get<0>(_iter_tuple);
 		}
     template <class ITER_TUPLE_, class DIFF_>
     std::enable_if_t<std::is_convertible<ITER_TUPLE_, ITER_TUPLE>::value &&
@@ -555,7 +552,7 @@ size(const tuple<T...>& t)
 template <class... T> inline auto
 operator -(const tuple<T...>& t)
 {
-    return TU::tuple_transform(t, [](const auto& x){ return -x; });
+    return TU::tuple_transform([](const auto& x){ return -x; }, t);
 }
 
 template <class L, class R,
@@ -631,6 +628,20 @@ operator %=(L&& l, const R& r)
 {
     TU::tuple_for_each([](auto&& x, const auto& y){ x %= y; }, l, r);
     return l;
+}
+
+template <class T> inline enable_if_t<TU::is_tuple<T>::value, T&>
+operator ++(T&& t)
+{
+    TU::tuple_for_each([](auto&& x){ ++x; }, t);
+    return t;
+}
+
+template <class T> inline enable_if_t<TU::is_tuple<T>::value, T&>
+operator --(T&& t)
+{
+    TU::tuple_for_each([](auto&& x){ --x; }, t);
+    return t;
 }
 
 template <class L, class C, class R,

@@ -237,9 +237,6 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out) const
     if (ib == ie)
 	return;
 
-    if ((ib.stride() != gb.stride()) || (ib.stride() != out.stride()))
-	throw std::runtime_error("GuidedFilter2<T>::convolve(): unmatched stride!");
-
     const auto	n    = rowWinSize() * colWinSize();
     const auto	nrow = super::outRowLength(std::distance(ib, ie));
     const auto	ncol = super::outColLength(std::size(*ib));
@@ -251,17 +248,18 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out) const
 			boost::make_transform_iterator(
 			    std::cbegin(std::make_tuple(*ib, *gb)),
 			    init_params()),
-			ib.stride(), ib.size()),
+			std::make_tuple(ib.stride(), gb.stride()), ib.size()),
 		    make_range_iterator(
 			boost::make_transform_iterator(
 			    std::cbegin(std::make_tuple(*ie, *ge)),
 			    init_params()),
-			ie.stride(), ie.size()),
+			std::make_tuple(ie.stride(), ge.stride()), ie.size()),
 		    make_range_iterator(
 			make_assignment_iterator(std::begin(*std::begin(c)),
 						 init_coeffs(n, _e)),
-			std::get<0>(c).begin().stride(),
-			std::get<0>(c).begin().size()));
+			std::make_tuple(std::begin(std::get<0>(c)).stride(),
+					std::begin(std::get<1>(c)).stride()),
+			std::begin(std::get<0>(c)).size()));
     
   // 係数ベクトルの平均値を求め，それによってガイドデータ列を線型変換する．
     std::advance(gb,  rowWinSize() - 1);
@@ -272,7 +270,8 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out) const
 			    std::begin(std::make_tuple(*gb, *out))
 			    + colWinSize() - 1,
 			    trans_guides(n)),
-			out.stride(), out.size()));
+			std::make_tuple(gb.stride(), out.stride()),
+			out.size()));
 }
 
 //! 2次元入力データにguided filterを適用する
@@ -288,9 +287,6 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, OUT out) const
 {
     if (ib == ie)
 	return;
-
-    if (ib.stride() != out.stride())
-	throw std::runtime_error("GuidedFilter2<T>::convolve(): unmatched stride!");
 
     const auto	n    = rowWinSize() * colWinSize();
     const auto	nrow = super::outRowLength(std::distance(ib, ie));
@@ -310,8 +306,9 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, OUT out) const
 		    make_range_iterator(
 			make_assignment_iterator(std::begin(*std::begin(c)),
 						 init_coeffs(n, _e)),
-			std::get<0>(c).begin().stride(),
-			std::get<0>(c).begin().size()));
+			std::make_tuple(std::begin(std::get<0>(c)).stride(),
+					std::begin(std::get<1>(c)).stride()),
+			std::begin(std::get<0>(c)).size()));
 
   // 係数ベクトルの平均値を求め，それによって入力データ列を線型変換する．
     std::advance(ib,  rowWinSize() - 1);
@@ -322,7 +319,8 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, OUT out) const
 			    std::begin(std::make_tuple(*ib, *out))
 			    + colWinSize() - 1,
 			    trans_guides(n)),
-			out.stride(), out.size()));
+			std::make_tuple(ib.stride(), out.stride()),
+			out.size()));
 }
 
 }
