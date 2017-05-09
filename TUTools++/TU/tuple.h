@@ -366,7 +366,9 @@ class zip_iterator : public boost::iterator_facade<
 		    return tuple_transform(detail::generic_dereference(),
 					   _iter_tuple);
 		}
-    bool	equal(const zip_iterator& iter) const
+    template <class ITER_TUPLE_>
+    std::enable_if_t<std::is_convertible<ITER_TUPLE_, ITER_TUPLE>::value, bool>
+		equal(const zip_iterator<ITER_TUPLE_>& iter) const
 		{
 		    return std::get<0>(iter.get_iterator_tuple())
 			== std::get<0>(_iter_tuple);
@@ -379,37 +381,17 @@ class zip_iterator : public boost::iterator_facade<
 		{
 		    --_iter_tuple;
 		}
-    template <class DIFF_>
-    std::enable_if_t<!is_tuple<DIFF_>::value>
-		advance(DIFF_ n)
+    void	advance(difference_type n)
 		{
 		    _iter_tuple += n;
 		}
-    template <class DIFF_>
-    std::enable_if_t<is_tuple<DIFF_>::value>
-		advance(DIFF_ n)
-		{
-		    tuple_for_each([](auto& x, auto d){ x += d; },
-				   _iter_tuple, n);
-		}
-    template <class ITER_TUPLE_, class DIFF_>
-    std::enable_if_t<std::is_convertible<ITER_TUPLE_, ITER_TUPLE>::value &&
-		     std::is_convertible<DIFF_, DIFF>::value &&
-		     !is_tuple<DIFF_>::value,
+    template <class ITER_TUPLE_>
+    std::enable_if_t<std::is_convertible<ITER_TUPLE_, ITER_TUPLE>::value,
 		     difference_type>
-		distance_to(const zip_iterator<ITER_TUPLE_, DIFF_>& iter) const
+		distance_to(const zip_iterator<ITER_TUPLE_>& iter) const
 		{
 		    return std::get<0>(iter.get_iterator_tuple())
 		  	 - std::get<0>(_iter_tuple);
-		}
-    template <class ITER_TUPLE_, class DIFF_>
-    std::enable_if_t<std::is_convertible<ITER_TUPLE_, ITER_TUPLE>::value &&
-		     std::is_convertible<DIFF_, DIFF>::value &&
-		     is_tuple<DIFF_>::value,
-		     difference_type>
-		distance_to(const zip_iterator<ITER_TUPLE_, DIFF_>& iter) const
-		{
-		    return iter.get_iterator_tuple() - _iter_tuple;
 		}
 
   private:

@@ -74,40 +74,6 @@ template <class E>
 using element_t	= typename detail::element_t<E>::type;
 
 /************************************************************************
-*  type alias: iterator_stride<ITER>					*
-************************************************************************/
-namespace detail
-{
-  template <class ITER>
-  struct iterator_stride
-  {
-    private:
-      template <class ITER_, class BASE_, class VAL_,
-		class CAT_,  class REF_,  class DIFF_>
-      static BASE_	check_base_type(
-			    boost::iterator_adaptor<ITER_, BASE_, VAL_,
-						    CAT_, REF_, DIFF_>)	;
-      static void	check_base_type(...)				;
-
-      using base_type	= decltype(check_base_type(std::declval<ITER>()));
-
-    public:
-      using type	= typename std::conditional_t<
-				       std::is_void<base_type>::value,
-				       identity<iterator_difference<ITER> >,
-				       iterator_stride<base_type> >::type;
-  };
-  template <class ITER_TUPLE>
-  struct iterator_stride<zip_iterator<ITER_TUPLE> >
-  {
-      using type	= typename zip_iterator<ITER_TUPLE>::stride_t;
-  };
-}	// namespace detail
-
-template <class ITER>
-using iterator_stride = typename detail::iterator_stride<ITER>::type;
-    
-/************************************************************************
 *  rank<E>(), size0<E>(), size<E>() and stride<E>()			*
 ************************************************************************/
 //! 式の次元数(軸の個数)を返す
@@ -548,6 +514,40 @@ operator <<(std::ostream& out, const range<ITER, SIZE>& r)
 }
     
 /************************************************************************
+*  type alias: iterator_stride<ITER>					*
+************************************************************************/
+namespace detail
+{
+  template <class ITER>
+  struct iterator_stride
+  {
+    private:
+      template <class ITER_, class BASE_, class VAL_,
+		class CAT_,  class REF_,  class DIFF_>
+      static BASE_	check_base_type(
+			    boost::iterator_adaptor<ITER_, BASE_, VAL_,
+						    CAT_, REF_, DIFF_>)	;
+      static void	check_base_type(...)				;
+
+      using base_type	= decltype(check_base_type(std::declval<ITER>()));
+
+    public:
+      using type	= typename std::conditional_t<
+				       std::is_void<base_type>::value,
+				       identity<iterator_difference<ITER> >,
+				       iterator_stride<base_type> >::type;
+  };
+  template <class ITER_TUPLE>
+  struct iterator_stride<zip_iterator<ITER_TUPLE> >
+  {
+      using type	= typename zip_iterator<ITER_TUPLE>::stride_t;
+  };
+}	// namespace detail
+
+template <class ITER>
+using iterator_stride = typename detail::iterator_stride<ITER>::type;
+    
+/************************************************************************
 *  class range_iterator<ITER, STRIDE, SIZE>				*
 ************************************************************************/
 namespace detail
@@ -671,6 +671,7 @@ class range_iterator
 		{
 		    return (iter.base() - super::base()) / stride();
 		}
+
     void	advance(stride_t stride, std::false_type)
 		{
 		    super::base_reference() += stride;
