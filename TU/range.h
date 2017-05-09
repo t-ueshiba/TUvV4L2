@@ -74,13 +74,47 @@ template <class E>
 using element_t	= typename detail::element_t<E>::type;
 
 /************************************************************************
+*  type alias: iterator_stride<ITER>					*
+************************************************************************/
+namespace detail
+{
+  template <class ITER>
+  struct iterator_stride
+  {
+    private:
+      template <class ITER_, class BASE_, class VAL_,
+		class CAT_,  class REF_,  class DIFF_>
+      static BASE_	check_base_type(
+			    boost::iterator_adaptor<ITER_, BASE_, VAL_,
+						    CAT_, REF_, DIFF_>)	;
+      static void	check_base_type(...)				;
+
+      using base_type	= decltype(check_base_type(std::declval<ITER>()));
+
+    public:
+      using type	= typename std::conditional_t<
+				       std::is_void<base_type>::value,
+				       identity<iterator_difference<ITER> >,
+				       iterator_stride<base_type> >::type;
+  };
+  template <class ITER_TUPLE>
+  struct iterator_stride<zip_iterator<ITER_TUPLE> >
+  {
+      using type	= typename zip_iterator<ITER_TUPLE>::stride_t;
+  };
+}	// namespace detail
+
+template <class ITER>
+using iterator_stride = typename detail::iterator_stride<ITER>::type;
+    
+/************************************************************************
 *  rank<E>(), size0<E>(), size<E>() and stride<E>()			*
 ************************************************************************/
 //! 式の次元数(軸の個数)を返す
 /*!
   \param E	式の型
   \return	式の次元数
- */
+*/
 template <class E>
 constexpr std::enable_if_t<!has_begin<E>::value, size_t>
 rank()
@@ -518,28 +552,34 @@ operator <<(std::ostream& out, const range<ITER, SIZE>& r)
 ************************************************************************/
 namespace detail
 {
-  template <ptrdiff_t STRIDE, size_t SIZE>
+  template <class DIFF, ptrdiff_t STRIDE, size_t SIZE>
   struct stride_and_size
   {
-      stride_and_size(ptrdiff_t, size_t)	{}
+      using stride_t	= ptrdiff_t;
+      
+      stride_and_size(stride_t, size_t)		{}
       constexpr static auto	stride()	{ return STRIDE; }
       constexpr static auto	size()		{ return SIZE; }
   };
-  template <size_t SIZE>
-  struct stride_and_size<0, SIZE>
+  template <class DIFF, size_t SIZE>
+  struct stride_and_size<DIFF, 0, SIZE>
   {
-      stride_and_size(ptrdiff_t stride, size_t)
+      using stride_t	= DIFF;
+      
+      stride_and_size(stride_t stride, size_t)
 	  :_stride(stride)			{}
       auto			stride() const	{ return _stride; }
       constexpr static auto	size()		{ return SIZE; }
 
     private:
-      ptrdiff_t	_stride;
+      stride_t	_stride;
   };
-  template <ptrdiff_t STRIDE>
-  struct stride_and_size<STRIDE, 0>
+  template <class DIFF, ptrdiff_t STRIDE>
+  struct stride_and_size<DIFF, STRIDE, 0>
   {
-      stride_and_size(ptrdiff_t, size_t size)
+      using stride_t	= ptrdiff_t;
+      
+      stride_and_size(stride_t, size_t size)
 	  :_size(size)				{}
       constexpr static auto	stride()	{ return STRIDE; }
       auto			size()	 const	{ return _size; }
@@ -547,20 +587,22 @@ namespace detail
     private:
       size_t	_size;
   };
-  template <>
-  struct stride_and_size<0, 0>
+  template <class DIFF>
+  struct stride_and_size<DIFF, 0, 0>
   {
-      stride_and_size(ptrdiff_t stride, size_t size)
+      using stride_t	= DIFF;
+      
+      stride_and_size(stride_t stride, size_t size)
 	  :_stride(stride), _size(size)		{}
       auto			stride() const	{ return _stride; }
       auto			size()	 const	{ return _size; }
 
     private:
-      ptrdiff_t	_stride;
+      stride_t	_stride;
       size_t	_size;
   };
 }	// namespace detail
-    
+
 //! 配列を一定間隔に切り分けたレンジを指す反復子
 /*!
   \param ITER	配列の要素を指す反復子の型
@@ -574,7 +616,7 @@ class range_iterator
 				     range<ITER, SIZE>,
 				     boost::use_default,
 				     range<ITER, SIZE> >,
-      public detail::stride_and_size<STRIDE, SIZE>
+      public detail::stride_and_size<iterator_stride<ITER>, STRIDE, SIZE>
 {
   private:
     using super	= boost::iterator_adaptor<range_iterator,
@@ -582,17 +624,18 @@ class range_iterator
 					  range<ITER, SIZE>,
 					  boost::use_default,
 					  range<ITER, SIZE> >;
-    using ss	= detail::stride_and_size<STRIDE, SIZE>;
+    using ss	= detail::stride_and_size<iterator_stride<ITER>,
+					  STRIDE, SIZE>;
     
   public:
     using		typename super::reference;
     using		typename super::difference_type;
-
+    using stride_t    =	typename ss::stride_t;
     friend class	boost::iterator_core_access;
 	  
   public:
 		range_iterator(ITER iter,
-			       iterator_difference<ITER> stride=STRIDE,
+			       iterator_stride<ITER> stride=STRIDE,
 			       size_t size=SIZE)
 		    :super(iter), ss(stride, size)			{}
 
@@ -613,20 +656,41 @@ class range_iterator
 		}
     void	increment()
 		{
-		    super::base_reference() += stride();
+		    advance(stride(), is_tuple<stride_t>());
 		}
     void	decrement()
 		{
-		    super::base_reference() -= stride();
+		    advance(-stride(), is_tuple<stride_t>());
 		}
     void	advance(difference_type n)
 		{
-		    super::base_reference() += n*stride();
+		    advance(n*stride(), is_tuple<stride_t>());
 		}
     difference_type
 		distance_to(const range_iterator& iter) const
 		{
 		    return (iter.base() - super::base()) / stride();
+		}
+    void	advance(stride_t stride, std::false_type)
+		{
+		    super::base_reference() += stride;
+		}
+    void	advance(stride_t stride, std::true_type)
+		{
+		    const auto&	iter = base_zip_iterator(super::base());
+		    const_cast<std::decay_t<decltype(iter)>&>(iter)
+			.advance(stride);
+		}
+
+    template <class ITER_TUPLE_> static const auto&
+		base_zip_iterator(const zip_iterator<ITER_TUPLE_>& iter)
+		{
+		    return iter;
+		}
+    template <class ITER_> static const auto&
+		base_zip_iterator(const ITER_& iter)
+		{
+		    return base_zip_iterator(iter.base());
 		}
 };
 
@@ -651,7 +715,7 @@ make_range_iterator(ITER iter)
 */
 template <size_t SIZE, class ITER>
 inline range_iterator<ITER, 0, SIZE>
-make_range_iterator(ITER iter, iterator_difference<ITER> stride)
+make_range_iterator(ITER iter, iterator_stride<ITER> stride)
 {
     return {iter, stride};
 }
@@ -663,7 +727,7 @@ make_range_iterator(ITER iter, iterator_difference<ITER> stride)
   \param size	レンジサイズ
 */
 template <class ITER> inline range_iterator<ITER, 0, 0>
-make_range_iterator(ITER iter, iterator_difference<ITER> stride, size_t size)
+make_range_iterator(ITER iter, iterator_stride<ITER> stride, size_t size)
 {
     return {iter, stride, size};
 }
@@ -709,7 +773,7 @@ template <size_t SIZE, size_t... SIZES, class ITER, class... STRIDES,
 	  std::enable_if_t<sizeof...(SIZES) == sizeof...(STRIDES)>* = nullptr>
 inline auto
 make_range_iterator(ITER iter,
-		    iterator_difference<ITER> stride, STRIDES... strides)
+		    iterator_stride<ITER> stride, STRIDES... strides)
 {
     return make_range_iterator<SIZE>(
 	       make_range_iterator<SIZES...>(iter, strides...), stride);
@@ -735,7 +799,7 @@ make_range(ITER iter, STRIDES... strides)
 */
 template <class ITER, class... SS> inline auto
 make_range_iterator(ITER iter,
-		    iterator_difference<ITER> stride, size_t size, SS... ss)
+		    iterator_stride<ITER> stride, size_t size, SS... ss)
 {
     return make_range_iterator(make_range_iterator(iter, ss...),
 			       stride, size);
