@@ -29,16 +29,14 @@ class fir_filter_iterator
 						     iterator_value<COEFF> > >
 {
   private:
-    template <size_t I_>
-    using index		= std::integral_constant<size_t, I_>;
-    using super		= boost::iterator_adaptor<
-				fir_filter_iterator,
-				ITER,
-				replace_element<iterator_substance<ITER>,
-					      iterator_value<COEFF> >,
-				boost::forward_traversal_tag,
-				replace_element<iterator_substance<ITER>,
-						iterator_value<COEFF> > >;
+    using super	= boost::iterator_adaptor<
+			fir_filter_iterator,
+			ITER,
+			replace_element<iterator_substance<ITER>,
+					iterator_value<COEFF> >,
+			boost::forward_traversal_tag,
+			replace_element<iterator_substance<ITER>,
+					iterator_value<COEFF> > >;
     
   public:
     using	typename super::value_type;
@@ -48,6 +46,8 @@ class fir_filter_iterator
 
   private:
     using buf_type	= std::array<value_type, D>;
+    template <size_t I_>
+    using index		= std::integral_constant<size_t, I_>;
     
   public:
 		fir_filter_iterator(const ITER& iter, COEFF c)
