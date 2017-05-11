@@ -52,7 +52,6 @@ HDRS		= TU/Array++.h \
 		TU/Feature.h \
 		TU/FeatureMatch.h \
 		TU/Filter2.h \
-		TU/GFStereo-ORG.h \
 		TU/GFStereo.h \
 		TU/GaussianConvolver.h \
 		TU/Geometry++.h \
