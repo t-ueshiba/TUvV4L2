@@ -77,25 +77,22 @@ struct StereoParameters
 };
     
 /************************************************************************
-*  class MinIdx<A>							*
+*  class MinIdx								*
 ************************************************************************/
-template <class A>
 class MinIdx
 {
   public:
-    typedef A		argument_type;
-    typedef size_t	result_type;
-
-  public:
     MinIdx(size_t disparityMax)	:_disparityMax(disparityMax)	{}
-    
-    result_type	operator ()(const argument_type& R) const
+
+    template <class SCORES_>
+    size_t	operator ()(const SCORES_& R) const
 		{
-		    auto	RminL = R.begin();
-		    for (auto iter = R.begin(); iter != R.end(); ++iter)
+		    auto	RminL = std::cbegin(R);
+		    for (auto iter = std::cbegin(R); iter != std::cend(R);
+			 ++iter)
 			if (*iter < *RminL)
 			    RminL = iter;
-		    return _disparityMax - (RminL - R.begin());
+		    return _disparityMax - (RminL - std::cbegin(R));
 		}
   private:
     const size_t	_disparityMax;
@@ -113,21 +110,20 @@ class diff_iterator
 				     const Array<T>&>
 {
   private:
-    typedef boost::iterator_adaptor<diff_iterator<COL, T>,
-				    zip_iterator<std::tuple<COL, COL> >,
-				    Array<T>,
-				    boost::use_default,
-				    const Array<T>&>		super;
+    using super	= boost::iterator_adaptor<diff_iterator,
+					  zip_iterator<std::tuple<COL, COL> >,
+					  Array<T>,
+					  boost::use_default,
+					  const Array<T>&>;
+    friend	class boost::iterator_core_access;
 
   public:
-    typedef typename super::value_type			value_type;
-    typedef typename super::reference			reference;
-    typedef typename super::base_type			base_type;
-    
-    friend class	boost::iterator_core_access;
+    using col_t	= iterator_value<COL>;
+    using	typename super::base_type;
+    using	typename super::reference;
     
   public:
-		diff_iterator(const base_type& col, size_t dsw, T thresh)
+		diff_iterator(base_type col, size_t dsw, col_t thresh)
 		    :super(col), _P(dsw), _thresh(thresh)		{};
     
   private:
@@ -138,7 +134,7 @@ class diff_iterator
 		    auto	colR =  std::get<1>(iter_tuple);
 		    for (auto& val : _P)
 		    {
-			val = std::min(T(diff(colL, *colR)), _thresh);
+			val = std::min(diff(colL, *colR), _thresh);
 			++colR;
 		    }
 
@@ -146,31 +142,29 @@ class diff_iterator
 		}
     
   private:
-    mutable value_type	_P;
-    const T		_thresh;
+    mutable Array<T>	_P;
+    const col_t		_thresh;
 };
 
-template <class COL, class T> inline diff_iterator<COL, T>
-make_diff_iterator(zip_iterator<std::tuple<COL, COL> > iter, size_t dsw, T thresh)
+template <class T, class COL> inline diff_iterator<COL, T>
+make_diff_iterator(COL colL, COL colR, size_t dsw, iterator_value<COL> thresh)
 {
-    return {iter, dsw, thresh};
+    return {make_zip_iterator(std::make_tuple(colL, colR)), dsw, thresh};
 }
 
 /************************************************************************
-*  class matching_iterator<ITER, A>					*
+*  class matching_iterator<ITER, SCORE>					*
 ************************************************************************/
 namespace detail
 {
-  template <class ITER, class A>
+  template <class ITER>
   class matching_proxy
   {
     public:
-      using	argument_type = A;
-	
-    public:
-			matching_proxy(const ITER& iter) :_iter(iter)	{}
+      matching_proxy(const ITER& iter)	:_iter(iter)	{}
 
-      matching_proxy&	operator =(const argument_type& R)
+      template <class SCORES_>
+      matching_proxy&	operator =(const SCORES_& R)
 			{
 			    _iter.read(R);
 			    return *this;
@@ -181,44 +175,42 @@ namespace detail
   };
 }
     
-template <class OUT, class A>
+template <class OUT, class SCORE>
 class matching_iterator
-    : public boost::iterator_adaptor<matching_iterator<OUT, A>,
+    : public boost::iterator_adaptor<matching_iterator<OUT, SCORE>,
 				     OUT,
 				     size_t,
 				     boost::single_pass_traversal_tag,
 				     detail::matching_proxy<
-					 matching_iterator<OUT, A>, A> >
+					 matching_iterator<OUT, SCORE> > >
 {
   private:
-    typedef boost::iterator_adaptor<
-		matching_iterator,
-		OUT,
-		size_t,
-		boost::single_pass_traversal_tag,
-		detail::matching_proxy<matching_iterator, A> >	super;
-    typedef typename A::value_type				score_type;
+    using super		= boost::iterator_adaptor<
+				matching_iterator,
+				OUT,
+				size_t,
+				boost::single_pass_traversal_tag,
+				detail::matching_proxy<matching_iterator> >;
     
     struct Element
     {
 	Element()	:dminL(0), RminR(_infty), dminR(0)	{}
 
 	size_t		dminL;
-	score_type	RminR;
+	SCORE		RminR;
 	size_t		dminR;
     };
-    typedef Array<Element>					buf_type;
-    typedef ring_iterator<typename buf_type::iterator>		biterator;
+    using buf_type	= Array<Element>;
+    using biterator	= ring_iterator<typename buf_type::iterator>;
 
   public:
-    typedef A							argument_type;
-    typedef typename super::reference				reference;
+    using		typename super::reference;
 
     friend class	boost::iterator_core_access;
-    friend class	detail::matching_proxy<matching_iterator, A>;
+    friend class	detail::matching_proxy<matching_iterator>;
 
   public:
-		matching_iterator(const OUT& out, size_t dsw,
+		matching_iterator(OUT out, size_t dsw,
 				  size_t disparityMax, size_t thresh)
 		    :super(out),
 		     _dsw(dsw),
@@ -272,11 +264,13 @@ class matching_iterator
     void	increment()
 		{
 		}
-    void	read(const argument_type& R) const
+    template <class SCORES_>
+    void	read(const SCORES_& R) const
 		{
-		    auto	RminL = R.begin();
+		    auto	RminL = std::cbegin(R);
 		    auto	b = _next;
-		    for (auto iter = R.begin(); iter != R.end(); ++iter)
+		    for (auto iter = std::cbegin(R); iter != std::cend(R);
+			 ++iter)
 		    {
 			if (*iter < *RminL)
 			    RminL = iter;
@@ -284,7 +278,7 @@ class matching_iterator
 			if (*iter < b->RminR)
 			{
 			    b->RminR = *iter;
-			    b->dminR = iter - R.begin();
+			    b->dminR = iter - std::cbegin(R);
 			}
 			++b;
 		    }
@@ -307,15 +301,20 @@ class matching_iterator
 		}
     
   private:
-    size_t		_dsw;		// 代入可能にするためconstを付けない
-    size_t		_disparityMax;	// 同上
-    size_t		_thresh;	// 同上
-    buf_type		_buf;
-    biterator		_curr;
-    mutable biterator	_next;
-    constexpr static score_type
-			_infty = std::numeric_limits<score_type>::max();
+    size_t			_dsw;	// 代入可能にするためconstを付けない
+    size_t			_disparityMax;	// 同上
+    size_t			_thresh;	// 同上
+    buf_type			_buf;
+    biterator			_curr;
+    mutable biterator		_next;
+    constexpr static SCORE	_infty = std::numeric_limits<SCORE>::max();
 };
+
+template <class SCORE, class OUT> inline matching_iterator<OUT, SCORE>
+make_matching_iterator(OUT out, size_t dsw, size_t disparityMax, size_t thresh)
+{
+    return {out, dsw, disparityMax, thresh};
+}
     
 }
 #endif	// !__TU_STEREOUTILITY_H

@@ -45,7 +45,7 @@ using reverse_iterator_t = std::reverse_iterator<iterator_t<E> >;
   \return	E の反復子が指す型
 */
 template <class E>
-using value_t	= typename std::iterator_traits<iterator_t<E> >::value_type;
+using value_t	= iterator_value<iterator_t<E> >;
 
 namespace detail
 {
