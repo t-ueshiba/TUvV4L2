@@ -31,7 +31,6 @@ class box_filter_iterator
 					  boost::single_pass_traversal_tag>;
 		    
   public:
-    using	typename super::value_type;
     using	typename super::reference;
 
     friend class	boost::iterator_core_access;
@@ -99,7 +98,7 @@ class box_filter_iterator
 
   private:
     mutable ITER	_head;
-    mutable value_type	_val;	// [_head, base()) or [_head, base()] の総和
+    mutable T		_val;	// [_head, base()) or [_head, base()] の総和
     mutable bool	_valid;	// _val が [_head, base()] の総和ならtrue
 };
 
@@ -252,7 +251,7 @@ class BoxFilter2 : public Filter2<BoxFilter2>
 
     size_t	overlap()	const	{ return rowWinSize() - 1; }
 
-    template <class IN, class OUT>
+    template <class T=void, class IN, class OUT>
     void	convolveRows(IN ib, IN ie, OUT out)	const	;
     
   private:
@@ -266,7 +265,7 @@ class BoxFilter2 : public Filter2<BoxFilter2>
   \param ie	入力2次元データ配列の末尾の次の行を指す反復子
   \param out	出力2次元データ配列の先頭行を指す反復子
 */
-template <class IN, class OUT> void
+template <class T, class IN, class OUT> void
 BoxFilter2::convolveRows(IN ib, IN ie, OUT out) const
 {
     if (std::distance(ib, ie) < rowWinSize())
@@ -274,7 +273,8 @@ BoxFilter2::convolveRows(IN ib, IN ie, OUT out) const
     
     for (box_filter_iterator<IN> row(ib, _rowWinSize), rowe(ie);
 	 row != rowe; ++row, ++out)
-	_colFilter.convolve(std::begin(*row), std::end(*row), std::begin(*out));
+	_colFilter.convolve(std::begin(*row), std::end(*row),
+			    std::begin(*out));
 }
 
 }

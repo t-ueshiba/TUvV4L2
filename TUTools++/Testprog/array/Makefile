@@ -56,4 +56,4 @@ include $(PROJECT)/lib/common.mk
 ###
 main.o: ../../TU/Geometry++.h ../../TU/Minimize.h ../../TU/Vector++.h \
 	../../TU/Array++.h ../../TU/range.h ../../TU/algorithm.h \
-	../../TU/iterator.h ../../TU/tuple.h
+	../../TU/tuple.h ../../TU/iterator.h

@@ -115,7 +115,6 @@ EXTHDRS		= ../../TU/Array++.h \
 		../../TU/simd/x86/vec.h \
 		../../TU/simd/x86/zero.h \
 		../../TU/simd/zero.h \
-		../../TU/simd/zero.h \
 		../../TU/tuple.h \
 		../../TU/types.h
 HDRS		=
@@ -162,6 +161,5 @@ main.o: ../../TU/Warp.h ../../TU/Image++.h ../../TU/types.h \
 	../../TU/simd/arm/lookup.h ../../TU/simd/load_iterator.h \
 	../../TU/simd/store_iterator.h ../../TU/simd/cvtdown_iterator.h \
 	../../TU/simd/cvtup_iterator.h ../../TU/simd/shift_iterator.h \
-	../../TU/simd/BufTraits.h ../../TU/simd/zero.h ../../TU/ICIA.h \
-	../../TU/DericheConvolver.h ../../TU/IIRFilter.h \
-	../../TU/SeparableFilter2.h ../../TU/Profiler.h
+	../../TU/simd/BufTraits.h ../../TU/ICIA.h ../../TU/DericheConvolver.h \
+	../../TU/IIRFilter.h ../../TU/SeparableFilter2.h ../../TU/Profiler.h

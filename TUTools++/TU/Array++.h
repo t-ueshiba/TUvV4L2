@@ -16,14 +16,20 @@ namespace TU
 *  class BufTraits<T>							*
 ************************************************************************/
 template <class T, class ALLOC>
-struct BufTraits
+class BufTraits : public std::allocator_traits<ALLOC>
 {
-    using allocator_traits	= std::allocator_traits<ALLOC>;
-    using iterator		= typename allocator_traits::pointer;
-    using const_iterator	= typename allocator_traits::const_pointer;
+  private:
+    using super			= std::allocator_traits<ALLOC>;
+
+  public:
+    using iterator		= typename super::pointer;
+    using const_iterator	= typename super::const_pointer;
     
   protected:
-    static auto	null()		{ return nullptr; }
+    using			typename super::pointer;
+
+    static auto null()		{ return nullptr; }
+    static auto ptr(pointer p)	{ return p; }
 };
 
 /************************************************************************
@@ -72,15 +78,14 @@ class Buf : public BufTraits<T, ALLOC>
     template <size_t I_>
     using axis			= std::integral_constant<size_t, I_>;
     using super			= BufTraits<T, ALLOC>;
-    using allocator_traits	= typename super::allocator_traits;
     
   public:
     constexpr static size_t	Dimension = 1 + sizeof...(SIZES);
 
     using sizes_type		= std::array<size_t, Dimension>;
-    using value_type		= T;
-    using pointer		= typename allocator_traits::pointer;
-    using const_pointer		= typename allocator_traits::const_pointer;
+    using			typename super::value_type;
+    using			typename super::pointer;
+    using			typename super::const_pointer;
 
   public:
   // 標準コンストラクタ/代入演算子およびデストラクタ
@@ -183,7 +188,6 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 {
   private:
     using super			= BufTraits<T, ALLOC>;
-    using allocator_traits	= typename super::allocator_traits;
     using base_iterator		= typename super::iterator;
     using const_base_iterator	= typename super::const_iterator;
     template <size_t I_>
@@ -193,10 +197,10 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
     constexpr static size_t	Dimension = 1 + sizeof...(SIZES);
 
     using sizes_type		= std::array<size_t, Dimension>;
-    using value_type		= T;
-    using allocator_type	= typename allocator_traits::allocator_type;
-    using pointer		= typename allocator_traits::pointer;
-    using const_pointer		= typename allocator_traits::const_pointer;
+    using			typename super::value_type;
+    using			typename super::pointer;
+    using			typename super::const_pointer;
+    using			typename super::allocator_type;
 
   public:
   // 標準コンストラクタ/代入演算子およびデストラクタ
@@ -352,10 +356,10 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 
     pointer	alloc(size_t siz)
 		{
-		    const auto	p = allocator_traits::allocate(_allocator, siz);
+		    const auto	p = super::allocate(_allocator, siz);
 		    for (pointer q = p, qe = q + siz; q != qe; ++q)
-			allocator_traits::construct(_allocator,
-						    q, value_type());
+			super::construct(_allocator,
+					 super::ptr(q), value_type());
 		    return p;
 		}
     void	free(pointer p, size_t siz)
@@ -363,8 +367,8 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 		    if (!_ext && p != super::null())
 		    {
 			for (pointer q = p, qe = q + siz; q != qe; ++q)
-			    allocator_traits::destroy(_allocator, q);
-			allocator_traits::deallocate(_allocator, p, siz);
+			    super::destroy(_allocator, super::ptr(q));
+			super::deallocate(_allocator, p, siz);
 		    }
 		}
 

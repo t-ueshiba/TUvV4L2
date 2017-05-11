@@ -56,36 +56,41 @@ class Filter2
     using filter_type	= F;
 #if defined(USE_TBB)
   private:
-    template <class IN, class OUT>
+    template <class T_, class IN_, class OUT_>
     class ConvolveRows
     {
       public:
-	ConvolveRows(F const& filter, IN ib, IN ie, OUT out)
+	ConvolveRows(F const& filter, IN_ ib, IN_ ie, OUT_ out)
 	    :_filter(filter), _ib(ib), _ie(ie), _out(out)		{}
 
 	void	operator ()(const tbb::blocked_range<size_t>& r) const
 		{
+		    using S = std::conditional_t<std::is_void<T_>::value,
+						 value_t<iterator_value<IN_> >,
+						 T_>;
+		    
 		    auto	ib = _ib;
 		    auto	ie = _ib;
 		    std::advance(ib, r.begin());
 		    std::advance(ie, r.end() + _filter.overlap());
 		    auto	out = _out;
 		    std::advance(out, r.begin());
-		    _filter.convolveRows(ib, std::min(ie, _ie), out);
+		    _filter.template convolveRows<S>(ib, std::min(ie, _ie),
+						     out);
 		}
 
       private:
 	F	const&	_filter;
-	IN	const	_ib;
-	IN	const	_ie;
-	OUT	const	_out;
+	IN_	const	_ib;
+	IN_	const	_ie;
+	OUT_	const	_out;
     };
 #endif
   public:
-    template <class ...ARG>
-    Filter2(const ARG& ...arg)	:_filter(arg...), _grainSize(1)	{}
-    template <class IN, class OUT>
-    void	convolve(IN ib, IN ie, OUT out)	const	;
+    template <class ...ARG_>
+    Filter2(const ARG_& ...arg)	:_filter(arg...), _grainSize(1)	{}
+    template <class T_=void, class IN_, class OUT_>
+    void	convolve(IN_ ib, IN_ ie, OUT_ out)	const	;
     size_t	grainSize()			const	{ return _grainSize; }
     void	setGrainSize(size_t gs)			{ _grainSize = gs; }
 	
@@ -100,15 +105,15 @@ class Filter2
   \param ie	入力2次元データ配列の末尾の次の行を指す反復子
   \param out	出力2次元データ配列の先頭行を指す反復子
 */
-template <class F> template <class IN, class OUT> void
-Filter2<F>::convolve(IN ib, IN ie, OUT out) const
+template <class F> template <class T_, class IN_, class OUT_> void
+Filter2<F>::convolve(IN_ ib, IN_ ie, OUT_ out) const
 {
 #if defined(USE_TBB)
     tbb::parallel_for(tbb::blocked_range<size_t>(0, std::distance(ib, ie),
 						 _grainSize),
-		      ConvolveRows<IN, OUT>(_filter, ib, ie, out));
+		      ConvolveRows<T_, IN_, OUT_>(_filter, ib, ie, out));
 #else
-    _filter.convolveRows(ib, ie, out);
+    _filter.template convolveRows<T_>(ib, ie, out);
 #endif
 }
 

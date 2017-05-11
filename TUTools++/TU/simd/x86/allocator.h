@@ -40,7 +40,7 @@ class allocator
   public:
 		allocator()						{}
 
-    static T*	allocate(std::size_t n)
+    T*		allocate(std::size_t n)
 		{
 		    if (n == 0)
 			return nullptr;
@@ -53,7 +53,7 @@ class allocator
 			throw std::bad_alloc();
 		    return p;
 		}
-    static void	deallocate(T* p, std::size_t)
+    void	deallocate(T* p, std::size_t)
 		{
 		    if (p != nullptr)
 			boost::alignment::aligned_free(p);

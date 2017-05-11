@@ -416,7 +416,7 @@ namespace detail
   template <class ITER>
   struct decayed_iterator_value
   {
-      using type = typename std::iterator_traits<ITER>::value_type;
+      using type = iterator_value<ITER>;
   };
   template <class... ITER>
   struct decayed_iterator_value<zip_iterator<std::tuple<ITER...> > >
