@@ -28,16 +28,12 @@ class iir_filter_iterator
 				     boost::single_pass_traversal_tag>
 {
   private:
-    template <size_t D_, bool FWD_>
-    struct selector	{ enum {dim = D_, fwd = FWD_}; };
-    template <size_t I_>
-    using index		= std::integral_constant<size_t, I_>;
-    using super		= boost::iterator_adaptor<
-			      iir_filter_iterator,
-			      ITER,
-			      replace_element<iterator_substance<ITER>,
-					      iterator_value<COEFF> >,
-			      boost::single_pass_traversal_tag>;
+    using super	= boost::iterator_adaptor<
+			iir_filter_iterator,
+			ITER,
+			replace_element<iterator_substance<ITER>,
+					iterator_value<COEFF> >,
+			boost::single_pass_traversal_tag>;
     
   public:
     using	typename super::value_type;
@@ -48,7 +44,12 @@ class iir_filter_iterator
   private:
   // 初期値を0にするためstd::arrayは使わない    
     using buf_type	= Array<value_type, D>;
-    using val_is_array	= std::integral_constant<bool, size0<value_type>() == 0>;
+    using val_is_array	= std::integral_constant<bool,
+						 size0<value_type>() == 0>;
+    template <size_t D_, bool FWD_>
+    struct selector	{ enum {dim = D_, fwd = FWD_}; };
+    template <size_t I_>
+    using index		= std::integral_constant<size_t, I_>;
 
   public:
 		iir_filter_iterator(const ITER& iter, COEFF ci, COEFF co)

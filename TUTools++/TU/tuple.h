@@ -118,9 +118,8 @@ using tuple_head = typename detail::tuple_head<T>::type;
 namespace detail
 {
   template <class S, class T>
-  struct replace_element
+  struct replace_element : std::conditional<std::is_void<T>::value, S, T>
   {
-      using type = T;
   };
   template <class... S, class T>
   struct replace_element<std::tuple<S...>, T>
@@ -135,9 +134,7 @@ namespace detail
   \param T	置換後の要素の型．voidならば置換しない．
 */
 template <class S, class T>
-using replace_element = std::conditional_t<
-				std::is_void<T>::value, S,
-				typename detail::replace_element<S, T>::type>;
+using replace_element = typename detail::replace_element<S, T>::type;
 
 /************************************************************************
 *  make_reference_wrapper(T&&)						*

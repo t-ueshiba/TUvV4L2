@@ -819,7 +819,11 @@ namespace detail
   template <class S, size_t SIZE, size_t... SIZES, class T>
   struct replace_element<array<S, std::allocator<S>, SIZE, SIZES...>, T>
   {
-      using type = array<T, std::allocator<T>, SIZE, SIZES...>;
+    private:
+      using U	 = typename replace_element<S, T>::type;
+
+    public:
+      using type = array<U, std::allocator<U>, SIZE, SIZES...>;
   };
 }	// namespace detail
     

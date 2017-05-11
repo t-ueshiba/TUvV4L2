@@ -21,7 +21,8 @@ template <class ITER, class T=void>
 class box_filter_iterator
     : public boost::iterator_adaptor<box_filter_iterator<ITER, T>,
 				     ITER,
-				     replace_element<iterator_substance<ITER>, T>,
+				     replace_element<iterator_substance<ITER>,
+						     T>,
 				     boost::single_pass_traversal_tag>
 {
   private:
@@ -35,7 +36,7 @@ class box_filter_iterator
     using	typename super::value_type;
     using	typename super::reference;
 
-    friend class	boost::iterator_core_access;
+    friend	class boost::iterator_core_access;
 
   public:
 		box_filter_iterator()
@@ -109,8 +110,7 @@ class box_filter_iterator
   \param iter	コンテナ中の要素を指す定数反復子
   \return	box filter反復子
 */
-template <class T=void, class ITER>
-box_filter_iterator<ITER, T>
+template <class T=void, class ITER> box_filter_iterator<ITER, T>
 make_box_filter_iterator(ITER iter, size_t w=0)
 {
     return {iter, w};
