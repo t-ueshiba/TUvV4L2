@@ -81,7 +81,6 @@ HDRS		= TU/Array++.h \
 		TU/Serial.h \
 		TU/SparseMatrix++.h \
 		TU/StereoBase.h \
-		TU/StereoIterators.h \
 		TU/StereoUtility.h \
 		TU/TreeFilter.h \
 		TU/TriggerGenerator.h \

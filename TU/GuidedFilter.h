@@ -257,8 +257,7 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out) const
 		    make_range_iterator(
 			make_assignment_iterator(std::begin(*std::begin(c)),
 						 init_coeffs(n, _e)),
-			std::make_tuple(std::begin(std::get<0>(c)).stride(),
-					std::begin(std::get<1>(c)).stride()),
+			stride(std::begin(c)),
 			std::begin(std::get<0>(c)).size()));
     
   // 係数ベクトルの平均値を求め，それによってガイドデータ列を線型変換する．
@@ -306,8 +305,7 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, OUT out) const
 		    make_range_iterator(
 			make_assignment_iterator(std::begin(*std::begin(c)),
 						 init_coeffs(n, _e)),
-			std::make_tuple(std::begin(std::get<0>(c)).stride(),
-					std::begin(std::get<1>(c)).stride()),
+			stride(std::begin(c)),
 			std::begin(std::get<0>(c)).size()));
 
   // 係数ベクトルの平均値を求め，それによって入力データ列を線型変換する．
