@@ -17,20 +17,22 @@ namespace TU
 /*!
   \param ITER	コンテナ中の要素を指す定数反復子の型
 */
-template <class ITER, class T=iterator_substance<ITER> >
+template <class ITER, class T=void>
 class box_filter_iterator
     : public boost::iterator_adaptor<box_filter_iterator<ITER, T>,
-				     ITER,			// base
-				     T,				// value_type
+				     ITER,
+				     replace_element<iterator_substance<ITER>, T>,
 				     boost::single_pass_traversal_tag>
 {
   private:
-    using super = boost::iterator_adaptor<box_filter_iterator,
-					  ITER,
-					  T,
-					  boost::single_pass_traversal_tag>;
+    using super = boost::iterator_adaptor<
+			box_filter_iterator,
+			ITER,
+			replace_element<iterator_substance<ITER>, T>,
+			boost::single_pass_traversal_tag>;
 		    
   public:
+    using	typename super::value_type;
     using	typename super::reference;
 
     friend class	boost::iterator_core_access;
@@ -98,7 +100,7 @@ class box_filter_iterator
 
   private:
     mutable ITER	_head;
-    mutable T		_val;	// [_head, base()) or [_head, base()] の総和
+    mutable value_type	_val;	// [_head, base()) or [_head, base()] の総和
     mutable bool	_valid;	// _val が [_head, base()] の総和ならtrue
 };
 
@@ -108,8 +110,7 @@ class box_filter_iterator
   \return	box filter反復子
 */
 template <class T=void, class ITER>
-box_filter_iterator<ITER, std::conditional_t<std::is_void<T>::value,
-					     iterator_substance<ITER>, T> >
+box_filter_iterator<ITER, T>
 make_box_filter_iterator(ITER iter, size_t w=0)
 {
     return {iter, w};
@@ -271,10 +272,10 @@ BoxFilter2::convolveRows(IN ib, IN ie, OUT out) const
     if (std::distance(ib, ie) < rowWinSize())
 	throw std::runtime_error("BoxFilter2::convolveRows(): not enough rows!");
     
-    for (box_filter_iterator<IN> row(ib, _rowWinSize), rowe(ie);
+    for (box_filter_iterator<IN, T> row(ib, _rowWinSize), rowe(ie);
 	 row != rowe; ++row, ++out)
-	_colFilter.convolve(std::begin(*row), std::end(*row),
-			    std::begin(*out));
+	_colFilter.convolve<T>(std::begin(*row), std::end(*row),
+			       std::begin(*out));
 }
 
 }

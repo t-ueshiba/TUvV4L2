@@ -233,17 +233,17 @@ template <class ITER, class RV_ITER>
 class mask_iterator : public boost::iterator_adaptor<
 				 mask_iterator<ITER, RV_ITER>,
 				 ITER,
-				 tuple_replace<iterator_value<RV_ITER>, bool>,
+				 replace_element<iterator_value<RV_ITER>, bool>,
 				 boost::single_pass_traversal_tag,
-				 tuple_replace<iterator_value<RV_ITER>, bool> >
+				 replace_element<iterator_value<RV_ITER>, bool> >
 {
   private:
     using super		= boost::iterator_adaptor<
 			      mask_iterator,
 			      ITER,
-			      tuple_replace<iterator_value<RV_ITER>, bool>,
+			      replace_element<iterator_value<RV_ITER>, bool>,
 			      boost::single_pass_traversal_tag,
-			      tuple_replace<iterator_value<RV_ITER>, bool> >;
+			      replace_element<iterator_value<RV_ITER>, bool> >;
     using rv_type	= decayed_iterator_value<RV_ITER>;
     using element_type	= tuple_head<rv_type>;
     
@@ -376,13 +376,13 @@ namespace simd
       : public boost::iterator_adaptor<
 	    mask_iterator<ITER, RV_ITER>,
 	    ITER,
-	    tuple_replace<
+	    replace_element<
 		decayed_iterator_value<RV_ITER>,
 		vec<mask_type<typename tuple_head<
 				  decayed_iterator_value<
 				      RV_ITER> >::element_type> > >,
 	    boost::single_pass_traversal_tag,
-	    tuple_replace<
+	    replace_element<
 		decayed_iterator_value<RV_ITER>,
 		vec<mask_type<typename tuple_head<
 				  decayed_iterator_value<
@@ -393,25 +393,25 @@ namespace simd
       : public boost::iterator_adaptor<
 	    mask_iterator<T, ITER, RV_ITER>,
 	    ITER,
-	    tuple_replace<decayed_iterator_value<RV_ITER>, vec<T> >,
+	    replace_element<decayed_iterator_value<RV_ITER>, vec<T> >,
 	    boost::single_pass_traversal_tag,
-	    tuple_replace<decayed_iterator_value<RV_ITER>, vec<T> > >
+	    replace_element<decayed_iterator_value<RV_ITER>, vec<T> > >
 #  endif
   {
     private:
       using score_vec	  = decayed_iterator_value<RV_ITER>;
       using score_element = typename tuple_head<score_vec>::element_type;
       using S		  = mask_type<score_element>;
-      using mask_vec	  = tuple_replace<score_vec, vec<S> >;
+      using mask_vec	  = replace_element<score_vec, vec<S> >;
 #  if defined(WITHOUT_CVTDOWN)
       using T		  = S;
 #endif
       using super	= boost::iterator_adaptor<
 			      mask_iterator,
 			      ITER,
-			      tuple_replace<score_vec, vec<T> >,
+			      replace_element<score_vec, vec<T> >,
 			      boost::single_pass_traversal_tag,
-			      tuple_replace<score_vec, vec<T> > >;
+			      replace_element<score_vec, vec<T> > >;
 
       template <class T_, size_t I_=vec<T_>::size/2> static inline int
 		minIdx(vec<T_> d, vec<T_> x,
@@ -465,7 +465,7 @@ namespace simd
     // mask と mask tuple に対するupdate
       template <class T_>
       std::enable_if_t<(vec<T_>::size == vec<S>::size),
-		       tuple_replace<mask_vec, vec<T_> > >
+		       replace_element<mask_vec, vec<T_> > >
 		cvtdown()
 		{
 		    const auto	R = *super::base();
@@ -487,7 +487,7 @@ namespace simd
 #  if !defined(WITHOUT_CVTDOWN)
       template <class T_>
       std::enable_if_t<(vec<T_>::size > vec<S>::size),
-		       tuple_replace<mask_vec, vec<T_> > >
+		       replace_element<mask_vec, vec<T_> > >
 		cvtdown()
 		{
 		    using	A = cvt_above_type<T_, S, true>;

@@ -248,17 +248,16 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out) const
 			boost::make_transform_iterator(
 			    std::cbegin(std::make_tuple(*ib, *gb)),
 			    init_params()),
-			std::make_tuple(ib.stride(), gb.stride()), ib.size()),
+			std::make_tuple(stride(ib), stride(gb)), std::size(*ib)),
 		    make_range_iterator(
 			boost::make_transform_iterator(
 			    std::cbegin(std::make_tuple(*ie, *ge)),
 			    init_params()),
-			std::make_tuple(ie.stride(), ge.stride()), ie.size()),
+			std::make_tuple(stride(ie), stride(ge)), std::size(*ie)),
 		    make_range_iterator(
 			make_assignment_iterator(std::begin(*std::begin(c)),
 						 init_coeffs(n, _e)),
-			stride(std::begin(c)),
-			std::begin(std::get<0>(c)).size()));
+			stride(std::begin(c)), nrow));
     
   // 係数ベクトルの平均値を求め，それによってガイドデータ列を線型変換する．
     std::advance(gb,  rowWinSize() - 1);
@@ -269,8 +268,7 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out) const
 			    std::begin(std::make_tuple(*gb, *out))
 			    + colWinSize() - 1,
 			    trans_guides(n)),
-			std::make_tuple(gb.stride(), out.stride()),
-			out.size()));
+			std::make_tuple(stride(gb), stride(out)), out.size()));
 }
 
 //! 2次元入力データにguided filterを適用する
@@ -297,16 +295,15 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, OUT out) const
     super::convolve(make_range_iterator(
 			boost::make_transform_iterator(std::cbegin(*ib),
 						       init_params()),
-			ib.stride(), ib.size()),
+			stride(ib), std::size(*ib)),
 		    make_range_iterator(
 			boost::make_transform_iterator(std::cbegin(*ie),
 						       init_params()),
-			ie.stride(), ie.size()),
+			stride(ie), std::size(*ie)),
 		    make_range_iterator(
 			make_assignment_iterator(std::begin(*std::begin(c)),
 						 init_coeffs(n, _e)),
-			stride(std::begin(c)),
-			std::begin(std::get<0>(c)).size()));
+			stride(std::begin(c)), nrow));
 
   // 係数ベクトルの平均値を求め，それによって入力データ列を線型変換する．
     std::advance(ib,  rowWinSize() - 1);
@@ -317,8 +314,7 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, OUT out) const
 			    std::begin(std::make_tuple(*ib, *out))
 			    + colWinSize() - 1,
 			    trans_guides(n)),
-			std::make_tuple(ib.stride(), out.stride()),
-			out.size()));
+			std::make_tuple(ib.stride(), out.stride()), out.size()));
 }
 
 }

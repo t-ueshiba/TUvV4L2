@@ -113,28 +113,31 @@ template <class T>
 using tuple_head = typename detail::tuple_head<T>::type;
 
 /************************************************************************
-*  type alias: tuple_replace<S, T>					*
+*  type alias: replace_element<S, T>					*
 ************************************************************************/
 namespace detail
 {
   template <class S, class T>
-  struct tuple_replace : std::conditional<std::is_void<T>::value, S, T>
+  struct replace_element
   {
+      using type = T;
   };
   template <class... S, class T>
-  struct tuple_replace<std::tuple<S...>, T>
+  struct replace_element<std::tuple<S...>, T>
   {
-      using type = std::tuple<typename tuple_replace<S, T>::type...>;
+      using type = std::tuple<typename replace_element<S, T>::type...>;
   };
 }	// namespace detail
     
-//! 与えられた型がtupleならばその全要素の型を，そうでなければ元の型自身を別の型で置き換える．
+//! 与えられた型がstd::tupleならばその要素の型を，そうでなければ元の型自身を別の型で置き換える．
 /*!
   \param S	要素型置換の対象となる型
   \param T	置換後の要素の型．voidならば置換しない．
 */
-template <class S, class T=void>
-using tuple_replace = typename detail::tuple_replace<S, T>::type;
+template <class S, class T>
+using replace_element = std::conditional_t<
+				std::is_void<T>::value, S,
+				typename detail::replace_element<S, T>::type>;
 
 /************************************************************************
 *  make_reference_wrapper(T&&)						*
@@ -344,7 +347,7 @@ class zip_iterator : public boost::iterator_facade<
   public:
     using		typename super::reference;
     using		typename super::difference_type;
-    using stride_t    = tuple_replace<ITER_TUPLE, ptrdiff_t>;
+    using stride_t    = replace_element<ITER_TUPLE, ptrdiff_t>;
     
   public:
 		zip_iterator(ITER_TUPLE iter_tuple)
@@ -401,7 +404,7 @@ class zip_iterator : public boost::iterator_facade<
 template <class DIFF=ptrdiff_t, class ITER_TUPLE>
 inline zip_iterator<ITER_TUPLE,
 		    std::conditional_t<std::is_void<DIFF>::value,
-				       tuple_replace<ITER_TUPLE, ptrdiff_t>,
+				       replace_element<ITER_TUPLE, ptrdiff_t>,
 				       DIFF> >
 make_zip_iterator(ITER_TUPLE iter_tuple)
 {
