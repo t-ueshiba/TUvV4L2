@@ -13,8 +13,7 @@ main(int argc, char* argv[])
     typedef Array<int>						array_type;
     typedef Array2<int>						array2_type;
     typedef box_filter_iterator<array_type::const_iterator>	box_iterator;
-    typedef box_filter_iterator<array2_type::const_iterator,
-				array_type>			box2_iterator;
+    typedef box_filter_iterator<array2_type::const_iterator>	box2_iterator;
     
     size_t		winSize = 3;
     extern char*	optarg;
