@@ -74,7 +74,7 @@ template <class E>
 using element_t	= typename detail::element_t<E>::type;
 
 /************************************************************************
-*  rank<E>(), size0<E>(), size<E>() and stride<E>()			*
+*  rank<E>(), size0<E>(), size<E>()					*
 ************************************************************************/
 //! 式の次元数(軸の個数)を返す
 /*!
@@ -127,17 +127,6 @@ namespace detail
   {
       return size(*std::begin(expr), std::integral_constant<size_t, I-1>());
   }
-
-  template <class E> inline auto
-  stride(const E& expr, std::integral_constant<size_t, 1>)
-  {
-      return std::begin(expr).stride();
-  }
-  template <size_t I, class E> inline auto
-  stride(const E& expr, std::integral_constant<size_t, I>)
-  {
-      return stride(*std::begin(expr), std::integral_constant<size_t, I-1>());
-  }
 }	// namespace detail
 
 template <class E>
@@ -173,19 +162,6 @@ inline auto
 size(const E& expr)
 {
     return detail::size(expr, std::integral_constant<size_t, I>());
-}
-
-//! 与えられた式について，指定された軸のストライドを返す
-/*!
-  \param I	軸を指定するindex (1 <= I < Dimension)
-  \param E	式の型
-  \return	軸Iのストライド
- */
-template <size_t I, class E, std::enable_if_t<rank<E>() != 0>* = nullptr>
-inline auto
-stride(const E& expr)
-{
-    return detail::stride(expr, std::integral_constant<size_t, I>());
 }
 
 /************************************************************************
@@ -481,6 +457,7 @@ class range<ITER, 0>
 /*!
   \param SIZE	レンジサイズ
   \param iter	レンジの先頭要素を指す反復子
+  \return	固定長レンジ
 */
 template <size_t SIZE, class ITER> inline range<ITER, SIZE>
 make_range(ITER iter)
@@ -492,6 +469,7 @@ make_range(ITER iter)
 /*!
   \param iter	レンジの先頭要素を指す反復子
   \param size	レンジサイズ
+  \return	可変長レンジ
 */
 template <size_t SIZE=0, class ITER> inline range<ITER, SIZE>
 make_range(ITER iter, size_t size)
@@ -695,11 +673,34 @@ class range_iterator
 		}
 };
 
+//! 反復子が指すレンジが所属する軸のストライドを返す
+/*!
+  \param iter	レンジを指す反復子
+  \return	レンジ軸のストライド
+*/
+template <class ITER> inline auto
+stride(ITER iter)
+{
+    return std::size(*iter);
+}
+template <class ITER, ptrdiff_t STRIDE, size_t SIZE> inline auto
+stride(const range_iterator<ITER, STRIDE, SIZE>& iter)
+{
+    return iter.stride();
+}
+template <class ITER_TUPLE> inline auto
+stride(const zip_iterator<ITER_TUPLE>& iter)
+{
+    return tuple_transform([](const auto& it){ return stride(it); },
+			   iter.get_iterator_tuple());
+}
+
 //! 固定長レンジを指し，インクリメント時に固定した要素数だけ進める反復子を生成する
 /*!
   \param STRIDE	インクリメント時に進める要素数
   \param SIZE	レンジサイズ
   \param iter	レンジの先頭要素を指す反復子
+  \return	レンジ反復子
 */
 template <ptrdiff_t STRIDE, size_t SIZE, class ITER>
 inline range_iterator<ITER, STRIDE, SIZE>
@@ -713,6 +714,7 @@ make_range_iterator(ITER iter)
   \param SIZE	レンジサイズ
   \param iter	レンジの先頭要素を指す反復子
   \param stride	インクリメント時に進める要素数
+  \return	レンジ反復子
 */
 template <size_t SIZE, class ITER>
 inline range_iterator<ITER, 0, SIZE>
@@ -726,6 +728,7 @@ make_range_iterator(ITER iter, iterator_stride<ITER> stride)
   \param iter	レンジの先頭要素を指す反復子
   \param stride	インクリメント時に進める要素数
   \param size	レンジサイズ
+  \return	レンジ反復子
 */
 template <class ITER> inline range_iterator<ITER, 0, 0>
 make_range_iterator(ITER iter, iterator_stride<ITER> stride, size_t size)
@@ -769,6 +772,7 @@ make_range(ITER iter)
   \param stride		最上位軸のストライド
   \param strides	2番目以降の軸のストライドの並び
   \param iter		レンジの先頭要素を指す反復子
+  \return		レンジ反復子
 */
 template <size_t SIZE, size_t... SIZES, class ITER, class... STRIDES,
 	  std::enable_if_t<sizeof...(SIZES) == sizeof...(STRIDES)>* = nullptr>
@@ -797,6 +801,7 @@ make_range(ITER iter, STRIDES... strides)
   \param stride		最上位軸のストライド
   \param size		最上位軸のレンジサイズ
   \param ss		2番目以降の軸の{ストライド, レンジサイズ}の並び
+  \return		レンジ反復子
 */
 template <class ITER, class... SS> inline auto
 make_range_iterator(ITER iter,
@@ -965,19 +970,13 @@ make_column_iterator(ROW row, size_t nrows, size_t col)
 }
 
 template <class E> inline auto
-column_begin(E& expr)
+column_begin(E&& expr)
 {
-    return make_column_iterator<size0<E>()>(std::begin(expr), std::size(expr),
-					    0);
-}
+    constexpr auto	N = size0<std::remove_reference_t<E> >();
     
-template <class E> inline auto
-column_begin(const E& expr)
-{
-    return make_column_iterator<size0<E>()>(std::begin(expr), std::size(expr),
-					    0);
+    return make_column_iterator<N>(std::begin(expr), std::size(expr), 0);
 }
-    
+
 template <class E> inline auto
 column_cbegin(const E& expr)
 {
@@ -985,17 +984,12 @@ column_cbegin(const E& expr)
 }
     
 template <class E> inline auto
-column_end(E& expr)
+column_end(E&& expr)
 {
-    return make_column_iterator<size0<E>()>(std::begin(expr), std::size(expr),
-					    size<1>(expr));
-}
-
-template <class E> inline auto
-column_end(const E& expr)
-{
-    return make_column_iterator<size0<E>()>(std::begin(expr), std::size(expr),
-					    size<1>(expr));
+    constexpr auto	N = size0<std::remove_reference_t<E> >();
+    
+    return make_column_iterator<N>(std::begin(expr), std::size(expr),
+				   size<1>(expr));
 }
 
 template <class E> inline auto

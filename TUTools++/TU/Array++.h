@@ -778,19 +778,6 @@ size(const array<T, ALLOC, SIZE, SIZES...>& a)
     return a.template size<I>();
 }
 
-//! 多次元配列の指定された軸のストライドを返す
-/*!
-  軸はテンプレートパラメータ I で指定する
-  \param a	多次元配列
-  \return	第 I 軸のストライド
- */
-template <size_t I, class T, class ALLOC, size_t SIZE, size_t... SIZES>
-inline ptrdiff_t
-stride(const array<T, ALLOC, SIZE, SIZES...>& a)
-{
-    return a.template stride<I>();
-}
-
 //! 出力ストリームへ配列を書き出し(ASCII)，さらに改行コードを出力する．
 /*!
   \param out	出力ストリーム
