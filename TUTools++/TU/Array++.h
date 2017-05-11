@@ -811,6 +811,19 @@ serialize(const array<T, ALLOC, SIZE, SIZES...>& a)
 }
 
 /************************************************************************
+*  type alias: replace_element<S, T>					*
+************************************************************************/
+namespace detail
+{
+// array<S, std::allocator<S>, SIZE, SIZES...> のSをTに置換する
+  template <class S, size_t SIZE, size_t... SIZES, class T>
+  struct replace_element<array<S, std::allocator<S>, SIZE, SIZES...>, T>
+  {
+      using type = array<T, std::allocator<T>, SIZE, SIZES...>;
+  };
+}	// namespace detail
+    
+/************************************************************************
 *  substance_t<E, PRED>							*
 ************************************************************************/
 namespace detail

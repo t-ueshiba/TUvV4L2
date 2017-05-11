@@ -59,13 +59,13 @@ class SeparableFilter2
 		{
 		    _filterV.convolve(make_range_iterator(
 					  std::begin(*_ib) + r.begin(),
-					  _ib.stride(), r.size()),
+					  stride(_ib), r.size()),
 				      make_range_iterator(
 					  std::begin(*_ie) + r.begin(),
-					  _ie.stride(), r.size()),
+					  stride(_ie), r.size()),
 				      make_range_iterator(
 					  std::begin(*_out) + r.begin(),
-					  _out.stride(), r.size()));
+					  stride(_out), r.size()));
 		}
 
       private:
@@ -133,7 +133,7 @@ class SeparableFilter2
 template <class F> template <class IN_, class OUT_> void
 SeparableFilter2<F>::convolve(IN_ ib, IN_ ie, OUT_ out) const
 {
-    using buf_type	= Array2<value_t<iterator_value<OUT_> > >;
+    using buf_type	= Array2<typename filter_type::element_type>;
     
     if (ib == ie)
 	return;

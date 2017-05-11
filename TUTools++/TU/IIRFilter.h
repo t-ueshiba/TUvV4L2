@@ -10,7 +10,7 @@
 namespace TU
 {
 /************************************************************************
-*  class iir_filter_iterator<D, FWD, COEFF, ITER, T>			*
+*  class iir_filter_iterator<D, FWD, COEFF, ITER>			*
 ************************************************************************/
 //! データ列中の指定された要素に対してinfinite impulse response filterを適用した結果を返す反復子
 /*!
@@ -18,35 +18,37 @@ namespace TU
   \param FWD	前進フィルタならtrue, 後退フィルタならfalse
   \param COEFF	フィルタのz変換係数
   \param ITER	データ列中の要素を指す定数反復子の型
-  \param T	フィルタ出力の型
 */
-template <size_t D, bool FWD, class COEFF, class ITER,
-	  class T=iterator_value<COEFF> >
+template <size_t D, bool FWD, class COEFF, class ITER>
 class iir_filter_iterator
-    : public boost::iterator_adaptor<
-		iir_filter_iterator<D, FWD, COEFF, ITER, T>,	// self
-		ITER,						// base
-		T,						// value_type
-		boost::single_pass_traversal_tag>		// traversal
+    : public boost::iterator_adaptor<iir_filter_iterator<D, FWD, COEFF, ITER>,
+				     ITER,
+				     replace_element<iterator_substance<ITER>,
+						     iterator_value<COEFF> >,
+				     boost::single_pass_traversal_tag>
 {
   private:
     template <size_t D_, bool FWD_>
     struct selector	{ enum {dim = D_, fwd = FWD_}; };
     template <size_t I_>
     using index		= std::integral_constant<size_t, I_>;
-    using buf_type	= Array<T, D>;	// 初期値を0にするためstd::arrayは使わない
     using super		= boost::iterator_adaptor<
 			      iir_filter_iterator,
 			      ITER,
-			      T,
+			      replace_element<iterator_substance<ITER>,
+					      iterator_value<COEFF> >,
 			      boost::single_pass_traversal_tag>;
-    using val_is_array	= std::integral_constant<bool, size0<T>() == 0>;
     
   public:
     using	typename super::value_type;
     using	typename super::reference;
 
     friend	class boost::iterator_core_access;
+
+  private:
+  // 初期値を0にするためstd::arrayは使わない    
+    using buf_type	= Array<value_type, D>;
+    using val_is_array	= std::integral_constant<bool, size0<value_type>() == 0>;
 
   public:
 		iir_filter_iterator(const ITER& iter, COEFF ci, COEFF co)
@@ -272,8 +274,8 @@ class iir_filter_iterator
   \param ci	先頭の出力フィルタ係数を指す反復子
   \return	infinite impulse response filter反復子
 */
-template <size_t D, bool FWD, class T, class COEFF, class ITER>
-iir_filter_iterator<D, FWD, COEFF, ITER, T>
+template <size_t D, bool FWD, class COEFF, class ITER>
+iir_filter_iterator<D, FWD, COEFF, ITER>
 make_iir_filter_iterator(ITER iter, COEFF ci, COEFF co)
 {
     return {iter, ci, co};
@@ -286,7 +288,7 @@ make_iir_filter_iterator(ITER iter, COEFF ci, COEFF co)
 template <size_t D, class T=float> class IIRFilter
 {
   public:
-    using coeff_type	= T;
+    using element_type	= T;
     using coeffs_type	= std::array<T, D>;
     
     IIRFilter&	initialize(const T c[D+D])				;
@@ -394,11 +396,9 @@ IIRFilter<D, T>::limitsB(T& limit0B, T& limit1B, T& limit2B) const
 template <size_t D, class T> template <class IN, class OUT> OUT
 IIRFilter<D, T>::forward(IN ib, IN ie, OUT out) const
 {
-    using value_type	= iterator_substance<OUT>;
-    
-    return std::copy(make_iir_filter_iterator<D, true, value_type>(
+    return std::copy(make_iir_filter_iterator<D, true>(
 			 ib, _ci.begin(), _co.begin()),
-		     make_iir_filter_iterator<D, true, value_type>(
+		     make_iir_filter_iterator<D, true>(
 			 ie, _ci.begin(), _co.begin()),
 		     out);
 }
@@ -413,11 +413,9 @@ IIRFilter<D, T>::forward(IN ib, IN ie, OUT out) const
 template <size_t D, class T> template <class IN, class OUT> OUT
 IIRFilter<D, T>::backward(IN ib, IN ie, OUT oe) const
 {
-    using value_type	= iterator_substance<OUT>;
-    
-    return std::copy(make_iir_filter_iterator<D, false, value_type>(
+    return std::copy(make_iir_filter_iterator<D, false>(
 			 ib, _ci.rbegin(), _co.rbegin()),
-		     make_iir_filter_iterator<D, false, value_type>(
+		     make_iir_filter_iterator<D, false>(
 			 ie, _ci.rbegin(), _co.rbegin()),
 		     oe);
 }
@@ -443,7 +441,7 @@ template <size_t D, class T=float> class BidirectionalIIRFilter
     using iirf_type	= IIRFilter<D, T>;
     
   public:
-    using coeff_type	= typename iirf_type::coeff_type;
+    using element_type	= typename iirf_type::element_type;
     using coeffs_type	= typename iirf_type::coeffs_type;
     
   //! 微分の階数
@@ -635,7 +633,7 @@ class BidirectionalIIRFilter2
     using super		= SeparableFilter2<biir_type>;
 
   public:
-    using coeff_type	= typename biir_type::coeff_type;
+    using element_type	= typename biir_type::element_type;
     using coeffs_type	= typename biir_type::coeffs_type;
     using Order		= typename biir_type::Order;
     

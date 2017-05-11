@@ -10,32 +10,35 @@
 namespace TU
 {
 /************************************************************************
-*  class fir_filter_iterator<D, COEFF, ITER, T>				*
+*  class fir_filter_iterator<D, COEFF, ITER>				*
 ************************************************************************/
 //! データ列中の指定された要素に対してfinite impulse response filterを適用した結果を返す反復子
 /*!
   \param D	フィルタの階数
   \param COEFF	フィルタのz変換係数
   \param ITER	データ列中の要素を指す定数反復子の型
-  \param T	フィルタ出力の型
 */
-template <size_t D, class COEFF, class ITER, class T=iterator_value<COEFF> >
+template <size_t D, class COEFF, class ITER>
 class fir_filter_iterator
-    : public boost::iterator_adaptor<fir_filter_iterator<D, COEFF, ITER, T>,
+    : public boost::iterator_adaptor<fir_filter_iterator<D, COEFF, ITER>,
 				     ITER,
-				     T,
+				     replace_element<iterator_substance<ITER>,
+						     iterator_value<COEFF> >,
 				     boost::forward_traversal_tag,
-				     T>
+				     replace_element<iterator_substance<ITER>,
+						     iterator_value<COEFF> > >
 {
   private:
     template <size_t I_>
     using index		= std::integral_constant<size_t, I_>;
-    using buf_type	= Array<T, D>;	// 初期値を0にするためstd::arrayは使わない
-    using super		= boost::iterator_adaptor<fir_filter_iterator,
-						  ITER,
-						  T,
-						  boost::forward_traversal_tag,
-						  T>;
+    using super		= boost::iterator_adaptor<
+				fir_filter_iterator,
+				ITER,
+				replace_element<iterator_substance<ITER>,
+					      iterator_value<COEFF> >,
+				boost::forward_traversal_tag,
+				replace_element<iterator_substance<ITER>,
+						iterator_value<COEFF> > >;
     
   public:
     using	typename super::value_type;
@@ -43,6 +46,9 @@ class fir_filter_iterator
 
     friend	class boost::iterator_core_access;
 
+  private:
+    using buf_type	= std::array<value_type, D>;
+    
   public:
 		fir_filter_iterator(const ITER& iter, COEFF c)
 		    :super(iter), _c(c), _ibuf(), _n(D-1)
@@ -126,8 +132,7 @@ class fir_filter_iterator
   \param c	先頭の入力フィルタ係数を指す反復子
   \return	finite impulse response filter反復子
 */
-template <size_t D, class T, class COEFF, class ITER>
-fir_filter_iterator<D, COEFF, ITER, T>
+template <size_t D, class COEFF, class ITER> fir_filter_iterator<D, COEFF, ITER>
 make_fir_filter_iterator(ITER iter, COEFF c)
 {
     return {iter, c};
@@ -138,8 +143,7 @@ make_fir_filter_iterator(ITER iter, COEFF c)
   \param iter	コンテナ中の要素を指す定数反復子
   \return	finite impulse response filter反復子(終端)
 */
-template <size_t D, class T, class COEFF, class ITER>
-fir_filter_iterator<D, COEFF, ITER, T>
+template <size_t D, class COEFF, class ITER> fir_filter_iterator<D, COEFF, ITER>
 make_fir_filter_iterator(ITER iter)
 {
     return {iter};
@@ -153,7 +157,7 @@ template <size_t D, class T=float>
 class FIRFilter
 {
   public:
-    using coeff_type	= T;
+    using element_type	= T;
     using coeffs_type	= std::array<T, D>;
 
     FIRFilter&		initialize(const T c[D])			;
@@ -217,11 +221,10 @@ FIRFilter<D, T>::limits(T& limit0, T& limit1, T& limit2) const
 template <size_t D, class T> template <class IN, class OUT> OUT
 FIRFilter<D, T>::convolve(IN ib, IN ie, OUT out) const
 {
-    using value_type	= iterator_substance<OUT>;
     using citerator	= typename coeffs_type::const_iterator;
     
-    return std::copy(make_fir_filter_iterator<D, value_type>(ib, _c.begin()),
-		     make_fir_filter_iterator<D, value_type, citerator>(ie),
+    return std::copy(make_fir_filter_iterator<D>(ib, _c.begin()),
+		     make_fir_filter_iterator<D, citerator>(ie),
 		     out);
 }
 
@@ -248,7 +251,7 @@ class FIRFilter2 : public SeparableFilter2<FIRFilter<D, T> >
     using super		= SeparableFilter2<fir_type>;
 
   public:
-    using coeff_type	= typename fir_type::coeff_type;
+    using element_type	= typename fir_type::element_type;
     using coeffs_type	= typename fir_type::coeffs_type;
 
   public:
