@@ -22,6 +22,8 @@ CCFLAGS		= $(CFLAGS)
 
 LINKER		= $(CXX)
 
+OTHER_DIR	= $(HOME)/projects/HRP-5P/hrp5p-calib/src/TUIIDC++/MacOSX
+
 #########################
 #  Macros set by mkmf	#
 #########################
@@ -34,6 +36,10 @@ HDRS		= libraw1394/csr.h \
 SRCS		= raw1394.cc
 OBJS		= raw1394.o
 
+OTHER_HDRS	= $(HDRS)
+OTHER_SRCS	= $(SRCS)
+
 include $(PROJECT)/lib/l.mk
+include $(PROJECT)/lib/other.mk
 ###
 raw1394.o: raw1394_.h libraw1394/raw1394.h

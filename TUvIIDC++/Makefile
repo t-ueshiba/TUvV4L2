@@ -33,6 +33,8 @@ BINDIR		= $(PREFIX)/bin
 LIBDIR		= $(PREFIX)/lib
 INCDIR		= $(PREFIX)/include
 
+OTHER_DIR	= $(HOME)/projects/HRP-5P/hrp5p-calib/src/TUvIIDC++
+
 #########################
 #  Macros set by mkmf	#
 #########################
@@ -66,11 +68,15 @@ OBJS		= createFormatMenu.o \
 		featureCmds.o \
 		selectROI.o
 
+OTHER_HDRS	= $(HDRS)
+OTHER_SRCS	= $(SRCS)
+
 #include $(PROJECT)/lib/rtc.mk		# IDLHDRS, IDLSRCS, CPPFLAGS, OBJS, LIBS
 #include $(PROJECT)/lib/qt.mk		# MOCSRCS, OBJS
 #include $(PROJECT)/lib/cnoid.mk	# CPPFLAGS, LIBS, LIBDIR
 include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
+include $(PROJECT)/lib/other.mk
 ###
 createFormatMenu.o: TU/v/vIIDC++.h /usr/local/include/TU/v/CmdPane.h \
 	/usr/local/include/TU/v/CmdWindow.h /usr/local/include/TU/v/TUv++.h \
