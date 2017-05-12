@@ -41,7 +41,7 @@ uu<YUV411>(int u)
 template <class S> void
 XDC::createXImage(const Image<S>& image)
 {
-    const int	buffWidth  = log2devR(image.width()),
+    const auto	buffWidth  = log2devR(image.width()),
 		buffHeight = log2devR(image.height());
     if (_ximage == 0 ||
 	_ximage->width != buffWidth || _ximage->height != buffHeight)
@@ -87,30 +87,32 @@ XDC::fillBuff(const Image<S>& image)
     const auto	buffWidth    = _ximage->width;
     const auto	buffHeight   = _ximage->height;
     const auto	bytesPerLine = _ximage->bytes_per_line;
+    const int	imageWidth   = image.width();
+    const int	imageHeight  = image.height();
     
-    if (image.width() == buffWidth && image.height() == buffHeight)
+    if (imageWidth == buffWidth && imageHeight == buffHeight)
     {
-	for (size_t v = 0; v < image.height(); ++v)
+	for (int v = 0; v < imageHeight; ++v)
 	{
 	    auto	p = image[v].begin();
 	    auto	q = reinterpret_cast<T*>(buff + v * bytesPerLine);
-	    for (size_t u = 0; u < image.width(); ++u)
+	    for (int u = 0; u < imageWidth; ++u)
 		*q++ = _colormap.getUnderlayPixel(p[uu<S>(u)], u, v);
 	}
     }
     else
     {
-	if (image.width() < buffWidth)	// expansion
+	if (imageWidth < buffWidth)	// expansion
 	{
 	    for (int vs = -1, vdp = 0, vd = 0; vd < buffHeight; ++vd)
-		if ((vs+1)*buffHeight <= vd*image.height())
+		if ((vs+1)*buffHeight <= vd*imageHeight)
 		{
 		    auto	p = image[++vs].begin();
 		    auto	q = reinterpret_cast<T*>(buff +
 							 vd * bytesPerLine);
 		    for (int us = -1, ud = 0; ud < buffWidth; )
 		    {
-			if ((us+1)*buffWidth <= ud*image.width())
+			if ((us+1)*buffWidth <= ud*imageWidth)
 			    ++us;
 			q[ud++] = _colormap.getUnderlayPixel(p[uu<S>(us)],
 							     us, vs);
@@ -124,13 +126,13 @@ XDC::fillBuff(const Image<S>& image)
 	else					// shrink
 	{
 	    for (int vs = 0, vd = 0; vd < buffHeight; ++vs)
-		if (vd*image.height() <= vs*buffHeight)
+		if (vd*imageHeight <= vs*buffHeight)
 		{
 		    auto	p = image[vs].begin();
 		    auto	q = reinterpret_cast<T*>(buff +
 							 (vd++) * bytesPerLine);
 		    for (int us = 0, ud = 0; ud < buffWidth; ++us)
-			if (ud*image.width() <= us*buffWidth)
+			if (ud*imageWidth <= us*buffWidth)
 			    q[ud++] = _colormap.getUnderlayPixel(p[uu<S>(us)],
 								 us, vs);
 		}
