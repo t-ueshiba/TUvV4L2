@@ -1,5 +1,6 @@
 /*!
   \file		GuidedFilter.h
+  \author	Toshio UESHIBA
   \brief	guided filterに関するクラスの定義と実装
 */
 #ifndef __TU_GUIDEDFILTER_H

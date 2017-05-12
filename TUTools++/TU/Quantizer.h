@@ -1,6 +1,8 @@
-/*
- *  $Id$
- */
+/*!
+  \file		Quantizer.h
+  \author	Toshio UESHIBA
+  \brief	クラス TU::Quantizer, TU::Quantizer2 の定義と実装
+*/
 #ifndef __TU_QUANTIZER_H
 #define __TU_QUANTIZER_H
 

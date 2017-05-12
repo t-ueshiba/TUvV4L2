@@ -1,6 +1,8 @@
-/*
- *  $Id$
- */
+/*!
+  \file		TreeFilter.h
+  \author	Toshio UESHIBA
+  \brief	クラス TU::TreeFilter の定義と実装
+*/
 #ifndef __TU_TREEFILTER_H
 #define __TU_TREEFILTER_H
 

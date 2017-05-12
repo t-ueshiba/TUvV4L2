@@ -1,5 +1,6 @@
 /*!
   \file		Geometry++.h
+  \author	Toshio UESHIBA
   \brief	点，直線，超平面および各種の幾何変換に関するクラスの定義と実装
 */
 #ifndef __TU_GEOMETRYPP_H

@@ -1,5 +1,6 @@
 /*!
   \file		StereoBase.h
+  \author	Toshio UESHIBA
   \brief	ステレオマッチングクラスの定義と実装
 */
 #ifndef __TU_STEREOBASE_H

@@ -1,6 +1,8 @@
-/*
- *  $Id: Rectify.cc 1495 2014-02-27 15:07:51Z ueshiba $
- */
+/*!
+  \file		Rectify.cc
+  \author	Toshio UESHIBA
+  \brief	クラス TU::Rectify の実装
+*/
 #include "TU/Rectify.h"
 #include "TU/algorithm.h"
 

@@ -1,6 +1,8 @@
-/*
- *  $Id$
- */
+/*!
+  \file		StereoUtility.h
+  \author	Toshio UESHIBA
+  \brief	ステレオビジョンをサポートする各種クラスの定義と実装
+*/
 #ifndef __TU_STEREOUTILITY_H
 #define __TU_STEREOUTILITY_H
 

@@ -1,5 +1,6 @@
 /*!
   \file		Bezier++.h
+  \author	Toshio UESHIBA
   \brief	Bezier曲線およびBezier曲面に関連するクラスの定義と実装
 */
 #ifndef __TU_BEZIERPP_H

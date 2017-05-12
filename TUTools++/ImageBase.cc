@@ -1,6 +1,8 @@
-/*
- *  $Id: ImageBase.cc 1836 2015-07-06 06:42:09Z ueshiba $
- */
+/*!
+  \file		ImageBase.cc
+  \author	Toshio UESHIBA
+  \brief	画像クラスの基底となるクラスの実装
+*/
 #include "TU/Image++.h"
 #include "TU/Camera++.h"
 #include "TU/Manip.h"

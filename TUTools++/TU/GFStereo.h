@@ -1,5 +1,6 @@
 /*!
   \file		GFStereo.h
+  \author	Toshio UESHIBA
   \brief	Guided Filterステレオマッチングクラスの定義と実装
 */
 #ifndef __TU_GFSTEREO_H

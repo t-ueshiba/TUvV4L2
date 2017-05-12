@@ -1,5 +1,6 @@
 /*!
   \file		Warp.h
+  \author	Toshio UESHIBA
   \brief	クラス TU::Warp の定義と実装
 */
 #ifndef	__TU_WARP_H

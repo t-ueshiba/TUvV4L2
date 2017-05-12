@@ -1,5 +1,6 @@
 /*!
   \file		BoxFilter.h
+  \author	Toshio UESHIBA
   \brief	box filterに関するクラスの定義と実装
 */
 #ifndef	__TU_BOXFILTER_H

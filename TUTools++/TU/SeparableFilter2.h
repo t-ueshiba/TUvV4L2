@@ -1,5 +1,6 @@
 /*!
   \file		SeparableFilter2.h
+  \author	Toshio UESHIBA
   \brief	水平/垂直方向に分離可能な2次元フィルタを実装するための基底クラスの定義
 */
 #ifndef __TU_SEPARABLEFILTER2_H

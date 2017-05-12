@@ -1,6 +1,8 @@
-/*
- *  $Id: SURFCreator.h,v 1.16 2012-01-24 02:44:54 ueshiba Exp $
- */
+/*!
+  \file		SURFCreator.h
+  \author	Toshio UESHIBA
+  \brief	クラス TU::SURFCreator の定義と実装
+*/
 #ifndef __TU_SURFCREATOR_H
 #define __TU_SURFCREATOR_H
 

@@ -1,6 +1,8 @@
-/*
- *  $Id: FIRGaussianConvolver.cc 1219 2012-11-09 05:45:49Z ueshiba $
- */
+/*!
+  \file		FIRGaussianCoefficients.cc
+  \author	Toshio UESHIBA
+  \brief	クラス TU::FIRGaussianConvolver の実装
+*/
 #include "TU/FIRGaussianConvolver.h"
 #include <cmath>
 

@@ -1,5 +1,6 @@
 /*!
   \file		Vector++.h
+  \author	Toshio UESHIBA
   \brief	ベクトルと行列の演算およびそれに関連するクラスの定義と実装
 */
 #ifndef __TU_VECTORPP_H
