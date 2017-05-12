@@ -300,7 +300,6 @@ Warp::initialize(const typename I::matrix33_type& Htinv, const I& intrinsic,
     using namespace std;
 
     using intrinsic_type	= I;
-    using point2_type		= typename intrinsic_type::point2_type;
     using vector3_type		= Vector<typename intrinsic_type::element_type,
 					 3>;
     using matrix33_type		= typename intrinsic_type::matrix33_type;
