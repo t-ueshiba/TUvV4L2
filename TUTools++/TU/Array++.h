@@ -495,7 +495,7 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 		  all<std::is_integral, std::tuple<SIZES_...> >::value>*
 	      = nullptr>
     explicit	array(SIZES_... sizes)
-		    :super({{to_size(sizes)...}})
+		    :super({to_size(sizes)...})
 		{
 		}
     template <class... SIZES_>
@@ -503,7 +503,7 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 		     all<std::is_integral, std::tuple<SIZES_...> >::value, bool>
 		resize(SIZES_... sizes)
 		{
-		    return super::resize({{to_size(sizes)...}});
+		    return super::resize({to_size(sizes)...});
 		}
     
     template <class... SIZES_,
