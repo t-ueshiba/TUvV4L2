@@ -1,8 +1,6 @@
-/*
- *  $Id: Image++.h 2268 2017-03-01 06:42:18Z ueshiba $
- */
 /*!
   \file		Image++.h
+  \author	Toshio UESHIBA
   \brief	画素と画像に関連するクラスの定義と実装
 */
 #ifndef	__TU_IMAGEPP_H

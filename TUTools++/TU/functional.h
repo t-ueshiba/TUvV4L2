@@ -1,5 +1,6 @@
 /*!
   \file		functional.h
+  \author	Toshio UESHIBA
   \brief	関数オブジェクトの定義と実装
 */
 #ifndef __TU_FUNCTIONAL_H
