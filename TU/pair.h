@@ -1,8 +1,6 @@
-/*
- *  $Id: functional.h 1775 2014-12-24 06:08:59Z ueshiba $
- */
 /*!
   \file		pair.h
+  \author	Toshio UESHIBA
   \brief	std::pairの用途拡張のためのユティリティ
 */
 #ifndef __TU_PAIR_H

@@ -1,6 +1,8 @@
-/*
- *  $Id: Rectify.h 1495 2014-02-27 15:07:51Z ueshiba $
- */
+/*!
+  \file		Rectify.h
+  \author	Toshio UESHIBA
+  \brief	クラス TU::Rectify の定義と実装
+*/
 #ifndef __TU_RECTIFY_H
 #define __TU_RECTIFY_H
 

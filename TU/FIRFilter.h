@@ -1,5 +1,6 @@
 /*!
   \file		FIRFilter.h
+  \author	Toshio UESHIBA
   \brief	一般的なfinite impulse response filterを表すクラスの定義と実装
 */
 #ifndef	__TU_FIRFILTER_H

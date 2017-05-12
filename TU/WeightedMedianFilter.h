@@ -1,6 +1,8 @@
-/*
- *  $Id$
- */
+/*!
+  \file		WeightedMedianFilter.h
+  \author	Toshio UESHIBA
+  \brief	クラス TU::WeightedMedianFilter の定義と実装
+*/
 #ifndef __TU_WEIGHTEDMEDIANFILTER_H
 #define __TU_WEIGHTEDMEDIANFILTER_H
 

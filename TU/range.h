@@ -1,5 +1,6 @@
 /*!
   \file		range.h
+  \author	Toshio UESHIBA
   \brief	2つの反復子によって指定されるレンジの定義と実装
 */
 #ifndef __TU_RANGE_H

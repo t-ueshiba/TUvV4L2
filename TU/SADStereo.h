@@ -1,5 +1,6 @@
 /*!
   \file		SADStereo.h
+  \author	Toshio UESHIBA
   \brief	SADステレオマッチングクラスの定義と実装
 */
 #ifndef __TU_SADSTEREO_H

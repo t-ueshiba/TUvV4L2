@@ -48,6 +48,7 @@
 */
 /*!
   \file		Random.h
+  \author	Toshio UESHIBA
   \brief	クラス TU::Random の定義と実装
 */
 #ifndef __TU_RANDOM_H

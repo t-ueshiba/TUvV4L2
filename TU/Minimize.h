@@ -1,5 +1,6 @@
 /*!
   \file		Minimize.h
+  \author	Toshio UESHIBA
   \brief	汎用最小自乗法に関連する関数の定義と実装
 */
 #ifndef __TU_MINIMIZE_H

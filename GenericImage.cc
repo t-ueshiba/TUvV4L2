@@ -1,6 +1,8 @@
-/*
- *  $Id: GenericImage.cc 1945 2016-02-21 03:44:08Z ueshiba $
- */
+/*!
+  \file		GenericImage.cc
+  \author	Toshio UESHIBA
+  \brief	任意の画素型をとれる画像クラスの実装
+*/
 #include "TU/Image++.h"
 
 namespace TU

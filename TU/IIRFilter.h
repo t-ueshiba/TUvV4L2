@@ -1,5 +1,6 @@
 /*!
   \file		IIRFilter.h
+  \author	Toshio UESHIBA
   \brief	各種infinite impulse response filterに関するクラスの定義と実装
 */
 #ifndef	__TU_IIRFILTER_H

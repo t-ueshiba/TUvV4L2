@@ -1,6 +1,8 @@
-/*
- *  $Id: ICIA.h,v 1.3 2012-08-16 06:52:44 ueshiba Exp $
- */
+/*!
+  \file		ICIA.h
+  \author	Toshio UESHIBA
+  \brief	クラス TU::ICIA の定義と実装
+*/
 #ifndef __TU_ICIA_H
 #define __TU_ICIA_H
 

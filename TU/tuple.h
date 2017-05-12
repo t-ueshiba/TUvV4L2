@@ -1,5 +1,6 @@
 /*!
   \file		tuple.h
+  \author	Toshio UESHIBA
   \brief	std::tupleの用途拡張のためのユティリティ
 */
 #ifndef __TU_TUPLE_H

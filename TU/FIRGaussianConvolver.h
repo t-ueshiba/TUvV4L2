@@ -1,8 +1,6 @@
-/*
- *  $Id: FIRGaussianConvolver.h 1219 2012-11-09 05:45:49Z ueshiba $
- */
 /*!
   \file		FIRGaussianConvolver.h
+  \author	Toshio UESHIBA
   \brief	Gauss核による畳み込みに関連するクラスの定義と実装
 */ 
 #include "TU/FIRFilter.h"

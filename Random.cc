@@ -46,6 +46,11 @@
    
    $Id: Random.cc 1202 2012-09-25 00:03:13Z ueshiba $
 */
+/*!
+  \file		Random.cc
+  \author	Toshio UESHIBA
+  \brief	クラス TU::Random の実装
+*/
 #include "TU/Random.h"
 #include <cmath>
 #ifdef WIN32
