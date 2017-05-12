@@ -18,23 +18,32 @@ namespace TU
 ************************************************************************/
 namespace detail
 {
+  template <class T>
+  struct check_pair : std::false_type					{};
   template <class S, class T>
-  std::true_type	check_pair(std::pair<S, T>)			;
-  std::false_type	check_pair(...)					;
+  struct check_pair<std::pair<S, T> > : std::true_type			{};
 }	// namespace detail
 
+//! 与えられた型が std::pair 又はそれへの参照であるか判定する
+/*!
+  T が std::pair に変換可能でも，std::pair そのもの，又はそれへの参照で
+  なければ false
+  \param T	判定対象となる型
+*/ 
 template <class T>
-using is_pair = decltype(detail::check_pair(std::declval<T>()));
-
+using is_pair = detail::check_pair<std::decay_t<T> >;
+    
 /************************************************************************
 *  predicate: any_pair<ARGS...>						*
 ************************************************************************/
-//! 少なくとも1つのテンプレート引数が std::pair であるか判定する
+//! 少なくとも1つのテンプレート引数が std::pair 又はそれへの参照であるか判定する
 /*!
   \param ARGS...	判定対象となる型の並び
 */
 template <class... ARGS>
-struct any_pair : std::false_type					{};
+struct any_pair;
+template <>
+struct any_pair<> : std::false_type					{};
 template <class ARG, class... ARGS>
 struct any_pair<ARG, ARGS...>
     : std::integral_constant<bool, (is_pair<ARG>::value ||
