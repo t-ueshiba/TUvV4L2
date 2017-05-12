@@ -113,7 +113,7 @@ ListCmd::setPercent(float percent)
     _top = int(_nitems * percent + 0.5);
     if (_top < 0)
 	_top = 0;
-    else if (_top > _nitems - nshown)
+    else if (size_t(_top) > _nitems - nshown)
 	_top = _nitems - nshown;
     vViewportSetLocation(_widget, 0.0, float(_top) / float(_nitems));
 }

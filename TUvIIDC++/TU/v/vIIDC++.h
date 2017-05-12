@@ -124,7 +124,7 @@ setFeature(CAMERAS&& cameras, CmdId id, CmdVal val, CmdPane& cmdPane)
     
   // idが属性の絶対値指定でなければGUIを更新する必要はない
     if (camera == std::end(cameras) ||
-	id < IIDCCamera::BRIGHTNESS + IIDCCAMERA_OFFSET_ABS)
+	u_int(id) < IIDCCamera::BRIGHTNESS + IIDCCAMERA_OFFSET_ABS)
 	return true;
     
   // 属性の絶対値指定が変更されたら、sliderコマンドの定義域と値を更新する

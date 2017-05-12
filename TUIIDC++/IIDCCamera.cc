@@ -2471,7 +2471,7 @@ IIDCCamera::inquireFrameRate_or_Format_7_Offset(Format format) const
     const quadlet_t	Format_1	= 0x1u << 30;
     const quadlet_t	Format_2	= 0x1u << 29;
     const quadlet_t	Format_5	= 0x1u << 26;
-    const quadlet_t	Format_6	= 0x1u << 25;
+  //const quadlet_t	Format_6	= 0x1u << 25;
     const quadlet_t	Format_7	= 0x1u << 24;
     quadlet_t		inq		= 0;
     switch (format)	// Check presence of format.
@@ -2533,7 +2533,7 @@ IIDCCamera::inquireFrameRate_or_Format_7_Offset(Format format) const
     const u_int		V_MODE_INQ_1	= 0x184;
     const u_int		V_MODE_INQ_2	= 0x188;
     const u_int		V_MODE_INQ_5	= 0x194;
-    const u_int		V_MODE_INQ_6	= 0x198;
+  //const u_int		V_MODE_INQ_6	= 0x198;
     const u_int		V_MODE_INQ_7	= 0x19c;
     const quadlet_t	Mode_0		= 0x1u << 31;
     const quadlet_t	Mode_1		= 0x1u << 30;
