@@ -82,6 +82,12 @@ crend(const T& x) -> decltype(std::rend(x))
 {
     return std::rend(x);
 }
+
+template <class ITER> inline auto
+make_reverse_iterator(ITER iter)
+{
+    return reverse_iterator<ITER>(iter);
+}
 #endif
 }	// namespace std
 

@@ -1,5 +1,6 @@
 /*!
   \file		algorithm.h
+  \author	Toshio UESHIBA
   \brief	各種アルゴリズムの定義と実装
 */
 #ifndef __TU_ALGORITHM_H

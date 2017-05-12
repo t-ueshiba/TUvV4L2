@@ -13,8 +13,8 @@ IDLS		=
 MOCHDRS		=
 
 INCDIRS		= -I../..
-CPPFLAGS	= #-DNDEBUG #-DWITHOUT_CVTDOWN
-CFLAGS		= -g -O3
+CPPFLAGS	= -DNDEBUG #-DWITHOUT_CVTDOWN
+CFLAGS		= -O3
 ifeq ($(shell arch), armv7l)
   CPPFLAGS     += -DNEON
 else ifeq ($(shell arch), aarch64)
