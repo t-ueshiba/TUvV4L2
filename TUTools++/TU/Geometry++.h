@@ -1734,7 +1734,7 @@ BoundingBox<P>::clear()
 template <class P> template <class T_, size_t D_> BoundingBox<P>&
 BoundingBox<P>::expand(const Array<T_, D_>& p)
 {
-    for (int i = 0; i < dim(); ++i)
+    for (size_t i = 0; i < dim(); ++i)
     {
 	_min[i] = std::min(_min[i], p[i]);
 	_max[i] = std::max(_max[i], p[i]);
