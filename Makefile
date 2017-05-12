@@ -34,6 +34,8 @@ BINDIR		= $(PREFIX)/bin
 LIBDIR		= $(PREFIX)/lib
 INCDIR		= $(PREFIX)/include
 
+OTHER_DIR	= $(HOME)/projects/HRP-5P/hrp5p-calib/src/TUIIDC++
+
 #########################
 #  Macros set by mkmf	#
 #########################
@@ -63,11 +65,15 @@ OBJS		= FireWireNode.o \
 		IIDCNode.o \
 		USBNode.o
 
+OTHER_HDRS	= $(HDRS)
+OTHER_SRCS	= $(SRCS)
+
 #include $(PROJECT)/lib/rtc.mk		# IDLHDRS, IDLSRCS, CPPFLAGS, OBJS, LIBS
 #include $(PROJECT)/lib/qt.mk		# MOCSRCS, OBJS
 #include $(PROJECT)/lib/cnoid.mk	# CPPFLAGS, LIBS, LIBDIR
 include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
+include $(PROJECT)/lib/other.mk
 ###
 FireWireNode.o: FireWireNode_.h TU/IIDC++.h \
 	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
