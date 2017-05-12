@@ -2,20 +2,9 @@
  *  $Id$
  */
 #include "TU/Array++.h"
-#ifdef DEMANGLE
-#  include <boost/core/demangle.hpp>
-#endif
 
 namespace TU
 {
-template <class S, class T>
-struct Derived : public std::tuple<S, T>
-{
-    Derived(S i, T d)	:std::tuple<S, T>(i, d), a(10)	{};
-
-    int	a;
-};
-
 template <class S, class T> void
 arithmetic_test()
 {
@@ -33,14 +22,6 @@ arithmetic_test()
 
     std::tuple<ivec_t, dvec_t>	ax{a, x}, by{b, y};
     cout << (ax *= by) << endl;
-#ifdef DEMANGLE
-    using	boost::core::demangle;
-    
-  //    cout << demangle(typeid(tuple_t<Derived<S, T> >).name()) << endl;
-#endif
-    Derived<S, T>	c(3, 30.3), d(4, 40.4);
-    auto		u = 3*c + d*2;
-    cout << u << endl;
 }
 
 void

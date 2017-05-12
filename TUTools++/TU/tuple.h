@@ -62,22 +62,25 @@ using all_has_begin	= all<has_begin, std::decay_t<TUPLE> >;
 ************************************************************************/
 namespace detail
 {
+  template <class T>
+  struct check_tuple : std::false_type					{};
   template <class... T>
-  std::true_type	check_tuple(std::tuple<T...>)			;
-  std::false_type	check_tuple(...)				;
+  struct check_tuple<std::tuple<T...> > : std::true_type		{};
 }	// namespace detail
 
-//! 与えられた型が std::tuple であるか判定する
+//! 与えられた型が std::tuple 又はそれへの参照であるか判定する
 /*!
+  T が std::tuple に変換可能でも，std::tuple そのもの，又はそれへの参照で
+  なければ false
   \param T	判定対象となる型
 */ 
 template <class T>
-using is_tuple		= decltype(detail::check_tuple(std::declval<T>()));
+using is_tuple		= detail::check_tuple<std::decay_t<T> >;
 
 /************************************************************************
 *  predicate: any_tuple<ARGS...>					*
 ************************************************************************/
-//! 少なくとも1つのテンプレート引数が std::tuple であるか判定する
+//! 少なくとも1つのテンプレート引数が std::tuple 又はそれへの参照であるか判定する
 /*!
   \param ARGS...	判定対象となる型の並び
 */
