@@ -190,7 +190,6 @@
 #ifndef __TU_ALGORITHM_H
 #define __TU_ALGORITHM_H
 
-#include <cstddef>		// for size_t
 #include <cmath>		// for std::sqrt()
 #include <iterator>		// for std::iterator_traits<ITER>
 #include <type_traits>		// for std::common_type<TYPES....>
