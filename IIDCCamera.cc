@@ -2718,19 +2718,19 @@ constexpr IIDCCamera::TriggerModeName	IIDCCamera::triggerModeNames[];
 std::ostream&
 operator <<(std::ostream& out, const IIDCCamera& camera)
 {
-    using namespace	std;
-
-    out << showbase << hex << camera.globalUniqueId()	// Write glob. uniq. ID.
-	<< ' '
-	<< find_if(begin(IIDCCamera::formatNames),	// Write format.
-		   end(IIDCCamera::formatNames),
+    using	namespace std;
+    
+    out << showbase << hex << camera.globalUniqueId()
+	<< ' '						    // Write GUID.
+	<< find_if(std::begin(IIDCCamera::formatNames),	    // Write format.
+		   std::end(IIDCCamera::formatNames),
 		   [&](IIDCCamera::FormatName format)
 		   {
 		       return camera.getFormat() == format.format;
 		   })->name
 	<< ' '
-	<< find_if(begin(IIDCCamera::frameRateNames),	// Write frame rate.
-		   end(IIDCCamera::frameRateNames),
+	<< find_if(std::begin(IIDCCamera::frameRateNames),  // Write frame rate.
+		   std::end(IIDCCamera::frameRateNames),
 		   [&](IIDCCamera::FrameRateName frameRate)
 		   {
 		       return camera.getFrameRate() == frameRate.frameRate;
@@ -2753,8 +2753,8 @@ operator <<(std::ostream& out, const IIDCCamera& camera)
 	    << ' ' << fmt7info.width << ' ' << fmt7info.height
 	    << ' ' << fmt7info.bytePerPacket
 	    << ' '
-	    << find_if(begin(IIDCCamera::pixelFormatNames),
-		       end(IIDCCamera::pixelFormatNames),
+	    << find_if(std::begin(IIDCCamera::pixelFormatNames),
+		       std::end(IIDCCamera::pixelFormatNames),
 		       [&](IIDCCamera::PixelFormatName pixelFormat)
 		       {
 			   return fmt7info.pixelFormat
@@ -2792,8 +2792,8 @@ operator <<(std::ostream& out, const IIDCCamera& camera)
 	    switch (feature.feature)
 	    {
 	      case IIDCCamera::TRIGGER_MODE:
-		out << find_if(begin(IIDCCamera::triggerModeNames),
-			       end(IIDCCamera::triggerModeNames),
+		out << find_if(std::begin(IIDCCamera::triggerModeNames),
+			       std::end(IIDCCamera::triggerModeNames),
 			       [&](IIDCCamera::TriggerModeName triggerMode)
 			       {
 				   return camera.getTriggerMode()
@@ -2846,24 +2846,24 @@ operator >>(std::istream& in, IIDCCamera& camera)
     
   // formatを読み込む
     in >> s;
-    const auto	format = find_if(begin(IIDCCamera::formatNames),
-				 end(IIDCCamera::formatNames),
+    const auto	format = find_if(std::begin(IIDCCamera::formatNames),
+				 std::end(IIDCCamera::formatNames),
 				 [&](IIDCCamera::FormatName fmt)
 				 {
 				     return s == fmt.name;
 				 });
-    if (format == end(IIDCCamera::formatNames))
+    if (format == std::end(IIDCCamera::formatNames))
 	throw runtime_error("IIDCCamera: Unknown format[" + s + ']');
 
   // frame rateを読み込む
     in >> s;
-    const auto	frameRate = find_if(begin(IIDCCamera::frameRateNames),
-				    end(IIDCCamera::frameRateNames),
+    const auto	frameRate = find_if(std::begin(IIDCCamera::frameRateNames),
+				    std::end(IIDCCamera::frameRateNames),
 				    [&](IIDCCamera::FrameRateName rt)
 				    {
 					return s == rt.name;
 				    });
-    if (frameRate == end(IIDCCamera::frameRateNames))
+    if (frameRate == std::end(IIDCCamera::frameRateNames))
 	throw runtime_error("IIDCCamera: Unknown frame rate[" + s + ']');
 
     switch (format->format)
@@ -2881,8 +2881,8 @@ operator >>(std::istream& in, IIDCCamera& camera)
 	in >> u0 >> v0 >> width >> height >> packetSize >> s;
 
 	const auto	pixelFormat
-			    = find_if(begin(IIDCCamera::pixelFormatNames),
-				      end(IIDCCamera::pixelFormatNames),
+			    = find_if(std::begin(IIDCCamera::pixelFormatNames),
+				      std::end(IIDCCamera::pixelFormatNames),
 				      [&](IIDCCamera::PixelFormatName pixfmt)
 				      {
 					  return s == pixfmt.name;
@@ -2927,13 +2927,13 @@ operator >>(std::istream& in, IIDCCamera& camera)
       done:
       // feature名を読み込む
 	in >> s;					// Read feature name.
-	const auto	feature = find_if(begin(IIDCCamera::featureNames),
-					  end(IIDCCamera::featureNames),
+	const auto	feature = find_if(std::begin(IIDCCamera::featureNames),
+					  std::end(IIDCCamera::featureNames),
 					  [&](IIDCCamera::FeatureName ftr)
 					  {
 					      return s == ftr.name;
 					  });
-	if (feature == end(IIDCCamera::featureNames))
+	if (feature == std::end(IIDCCamera::featureNames))
 	    throw runtime_error("IIDCCamera: Unknown feature[" + s + ']');
 
       // featureのOn/Off, AUTO/Manual, Absolute/Relative をセットする
@@ -2948,13 +2948,13 @@ operator >>(std::istream& in, IIDCCamera& camera)
 	  {
 	      in >> s;
 	      const auto
-		  triggerMode = find_if(begin(IIDCCamera::triggerModeNames),
-					end(IIDCCamera::triggerModeNames),
+		  triggerMode = find_if(std::begin(IIDCCamera::triggerModeNames),
+					std::end(IIDCCamera::triggerModeNames),
 					[&](IIDCCamera::TriggerModeName md)
 					{
 					    return s == md.name;
 					});
-	      if (triggerMode == end(IIDCCamera::triggerModeNames))
+	      if (triggerMode == std::end(IIDCCamera::triggerModeNames))
 		  throw runtime_error("IIDCCamera: Unknown trigger mode[" +
 				      s + ']');
 	      camera.setTriggerMode(triggerMode->triggerMode);
