@@ -36,8 +36,7 @@ INCDIR		= $(PREFIX)/include
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC .cpp:sC .cu:sC
-EXTHDRS		= /usr/local/include/TU/Object++.h \
-		/usr/local/include/TU/types.h
+EXTHDRS		= /usr/local/include/TU/Object++.h
 HDRS		= TU/Collection++.h
 SRCS		= Collection++.cc \
 		ObjTreeBase.cc \
@@ -52,9 +51,6 @@ OBJS		= Collection++.o \
 include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
-Collection++.o: TU/Collection++.h /usr/local/include/TU/Object++.h \
-	/usr/local/include/TU/types.h
-ObjTreeBase.o: TU/Collection++.h /usr/local/include/TU/Object++.h \
-	/usr/local/include/TU/types.h
-TUCollection++.sa.o: TU/Collection++.h /usr/local/include/TU/Object++.h \
-	/usr/local/include/TU/types.h
+Collection++.o: TU/Collection++.h /usr/local/include/TU/Object++.h
+ObjTreeBase.o: TU/Collection++.h /usr/local/include/TU/Object++.h
+TUCollection++.sa.o: TU/Collection++.h /usr/local/include/TU/Object++.h

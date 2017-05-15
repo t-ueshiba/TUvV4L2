@@ -41,8 +41,7 @@ INCDIR		= $(PREFIX)/include
 SUFFIX		= .cc:sC .cpp:sC .cu:sC
 EXTHDRS		= ../../../TU/SHOT602.h \
 		../../../TU/Serial.h \
-		../../../TU/fdstream.h \
-		../../../TU/types.h
+		../../../TU/fdstream.h
 HDRS		=
 SRCS		= main.cc
 OBJS		= main.o
@@ -53,5 +52,4 @@ OBJS		= main.o
 #include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
-main.o: ../../../TU/SHOT602.h ../../../TU/Serial.h ../../../TU/fdstream.h \
-	../../../TU/types.h
+main.o: ../../../TU/SHOT602.h ../../../TU/Serial.h ../../../TU/fdstream.h

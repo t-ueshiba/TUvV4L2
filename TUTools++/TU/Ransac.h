@@ -8,7 +8,6 @@
 
 #include <math.h>
 #include <stdexcept>
-#include "TU/types.h"
 
 namespace TU
 {

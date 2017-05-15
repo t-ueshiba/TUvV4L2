@@ -579,7 +579,6 @@ ImageBase::saveBMPHeader(std::ostream& out, Type type) const
 /*!
   \param ty	画素タイプ
 */
-__PORT
 ImageBase::TypeInfo::TypeInfo(Type ty)
     :type(ty), bottomToTop(false), ncolors(0)
 {

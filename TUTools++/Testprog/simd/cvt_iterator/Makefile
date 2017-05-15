@@ -87,8 +87,8 @@ OBJS		= main.o
 include $(PROJECT)/lib/common.mk
 ###
 main.o: ../../../TU/simd/cvt_iterator.h ../../../TU/iterator.h \
-	../../../TU/simd/pack.h ../../../TU/pair.h ../../../TU/simd/cvt.h \
-	../../../TU/tuple.h ../../../TU/simd/zero.h ../../../TU/simd/vec.h \
+	../../../TU/tuple.h ../../../TU/simd/pack.h ../../../TU/pair.h \
+	../../../TU/simd/cvt.h ../../../TU/simd/zero.h ../../../TU/simd/vec.h \
 	../../../TU/simd/config.h ../../../TU/simd/type_traits.h \
 	../../../TU/simd/x86/type_traits.h ../../../TU/simd/arm/type_traits.h \
 	../../../TU/simd/x86/vec.h ../../../TU/simd/x86/arch.h \

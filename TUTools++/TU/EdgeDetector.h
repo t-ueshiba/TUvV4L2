@@ -14,7 +14,7 @@ namespace TU
 *  class EdgeDetector							*
 ************************************************************************/
 //! エッジ検出を行うクラス
-class __PORT EdgeDetector
+class EdgeDetector
 {
   public:
     enum

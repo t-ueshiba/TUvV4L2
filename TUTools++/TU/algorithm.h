@@ -1,6 +1,190 @@
 /*!
-  \file		algorithm.h
+  \mainpage	libTUTools++ - 配列，ベクトル，行列，画像等の基本的なデータ型とそれに付随したアルゴリズムを収めたライブラリ
+  \anchor	libTUTools
   \author	Toshio UESHIBA
+  \copyright	2002-2017年 植芝俊夫
+
+  \section abstract 概要
+  libTUTools++は，配列，ベクトル，行列，画像等の基本的なデータ型とそれ
+  に付随したアルゴリズムを収めたライブラリである．現在実装されている主
+  要なクラスおよび関数はおおまかに以下の分野に分類される．
+
+  <b>多次元配列</b>
+  - #TU::array
+  - #TU::Array
+  - #TU::Array2
+
+  <b>ベクトルと行列および線形計算</b>
+  - #TU::Vector
+  - #TU::Matrix
+  - #TU::LUDecomposition
+  - #TU::Householder
+  - #TU::QRDecomposition
+  - #TU::TriDiagonal
+  - #TU::BiDiagonal
+  - #TU::SVDecomposition
+  - #TU::BlockDiagonalMatrix
+  - #TU::SparseMatrix
+  - #TU::BandMatrix
+
+  <b>非線形最適化</b>
+  - #TU::NullConstraint
+  - #TU::ConstNormConstraint
+  - #TU::minimizeSquare(const F&, const G&, AT&, size_t, double)
+  - #TU::minimizeSquareSparse(const F&, const G&, ATA&, IB, IB, size_t, double)
+
+  <b>RANSAC</b>
+  - #TU::ransac(const PointSet&, Model&, Conform, double)
+
+  <b>グラフカット</b>
+  - #boost::GraphCuts
+
+  <b>動的計画法</b>
+  - #TU::DP
+
+  <b>点，直線，平面等の幾何要素とその変換</b>
+  - #TU::Point2
+  - #TU::Point3
+  - #TU::HyperPlane
+  - #TU::Normalize
+  - #TU::Projectivity
+  - #TU::Affinity
+  - #TU::Rigidity
+  - #TU::BoundingBox
+  
+  <b>投影の幾何</b>
+  - #TU::IntrinsicBase
+  - #TU::IntrinsicWithFocalLength
+  - #TU::IntrinsicWithEuclideanImagePlane
+  - #TU::Intrinsic
+  - #TU::IntrinsicWithDistortion
+  - #TU::CanonicalCamera
+  - #TU::Camera
+  
+  <b>画素と画像</b>
+  - #TU::RGB
+  - #TU::BGR
+  - #TU::RGBA
+  - #TU::ABGR
+  - #TU::ARGB
+  - #TU::BGRA
+  - #TU::YUV444
+  - #TU::YUV422
+  - #TU::YUV411
+  - #TU::Image
+  - #TU::GenericImage
+  - #TU::ComplexImage
+  - #TU::CCSImage
+  - #TU::Movie
+
+  <b>画像処理</b>
+  - #TU::Rectify
+  - #TU::EdgeDetector
+  - #TU::IntegralImage
+  - #TU::DiagonalIntegralImage
+  
+  <b>画像に限らない信号処理</b>
+  - #TU::Warp
+  - #TU::Filter2
+  - #TU::SeparableFilter2
+  - #TU::IIRFilter
+  - #TU::BidirectionalIIRFilter
+  - #TU::BidirectionalIIRFilter2
+  - #TU::DericheConvolver
+  - #TU::DericheConvolver2
+  - #TU::GaussianConvolver
+  - #TU::GaussianConvolver2
+  - #TU::BoxFilter
+  - #TU::BoxFilter2
+  - #TU::GuidedFilter
+  - #TU::GuidedFilter2
+  - #TU::FIRFilter
+  - #TU::FIRGaussianConvolver
+  - #TU::WeightedMedianFilter
+  - #TU::TreeFilter
+
+  <b>特殊データ構造</b>
+  - #TU::List
+  - #TU::PSTree
+  - #TU::NDTree
+  
+  <b>Bezier曲線とBezier曲面</b>
+  - #TU::BezierCurve
+  - #TU::BezierSurface
+  
+  <b>B-spline曲線とB-spline曲面</b>
+  - #TU::BSplineKnots
+  - #TU::BSplineCurve
+  - #TU::BSplineSurface
+  
+  <b>メッシュ</b>
+  - #TU::Mesh
+
+  <b>アルゴリズム</b>
+  - #TU::pull_if(Iter, Iter, Pred)
+  - #TU::diff(const T&, const T&)
+  - #TU::op3x3(Iterator begin, Iterator end, OP op)
+  - #TU::max3x3(P p, P q, P r)
+  - #TU::min3x3(P p, P q, P r)
+  - #TU::mopOpen(Iterator begin, Iterator end, size_t niter)
+  - #TU::mopClose(Iterator begin, Iterator end, size_t niter)
+
+  <b>関数オブジェクト</b>
+  - #TU::identity
+  - #TU::plus_assign
+  - #TU::minus_assign
+  - #TU::multiplies_assign
+  - #TU::divides_assign
+  - #TU::modulus_assign
+  - #TU::bit_and_assign
+  - #TU::bit_or_assign
+  - #TU::bit_xor_assign
+  - #TU::square()
+  - #TU::length()
+  - #TU::square_distance()
+  - #TU::distance()
+  - #TU::gcd()
+  - #TU::lcm()
+
+  <b>反復子</b>
+  - #TU::make_mbr_iterator()
+  - #TU::make_first_iterator()
+  - #TU::make_second_iterator()
+  - #TU::zip_iterator
+  - #TU::assignment_iterator
+  - #TU::row2col
+  - #TU::column_iterator
+  - #TU::ring_iterator
+  - #TU::box_filter_iterator
+  - #TU::iir_filter_iterator
+  
+  <b>マニピュレータ</b>
+  - #TU::skipl(std::istream&)
+  - #TU::IOManip
+  - #TU::IManip1
+  - #TU::OManip1
+  - #TU::IOManip1
+  - #TU::IManip2
+  - #TU::OManip2
+
+  <b>ストリーム
+  - #TU::fdistream
+  - #TU::fdostream
+  - #TU::fdstream
+  
+  <b>シリアルインタフェース</b>
+  - #TU::Serial
+  - #TU::TriggerGenerator
+  - #TU::PM16C_04
+  - #TU::SHOT602
+
+  <b>乱数発生器</b>
+  - #TU::Random
+
+  <b>SIMD命令</b>
+  - #TU::simd::vec
+  
+  \file		algorithm.h
   \brief	各種アルゴリズムの定義と実装
 */
 #ifndef __TU_ALGORITHM_H
@@ -16,6 +200,7 @@
 #  include <iostream>
 #endif
 
+//! libTUTools++ のクラスや関数等を収める名前空間
 namespace TU
 {
 #ifdef TU_DEBUG

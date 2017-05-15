@@ -43,6 +43,7 @@ INCDIR		= $(PREFIX)/include
 SUFFIX		= .cc:sC .cpp:sC .cu:sC
 EXTHDRS		= ../../../TU/functional.h \
 		../../../TU/iterator.h \
+		../../../TU/pair.h \
 		../../../TU/simd/arithmetic.h \
 		../../../TU/simd/arm/arch.h \
 		../../../TU/simd/arm/arithmetic.h \
@@ -62,6 +63,7 @@ EXTHDRS		= ../../../TU/functional.h \
 		../../../TU/simd/load_iterator.h \
 		../../../TU/simd/load_store.h \
 		../../../TU/simd/logical.h \
+		../../../TU/simd/pack.h \
 		../../../TU/simd/shift.h \
 		../../../TU/simd/store_iterator.h \
 		../../../TU/simd/transform.h \
@@ -93,7 +95,7 @@ OBJS		= main.o
 include $(PROJECT)/lib/common.mk
 ###
 main.o: ../../../TU/simd/transform.h ../../../TU/iterator.h \
-	../../../TU/functional.h ../../../TU/simd/cvt.h ../../../TU/tuple.h \
+	../../../TU/tuple.h ../../../TU/functional.h ../../../TU/simd/cvt.h \
 	../../../TU/simd/zero.h ../../../TU/simd/vec.h \
 	../../../TU/simd/config.h ../../../TU/simd/type_traits.h \
 	../../../TU/simd/x86/type_traits.h ../../../TU/simd/arm/type_traits.h \
@@ -107,6 +109,7 @@ main.o: ../../../TU/simd/transform.h ../../../TU/iterator.h \
 	../../../TU/simd/arm/bit_shift.h ../../../TU/simd/x86/cvt.h \
 	../../../TU/simd/x86/unpack.h ../../../TU/simd/arm/cvt.h \
 	../../../TU/simd/load_iterator.h ../../../TU/simd/load_store.h \
+	../../../TU/pair.h ../../../TU/simd/pack.h \
 	../../../TU/simd/x86/load_store.h ../../../TU/simd/arm/load_store.h \
 	../../../TU/simd/store_iterator.h ../../../TU/simd/arithmetic.h \
 	../../../TU/simd/logical.h ../../../TU/simd/x86/logical.h \

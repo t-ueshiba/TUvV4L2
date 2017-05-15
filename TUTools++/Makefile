@@ -164,8 +164,7 @@ HDRS		= TU/Array++.h \
 		TU/simd/x86/vec.h \
 		TU/simd/x86/zero.h \
 		TU/simd/zero.h \
-		TU/tuple.h \
-		TU/types.h
+		TU/tuple.h
 SRCS		= ColorConverter.cc \
 		EdgeDetector.cc \
 		FIRGaussianCoefficients.cc \
@@ -312,8 +311,7 @@ OTHER_HDRS	= TU/Array++.h \
 		TU/simd/x86/vec.h \
 		TU/simd/x86/zero.h \
 		TU/simd/zero.h \
-		TU/tuple.h \
-		TU/types.h
+		TU/tuple.h
 OTHER_SRCS	= ColorConverter.cc \
 		EdgeDetector.cc \
 		FIRGaussianCoefficients.cc \
@@ -335,28 +333,28 @@ include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 include $(PROJECT)/lib/other.mk
 ###
-ColorConverter.o: TU/Image++.h TU/types.h TU/pair.h TU/Vector++.h \
-	TU/Array++.h TU/range.h TU/algorithm.h TU/tuple.h TU/iterator.h
-EdgeDetector.o: TU/EdgeDetector.h TU/Image++.h TU/types.h TU/pair.h \
-	TU/Vector++.h TU/Array++.h TU/range.h TU/algorithm.h TU/tuple.h \
-	TU/iterator.h TU/Geometry++.h TU/Minimize.h TU/simd/simd.h \
-	TU/simd/config.h TU/simd/vec.h TU/simd/type_traits.h \
-	TU/simd/x86/type_traits.h TU/simd/arm/type_traits.h TU/simd/x86/vec.h \
-	TU/simd/x86/arch.h TU/simd/arm/vec.h TU/simd/arm/arch.h \
-	TU/simd/allocator.h TU/simd/x86/allocator.h TU/simd/arm/allocator.h \
-	TU/simd/load_store.h TU/simd/x86/load_store.h \
-	TU/simd/arm/load_store.h TU/simd/zero.h TU/simd/x86/zero.h \
+ColorConverter.o: TU/Image++.h TU/pair.h TU/Vector++.h TU/Array++.h \
+	TU/range.h TU/algorithm.h TU/iterator.h TU/tuple.h
+EdgeDetector.o: TU/EdgeDetector.h TU/Image++.h TU/pair.h TU/Vector++.h \
+	TU/Array++.h TU/range.h TU/algorithm.h TU/iterator.h TU/tuple.h \
+	TU/Geometry++.h TU/Minimize.h TU/simd/simd.h TU/simd/config.h \
+	TU/simd/vec.h TU/simd/type_traits.h TU/simd/x86/type_traits.h \
+	TU/simd/arm/type_traits.h TU/simd/x86/vec.h TU/simd/x86/arch.h \
+	TU/simd/arm/vec.h TU/simd/arm/arch.h TU/simd/allocator.h \
+	TU/simd/x86/allocator.h TU/simd/arm/allocator.h TU/simd/load_store.h \
+	TU/simd/pack.h TU/simd/cvt.h TU/simd/zero.h TU/simd/x86/zero.h \
 	TU/simd/arm/zero.h TU/simd/cast.h TU/simd/x86/cast.h \
-	TU/simd/arm/cast.h TU/simd/insert_extract.h \
-	TU/simd/x86/insert_extract.h TU/simd/arm/insert_extract.h \
-	TU/simd/shift.h TU/simd/x86/shift.h TU/simd/arm/shift.h \
-	TU/simd/bit_shift.h TU/simd/x86/bit_shift.h TU/simd/arm/bit_shift.h \
-	TU/simd/dup.h TU/simd/cvt.h TU/simd/x86/cvt.h TU/simd/x86/unpack.h \
-	TU/simd/arm/cvt.h TU/simd/logical.h TU/simd/x86/logical.h \
-	TU/simd/x86/logical_base.h TU/simd/arm/logical.h TU/simd/x86/dup.h \
-	TU/simd/arm/dup.h TU/simd/compare.h TU/simd/x86/compare.h \
-	TU/simd/arm/compare.h TU/simd/select.h TU/simd/x86/select.h \
-	TU/simd/arm/select.h TU/simd/arithmetic.h TU/simd/x86/arithmetic.h \
+	TU/simd/arm/cast.h TU/simd/shift.h TU/simd/x86/shift.h \
+	TU/simd/arm/shift.h TU/simd/bit_shift.h TU/simd/x86/bit_shift.h \
+	TU/simd/arm/bit_shift.h TU/simd/x86/cvt.h TU/simd/x86/unpack.h \
+	TU/simd/arm/cvt.h TU/simd/x86/load_store.h TU/simd/arm/load_store.h \
+	TU/simd/insert_extract.h TU/simd/x86/insert_extract.h \
+	TU/simd/arm/insert_extract.h TU/simd/dup.h TU/simd/logical.h \
+	TU/simd/x86/logical.h TU/simd/x86/logical_base.h \
+	TU/simd/arm/logical.h TU/simd/x86/dup.h TU/simd/arm/dup.h \
+	TU/simd/compare.h TU/simd/x86/compare.h TU/simd/arm/compare.h \
+	TU/simd/select.h TU/simd/x86/select.h TU/simd/arm/select.h \
+	TU/simd/arithmetic.h TU/simd/x86/arithmetic.h \
 	TU/simd/arm/arithmetic.h TU/simd/transform.h TU/functional.h \
 	TU/simd/lookup.h TU/simd/x86/lookup.h TU/simd/arm/lookup.h \
 	TU/simd/load_iterator.h TU/simd/store_iterator.h \
@@ -364,36 +362,36 @@ EdgeDetector.o: TU/EdgeDetector.h TU/Image++.h TU/types.h TU/pair.h \
 	TU/simd/shift_iterator.h TU/simd/BufTraits.h
 FIRGaussianCoefficients.o: TU/FIRGaussianConvolver.h TU/FIRFilter.h \
 	TU/SeparableFilter2.h TU/Array++.h TU/range.h TU/algorithm.h \
-	TU/tuple.h TU/iterator.h
+	TU/iterator.h TU/tuple.h
 FeatureMatch.o: TU/FeatureMatch.h TU/Geometry++.h TU/Minimize.h \
-	TU/Vector++.h TU/Array++.h TU/range.h TU/algorithm.h TU/tuple.h \
-	TU/iterator.h TU/Random.h TU/types.h TU/Ransac.h TU/Manip.h
+	TU/Vector++.h TU/Array++.h TU/range.h TU/algorithm.h TU/iterator.h \
+	TU/tuple.h TU/Random.h TU/Ransac.h TU/Manip.h
 GaussianCoefficients.o: TU/GaussianConvolver.h TU/Vector++.h TU/Array++.h \
-	TU/range.h TU/algorithm.h TU/tuple.h TU/iterator.h TU/IIRFilter.h \
+	TU/range.h TU/algorithm.h TU/iterator.h TU/tuple.h TU/IIRFilter.h \
 	TU/SeparableFilter2.h TU/Minimize.h
-GenericImage.o: TU/Image++.h TU/types.h TU/pair.h TU/Vector++.h \
-	TU/Array++.h TU/range.h TU/algorithm.h TU/tuple.h TU/iterator.h
-ImageBase.o: TU/Image++.h TU/types.h TU/pair.h TU/Vector++.h TU/Array++.h \
-	TU/range.h TU/algorithm.h TU/tuple.h TU/iterator.h TU/Camera++.h \
-	TU/Geometry++.h TU/Minimize.h TU/Manip.h
-PM16C_04.o: TU/PM16C_04.h TU/Serial.h TU/fdstream.h TU/types.h TU/Manip.h
-Random.o: TU/Random.h TU/types.h
-Rectify.o: TU/Rectify.h TU/Warp.h TU/Image++.h TU/types.h TU/pair.h \
-	TU/Vector++.h TU/Array++.h TU/range.h TU/algorithm.h TU/tuple.h \
-	TU/iterator.h TU/Camera++.h TU/Geometry++.h TU/Minimize.h \
-	TU/simd/simd.h TU/simd/config.h TU/simd/vec.h TU/simd/type_traits.h \
+GenericImage.o: TU/Image++.h TU/pair.h TU/Vector++.h TU/Array++.h \
+	TU/range.h TU/algorithm.h TU/iterator.h TU/tuple.h
+ImageBase.o: TU/Image++.h TU/pair.h TU/Vector++.h TU/Array++.h TU/range.h \
+	TU/algorithm.h TU/iterator.h TU/tuple.h TU/Camera++.h TU/Geometry++.h \
+	TU/Minimize.h TU/Manip.h
+PM16C_04.o: TU/PM16C_04.h TU/Serial.h TU/fdstream.h TU/Manip.h
+Random.o: TU/Random.h
+Rectify.o: TU/Rectify.h TU/Warp.h TU/Image++.h TU/pair.h TU/Vector++.h \
+	TU/Array++.h TU/range.h TU/algorithm.h TU/iterator.h TU/tuple.h \
+	TU/Camera++.h TU/Geometry++.h TU/Minimize.h TU/simd/simd.h \
+	TU/simd/config.h TU/simd/vec.h TU/simd/type_traits.h \
 	TU/simd/x86/type_traits.h TU/simd/arm/type_traits.h TU/simd/x86/vec.h \
 	TU/simd/x86/arch.h TU/simd/arm/vec.h TU/simd/arm/arch.h \
 	TU/simd/allocator.h TU/simd/x86/allocator.h TU/simd/arm/allocator.h \
-	TU/simd/load_store.h TU/simd/x86/load_store.h \
-	TU/simd/arm/load_store.h TU/simd/zero.h TU/simd/x86/zero.h \
-	TU/simd/arm/zero.h TU/simd/cast.h TU/simd/x86/cast.h \
-	TU/simd/arm/cast.h TU/simd/insert_extract.h \
+	TU/simd/load_store.h TU/simd/pack.h TU/simd/cvt.h TU/simd/zero.h \
+	TU/simd/x86/zero.h TU/simd/arm/zero.h TU/simd/cast.h \
+	TU/simd/x86/cast.h TU/simd/arm/cast.h TU/simd/shift.h \
+	TU/simd/x86/shift.h TU/simd/arm/shift.h TU/simd/bit_shift.h \
+	TU/simd/x86/bit_shift.h TU/simd/arm/bit_shift.h TU/simd/x86/cvt.h \
+	TU/simd/x86/unpack.h TU/simd/arm/cvt.h TU/simd/x86/load_store.h \
+	TU/simd/arm/load_store.h TU/simd/insert_extract.h \
 	TU/simd/x86/insert_extract.h TU/simd/arm/insert_extract.h \
-	TU/simd/shift.h TU/simd/x86/shift.h TU/simd/arm/shift.h \
-	TU/simd/bit_shift.h TU/simd/x86/bit_shift.h TU/simd/arm/bit_shift.h \
-	TU/simd/dup.h TU/simd/cvt.h TU/simd/x86/cvt.h TU/simd/x86/unpack.h \
-	TU/simd/arm/cvt.h TU/simd/logical.h TU/simd/x86/logical.h \
+	TU/simd/dup.h TU/simd/logical.h TU/simd/x86/logical.h \
 	TU/simd/x86/logical_base.h TU/simd/arm/logical.h TU/simd/x86/dup.h \
 	TU/simd/arm/dup.h TU/simd/compare.h TU/simd/x86/compare.h \
 	TU/simd/arm/compare.h TU/simd/select.h TU/simd/x86/select.h \
@@ -403,14 +401,13 @@ Rectify.o: TU/Rectify.h TU/Warp.h TU/Image++.h TU/types.h TU/pair.h \
 	TU/simd/load_iterator.h TU/simd/store_iterator.h \
 	TU/simd/cvtdown_iterator.h TU/simd/cvtup_iterator.h \
 	TU/simd/shift_iterator.h TU/simd/BufTraits.h
-SHOT602.o: TU/SHOT602.h TU/Serial.h TU/fdstream.h TU/types.h TU/Manip.h
+SHOT602.o: TU/SHOT602.h TU/Serial.h TU/fdstream.h TU/Manip.h
 SURFCreator.o: TU/SURFCreator.h TU/Feature.h TU/Geometry++.h TU/Minimize.h \
-	TU/Vector++.h TU/Array++.h TU/range.h TU/algorithm.h TU/tuple.h \
-	TU/iterator.h TU/Manip.h TU/types.h TU/IntegralImage.h TU/Image++.h \
-	TU/pair.h
-Serial.o: TU/Serial.h TU/fdstream.h TU/types.h
+	TU/Vector++.h TU/Array++.h TU/range.h TU/algorithm.h TU/iterator.h \
+	TU/tuple.h TU/Manip.h TU/IntegralImage.h TU/Image++.h TU/pair.h
+Serial.o: TU/Serial.h TU/fdstream.h
 TriggerGenerator.o: TU/TriggerGenerator.h TU/Serial.h TU/fdstream.h \
-	TU/types.h TU/Manip.h
-fdstream.o: TU/fdstream.h TU/types.h
+	TU/Manip.h
+fdstream.o: TU/fdstream.h
 io.o: TU/io.h
-manipulators.o: TU/Manip.h TU/types.h
+manipulators.o: TU/Manip.h

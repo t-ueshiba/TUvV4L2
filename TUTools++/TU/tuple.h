@@ -8,87 +8,8 @@
 
 #include <tuple>
 #include <type_traits>		// for std::result_of<F(ARGS...)>
-#include <iterator>
+#include <iterator>		// for std::begin()
 #include <iostream>
-#include <boost/iterator/iterator_facade.hpp>
-
-namespace std
-{
-#if __cplusplus < 201700L
-/************************************************************************
-*  function std::size(T)						*
-************************************************************************/
-template <class T> inline size_t
-size(const T& x)
-{
-    return x.size();
-}
-template <class T, size_t N> inline constexpr size_t
-size(const T (&array)[N]) noexcept
-{
-    return N;
-}
-#endif
-
-#if __cplusplus < 201402L    
-/************************************************************************
-*  std::[rbegin|rend|cbegin|cend|crbegin|crend](T)			*
-************************************************************************/
-template <class T> inline auto
-rbegin(const T& x) -> decltype(x.rbegin())
-{
-    return x.rbegin();
-}
-    
-template <class T> inline auto
-rbegin(T& x) -> decltype(x.rbegin())
-{
-    return x.rbegin();
-}
-    
-template <class T> inline auto
-rend(const T& x) -> decltype(x.rend())
-{
-    return x.rend();
-}
-    
-template <class T> inline auto
-rend(T& x) -> decltype(x.rend())
-{
-    return x.rend();
-}
-    
-template <class T> inline auto
-cbegin(const T& x) -> decltype(std::begin(x))
-{
-    return std::begin(x);
-}
-    
-template <class T> inline auto
-cend(const T& x) -> decltype(std::end(x))
-{
-    return std::end(x);
-}
-
-template <class T> inline auto
-crbegin(const T& x) -> decltype(std::rbegin(x))
-{
-    return std::rbegin(x);
-}
-    
-template <class T> inline auto
-crend(const T& x) -> decltype(std::rend(x))
-{
-    return std::rend(x);
-}
-
-template <class ITER> inline auto
-make_reverse_iterator(ITER iter)
-{
-    return reverse_iterator<ITER>(iter);
-}
-#endif
-}	// namespace std
 
 namespace TU
 {
@@ -113,30 +34,6 @@ struct all<PRED, std::tuple<HEAD, TAIL...> >
     constexpr static bool	value = PRED<HEAD>::value &&
 					all<PRED, std::tuple<TAIL...> >::value;
 };
-
-/************************************************************************
-*  predicates: has_begin<T>, all_has_begin<T>				*
-************************************************************************/
-namespace detail
-{
-  template <class T>
-  auto	has_begin(T&& x) -> decltype(std::begin(x), std::true_type())	;
-  auto	has_begin(...)	 -> std::false_type				;
-}	// namespace detail
-
-//! 与えられた型に std::begin() を適用できるか判定する
-/*!
-  \param T	判定対象となる型
-*/ 
-template <class T>
-using has_begin		= decltype(detail::has_begin(std::declval<T>()));
-
-//! 与えられた std::tuple の全要素の型に std::begin() を適用できるか判定する
-/*!
-  \param TUPLE	判定対象となる std::tuple 型
-*/ 
-template <class TUPLE>
-using all_has_begin	= all<has_begin, std::decay_t<TUPLE> >;
 
 /************************************************************************
 *  predicate: is_tuple<T>						*
@@ -335,157 +232,6 @@ tuple_transform(FUNC f, TUPLES&&... x)
 	       std::make_index_sequence<
 		   detail::first_tuple_size<TUPLES...>::value>(),
 	       f, std::forward<TUPLES>(x)...);
-}
-
-/************************************************************************
-*  Selection								*
-************************************************************************/
-template <class X, class Y> inline auto
-select(bool s, const X& x, const Y& y)
-{
-    return (s ? x : y);
-}
-    
-template <class... S, class X, class Y,
-	  std::enable_if_t<any_tuple<X, Y>::value>* = nullptr> inline auto
-select(const std::tuple<S...>& s, const X& x, const Y& y)
-{
-    return tuple_transform([](const auto& t, const auto& u, const auto& v)
-			   { return select(t, u, v); }, s, x, y);
-}
-
-/************************************************************************
-*  class unarizer<FUNC>							*
-************************************************************************/
-//! 引数をtupleにまとめることによって多変数関数を1変数関数に変換
-template <class FUNC>
-class unarizer
-{
-  public:
-    using functor_type = FUNC;
-
-  public:
-    unarizer(FUNC func=FUNC())	:_func(func)		{}
-
-    template <class TUPLE_,
-	      std::enable_if_t<is_tuple<TUPLE_>::value>* = nullptr>
-    auto	operator ()(const TUPLE_& arg) const
-		{
-		    return exec(arg, std::make_index_sequence<
-					 std::tuple_size<TUPLE_>::value>());
-		}
-
-    const FUNC&	functor()			const	{return _func;}
-
-  private:
-    template <class TUPLE_, size_t... IDX_>
-    auto	exec(const TUPLE_& arg, std::index_sequence<IDX_...>) const
-		{
-		    return _func(std::get<IDX_>(arg)...);
-		}
-
-  private:
-    const FUNC	_func;
-};
-
-template <class FUNC> inline unarizer<FUNC>
-make_unarizer(FUNC func)
-{
-    return {func};
-}
-    
-/************************************************************************
-*  TU::[begin|end|rbegin|rend](std::tuple<T...>)			*
-************************************************************************/
-template <class ITER_TUPLE>
-class zip_iterator							;
-
-template <class ITER_TUPLE> inline zip_iterator<ITER_TUPLE>
-make_zip_iterator(ITER_TUPLE iter_tuple)				;
-
-/*
- *  icpc-17.0.2 のバグ回避のため，lambda関数ではなくgenericな関数オブジェクトを
- *  用いて実装
- */ 
-namespace detail
-{
-  struct generic_begin
-  {
-      template <class T_>
-      auto	operator ()(T_&& x) const
-		{
-		    using std::begin;	// ADLが働かない時は std::begin を使用
-		    return begin(x);
-		}
-  };
-  struct generic_end
-  {
-      template <class T_>
-      auto	operator ()(T_&& x) const
-		{
-		    using std::end;	// ADLが働かない時は std::end を使用
-		    return end(x);
-		}
-  };
-}	// namespace detail
-    
-template <class TUPLE,
-	  std::enable_if_t<all_has_begin<TUPLE>::value>* = nullptr> inline auto
-begin(TUPLE&& t)
-{
-    return make_zip_iterator(tuple_transform(detail::generic_begin(), t));
-}
-
-template <class TUPLE,
-	  std::enable_if_t<all_has_begin<TUPLE>::value>* = nullptr> inline auto
-end(TUPLE&& t)
-{
-    return make_zip_iterator(tuple_transform(detail::generic_end(), t));
-}
-
-template <class TUPLE,
-	  std::enable_if_t<all_has_begin<TUPLE>::value>* = nullptr> inline auto
-rbegin(TUPLE&& t)
-{
-    return std::make_reverse_iterator(end(t));
-}
-
-template <class TUPLE,
-	  std::enable_if_t<all_has_begin<TUPLE>::value>* = nullptr> inline auto
-rend(TUPLE&& t)
-{
-    return std::make_reverse_iterator(begin(t));
-}
-
-template <class... T> inline auto
-cbegin(const std::tuple<T...>& t)
-{
-    return begin(t);
-}
-
-template <class... T> inline auto
-cend(const std::tuple<T...>& t)
-{
-    return end(t);
-}
-
-template <class... T> inline auto
-crbegin(const std::tuple<T...>& t)
-{
-    return rbegin(t);
-}
-
-template <class... T> inline auto
-crend(const std::tuple<T...>& t)
-{
-    return rend(t);
-}
-
-template <class... T> inline auto
-size(const std::tuple<T...>& t)
-{
-    using std::size;
-    return size(std::get<0>(t));
 }
 
 /************************************************************************
@@ -719,129 +465,62 @@ operator >=(const L& l, const R& r)
 }
 
 /************************************************************************
-*  class zip_iterator<ITER_TUPLE>					*
+*  Selection								*
 ************************************************************************/
-namespace detail
+template <class X, class Y> inline auto
+select(bool s, const X& x, const Y& y)
 {
-  struct generic_dereference
-  {
-      template <class ITER_>
-      decltype(auto)	operator ()(ITER_ iter)	const	{ return *iter; }
-  };
-}	// namespace detail
+    return (s ? x : y);
+}
     
-template <class ITER_TUPLE>
-class zip_iterator : public boost::iterator_facade<
-			zip_iterator<ITER_TUPLE>,
-			decltype(tuple_transform(detail::generic_dereference(),
-						 std::declval<ITER_TUPLE>())),
-			typename std::iterator_traits<tuple_head<ITER_TUPLE> >
-				    ::iterator_category,
-			decltype(tuple_transform(detail::generic_dereference(),
-						 std::declval<ITER_TUPLE>()))>
+template <class... S, class X, class Y,
+	  std::enable_if_t<any_tuple<X, Y>::value>* = nullptr> inline auto
+select(const std::tuple<S...>& s, const X& x, const Y& y)
 {
-  private:
-    using super = boost::iterator_facade<
-			zip_iterator,
-			decltype(tuple_transform(detail::generic_dereference(),
-						 std::declval<ITER_TUPLE>())),
-			typename std::iterator_traits<tuple_head<ITER_TUPLE> >
-				    ::iterator_category,
-			decltype(tuple_transform(detail::generic_dereference(),
-						 std::declval<ITER_TUPLE>()))>;
-    friend	class boost::iterator_core_access;
-    
-  public:
-    using		typename super::reference;
-    using		typename super::difference_type;
-    using stride_t    = replace_element<ITER_TUPLE, ptrdiff_t>;
-    
-  public:
-		zip_iterator(ITER_TUPLE iter_tuple)
-		    :_iter_tuple(iter_tuple)				{}
-    template <class ITER_TUPLE_,
-	      std::enable_if_t<
-		  std::is_convertible<ITER_TUPLE_, ITER_TUPLE>::value>*
-	      = nullptr>
-		zip_iterator(const zip_iterator<ITER_TUPLE_>& iter)
-		    :_iter_tuple(iter.get_iterator_tuple())		{}
-
-    const ITER_TUPLE&
-		get_iterator_tuple()	const	{ return _iter_tuple; }
-    void	advance(stride_t stride)	{ _iter_tuple += stride; }
-
-  private:
-    reference	dereference() const
-		{
-		    return tuple_transform(detail::generic_dereference(),
-					   _iter_tuple);
-		}
-    template <class ITER_TUPLE_>
-    std::enable_if_t<std::is_convertible<ITER_TUPLE_, ITER_TUPLE>::value, bool>
-		equal(const zip_iterator<ITER_TUPLE_>& iter) const
-		{
-		    return std::get<0>(iter.get_iterator_tuple())
-			== std::get<0>(_iter_tuple);
-		}
-    void	increment()
-		{
-		    ++_iter_tuple;
-		}
-    void	decrement()
-		{
-		    --_iter_tuple;
-		}
-    void	advance(difference_type n)
-		{
-		    _iter_tuple += n;
-		}
-    template <class ITER_TUPLE_>
-    std::enable_if_t<std::is_convertible<ITER_TUPLE_, ITER_TUPLE>::value,
-		     difference_type>
-		distance_to(const zip_iterator<ITER_TUPLE_>& iter) const
-		{
-		    return std::get<0>(iter.get_iterator_tuple())
-		  	 - std::get<0>(_iter_tuple);
-		}
-
-  private:
-    ITER_TUPLE	_iter_tuple;
-};
-
-template <class ITER_TUPLE> inline zip_iterator<ITER_TUPLE>
-make_zip_iterator(ITER_TUPLE iter_tuple)
-{
-    return {iter_tuple};
+    return tuple_transform([](const auto& t, const auto& u, const auto& v)
+			   { return select(t, u, v); }, s, x, y);
 }
 
 /************************************************************************
-*  type alias: decayed_iterator_value<ITER>				*
+*  class unarizer<FUNC>							*
 ************************************************************************/
-namespace detail
+//! 引数をtupleにまとめることによって多変数関数を1変数関数に変換
+template <class FUNC>
+class unarizer
 {
-  template <class ITER>
-  struct decayed_iterator_value
-  {
-      using type = typename std::iterator_traits<ITER>::value_type;
-  };
-  template <class... ITER>
-  struct decayed_iterator_value<zip_iterator<std::tuple<ITER...> > >
-  {
-      using type = std::tuple<typename decayed_iterator_value<ITER>::type...>;
-  };
-}	// namespace detail
+  public:
+    using functor_type = FUNC;
 
-//! 反復子が指す型を返す．
-/*!
-  zip_iterator<ITER_TUPLE>::value_type はITER_TUPLE中の各反復子が指す値への
-  参照型のtupleであるが，decayed_iterator_value<zip_iterator<ITER_TUPLE> >は
-  ITER_TUPLE中の各反復子が指す値そのものの型のtupleを返す．
-  \param ITER	反復子
-*/
-template <class ITER>
-using decayed_iterator_value = typename detail::decayed_iterator_value<ITER>
-					      ::type;
+  public:
+    unarizer(FUNC func=FUNC())	:_func(func)		{}
 
+    template <class TUPLE_,
+	      std::enable_if_t<is_tuple<TUPLE_>::value>* = nullptr>
+    auto	operator ()(const TUPLE_& arg) const
+		{
+		    return exec(arg, std::make_index_sequence<
+					 std::tuple_size<TUPLE_>::value>());
+		}
+
+    const FUNC&	functor()			const	{return _func;}
+
+  private:
+    template <class TUPLE_, size_t... IDX_>
+    auto	exec(const TUPLE_& arg, std::index_sequence<IDX_...>) const
+		{
+		    return _func(std::get<IDX_>(arg)...);
+		}
+
+  private:
+    const FUNC	_func;
+};
+
+template <class FUNC> inline unarizer<FUNC>
+make_unarizer(FUNC func)
+{
+    return {func};
+}
+    
 }	// namespace TU
 
 namespace std
