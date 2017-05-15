@@ -10,7 +10,6 @@
 #include <boost/intrusive/set.hpp>
 #include <boost/iterator/counting_iterator.hpp>
 #include "TU/Quantizer.h"
-#include "TU/Vector++.h"
 #include "TU/algorithm.h"	// diff(const T&, const T&)
 #if defined(USE_TBB)
 #  include <tbb/parallel_for.h>
@@ -46,11 +45,9 @@ class ExpDiff
 		}
     T		f(S x, S y, std::false_type) const
 		{
-		    Vector<T, 3>	v;
-		    v[0] = T(x.r) - T(y.r);
-		    v[1] = T(x.g) - T(y.g);
-		    v[2] = T(x.b) - T(y.b);
-		    return std::exp(length(v) / _nsigma);
+		    Vector<T, 3>	a{T(x.r) - T(y.r),
+					  T(x.g) - T(y.g), T(x.b) - T(y.b)};
+		    return std::exp(length(a) / _nsigma);
 		}
 
   private:

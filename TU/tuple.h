@@ -7,8 +7,8 @@
 #define __TU_TUPLE_H
 
 #include <tuple>
-#include <type_traits>		// for std::result_of<F(ARGS...)>
-#include <iterator>		// for std::begin()
+#include <utility>		// for std::index_sequence<IDX...>
+#include <type_traits>		// for std::enable_if_t<B, T>
 #include <iostream>
 
 namespace TU

@@ -6,8 +6,7 @@
 #ifndef __TU_ITERATOR_H
 #define __TU_ITERATOR_H
 
-#include <cstddef>			// for size_t
-#include <utility>			// for std::declval<T>
+#include <iterator>
 #include <functional>			// for std::function
 #include <boost/iterator/transform_iterator.hpp>
 #include "TU/tuple.h"
