@@ -6,7 +6,6 @@
 #ifndef __TU_FDSTREAM_H
 #define __TU_FDSTREAM_H
 
-#include "TU/types.h"
 #include <iostream>
 #include <streambuf>
 
@@ -19,7 +18,7 @@ namespace TU
 /*!
   #TU::fdistream, #TU::fdostream, #TU::fdstream の内部で使われる．
 */
-class __PORT fdbuf : public std::streambuf
+class fdbuf : public std::streambuf
 {
   public:
     typedef std::streambuf::traits_type	traits_type;	//!< 特性の型
@@ -62,7 +61,7 @@ fdbuf::fd() const
 *  class fdistream							*
 ************************************************************************/
 //! ファイル記述子を持つ入力ストリームクラス
-class __PORT fdistream : public std::istream
+class fdistream : public std::istream
 {
   public:
     fdistream(const char* path)						;
@@ -100,7 +99,7 @@ fdistream::fd() const
 *  class fdostream							*
 ************************************************************************/
 //! ファイル記述子を持つ出力ストリームクラス
-class __PORT fdostream : public std::ostream
+class fdostream : public std::ostream
 {
   public:
     fdostream(const char* path)						;
@@ -138,7 +137,7 @@ fdostream::fd() const
 *  class fdstream							*
 ************************************************************************/
 //! ファイル記述子を持つ入出力ストリームクラス
-class __PORT fdstream : public std::iostream
+class fdstream : public std::iostream
 {
   public:
     fdstream(const char* path)						;

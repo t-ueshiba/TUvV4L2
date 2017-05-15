@@ -37,7 +37,7 @@ INCDIR		= $(PREFIX)/include
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC .cpp:sC .cu:sC
-EXTHDRS		= ../../../TU/iterator.h \
+EXTHDRS		= ../../../TU/pair.h \
 		../../../TU/simd/arm/arch.h \
 		../../../TU/simd/arm/bit_shift.h \
 		../../../TU/simd/arm/cast.h \
@@ -56,6 +56,7 @@ EXTHDRS		= ../../../TU/iterator.h \
 		../../../TU/simd/dup.h \
 		../../../TU/simd/load_store.h \
 		../../../TU/simd/logical.h \
+		../../../TU/simd/pack.h \
 		../../../TU/simd/shift.h \
 		../../../TU/simd/type_traits.h \
 		../../../TU/simd/vec.h \
@@ -85,7 +86,7 @@ OBJS		= main.o
 include $(PROJECT)/lib/common.mk
 ###
 main.o: ../../../TU/simd/dup.h ../../../TU/simd/cvt.h ../../../TU/tuple.h \
-	../../../TU/iterator.h ../../../TU/simd/zero.h ../../../TU/simd/vec.h \
+	../../../TU/simd/zero.h ../../../TU/simd/vec.h \
 	../../../TU/simd/config.h ../../../TU/simd/type_traits.h \
 	../../../TU/simd/x86/type_traits.h ../../../TU/simd/arm/type_traits.h \
 	../../../TU/simd/x86/vec.h ../../../TU/simd/x86/arch.h \
@@ -100,5 +101,6 @@ main.o: ../../../TU/simd/dup.h ../../../TU/simd/cvt.h ../../../TU/tuple.h \
 	../../../TU/simd/logical.h ../../../TU/simd/x86/logical.h \
 	../../../TU/simd/x86/logical_base.h ../../../TU/simd/arm/logical.h \
 	../../../TU/simd/x86/dup.h ../../../TU/simd/arm/dup.h \
-	../../../TU/simd/load_store.h ../../../TU/simd/x86/load_store.h \
+	../../../TU/simd/load_store.h ../../../TU/pair.h \
+	../../../TU/simd/pack.h ../../../TU/simd/x86/load_store.h \
 	../../../TU/simd/arm/load_store.h

@@ -8,9 +8,11 @@
 
 #include <cstring>		// for memcpy()
 #include <boost/operators.hpp>
-#include "TU/types.h"
+#include <sys/types.h>		// for u_int, u_char
 #include "TU/pair.h"
 #include "TU/Vector++.h"
+
+using s_char	= signed char;	//!< 符号付き8bit整数
 
 namespace TU
 {
@@ -1117,7 +1119,7 @@ class ImageBase
   //! 外部記憶に読み書きする際の付加情報
     struct TypeInfo
     {
-	__PORT	TypeInfo(Type ty=DEFAULT)	;
+	TypeInfo(Type ty=DEFAULT)	;
 
 	Type	type;		//!< 画素の型
 	bool	bottomToTop;	//!< 行が下から上へ収められているならtrue

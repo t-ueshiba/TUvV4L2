@@ -49,8 +49,7 @@ EXTHDRS		= ../../TU/Array++.h \
 		../../TU/iterator.h \
 		../../TU/pair.h \
 		../../TU/range.h \
-		../../TU/tuple.h \
-		../../TU/types.h
+		../../TU/tuple.h
 HDRS		=
 SRCS		= main.cc
 OBJS		= main.o
@@ -61,8 +60,7 @@ OBJS		= main.o
 #include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
-main.o: ../../TU/Image++.h ../../TU/types.h ../../TU/pair.h \
-	../../TU/Vector++.h ../../TU/Array++.h ../../TU/range.h \
-	../../TU/algorithm.h ../../TU/tuple.h ../../TU/iterator.h \
-	../../TU/FIRGaussianConvolver.h ../../TU/FIRFilter.h \
-	../../TU/SeparableFilter2.h ../../TU/Profiler.h
+main.o: ../../TU/Image++.h ../../TU/pair.h ../../TU/Vector++.h \
+	../../TU/Array++.h ../../TU/range.h ../../TU/algorithm.h \
+	../../TU/iterator.h ../../TU/tuple.h ../../TU/FIRGaussianConvolver.h \
+	../../TU/FIRFilter.h ../../TU/SeparableFilter2.h ../../TU/Profiler.h

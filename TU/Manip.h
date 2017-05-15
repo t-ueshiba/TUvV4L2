@@ -7,14 +7,13 @@
 #define __TU_MANIP_H
 
 #include <iostream>
-#include "TU/types.h"
 
 namespace TU
 {
 /************************************************************************
 *  Manipulators								*
 ************************************************************************/
-__PORT std::istream&	skipl(std::istream& in)			;
+std::istream&	skipl(std::istream& in)					;
 
 /************************************************************************
 *  class IOManip							*

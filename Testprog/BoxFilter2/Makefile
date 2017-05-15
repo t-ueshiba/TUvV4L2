@@ -53,5 +53,5 @@ OBJS		= main.o
 include $(PROJECT)/lib/common.mk
 ###
 main.o: ../../TU/BoxFilter.h ../../TU/Filter2.h ../../TU/iterator.h \
-	../../TU/Array++.h ../../TU/range.h ../../TU/algorithm.h \
-	../../TU/tuple.h
+	../../TU/tuple.h ../../TU/Array++.h ../../TU/range.h \
+	../../TU/algorithm.h

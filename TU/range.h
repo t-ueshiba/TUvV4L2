@@ -9,16 +9,15 @@
 #include <cassert>
 #include <initializer_list>
 #include "TU/algorithm.h"	// for copy<N>(IN, ARG, OUT), etc...
-#include "TU/tuple.h"		// required before defining iterator_t<E>
 #include "TU/iterator.h"
 
 namespace std
 {
-//! 式に適用できる反復子の型を返す
-/*!
-  E, const E&, E&, E&&型の x に std::begin() または x が所属するnamespaceで
-  定義された begin() がADLによって適用できるかチェックし，可能な場合はその型を返す．
-*/
+  //! 式に適用できる反復子の型を返す
+  /*!
+    E, const E&, E&, E&&型の x に std::begin() または x が所属するnamespaceで
+    定義された begin() がADLによって適用できるかチェックし，可能な場合はその型を返す．
+  */
   template <class E>
   auto	check_begin(E&& x) -> decltype(begin(x))			;
   void	check_begin(...)						;
@@ -83,19 +82,30 @@ using element_t	= typename detail::element_t<E>::type;
 /************************************************************************
 *  rank<E>(), size0<E>(), size<E>()					*
 ************************************************************************/
+namespace detail
+{
+  template <class E>
+  auto	check_stdbegin(E&& x) -> decltype(std::begin(x),
+					  std::true_type())		;
+  auto	check_stdbegin(...)   -> std::false_type			;
+
+  template <class E>
+  using has_stdbegin = decltype(check_stdbegin(std::declval<E>()));
+}	// namespace detail
+
 //! 式の次元数(軸の個数)を返す
 /*!
   \param E	式の型
   \return	式の次元数
 */
 template <class E>
-constexpr std::enable_if_t<!has_begin<E>::value, size_t>
+constexpr std::enable_if_t<!detail::has_stdbegin<E>::value, size_t>
 rank()
 {
     return 0;
 }
 template <class E>
-constexpr std::enable_if_t<has_begin<E>::value, size_t>
+constexpr std::enable_if_t<detail::has_stdbegin<E>::value, size_t>
 rank()
 {
     return 1 + rank<value_t<E> >();
@@ -912,7 +922,7 @@ make_range(zip_iterator<ITER_TUPLE> zip_iter, ARGS... args)
 }
     
 template <size_t... SIZES, class TUPLE, class... ARGS,
-	  std::enable_if_t<all_has_begin<TUPLE>::value>* = nullptr>
+	  std::enable_if_t<is_tuple<TUPLE>::value>* = nullptr>
 inline auto
 slice(TUPLE&& t, ARGS... args)
 {

@@ -17,7 +17,7 @@ namespace TU
   \param in	入力ストリーム
   \return	inで指定した入力ストリーム
 */
-__PORT std::istream&
+std::istream&
 skipl(std::istream& in)	// manipulator for skipping the rest of a line
 {
     for (char c; in.get(c); )

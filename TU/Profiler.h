@@ -8,8 +8,7 @@
 
 #include <chrono>
 #include <string>
-#include "TU/types.h"
-#include "TU/Array++.h"
+#include <vector>
 
 namespace TU
 {
@@ -24,9 +23,9 @@ template <class CLOCK>
 class Profiler
 {
   public:
-    typedef CLOCK			clock;
-    typedef typename clock::duration	duration;
-    typedef typename clock::time_point	time_point;
+    using clock		= CLOCK;
+    using duration	= typename clock::duration;
+    using time_point	= typename clock::time_point;
     
   public:
   //! 指定された個数のタイマを持つプロファイラを作成する．
@@ -107,7 +106,7 @@ class Profiler
     template <class PERIOD=std::milli>
     void	printTabSeparated(std::ostream& out) const
 		{
-		    typedef std::chrono::duration<float, PERIOD>	 dr;
+		    using dr =std::chrono::duration<float, PERIOD>;
 
 		    auto	total = duration::zero();
 
@@ -125,10 +124,9 @@ class Profiler
     template <class PERIOD>
     void	print(std::ostream& out, const duration& d) const
 		{
-		    using	std::setw;
-
-		    typedef std::chrono::duration<float, PERIOD>	 dr;
-		    typedef std::chrono::duration<float, std::ratio<1> > ds;
+		    using std::setw;
+		    using dr = std::chrono::duration<float, PERIOD>;
+		    using ds = std::chrono::duration<float, std::ratio<1> >;
 	
 		    if (_nframes > 0)
 		    {
@@ -149,10 +147,10 @@ class Profiler
     static std::string	cap(std::ratio<1>)	{ return std::string("s");  }
     
   private:
-    mutable int			_active;
-    mutable Array<duration>	_accums;
-    mutable time_point		_t0;
-    mutable size_t		_nframes;
+    mutable int				_active;
+    mutable std::vector<duration>	_accums;
+    mutable time_point			_t0;
+    mutable size_t			_nframes;
 };
 
 template <>
@@ -167,4 +165,4 @@ struct Profiler<void>
 };
 
 }
-#endif	// !__TU_PROFILER_H
+#endif	// !__TU_ROFILER_H

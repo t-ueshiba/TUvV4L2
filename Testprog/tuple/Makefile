@@ -52,4 +52,4 @@ OBJS		= main.o
 include $(PROJECT)/lib/common.mk
 ###
 main.o: ../../TU/Array++.h ../../TU/range.h ../../TU/algorithm.h \
-	../../TU/tuple.h ../../TU/iterator.h
+	../../TU/iterator.h ../../TU/tuple.h

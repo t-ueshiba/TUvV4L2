@@ -54,7 +54,7 @@
 #ifndef __TU_RANDOM_H
 #define __TU_RANDOM_H
 
-#include "TU/types.h"
+#include <sys/types.h>
 
 namespace TU
 {
@@ -62,7 +62,7 @@ namespace TU
 *  class Random								*
 ************************************************************************/
 //! Mersenne Twisterによる乱数発生器
-class __PORT Random
+class Random
 {
   public:
     Random()								;

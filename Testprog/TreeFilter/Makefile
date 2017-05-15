@@ -48,8 +48,7 @@ EXTHDRS		= ../../TU/Array++.h \
 		../../TU/algorithm.h \
 		../../TU/iterator.h \
 		../../TU/range.h \
-		../../TU/tuple.h \
-		../../TU/types.h
+		../../TU/tuple.h
 HDRS		=
 SRCS		= main.cc
 OBJS		= main.o
@@ -61,5 +60,5 @@ OBJS		= main.o
 include $(PROJECT)/lib/common.mk
 ###
 main.o: ../../TU/Array++.h ../../TU/range.h ../../TU/algorithm.h \
-	../../TU/tuple.h ../../TU/iterator.h ../../TU/TreeFilter.h \
-	../../TU/Profiler.h ../../TU/types.h
+	../../TU/iterator.h ../../TU/tuple.h ../../TU/TreeFilter.h \
+	../../TU/Profiler.h
