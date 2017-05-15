@@ -34,7 +34,6 @@
 #include <X11/StringDefs.h>
 #include "TU/List.h"
 #include "TU/Geometry++.h"
-#include "TU/types.h"
 
 namespace TU
 {
