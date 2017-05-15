@@ -7,7 +7,6 @@
 #define __TU_GFSTEREO_H
 
 #include "TU/StereoBase.h"
-#include "TU/Array++.h"
 #include "TU/BoxFilter.h"
 
 namespace TU
@@ -283,6 +282,12 @@ GFStereo<SCORE, DISP>::getOverlap() const
 template <class SCORE, class DISP> template <class ROW, class ROW_D> void
 GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowR, ROW_D rowD)
 {
+    using	std::cbegin;
+    using	std::cend;
+    using	std::begin;
+    using	std::crbegin;
+    using	std::crend;
+    
     start(0);
     const size_t	H = std::distance(rowL, rowLe),
 			W = (H != 0 ? std::size(*rowL) : 0),
@@ -309,17 +314,13 @@ GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowR, ROW_D rowD)
       // フィルタパラメータ(= 縦横両方向に積算された相違度(コスト)の総和
       // および画素毎のコストとガイド画素の積和)を初期化
 	if (rowL <= rowL0)
-	    initializeFilterParameters(std::cbegin(*rowL), std::cend(*rowL),
-				       std::cbegin(*rowR),
-				       std::begin(buffers->Q),
-				       std::begin(buffers->F));
+	    initializeFilterParameters(cbegin(*rowL), cend(*rowL), cbegin(*rowR),
+				       begin(buffers->Q), begin(buffers->F));
 	else
 	{
-	    updateFilterParameters(std::cbegin(*rowL), std::cend(*rowL),
-				   std::cbegin(*rowR),
-				   std::cbegin(*rowLp), std::cbegin(*rowRp),
-				   std::begin(buffers->Q),
-				   std::begin(buffers->F));
+	    updateFilterParameters(cbegin(*rowL), cend(*rowL), cbegin(*rowR),
+				   cbegin(*rowLp), cbegin(*rowRp),
+				   begin(buffers->Q), begin(buffers->F));
 	    ++rowLp;
 	    ++rowRp;
 	}
@@ -329,10 +330,8 @@ GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowR, ROW_D rowD)
 	    start(2);
 	  // さらにコストを横方向に積算してフィルタパラメータを計算し，
 	  // それを用いてフィルタ係数を初期化
-	    initializeFilterCoefficients(std::cbegin(buffers->Q),
-					 std::cend(buffers->Q),
-					 std::cbegin(buffers->F),
-					 std::begin(*rowA));
+	    initializeFilterCoefficients(cbegin(buffers->Q), cend(buffers->Q),
+					 cbegin(buffers->F), begin(*rowA));
 	    ++rowA;
 
 	    if (rowL >= rowL1)		// rowL0からN行分のフィルタ係数が
@@ -347,8 +346,7 @@ GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowR, ROW_D rowD)
 	      // それにguide画像を適用してウィンドウコストを求め，それを
 	      // 用いてそれぞれ左/右/上画像を基準とした最適視差を計算
 	  	buffers->RminR = std::numeric_limits<Score>::max();
-		computeDisparities(std::crbegin(B), std::crend(B),
-				   std::crbegin(*rowG) + N - 1,
+		computeDisparities(crbegin(B), crend(B), crbegin(*rowG) + N - 1,
 				   buffers->dminL.rbegin(),
 				   buffers->delta.rbegin(),
 				   buffers->dminR.end() - D + 1,
@@ -362,7 +360,7 @@ GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowR, ROW_D rowD)
 				  buffers->dminL.cend(),
 				  buffers->dminR.cbegin(),
 				  buffers->delta.cbegin(),
-				  std::begin(*rowD) + N - 1);
+				  begin(*rowD) + N - 1);
 	    }
 	    
 	    ++rowG;	// guide画像と視差画像は左画像よりもN-1行だけ遅れる
@@ -380,6 +378,12 @@ template <class SCORE, class DISP> template <class ROW, class ROW_D> void
 GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 			     ROW rowR, ROW rowV, ROW_D rowD)
 {
+    using	std::cbegin;
+    using	std::cend;
+    using	std::begin;
+    using	std::crbegin;
+    using	std::crend;
+    
     start(0);
     const size_t	H = std::distance(rowL, rowLe),
 			W = (H != 0 ? rowL->size() : 0),
@@ -413,29 +417,27 @@ GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
       // フィルタパラメータ(= 縦横両方向に積算された相違度(コスト)の総和
       // および画素毎のコストとガイド画素の積和)を初期化
 	if (rowL <= rowL0)
-	    initializeFilterParameters(std::cbegin(*rowL), std::cend(*rowL),
+	    initializeFilterParameters(cbegin(*rowL), cend(*rowL),
 				       make_zip_iterator(
 					   std::make_tuple(
-					       std::cbegin(*rowR),
+					       cbegin(*rowR),
 					       make_vertical_iterator(rowV,
 								      cV))),
-				       std::begin(buffers->Q),
-				       std::begin(buffers->F));
+				       begin(buffers->Q), begin(buffers->F));
 	else
 	{
-	    updateFilterParameters(std::cbegin(*rowL), std::cend(*rowL),
+	    updateFilterParameters(cbegin(*rowL), cend(*rowL),
 				   make_zip_iterator(
 				       std::make_tuple(
-					   std::cbegin(*rowR),
+					   cbegin(*rowR),
 					   make_vertical_iterator(rowV, cV))),
-				   std::cbegin(*rowLp),
+				   cbegin(*rowLp),
 				   make_zip_iterator(
 				       std::make_tuple(
-					   std::cbegin(*rowRp),
+					   cbegin(*rowRp),
 					   make_vertical_iterator(rowV,
 								  --cVp))),
-				   std::begin(buffers->Q),
-				   std::begin(buffers->F));
+				   begin(buffers->Q), begin(buffers->F));
 	    ++rowLp;
 	    ++rowRp;
 	}
@@ -445,10 +447,8 @@ GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 	    start(2);
 	  // さらにコストを横方向に積算してフィルタパラメータを計算し，
 	  // それを用いてフィルタ係数を初期化
-	    initializeFilterCoefficients(std::cbegin(buffers->Q),
-					 std::cend(buffers->Q),
-					 std::cbegin(buffers->F),
-					 std::begin(*rowA));
+	    initializeFilterCoefficients(cbegin(buffers->Q), cend(buffers->Q),
+					 cbegin(buffers->F), begin(*rowA));
 	    ++rowA;
 
 	    if (rowL >= rowL1)		// rowL0からN行分のフィルタ係数が
@@ -464,8 +464,7 @@ GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 	      // それにguide画像を適用してウィンドウコストを求め，それを
 	      // 用いてそれぞれ左/右/上画像を基準とした最適視差を計算
 		buffers->RminR = std::numeric_limits<Score>::max();
-		computeDisparities(std::crbegin(B), std::crend(B),
-				   std::crbegin(*rowG) + N - 1,
+		computeDisparities(crbegin(B), crend(B), crbegin(*rowG) + N - 1,
 				   buffers->dminL.rbegin(),
 				   buffers->delta.rbegin(),
 				   make_zip_iterator(
@@ -483,11 +482,10 @@ GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 		start(5);
 	      // 左/右基準視差が一致する場合のみ，それをサブピクセル補間して
 	      // 視差として書き出す
-		selectDisparities(buffers->dminL.cbegin(),
-				  buffers->dminL.cend(),
+		selectDisparities(buffers->dminL.cbegin(), buffers->dminL.cend(),
 				  buffers->dminR.cbegin(),
 				  buffers->delta.cbegin(),
-				  std::begin(*rowD) + N - 1);
+				  begin(*rowD) + N - 1);
 	    }
 
 	    ++rowG;	// guide画像と視差画像は左画像よりもN-1行だけ遅れる
@@ -505,7 +503,7 @@ GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 	{
 	    pruneDisparities(make_vertical_iterator(buffers->dminV.cbegin(), v),
 			     make_vertical_iterator(buffers->dminV.cend(),   v),
-			     std::begin(*rowD) + N - 1);
+			     begin(*rowD) + N - 1);
 	    ++rowD;
 	}
     }
@@ -561,10 +559,10 @@ GFStereo<SCORE, DISP>::initializeFilterParameters(COL colL, COL colLe,
 					ddiff_t(*(colL + 1) - *(colL - 1),
 						_params.derivativeDiffMax))));
 	    for (qiterator Q( make_assignment_iterator(
-				  std::begin(*colQ),
+				  begin(*colQ),
 				  init_params2(pixL, _params.blend))),
 			   Qe(make_assignment_iterator(
-				  std::end(*colQ),
+				  end(*colQ),
 				  init_params2(pixL, _params.blend)));
 		 Q != Qe; ++Q, ++P)
 		*Q += *P;
@@ -589,9 +587,9 @@ GFStereo<SCORE, DISP>::initializeFilterParameters(COL colL, COL colLe,
 	    const diff_t	diff(pixL, _params.intensityDiffMax);
 	    auto		in = make_col_load_iterator(colRV);
 	
-	    for (qiterator Q( make_assignment_iterator(std::begin(*colQ),
+	    for (qiterator Q( make_assignment_iterator(begin(*colQ),
 						       init_params(pixL))),
-			   Qe(make_assignment_iterator(std::end(*colQ),
+			   Qe(make_assignment_iterator(end(*colQ),
 						       init_params(pixL)));
 		 Q != Qe; ++Q, ++in)
 		*Q += diff(*in);
@@ -666,10 +664,10 @@ GFStereo<SCORE, DISP>::updateFilterParameters(COL colL, COL colLe, COL_RV colRV,
 					ddiff_t(*(colLp + 1) - *(colLp - 1),
 						_params.derivativeDiffMax))));
 	    for (qiterator Q( make_assignment_iterator(
-				  std::begin(*colQ),
+				  begin(*colQ),
 				  update_params2(pixL, pixLp, _params.blend))),
 			   Qe(make_assignment_iterator(
-				  std::end(*colQ),
+				  end(*colQ),
 				  update_params2(pixL, pixLp, _params.blend)));
 		 Q != Qe; ++Q, ++P)
 		*Q += *P;
@@ -698,10 +696,10 @@ GFStereo<SCORE, DISP>::updateFilterParameters(COL colL, COL colLe, COL_RV colRV,
 	    auto		in_n = make_col_load_iterator(colRV);
 	
 	    for (qiterator Q( make_assignment_iterator(
-				  std::begin(*colQ),
+				  begin(*colQ),
 				  update_params(pixL, pixLp))),
 			   Qe(make_assignment_iterator(
-				  std::end(*colQ),
+				  end(*colQ),
 				  update_params(pixL, pixLp)));
 		 Q != Qe; ++Q, ++in_p, ++in_n)
 		*Q += std::make_tuple(diff_n(*in_n), diff_p(*in_p));
@@ -731,7 +729,7 @@ GFStereo<SCORE, DISP>::initializeFilterCoefficients(const_col_siterator colQ,
     for (const_col_sbox boxR(colQ, _params.windowSize), boxRe(colQe);
 	 boxR != boxRe; ++boxR)
     {
-	std::transform(std::cbegin(*boxR), std::cend(*boxR), std::begin(*colA),
+	std::transform(cbegin(*boxR), cend(*boxR), begin(*colA),
 		       init_coeffs((*boxG)[0]/n, (*boxG)[1]/n,
 				   _params.epsilon));
 	++boxG;
@@ -748,7 +746,7 @@ GFStereo<SCORE, DISP>::computeDisparities(const_reverse_col_siterator colB,
 					  reverse_col_fiterator delta,
 					  DMIN_RV dminRV, RMIN_RV RminRV) const
 {
-    ScoreVecArray	R(std::size(*colB));
+    ScoreVecArray	R(size(*colB));
     
   // 評価値を横方向に積算し，最小値を与える視差を双方向に探索する．
     for (const_reverse_col_sbox boxC(colB, _params.windowSize), boxCe(colBe);
@@ -780,13 +778,13 @@ GFStereo<SCORE, DISP>::computeDisparities(const_reverse_col_siterator colB,
 	auto			dminRVt = make_col_store_iterator(--dminRV);
 #if defined(SIMD) && defined(WITHOUT_CVTDOWN)
 	miterator	maskRV(make_mask_iterator(R.cbegin(),
-						  std::begin(*RminRV)));
+						  begin(*RminRV)));
 	for (miterator maskRVe(make_mask_iterator(R.cend(),
-						  std::end(*RminRV)));
+						  end(*RminRV)));
 	     maskRV != maskRVe; ++maskRV)
 #else
-	miterator	maskRV(R.cbegin(), std::begin(*RminRV));
-	for (miterator maskRVe(R.cend(),   std::end(*RminRV));
+	miterator	maskRV(R.cbegin(), begin(*RminRV));
+	for (miterator maskRVe(R.cend(),   end(*RminRV));
 	     maskRV != maskRVe; ++maskRV)
 #endif
 	{

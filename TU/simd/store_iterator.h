@@ -122,7 +122,7 @@ class store_iterator
     void		advance(difference_type n)
 			{
 			    super::base_reference()
-				+= difference_type(n * value_type::size);
+				+= n * difference_type(value_type::size);
 			}
     void		increment()
 			{

@@ -10,26 +10,32 @@
 #include <initializer_list>
 #include "TU/algorithm.h"	// for copy<N>(IN, ARG, OUT), etc...
 #include "TU/tuple.h"		// required before defining iterator_t<E>
+#include "TU/iterator.h"
+
+namespace std
+{
+//! 式に適用できる反復子の型を返す
+/*!
+  E, const E&, E&, E&&型の x に std::begin() または x が所属するnamespaceで
+  定義された begin() がADLによって適用できるかチェックし，可能な場合はその型を返す．
+*/
+  template <class E>
+  auto	check_begin(E&& x) -> decltype(begin(x))			;
+  void	check_begin(...)						;
+}
 
 namespace TU
 {
 /************************************************************************
 *  type aliases: iterator_t<E>, value_t<E>, element_t<E>		*
 ************************************************************************/
-namespace detail
-{
-  template <class E>
-  auto	check_begin(E&& x) -> decltype(std::begin(x))			;
-  void	check_begin(...)						;
-}
-
 //! 式が持つ反復子の型を返す
 /*!
   \param E	式の型
   \return	E が反復子を持てばその型，持たなければ void
 */
 template <class E>
-using iterator_t = decltype(detail::check_begin(std::declval<E>()));
+using iterator_t = decltype(std::check_begin(std::declval<E>()));
 
 //! 式が持つ逆反復子の型を返す
 /*!

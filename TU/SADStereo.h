@@ -7,9 +7,7 @@
 #define __TU_SADSTEREO_H
 
 #include "TU/StereoBase.h"
-#include "TU/Array++.h"
 #include "TU/BoxFilter.h"
-#include <boost/tuple/tuple_io.hpp>
 
 namespace TU
 {
@@ -185,6 +183,10 @@ SADStereo<SCORE, DISP>::getOverlap() const
 template <class SCORE, class DISP> template <class ROW, class ROW_D> void
 SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowR, ROW_D rowD)
 {
+    using	std::cbegin;
+    using	std::cend;
+    using	std::begin;
+    
     start(0);
     const size_t	N = _params.windowSize,
 			D = _params.disparitySearchWidth,
@@ -206,14 +208,13 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowR, ROW_D rowD)
 	start(1);
 	if (rowL <= rowL0)
 	{
-	    initializeDissimilarities(std::cbegin(*rowL), std::cend(*rowL),
-				      std::cbegin(*rowR), buffers->Q.begin());
+	    initializeDissimilarities(cbegin(*rowL), cend(*rowL), cbegin(*rowR),
+				      buffers->Q.begin());
 	}
 	else
 	{
-	    updateDissimilarities(std::cbegin(*rowL), std::cend(*rowL),
-				  std::cbegin(*rowR),
-				  std::cbegin(*rowLp), std::cbegin(*rowRp),
+	    updateDissimilarities(cbegin(*rowL), cend(*rowL), cbegin(*rowR),
+				  cbegin(*rowLp), cbegin(*rowRp),
 				  buffers->Q.begin());
 	    ++rowLp;
 	    ++rowRp;
@@ -231,7 +232,7 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowR, ROW_D rowD)
 	    start(3);
 	    selectDisparities(buffers->dminL.cbegin(), buffers->dminL.cend(),
 			      buffers->dminR.cbegin(), buffers->delta.cbegin(),
-			      std::begin(*rowD) + N/2);
+			      begin(*rowD) + N/2);
 	    ++rowD;
 	}
 
@@ -246,6 +247,10 @@ template <class SCORE, class DISP> template <class ROW, class ROW_D> void
 SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 			      ROW rowR, ROW rowV, ROW_D rowD)
 {
+    using	std::cbegin;
+    using	std::cend;
+    using	std::begin;
+    
     start(0);
     const size_t	N = _params.windowSize,
 			D = _params.disparitySearchWidth,
@@ -274,24 +279,24 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 	
 	start(1);
 	if (rowL <= rowL0)
-	    initializeDissimilarities(std::cbegin(*rowL), std::cend(*rowL),
+	    initializeDissimilarities(cbegin(*rowL), cend(*rowL),
 				      make_zip_iterator(
 					  std::make_tuple(
-					      std::cbegin(*rowR),
+					      cbegin(*rowR),
 					      make_vertical_iterator(rowV,
 								     cV))),
 				      buffers->Q.begin());
 	else
 	{
-	    updateDissimilarities(std::cbegin(*rowL), std::cend(*rowL),
+	    updateDissimilarities(cbegin(*rowL), cend(*rowL),
 				  make_zip_iterator(
 				      std::make_tuple(
-					  std::cbegin(*rowR),
+					  cbegin(*rowR),
 					  make_vertical_iterator(rowV, cV))),
-				  std::cbegin(*rowLp),
+				  cbegin(*rowLp),
 				  make_zip_iterator(
 				      std::make_tuple(
-					  std::cbegin(*rowRp),
+					  cbegin(*rowRp),
 					  make_vertical_iterator(rowV, --cVp))),
 				  buffers->Q.begin());
 	    ++rowLp;
@@ -317,7 +322,7 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 	    start(3);
 	    selectDisparities(buffers->dminL.cbegin(), buffers->dminL.cend(),
 			      buffers->dminR.cbegin(), buffers->delta.cbegin(),
-			      std::begin(*rowD) + N/2);
+			      begin(*rowD) + N/2);
 
 	    ++rowD;
 	}
@@ -518,6 +523,8 @@ SADStereo<SCORE, DISP>::computeDisparities(const_reverse_col_siterator colQ,
 					   DMIN_RV dminRV,
 					   RMIN_RV RminRV) const
 {
+    using	std::begin;
+    
   // 評価値を横方向に積算し，最小値を与える視差を双方向に探索する．
     for (const_reverse_col_sbox boxR(colQ, _params.windowSize), boxRe(colQe);
 	 boxR != boxRe; ++boxR)
@@ -544,13 +551,13 @@ SADStereo<SCORE, DISP>::computeDisparities(const_reverse_col_siterator colQ,
 	auto			dminRVt = make_col_store_iterator(--dminRV);
 #if defined(SIMD) && defined(WITHOUT_CVTDOWN)
 	miterator	maskRV(make_mask_iterator(boxR->cbegin(),
-						  std::begin(*RminRV)));
+						  begin(*RminRV)));
 	for (miterator maskRVe(make_mask_iterator(boxR->cend(),
-						  std::begin(*RminRV)));
+						  begin(*RminRV)));
 	     maskRV != maskRVe; ++maskRV)
 #else
-	miterator	maskRV(boxR->cbegin(), std::begin(*RminRV));
-	for (miterator maskRVe(boxR->cend(), std::begin(*RminRV));
+	miterator	maskRV(boxR->cbegin(), begin(*RminRV));
+	for (miterator maskRVe(boxR->cend(),   begin(*RminRV));
 	     maskRV != maskRVe; ++maskRV)
 #endif
 	{
