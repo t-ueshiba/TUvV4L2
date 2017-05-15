@@ -141,7 +141,6 @@ EXTHDRS		= ../../TU/Array++.h \
 		../stereoIIDC/MyOglWindow.h \
 		/usr/local/include/TU/V4L2++.h \
 		/usr/local/include/TU/V4L2CameraArray.h \
-		/usr/local/include/TU/types.h \
 		/usr/local/include/TU/v/App.h \
 		/usr/local/include/TU/v/CanvasPane.h \
 		/usr/local/include/TU/v/CanvasPaneDC.h \
@@ -225,7 +224,7 @@ MyCanvasPane.o: ../stereoGUI/MyCanvasPane.h \
 	../../TU/List.h ../../TU/Geometry++.h ../../TU/Minimize.h \
 	../../TU/Vector++.h ../../TU/Array++.h ../../TU/range.h \
 	../../TU/algorithm.h ../../TU/iterator.h ../../TU/tuple.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/v/Widget-Xaw.h \
+	/usr/local/include/TU/v/Widget-Xaw.h \
 	/usr/local/include/TU/v/CanvasPaneDC.h /usr/local/include/TU/v/XDC.h \
 	/usr/local/include/TU/v/DC.h ../../TU/Image++.h ../../TU/pair.h \
 	../../TU/Manip.h /usr/local/include/TU/v/Colormap.h \
@@ -235,8 +234,7 @@ MyOglCanvasPane.o: ../stereoGUI/MyOglCanvasPane.h \
 	../../TU/List.h ../../TU/Geometry++.h ../../TU/Minimize.h \
 	../../TU/Vector++.h ../../TU/Array++.h ../../TU/range.h \
 	../../TU/algorithm.h ../../TU/iterator.h ../../TU/tuple.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/v/Widget-Xaw.h \
-	/usr/local/include/TU/v/OglDC.h \
+	/usr/local/include/TU/v/Widget-Xaw.h /usr/local/include/TU/v/OglDC.h \
 	/usr/local/include/TU/v/CanvasPaneDC3.h \
 	/usr/local/include/TU/v/CanvasPaneDC.h /usr/local/include/TU/v/XDC.h \
 	/usr/local/include/TU/v/DC.h ../../TU/Image++.h ../../TU/pair.h \
@@ -312,8 +310,7 @@ main.o: ../../TU/SADStereo.h ../../TU/StereoBase.h ../../TU/Image++.h \
 	../../TU/GFStereo.h ../../TU/io.h /usr/local/include/TU/v/vV4L2++.h \
 	/usr/local/include/TU/v/CmdPane.h /usr/local/include/TU/v/CmdWindow.h \
 	/usr/local/include/TU/v/TUv++.h ../../TU/List.h ../../TU/Geometry++.h \
-	../../TU/Minimize.h /usr/local/include/TU/types.h \
-	/usr/local/include/TU/v/Widget-Xaw.h \
+	../../TU/Minimize.h /usr/local/include/TU/v/Widget-Xaw.h \
 	/usr/local/include/TU/v/Colormap.h \
 	/usr/local/include/TU/V4L2CameraArray.h \
 	/usr/local/include/TU/V4L2++.h ../stereoIIDC/MyCmdWindow.h \

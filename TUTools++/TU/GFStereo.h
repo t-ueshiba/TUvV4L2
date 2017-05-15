@@ -752,7 +752,7 @@ GFStereo<SCORE, DISP>::computeDisparities(const_reverse_col_siterator colB,
     for (const_reverse_col_sbox boxC(colB, _params.windowSize), boxCe(colBe);
 	 boxC != boxCe; ++boxC)
     {
-	std::transform(std::cbegin(*boxC), std::cend(*boxC),
+	std::transform(cbegin(*boxC), cend(*boxC),
 		       R.begin(), trans_guides(*colG));
 	++colG;
 
