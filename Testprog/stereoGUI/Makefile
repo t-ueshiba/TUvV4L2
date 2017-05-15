@@ -127,7 +127,6 @@ EXTHDRS		= ../../TU/Array++.h \
 		../../TU/simd/x86/zero.h \
 		../../TU/simd/zero.h \
 		../../TU/tuple.h \
-		/usr/local/include/TU/types.h \
 		/usr/local/include/TU/v/App.h \
 		/usr/local/include/TU/v/CanvasPane.h \
 		/usr/local/include/TU/v/CanvasPaneDC.h \
@@ -217,8 +216,7 @@ MyCanvasPane.o: MyCanvasPane.h /usr/local/include/TU/v/CanvasPane.h \
 	/usr/local/include/TU/v/TUv++.h ../../TU/List.h ../../TU/Geometry++.h \
 	../../TU/Minimize.h ../../TU/Vector++.h ../../TU/Array++.h \
 	../../TU/range.h ../../TU/algorithm.h ../../TU/iterator.h \
-	../../TU/tuple.h /usr/local/include/TU/types.h \
-	/usr/local/include/TU/v/Widget-Xaw.h \
+	../../TU/tuple.h /usr/local/include/TU/v/Widget-Xaw.h \
 	/usr/local/include/TU/v/CanvasPaneDC.h /usr/local/include/TU/v/XDC.h \
 	/usr/local/include/TU/v/DC.h ../../TU/Image++.h ../../TU/pair.h \
 	../../TU/Manip.h /usr/local/include/TU/v/Colormap.h \
@@ -230,7 +228,7 @@ MyCmdWindow.o: /usr/local/include/TU/v/FileSelection.h \
 	../../TU/List.h ../../TU/Geometry++.h ../../TU/Minimize.h \
 	../../TU/Vector++.h ../../TU/Array++.h ../../TU/range.h \
 	../../TU/algorithm.h ../../TU/iterator.h ../../TU/tuple.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/v/Widget-Xaw.h \
+	/usr/local/include/TU/v/Widget-Xaw.h \
 	/usr/local/include/TU/v/Colormap.h ../../TU/Image++.h ../../TU/pair.h \
 	/usr/local/include/TU/v/Notify.h ../../TU/SADStereo.h \
 	../../TU/StereoBase.h ../../TU/simd/simd.h ../../TU/simd/config.h \
@@ -279,8 +277,8 @@ MyOglCanvasPane.o: MyOglCanvasPane.h /usr/local/include/TU/v/CanvasPane.h \
 	/usr/local/include/TU/v/TUv++.h ../../TU/List.h ../../TU/Geometry++.h \
 	../../TU/Minimize.h ../../TU/Vector++.h ../../TU/Array++.h \
 	../../TU/range.h ../../TU/algorithm.h ../../TU/iterator.h \
-	../../TU/tuple.h /usr/local/include/TU/types.h \
-	/usr/local/include/TU/v/Widget-Xaw.h /usr/local/include/TU/v/OglDC.h \
+	../../TU/tuple.h /usr/local/include/TU/v/Widget-Xaw.h \
+	/usr/local/include/TU/v/OglDC.h \
 	/usr/local/include/TU/v/CanvasPaneDC3.h \
 	/usr/local/include/TU/v/CanvasPaneDC.h /usr/local/include/TU/v/XDC.h \
 	/usr/local/include/TU/v/DC.h ../../TU/Image++.h ../../TU/pair.h \
@@ -321,7 +319,7 @@ MyOglCanvasPane.o: MyOglCanvasPane.h /usr/local/include/TU/v/CanvasPane.h \
 createMenuCmds.o: /usr/local/include/TU/v/TUv++.h ../../TU/List.h \
 	../../TU/Geometry++.h ../../TU/Minimize.h ../../TU/Vector++.h \
 	../../TU/Array++.h ../../TU/range.h ../../TU/algorithm.h \
-	../../TU/iterator.h ../../TU/tuple.h /usr/local/include/TU/types.h \
+	../../TU/iterator.h ../../TU/tuple.h \
 	/usr/local/include/TU/v/Widget-Xaw.h stereoGUI.h
 main.o: ../../TU/io.h ../../TU/SADStereo.h ../../TU/StereoBase.h \
 	../../TU/Image++.h ../../TU/pair.h ../../TU/Vector++.h \
@@ -361,7 +359,7 @@ main.o: ../../TU/io.h ../../TU/SADStereo.h ../../TU/StereoBase.h \
 	../../TU/Filter2.h ../../TU/GFStereo.h MyCmdWindow.h \
 	/usr/local/include/TU/v/App.h /usr/local/include/TU/v/TUv++.h \
 	../../TU/List.h ../../TU/Geometry++.h ../../TU/Minimize.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/v/Widget-Xaw.h \
+	/usr/local/include/TU/v/Widget-Xaw.h \
 	/usr/local/include/TU/v/Colormap.h \
 	/usr/local/include/TU/v/CmdWindow.h /usr/local/include/TU/v/CmdPane.h \
 	/usr/local/include/TU/v/Timer.h ../../TU/Rectify.h ../../TU/Warp.h \
