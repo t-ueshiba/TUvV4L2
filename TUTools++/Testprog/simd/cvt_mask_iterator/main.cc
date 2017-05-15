@@ -13,8 +13,6 @@ namespace simd
 template <class SRC, class DST> void
 doJob()
 {
-    using namespace	std;
-    
     typedef SRC							src_type;
     typedef DST							dst_type;
     typedef cvt_mask_iterator<dst_type,
@@ -28,10 +26,10 @@ doJob()
 				 0, f, 0, f, 0, 0, f, f,
 				 0, 0, 0, 0, f, f, f, f};
 
-    cout << hex;
-    copy(siterator(cbegin(src)), siterator(cend(src)),
-	 ostream_iterator<value_type>(cout, " "));
-    cout << endl;
+    std::cout << std::hex;
+    copy(siterator(std::cbegin(src)), siterator(std::cend(src)),
+	 std::ostream_iterator<value_type>(std::cout, " "));
+    std::cout << std::endl;
 
     empty();
 }

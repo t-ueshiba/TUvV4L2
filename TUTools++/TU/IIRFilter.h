@@ -603,9 +603,9 @@ BidirectionalIIRFilter<D, T>::convolve(IN ib, IN ie, OUT out) const
     auto	oute = out;
     std::advance(oute, std::distance(ib, ie));
     
-    _iirB.backward(std::reverse_iterator<IN>(ie),
-		   std::reverse_iterator<IN>(ib),
-		   std::reverse_iterator<OUT>(oute));
+    _iirB.backward(std::make_reverse_iterator(ie),
+		   std::make_reverse_iterator(ib),
+		   std::make_reverse_iterator(oute));
     _iirF.forward(ib, ie, make_assignment_iterator(
 			      out, [](auto&& y, const auto& x){ y += x; }));
 

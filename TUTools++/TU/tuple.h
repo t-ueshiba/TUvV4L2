@@ -7,8 +7,88 @@
 #define __TU_TUPLE_H
 
 #include <tuple>
+#include <type_traits>		// for std::result_of<F(ARGS...)>
+#include <iterator>
 #include <iostream>
-#include "TU/iterator.h"	// for std::rbegin(), std::rend() before C++14
+#include <boost/iterator/iterator_facade.hpp>
+
+namespace std
+{
+#if __cplusplus < 201700L
+/************************************************************************
+*  function std::size(T)						*
+************************************************************************/
+template <class T> inline size_t
+size(const T& x)
+{
+    return x.size();
+}
+template <class T, size_t N> inline constexpr size_t
+size(const T (&array)[N]) noexcept
+{
+    return N;
+}
+#endif
+
+#if __cplusplus < 201402L    
+/************************************************************************
+*  std::[rbegin|rend|cbegin|cend|crbegin|crend](T)			*
+************************************************************************/
+template <class T> inline auto
+rbegin(const T& x) -> decltype(x.rbegin())
+{
+    return x.rbegin();
+}
+    
+template <class T> inline auto
+rbegin(T& x) -> decltype(x.rbegin())
+{
+    return x.rbegin();
+}
+    
+template <class T> inline auto
+rend(const T& x) -> decltype(x.rend())
+{
+    return x.rend();
+}
+    
+template <class T> inline auto
+rend(T& x) -> decltype(x.rend())
+{
+    return x.rend();
+}
+    
+template <class T> inline auto
+cbegin(const T& x) -> decltype(std::begin(x))
+{
+    return std::begin(x);
+}
+    
+template <class T> inline auto
+cend(const T& x) -> decltype(std::end(x))
+{
+    return std::end(x);
+}
+
+template <class T> inline auto
+crbegin(const T& x) -> decltype(std::rbegin(x))
+{
+    return std::rbegin(x);
+}
+    
+template <class T> inline auto
+crend(const T& x) -> decltype(std::rend(x))
+{
+    return std::rend(x);
+}
+
+template <class ITER> inline auto
+make_reverse_iterator(ITER iter)
+{
+    return reverse_iterator<ITER>(iter);
+}
+#endif
+}	// namespace std
 
 namespace TU
 {
@@ -315,7 +395,331 @@ make_unarizer(FUNC func)
 }
     
 /************************************************************************
-*  class zip_iterator<ITER_TUPLE, DIFF>					*
+*  TU::[begin|end|rbegin|rend](std::tuple<T...>)			*
+************************************************************************/
+template <class ITER_TUPLE>
+class zip_iterator							;
+
+template <class ITER_TUPLE> inline zip_iterator<ITER_TUPLE>
+make_zip_iterator(ITER_TUPLE iter_tuple)				;
+
+/*
+ *  icpc-17.0.2 のバグ回避のため，lambda関数ではなくgenericな関数オブジェクトを
+ *  用いて実装
+ */ 
+namespace detail
+{
+  struct generic_begin
+  {
+      template <class T_>
+      auto	operator ()(T_&& x) const
+		{
+		    using std::begin;	// ADLが働かない時は std::begin を使用
+		    return begin(x);
+		}
+  };
+  struct generic_end
+  {
+      template <class T_>
+      auto	operator ()(T_&& x) const
+		{
+		    using std::end;	// ADLが働かない時は std::end を使用
+		    return end(x);
+		}
+  };
+}	// namespace detail
+    
+template <class TUPLE,
+	  std::enable_if_t<all_has_begin<TUPLE>::value>* = nullptr> inline auto
+begin(TUPLE&& t)
+{
+    return make_zip_iterator(tuple_transform(detail::generic_begin(), t));
+}
+
+template <class TUPLE,
+	  std::enable_if_t<all_has_begin<TUPLE>::value>* = nullptr> inline auto
+end(TUPLE&& t)
+{
+    return make_zip_iterator(tuple_transform(detail::generic_end(), t));
+}
+
+template <class TUPLE,
+	  std::enable_if_t<all_has_begin<TUPLE>::value>* = nullptr> inline auto
+rbegin(TUPLE&& t)
+{
+    return std::make_reverse_iterator(end(t));
+}
+
+template <class TUPLE,
+	  std::enable_if_t<all_has_begin<TUPLE>::value>* = nullptr> inline auto
+rend(TUPLE&& t)
+{
+    return std::make_reverse_iterator(begin(t));
+}
+
+template <class... T> inline auto
+cbegin(const std::tuple<T...>& t)
+{
+    return begin(t);
+}
+
+template <class... T> inline auto
+cend(const std::tuple<T...>& t)
+{
+    return end(t);
+}
+
+template <class... T> inline auto
+crbegin(const std::tuple<T...>& t)
+{
+    return rbegin(t);
+}
+
+template <class... T> inline auto
+crend(const std::tuple<T...>& t)
+{
+    return rend(t);
+}
+
+template <class... T> inline auto
+size(const std::tuple<T...>& t)
+{
+    using std::size;
+    return size(std::get<0>(t));
+}
+
+/************************************************************************
+*  Arithmetic operators							*
+************************************************************************/
+template <class... T> inline auto
+operator -(const std::tuple<T...>& t)
+{
+    return tuple_transform([](const auto& x){ return -x; }, t);
+}
+
+template <class L, class R,
+	  std::enable_if_t<any_tuple<L, R>::value>* = nullptr> inline auto
+operator +(const L& l, const R& r)
+{
+    return tuple_transform([](const auto& x, const auto& y)
+			   { return x + y; }, l, r);
+}
+
+template <class L, class R,
+	  std::enable_if_t<any_tuple<L, R>::value>* = nullptr> inline auto
+operator -(const L& l, const R& r)
+{
+    return tuple_transform([](const auto& x, const auto& y)
+			   { return x - y; }, l, r);
+}
+
+template <class L, class R,
+	  std::enable_if_t<any_tuple<L, R>::value>* = nullptr> inline auto
+operator *(const L& l, const R& r)
+{
+    return tuple_transform([](const auto& x, const auto& y)
+			   { return x * y; }, l, r);
+}
+
+template <class L, class R,
+	  std::enable_if_t<any_tuple<L, R>::value>* = nullptr> inline auto
+operator /(const L& l, const R& r)
+{
+    return tuple_transform([](const auto& x, const auto& y)
+			   { return x / y; }, l, r);
+}
+
+template <class L, class R,
+	  std::enable_if_t<any_tuple<L, R>::value>* = nullptr> inline auto
+operator %(const L& l, const R& r)
+{
+    return tuple_transform([](const auto& x, const auto& y)
+			   { return x % y; }, l, r);
+}
+
+template <class L, class R> inline std::enable_if_t<is_tuple<L>::value, L&>
+operator +=(L&& l, const R& r)
+{
+    tuple_for_each([](auto&& x, const auto& y){ x += y; }, l, r);
+    return l;
+}
+
+template <class L, class R> inline std::enable_if_t<is_tuple<L>::value, L&>
+operator -=(L&& l, const R& r)
+{
+    tuple_for_each([](auto&& x, const auto& y){ x -= y; }, l, r);
+    return l;
+}
+
+template <class L, class R> inline std::enable_if_t<is_tuple<L>::value, L&>
+operator *=(L&& l, const R& r)
+{
+    tuple_for_each([](auto&& x, const auto& y){ x *= y; }, l, r);
+    return l;
+}
+
+template <class L, class R> inline std::enable_if_t<is_tuple<L>::value, L&>
+operator /=(L&& l, const R& r)
+{
+    tuple_for_each([](auto&& x, const auto& y){ x /= y; }, l, r);
+    return l;
+}
+
+template <class L, class R> inline std::enable_if_t<is_tuple<L>::value, L&>
+operator %=(L&& l, const R& r)
+{
+    tuple_for_each([](auto&& x, const auto& y){ x %= y; }, l, r);
+    return l;
+}
+
+template <class T> inline std::enable_if_t<is_tuple<T>::value, T&>
+operator ++(T&& t)
+{
+    tuple_for_each([](auto&& x){ ++x; }, t);
+    return t;
+}
+
+template <class T> inline std::enable_if_t<is_tuple<T>::value, T&>
+operator --(T&& t)
+{
+    tuple_for_each([](auto&& x){ --x; }, t);
+    return t;
+}
+
+template <class L, class C, class R,
+	  std::enable_if_t<any_tuple<L, C, R>::value>* = nullptr> inline auto
+fma(const L& l, const C& c, const R& r)
+{
+    return tuple_transform([](const auto& x, const auto& y, const auto& z)
+			   { return fma(x, y, z); }, l, c, r);
+}
+
+/************************************************************************
+*  Bit operators							*
+************************************************************************/
+template <class L, class R,
+	  std::enable_if_t<any_tuple<L, R>::value>* = nullptr> inline auto
+operator &(const L& l, const R& r)
+{
+    return tuple_transform([](const auto& x, const auto& y)
+			   { return x & y; }, l, r);
+}
+    
+template <class L, class R,
+	  std::enable_if_t<any_tuple<L, R>::value>* = nullptr> inline auto
+operator |(const L& l, const R& r)
+{
+    return tuple_transform([](const auto& x, const auto& y)
+			   { return x | y; }, l, r);
+}
+    
+template <class L, class R,
+	  std::enable_if_t<any_tuple<L, R>::value>* = nullptr> inline auto
+operator ^(const L& l, const R& r)
+{
+    return tuple_transform([](const auto& x, const auto& y)
+			   { return x ^ y; }, l, r);
+}
+    
+template <class L, class R> inline std::enable_if_t<is_tuple<L>::value, L&>
+operator &=(L&& l, const R& r)
+{
+    tuple_for_each([](auto& x, const auto& y){ x &= y; }, l, r);
+    return l;
+}
+
+template <class L, class R> inline std::enable_if_t<is_tuple<L>::value, L&>
+operator |=(L&& l, const R& r)
+{
+    tuple_for_each([](auto& x, const auto& y){ x |= y; }, l, r);
+    return l;
+}
+
+template <class L, class R> inline std::enable_if_t<is_tuple<L>::value, L&>
+operator ^=(L&& l, const R& r)
+{
+    tuple_for_each([](auto& x, const auto& y){ x ^= y; }, l, r);
+    return l;
+}
+
+/************************************************************************
+*  Logical operators							*
+************************************************************************/
+template <class... T> inline auto
+operator !(const std::tuple<T...>& t)
+{
+    return tuple_transform([](const auto& x){ return !x; }, t);
+}
+    
+template <class L, class R,
+	  std::enable_if_t<any_tuple<L, R>::value>* = nullptr> inline auto
+operator &&(const L& l, const R& r)
+{
+    return tuple_transform([](const auto& x, const auto& y)
+			   { return x && y; }, l, r);
+}
+    
+template <class L, class R,
+	  std::enable_if_t<any_tuple<L, R>::value>* = nullptr> inline auto
+operator ||(const L& l, const R& r)
+{
+    return tuple_transform([](const auto& x, const auto& y)
+			   { return x || y; }, l, r);
+}
+    
+/************************************************************************
+*  Relational operators							*
+************************************************************************/
+template <class L, class R,
+	  std::enable_if_t<any_tuple<L, R>::value>* = nullptr> inline auto
+operator ==(const L& l, const R& r)
+{
+    return tuple_transform([](const auto& x, const auto& y)
+			   { return x == y; }, l, r);
+}
+    
+template <class L, class R,
+	  std::enable_if_t<any_tuple<L, R>::value>* = nullptr> inline auto
+operator !=(const L& l, const R& r)
+{
+    return tuple_transform([](const auto& x, const auto& y)
+			   { return x != y; }, l, r);
+}
+    
+template <class L, class R,
+	  std::enable_if_t<any_tuple<L, R>::value>* = nullptr> inline auto
+operator <(const L& l, const R& r)
+{
+    return tuple_transform([](const auto& x, const auto& y)
+			   { return x < y; }, l, r);
+}
+    
+template <class L, class R,
+	  std::enable_if_t<any_tuple<L, R>::value>* = nullptr> inline auto
+operator >(const L& l, const R& r)
+{
+    return tuple_transform([](const auto& x, const auto& y)
+			   { return x > y; }, l, r);
+}
+    
+template <class L, class R,
+	  std::enable_if_t<any_tuple<L, R>::value>* = nullptr> inline auto
+operator <=(const L& l, const R& r)
+{
+    return tuple_transform([](const auto& x, const auto& y)
+			   { return x <= y; }, l, r);
+}
+    
+template <class L, class R,
+	  std::enable_if_t<any_tuple<L, R>::value>* = nullptr> inline auto
+operator >=(const L& l, const R& r)
+{
+    return tuple_transform([](const auto& x, const auto& y)
+			   { return x >= y; }, l, r);
+}
+
+/************************************************************************
+*  class zip_iterator<ITER_TUPLE>					*
 ************************************************************************/
 namespace detail
 {
@@ -326,12 +730,13 @@ namespace detail
   };
 }	// namespace detail
     
-template <class ITER_TUPLE, class DIFF=ptrdiff_t>
+template <class ITER_TUPLE>
 class zip_iterator : public boost::iterator_facade<
 			zip_iterator<ITER_TUPLE>,
 			decltype(tuple_transform(detail::generic_dereference(),
 						 std::declval<ITER_TUPLE>())),
-			iterator_category<tuple_head<ITER_TUPLE> >,
+			typename std::iterator_traits<tuple_head<ITER_TUPLE> >
+				    ::iterator_category,
 			decltype(tuple_transform(detail::generic_dereference(),
 						 std::declval<ITER_TUPLE>()))>
 {
@@ -340,7 +745,8 @@ class zip_iterator : public boost::iterator_facade<
 			zip_iterator,
 			decltype(tuple_transform(detail::generic_dereference(),
 						 std::declval<ITER_TUPLE>())),
-			iterator_category<tuple_head<ITER_TUPLE> >,
+			typename std::iterator_traits<tuple_head<ITER_TUPLE> >
+				    ::iterator_category,
 			decltype(tuple_transform(detail::generic_dereference(),
 						 std::declval<ITER_TUPLE>()))>;
     friend	class boost::iterator_core_access;
@@ -402,11 +808,7 @@ class zip_iterator : public boost::iterator_facade<
     ITER_TUPLE	_iter_tuple;
 };
 
-template <class DIFF=ptrdiff_t, class ITER_TUPLE>
-inline zip_iterator<ITER_TUPLE,
-		    std::conditional_t<std::is_void<DIFF>::value,
-				       replace_element<ITER_TUPLE, ptrdiff_t>,
-				       DIFF> >
+template <class ITER_TUPLE> inline zip_iterator<ITER_TUPLE>
 make_zip_iterator(ITER_TUPLE iter_tuple)
 {
     return {iter_tuple};
@@ -420,7 +822,7 @@ namespace detail
   template <class ITER>
   struct decayed_iterator_value
   {
-      using type = iterator_value<ITER>;
+      using type = typename std::iterator_traits<ITER>::value_type;
   };
   template <class... ITER>
   struct decayed_iterator_value<zip_iterator<std::tuple<ITER...> > >
@@ -439,329 +841,11 @@ namespace detail
 template <class ITER>
 using decayed_iterator_value = typename detail::decayed_iterator_value<ITER>
 					      ::type;
+
 }	// namespace TU
 
-/*
- *  argument dependent lookup が働くために，std::tuple<...>を引数とする
- *  operator overloadされた関数は namespace std 中に定義しなければならない．
- */
 namespace std
 {
-/************************************************************************
-*  std::[begin|end|rbegin|rend](std::tuple<T...>)			*
-************************************************************************/
-/*
- *  icpc-17.0.2 のバグ回避のため，lambda関数ではなくgenericな関数オブジェクトを
- *  用いて実装
- */ 
-namespace detail
-{
-  struct generic_begin
-  {
-      template <class T_>
-      auto	operator ()(T_&& x)	const	{ return std::begin(x); }
-  };
-  struct generic_end
-  {
-      template <class T_>
-      auto	operator ()(T_&& x)	const	{ return std::end(x); }
-  };
-}	// namespace detail
-    
-template <class TUPLE,
-	  enable_if_t<TU::all_has_begin<TUPLE>::value>* = nullptr> inline auto
-begin(TUPLE&& t)
-{
-    return TU::make_zip_iterator(TU::tuple_transform(detail::generic_begin(),
-						     t));
-  //return TU::make_zip_iterator(TU::tuple_transform(
-  //				     t, [](auto&& x){ return begin(x); }));
-}
-
-template <class TUPLE,
-	  enable_if_t<TU::all_has_begin<TUPLE>::value>* = nullptr> inline auto
-end(TUPLE&& t)
-{
-    return TU::make_zip_iterator(TU::tuple_transform(detail::generic_end(),
-						     t));
-  //return TU::make_zip_iterator(TU::tuple_transform(
-  //				     t, [](auto&& x){ return end(x); }));
-}
-
-template <class TUPLE,
-	  enable_if_t<TU::all_has_begin<TUPLE>::value>* = nullptr> inline auto
-rbegin(TUPLE&& t)
-{
-    return make_reverse_iterator(end(t));
-}
-
-template <class TUPLE,
-	  enable_if_t<TU::all_has_begin<TUPLE>::value>* = nullptr> inline auto
-rend(TUPLE&& t)
-{
-    return make_reverse_iterator(begin(t));
-}
-
-template <class... T> inline auto
-cbegin(const std::tuple<T...>& t)
-{
-    return begin(t);
-}
-
-template <class... T> inline auto
-cend(const std::tuple<T...>& t)
-{
-    return end(t);
-}
-
-template <class... T> inline auto
-crbegin(const std::tuple<T...>& t)
-{
-    return rbegin(t);
-}
-
-template <class... T> inline auto
-crend(const std::tuple<T...>& t)
-{
-    return rend(t);
-}
-
-template <class... T> inline size_t
-size(const tuple<T...>& t)
-{
-    return size(get<0>(t));
-}
-    
-/************************************************************************
-*  Arithmetic operators							*
-************************************************************************/
-template <class... T> inline auto
-operator -(const tuple<T...>& t)
-{
-    return TU::tuple_transform([](const auto& x){ return -x; }, t);
-}
-
-template <class L, class R,
-	  enable_if_t<TU::any_tuple<L, R>::value>* = nullptr> inline auto
-operator +(const L& l, const R& r)
-{
-    return TU::tuple_transform([](const auto& x, const auto& y)
-			       { return x + y; }, l, r);
-}
-
-template <class L, class R,
-	  enable_if_t<TU::any_tuple<L, R>::value>* = nullptr> inline auto
-operator -(const L& l, const R& r)
-{
-    return TU::tuple_transform([](const auto& x, const auto& y)
-			       { return x - y; }, l, r);
-}
-
-template <class L, class R,
-	  enable_if_t<TU::any_tuple<L, R>::value>* = nullptr> inline auto
-operator *(const L& l, const R& r)
-{
-    return TU::tuple_transform([](const auto& x, const auto& y)
-			       { return x * y; }, l, r);
-}
-
-template <class L, class R,
-	  enable_if_t<TU::any_tuple<L, R>::value>* = nullptr> inline auto
-operator /(const L& l, const R& r)
-{
-    return TU::tuple_transform([](const auto& x, const auto& y)
-			       { return x / y; }, l, r);
-}
-
-template <class L, class R,
-	  enable_if_t<TU::any_tuple<L, R>::value>* = nullptr> inline auto
-operator %(const L& l, const R& r)
-{
-    return TU::tuple_transform([](const auto& x, const auto& y)
-			       { return x % y; }, l, r);
-}
-
-template <class L, class R> inline enable_if_t<TU::is_tuple<L>::value, L&>
-operator +=(L&& l, const R& r)
-{
-    TU::tuple_for_each([](auto&& x, const auto& y){ x += y; }, l, r);
-    return l;
-}
-
-template <class L, class R> inline enable_if_t<TU::is_tuple<L>::value, L&>
-operator -=(L&& l, const R& r)
-{
-    TU::tuple_for_each([](auto&& x, const auto& y){ x -= y; }, l, r);
-    return l;
-}
-
-template <class L, class R> inline enable_if_t<TU::is_tuple<L>::value, L&>
-operator *=(L&& l, const R& r)
-{
-    TU::tuple_for_each([](auto&& x, const auto& y){ x *= y; }, l, r);
-    return l;
-}
-
-template <class L, class R> inline enable_if_t<TU::is_tuple<L>::value, L&>
-operator /=(L&& l, const R& r)
-{
-    TU::tuple_for_each([](auto&& x, const auto& y){ x /= y; }, l, r);
-    return l;
-}
-
-template <class L, class R> inline enable_if_t<TU::is_tuple<L>::value, L&>
-operator %=(L&& l, const R& r)
-{
-    TU::tuple_for_each([](auto&& x, const auto& y){ x %= y; }, l, r);
-    return l;
-}
-
-template <class T> inline enable_if_t<TU::is_tuple<T>::value, T&>
-operator ++(T&& t)
-{
-    TU::tuple_for_each([](auto&& x){ ++x; }, t);
-    return t;
-}
-
-template <class T> inline enable_if_t<TU::is_tuple<T>::value, T&>
-operator --(T&& t)
-{
-    TU::tuple_for_each([](auto&& x){ --x; }, t);
-    return t;
-}
-
-template <class L, class C, class R,
-	  enable_if_t<TU::any_tuple<L, C, R>::value>* = nullptr> inline auto
-fma(const L& l, const C& c, const R& r)
-{
-    return TU::tuple_transform([](const auto& x, const auto& y, const auto& z)
-			       { return fma(x, y, z); }, l, c, r);
-}
-
-/************************************************************************
-*  Bit operators							*
-************************************************************************/
-template <class L, class R,
-	  enable_if_t<TU::any_tuple<L, R>::value>* = nullptr> inline auto
-operator &(const L& l, const R& r)
-{
-    return TU::tuple_transform([](const auto& x, const auto& y)
-			       { return x & y; }, l, r);
-}
-    
-template <class L, class R,
-	  enable_if_t<TU::any_tuple<L, R>::value>* = nullptr> inline auto
-operator |(const L& l, const R& r)
-{
-    return TU::tuple_transform([](const auto& x, const auto& y)
-			       { return x | y; }, l, r);
-}
-    
-template <class L, class R,
-	  enable_if_t<TU::any_tuple<L, R>::value>* = nullptr> inline auto
-operator ^(const L& l, const R& r)
-{
-    return TU::tuple_transform([](const auto& x, const auto& y)
-			       { return x ^ y; }, l, r);
-}
-    
-template <class L, class R> inline enable_if_t<TU::is_tuple<L>::value, L&>
-operator &=(L&& l, const R& r)
-{
-    TU::tuple_for_each([](auto& x, const auto& y){ x &= y; }, l, r);
-    return l;
-}
-
-template <class L, class R> inline enable_if_t<TU::is_tuple<L>::value, L&>
-operator |=(L&& l, const R& r)
-{
-    TU::tuple_for_each([](auto& x, const auto& y){ x |= y; }, l, r);
-    return l;
-}
-
-template <class L, class R> inline enable_if_t<TU::is_tuple<L>::value, L&>
-operator ^=(L&& l, const R& r)
-{
-    TU::tuple_for_each([](auto& x, const auto& y){ x ^= y; }, l, r);
-    return l;
-}
-
-/************************************************************************
-*  Logical operators							*
-************************************************************************/
-template <class... T> inline auto
-operator !(const tuple<T...>& t)
-{
-    return TU::tuple_transform([](const auto& x){ return !x; }, t);
-}
-    
-template <class L, class R,
-	  enable_if_t<TU::any_tuple<L, R>::value>* = nullptr> inline auto
-operator &&(const L& l, const R& r)
-{
-    return TU::tuple_transform([](const auto& x, const auto& y)
-			       { return x && y; }, l, r);
-}
-    
-template <class L, class R,
-	  enable_if_t<TU::any_tuple<L, R>::value>* = nullptr> inline auto
-operator ||(const L& l, const R& r)
-{
-    return TU::tuple_transform([](const auto& x, const auto& y)
-			       { return x || y; }, l, r);
-}
-    
-/************************************************************************
-*  Relational operators							*
-************************************************************************/
-template <class L, class R,
-	  enable_if_t<TU::any_tuple<L, R>::value>* = nullptr> inline auto
-operator ==(const L& l, const R& r)
-{
-    return TU::tuple_transform([](const auto& x, const auto& y)
-			       { return x == y; }, l, r);
-}
-    
-template <class L, class R,
-	  enable_if_t<TU::any_tuple<L, R>::value>* = nullptr> inline auto
-operator !=(const L& l, const R& r)
-{
-    return TU::tuple_transform([](const auto& x, const auto& y)
-			       { return x != y; }, l, r);
-}
-    
-template <class L, class R,
-	  enable_if_t<TU::any_tuple<L, R>::value>* = nullptr> inline auto
-operator <(const L& l, const R& r)
-{
-    return TU::tuple_transform([](const auto& x, const auto& y)
-			       { return x < y; }, l, r);
-}
-    
-template <class L, class R,
-	  enable_if_t<TU::any_tuple<L, R>::value>* = nullptr> inline auto
-operator >(const L& l, const R& r)
-{
-    return TU::tuple_transform([](const auto& x, const auto& y)
-			       { return x > y; }, l, r);
-}
-    
-template <class L, class R,
-	  enable_if_t<TU::any_tuple<L, R>::value>* = nullptr> inline auto
-operator <=(const L& l, const R& r)
-{
-    return TU::tuple_transform([](const auto& x, const auto& y)
-			       { return x <= y; }, l, r);
-}
-    
-template <class L, class R,
-	  enable_if_t<TU::any_tuple<L, R>::value>* = nullptr> inline auto
-operator >=(const L& l, const R& r)
-{
-    return TU::tuple_transform([](const auto& x, const auto& y)
-			       { return x >= y; }, l, r);
-}
-
 /************************************************************************
 *  I/O functions							*
 ************************************************************************/

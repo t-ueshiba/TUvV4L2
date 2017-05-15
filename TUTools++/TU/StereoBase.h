@@ -6,19 +6,17 @@
 #ifndef __TU_STEREOBASE_H
 #define __TU_STEREOBASE_H
 
-#include "TU/Image++.h"		// Use RGBA
-#include "TU/algorithm.h"	// Use std::min(), std::max() and TU::diff().
-#include "TU/tuple.h"
-#include "TU/simd/simd.h"
 #include <limits>		// Use std::numeric_limits<T>.
 #include <stack>
 #include <tbb/blocked_range.h>
-
 #if defined(USE_TBB)
 #  include <tbb/parallel_for.h>
 #  include <tbb/spin_mutex.h>
 #  include <tbb/scalable_allocator.h>
 #endif
+
+#include "TU/Image++.h"		// Use RGBA
+#include "TU/simd/simd.h"
 #include "TU/Profiler.h"
 
 #if defined(PROFILE) && !defined(USE_TBB)
@@ -469,6 +467,10 @@ namespace simd
 		       replace_element<mask_vec, vec<T_> > >
 		cvtdown()
 		{
+		  // _RminRV が zip_iterator の時，std::tuple に対する
+		  // TU::operator <(const L&, const R&) を呼ぶために必要
+		    using	TU::operator <;
+					      
 		    const auto	R = *super::base();
 		    ++super::base_reference();
 
@@ -476,7 +478,7 @@ namespace simd
 		    _RminL = min(R, _RminL);
 		    ++_index;
 
-		    constexpr size_t	N = vec<score_element>::size;
+		    constexpr auto	N = vec<score_element>::size;
 		    const score_vec	RminRV = *_RminRV;
 		    const auto		minval = min(R, RminRV);
 		    *_RminRV = shift_r<N-1>(_nextRV, minval);

@@ -13,8 +13,6 @@ namespace simd
 template <class SRC, class DST> void
 doJob()
 {
-    using namespace	std;
-    
     using src_type	= SRC;
     using dst_type	= DST;
     using siterator	= cvt_iterator<dst_type,
@@ -26,9 +24,9 @@ doJob()
 			 16, 17, 18, 19, 20, 21, 22, 23,
 			 24, 25, 26, 27, 28, 29, 30, 31};
 
-    copy(siterator(cbegin(src)), siterator(cend(src)),
-	 ostream_iterator<value_type>(cout, " "));
-    cout << endl;
+    std::copy(siterator(std::cbegin(src)), siterator(std::cend(src)),
+	      std::ostream_iterator<value_type>(std::cout, " "));
+    std::cout << std::endl;
   /*
     cout << typeid(typename siterator::upmost_type).name()	   << ", "
 	 << typeid(typename siterator::complementary_type).name()  << ", "

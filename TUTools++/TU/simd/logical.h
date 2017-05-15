@@ -26,11 +26,11 @@ vec<T>::andnot(vec<T> x)	{ return *this = simd::andnot(x, *this); }
 /************************************************************************
 *  Logical operators for vec tuples					*
 ************************************************************************/
-template <class... L, class... R> inline auto
-andnot(const std::tuple<L...>& l, const std::tuple<R...>& r)
+template <class L, class R,
+	  std::enable_if_t<any_tuple<L, R>::value>* = nullptr> inline auto
+andnot(const L& l, const R& r)
 {
-    return tuple_transform([](const auto& x, const auto& y)
-			   { return andnot(x, y); }, l, r);
+    return tuple_transform([](auto x, auto y){ return andnot(x, y); }, l, r);
 }
 
 }	// namespace simd

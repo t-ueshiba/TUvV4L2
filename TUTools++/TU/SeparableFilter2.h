@@ -34,12 +34,15 @@ class SeparableFilter2
 
 	void	operator ()(const tbb::blocked_range<size_t>& r) const
 		{
+		    using	std::begin;
+		    using	std::end;
+		    
 		    auto	in = _in;
 		    std::advance(in, r.begin());
 		    auto	ie = _in;
 		    std::advance(ie, r.end());
 		    for (auto col = r.begin(); in != ie; ++in, ++col)
-			_filter.convolve(std::begin(*in), std::end(*in),
+			_filter.convolve(begin(*in), end(*in),
 					 make_vertical_iterator(_out, col));
 		}
 
@@ -58,14 +61,17 @@ class SeparableFilter2
 
 	void	operator ()(const tbb::blocked_range<size_t>& r) const
 		{
+		    using	std::begin;
+		    using	std::end;
+		    
 		    _filterV.convolve(make_range_iterator(
-					  std::begin(*_ib) + r.begin(),
+					  begin(*_ib) + r.begin(),
 					  stride(_ib), r.size()),
 				      make_range_iterator(
-					  std::begin(*_ie) + r.begin(),
+					  begin(*_ie) + r.begin(),
 					  stride(_ie), r.size()),
 				      make_range_iterator(
-					  std::begin(*_out) + r.begin(),
+					  begin(*_out) + r.begin(),
 					  stride(_out), r.size()));
 		}
 
@@ -85,6 +91,9 @@ class SeparableFilter2
 
 	void	operator ()(const tbb::blocked_range<size_t>& r) const
 		{
+		    using	std::begin;
+		    using	std::end;
+		    
 		    auto	in = _in;
 		    std::advance(in, r.begin());
 		    auto	ie = _in;
@@ -92,8 +101,7 @@ class SeparableFilter2
 		    auto	out = _out;
 		    std::advance(out, r.begin());
 		    for (; in != ie; ++in, ++out)
-			_filterH.convolve(std::begin(*in), std::end(*in),
-					  std::begin(*out));
+			_filterH.convolve(begin(*in), end(*in), begin(*out));
 		}
 
       private:
@@ -134,13 +142,16 @@ class SeparableFilter2
 template <class F> template <class IN_, class OUT_> void
 SeparableFilter2<F>::convolve(IN_ ib, IN_ ie, OUT_ out) const
 {
+    using std::begin;
+    using std::end;
+    using std::size;
     using buf_type	= Array2<typename filter_type::element_type>;
     
     if (ib == ie)
 	return;
 
 #if defined(CACHE_FRIENDLY)
-    buf_type	buf(_filterV.outLength(std::distance(ib, ie)), std::size(*ib));
+    buf_type	buf(_filterV.outLength(std::distance(ib, ie)), size(*ib));
 
 #  if defined(USE_TBB)
     using convolveV	= ConvolveV<IN_, typename buf_type::iterator>;
@@ -154,12 +165,12 @@ SeparableFilter2<F>::convolve(IN_ ib, IN_ ie, OUT_ out) const
     _filterV.convolve(ib, ie, buf.begin());
     for (const auto& row : buf)
     {
-	_filterH.convolve(row.begin(), row.end(), std::begin(*out));
+	_filterH.convolve(row.begin(), row.end(), begin(*out));
 	++out;
     }
 #  endif
 #else
-    buf_type	buf(_filterH.outLength(std::size(*ib)), std::distance(ib, ie));
+    buf_type	buf(_filterH.outLength(size(*ib)), std::distance(ib, ie));
 
 #  if defined(USE_TBB)
     using convolveH	= ConvolveRows<IN_, typename buf_type::iterator>;
@@ -172,7 +183,7 @@ SeparableFilter2<F>::convolve(IN_ ib, IN_ ie, OUT_ out) const
 #  else
     size_t	col = 0;
     for (; ib != ie; ++ib)
-	_filterH.convolve(std::begin(*ib), std::end(*ib),
+	_filterH.convolve(begin(*ib), end(*ib),
 			  make_vertical_iterator(buf.begin(), col++));
     col = 0;
     for (const auto& row : buf)
