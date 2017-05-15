@@ -48,8 +48,7 @@ EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/iterator.h \
 		/usr/local/include/TU/pair.h \
 		/usr/local/include/TU/range.h \
-		/usr/local/include/TU/tuple.h \
-		/usr/local/include/TU/types.h
+		/usr/local/include/TU/tuple.h
 HDRS		= FireWireNode_.h \
 		TU/IIDC++.h \
 		TU/IIDCCameraArray.h \
@@ -76,30 +75,28 @@ include $(PROJECT)/lib/common.mk
 include $(PROJECT)/lib/other.mk
 ###
 FireWireNode.o: FireWireNode_.h TU/IIDC++.h \
-	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
+	/usr/local/include/TU/Image++.h /usr/local/include/TU/pair.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/range.h /usr/local/include/TU/algorithm.h \
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h
+IIDCCamera.o: FireWireNode_.h TU/IIDC++.h /usr/local/include/TU/Image++.h \
+	/usr/local/include/TU/pair.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/range.h \
+	/usr/local/include/TU/algorithm.h /usr/local/include/TU/iterator.h \
+	/usr/local/include/TU/tuple.h USBNode_.h
+IIDCCameraArray.o: TU/IIDCCameraArray.h TU/IIDC++.h \
+	/usr/local/include/TU/Image++.h /usr/local/include/TU/pair.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/range.h /usr/local/include/TU/algorithm.h \
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
+	/usr/local/include/TU/io.h
+IIDCNode.o: TU/IIDC++.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/pair.h /usr/local/include/TU/Vector++.h \
 	/usr/local/include/TU/Array++.h /usr/local/include/TU/range.h \
 	/usr/local/include/TU/algorithm.h /usr/local/include/TU/iterator.h \
 	/usr/local/include/TU/tuple.h
-IIDCCamera.o: FireWireNode_.h TU/IIDC++.h /usr/local/include/TU/Image++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/pair.h \
-	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/range.h /usr/local/include/TU/algorithm.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
-	USBNode_.h
-IIDCCameraArray.o: TU/IIDCCameraArray.h TU/IIDC++.h \
-	/usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
+USBNode.o: USBNode_.h TU/IIDC++.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/pair.h /usr/local/include/TU/Vector++.h \
 	/usr/local/include/TU/Array++.h /usr/local/include/TU/range.h \
 	/usr/local/include/TU/algorithm.h /usr/local/include/TU/iterator.h \
-	/usr/local/include/TU/tuple.h /usr/local/include/TU/io.h
-IIDCNode.o: TU/IIDC++.h /usr/local/include/TU/Image++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/pair.h \
-	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/range.h /usr/local/include/TU/algorithm.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h
-USBNode.o: USBNode_.h TU/IIDC++.h /usr/local/include/TU/Image++.h \
-	/usr/local/include/TU/types.h /usr/local/include/TU/pair.h \
-	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/range.h /usr/local/include/TU/algorithm.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h
+	/usr/local/include/TU/tuple.h
