@@ -220,7 +220,6 @@ OTHER_HDRS	= TU/Array++.h \
 		TU/Minimize.h \
 		TU/Movie.h \
 		TU/Profiler.h \
-		TU/Random.h \
 		TU/Ransac.h \
 		TU/Rectify.h \
 		TU/SADStereo.h \
@@ -310,11 +309,9 @@ OTHER_HDRS	= TU/Array++.h \
 OTHER_SRCS	= ColorConverter.cc \
 		EdgeDetector.cc \
 		FIRGaussianCoefficients.cc \
-		FeatureMatch.cc \
 		GaussianCoefficients.cc \
 		GenericImage.cc \
 		ImageBase.cc \
-		Random.cc \
 		Rectify.cc \
 		SURFCreator.cc \
 		fdstream.cc \
