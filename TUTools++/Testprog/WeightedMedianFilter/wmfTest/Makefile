@@ -54,7 +54,6 @@ EXTHDRS		= ../../../TU/Array++.h \
 		../../../TU/pair.h \
 		../../../TU/range.h \
 		../../../TU/tuple.h \
-		../../../TU/types.h \
 		/usr/local/include/TU/v/App.h \
 		/usr/local/include/TU/v/CanvasPane.h \
 		/usr/local/include/TU/v/CanvasPaneDC.h \
@@ -76,9 +75,9 @@ OBJS		= main.o
 #include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
-main.o: ../../../TU/Image++.h ../../../TU/types.h ../../../TU/pair.h \
-	../../../TU/Vector++.h ../../../TU/Array++.h ../../../TU/range.h \
-	../../../TU/algorithm.h ../../../TU/iterator.h ../../../TU/tuple.h \
+main.o: ../../../TU/Image++.h ../../../TU/pair.h ../../../TU/Vector++.h \
+	../../../TU/Array++.h ../../../TU/range.h ../../../TU/algorithm.h \
+	../../../TU/iterator.h ../../../TU/tuple.h \
 	/usr/local/include/TU/v/App.h /usr/local/include/TU/v/TUv++.h \
 	../../../TU/List.h ../../../TU/Geometry++.h ../../../TU/Minimize.h \
 	/usr/local/include/TU/v/Widget-Xaw.h \
