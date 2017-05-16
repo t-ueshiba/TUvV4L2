@@ -199,6 +199,76 @@
 #  include <iostream>
 #endif
 
+namespace std
+{
+#if __cplusplus < 201700L
+namespace detail
+{
+  template <class IN_ITER, class RAN_ITER, class SIZE, class GEN>
+  RAN_ITER
+  sample(IN_ITER in, IN_ITER ie, input_iterator_tag,
+	 RAN_ITER out, random_access_iterator_tag, SIZE n, GEN&& gen)
+  {
+      using distrib_type = std::uniform_int_distribution<SIZE>;
+      using param_type   = typename distrib_type::param_type;
+
+      distrib_type	distrib{};
+      SIZE		nsampled = 0;
+
+    // 最初のn個をコピー
+      for (; in != ie && nsampled != n; ++in, ++nsampled)
+	  out[nsampled] = *in;
+
+      for (auto ninputs = nsampled; in != ie; ++in, ++ninputs)
+      {
+	  const auto	i = distrib(gen, param_type{0, ninputs});
+	  if (i < n)
+	      out[i] = *in;
+      }
+
+      return out + nsampled;
+  }
+
+  template<class FWD_ITER, class OUT_ITER, class CAT, class SIZE, class GEN>
+  OUT_ITER
+  sample(FWD_ITER in, FWD_ITER ie, forward_iterator_tag,
+	 OUT_ITER out, CAT, SIZE n, GEN&& gen)
+  {
+      using distrib_type = std::uniform_int_distribution<SIZE>;
+      using param_type	 = typename distrib_type::param_type;
+
+      distrib_type	distrib{};
+      SIZE		nunsampled = std::distance(in, ie);
+
+      if (n > nunsampled)
+	  n = nunsampled;
+      
+      for (; n != 0; ++in)
+	  if (distrib(gen, param_type{0, --nunsampled}) < n)
+	  {
+	      *out++ = *in;
+	      --n;
+	  }
+
+      return out;
+  }
+}	// namespace detail
+    
+/// Take a random sample from a population.
+template<class POP_ITER, class SMPL_ITER, class SIZE, class GEN> SMPL_ITER
+sample(POP_ITER in, POP_ITER ie, SMPL_ITER out, SIZE n, GEN&& gen)
+{
+    using pop_cat  = typename std::iterator_traits<POP_ITER>
+				 ::iterator_category;
+    using samp_cat = typename std::iterator_traits<SMPL_ITER>
+				 ::iterator_category;
+
+    return detail::sample(in, ie, pop_cat{},
+			  out, samp_cat{}, n, std::forward<GEN>(gen));
+}
+#endif    
+}	// namespace std
+
 //! libTUTools++ のクラスや関数等を収める名前空間
 namespace TU
 {

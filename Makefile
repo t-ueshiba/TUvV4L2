@@ -73,7 +73,6 @@ HDRS		= TU/Array++.h \
 		TU/PM16C_04.h \
 		TU/Profiler.h \
 		TU/Quantizer.h \
-		TU/Random.h \
 		TU/Ransac.h \
 		TU/Rectify.h \
 		TU/SADStereo.h \
@@ -168,12 +167,10 @@ HDRS		= TU/Array++.h \
 SRCS		= ColorConverter.cc \
 		EdgeDetector.cc \
 		FIRGaussianCoefficients.cc \
-		FeatureMatch.cc \
 		GaussianCoefficients.cc \
 		GenericImage.cc \
 		ImageBase.cc \
 		PM16C_04.cc \
-		Random.cc \
 		Rectify.cc \
 		SHOT602.cc \
 		SURFCreator.cc \
@@ -185,12 +182,10 @@ SRCS		= ColorConverter.cc \
 OBJS		= ColorConverter.o \
 		EdgeDetector.o \
 		FIRGaussianCoefficients.o \
-		FeatureMatch.o \
 		GaussianCoefficients.o \
 		GenericImage.o \
 		ImageBase.o \
 		PM16C_04.o \
-		Random.o \
 		Rectify.o \
 		SHOT602.o \
 		SURFCreator.o \
@@ -363,9 +358,6 @@ EdgeDetector.o: TU/EdgeDetector.h TU/Image++.h TU/pair.h TU/Vector++.h \
 FIRGaussianCoefficients.o: TU/FIRGaussianConvolver.h TU/FIRFilter.h \
 	TU/SeparableFilter2.h TU/Array++.h TU/range.h TU/algorithm.h \
 	TU/iterator.h TU/tuple.h
-FeatureMatch.o: TU/FeatureMatch.h TU/Geometry++.h TU/Minimize.h \
-	TU/Vector++.h TU/Array++.h TU/range.h TU/algorithm.h TU/iterator.h \
-	TU/tuple.h TU/Random.h TU/Ransac.h TU/Manip.h
 GaussianCoefficients.o: TU/GaussianConvolver.h TU/Vector++.h TU/Array++.h \
 	TU/range.h TU/algorithm.h TU/iterator.h TU/tuple.h TU/IIRFilter.h \
 	TU/SeparableFilter2.h TU/Minimize.h
@@ -375,7 +367,6 @@ ImageBase.o: TU/Image++.h TU/pair.h TU/Vector++.h TU/Array++.h TU/range.h \
 	TU/algorithm.h TU/iterator.h TU/tuple.h TU/Camera++.h TU/Geometry++.h \
 	TU/Minimize.h TU/Manip.h
 PM16C_04.o: TU/PM16C_04.h TU/Serial.h TU/fdstream.h TU/Manip.h
-Random.o: TU/Random.h
 Rectify.o: TU/Rectify.h TU/Warp.h TU/Image++.h TU/pair.h TU/Vector++.h \
 	TU/Array++.h TU/range.h TU/algorithm.h TU/iterator.h TU/tuple.h \
 	TU/Camera++.h TU/Geometry++.h TU/Minimize.h TU/simd/simd.h \

@@ -6,8 +6,10 @@
 #ifndef __TU_RANSAC_H
 #define __TU_RANSAC_H
 
-#include <math.h>
+#include <vector>
+#include <random>
 #include <stdexcept>
+#include "TU/algorithm.h"
 
 namespace TU
 {
@@ -48,44 +50,58 @@ namespace TU
   \param pointSet	inlierとoutlierを含む点集合
   \param model		pointSetに含まれるinlierを当てはめるモデル
   \param conform	点のモデルへの適合性を判定する関数オブジェクト
+  \param inlierRate	[ib, ie)に含まれる点のうちinlierの割合.
+			0 < inlierRate < 1でなければならない
   \param hitRate	RANSACによって正しくinlierを引き当てる確率.
 			0 <= hitRate < 1でなければならない
   \return		pointSetに含まれるinlier
 */
-template <class PointSet, class Model, class Conform>
-typename PointSet::Container
-ransac(const PointSet& pointSet, Model& model, Conform conform,
-       double hitRate=0.99)
+template <class IN, class MODEL, class CONFORM, class T>
+std::vector<typename std::iterator_traits<IN>::value_type>
+ransac(IN ib, IN ie,
+       MODEL& model, CONFORM&& conform, T inlierRate, T hitRate=0.99)
 {
-    typedef typename PointSet::Container	Container;
+    using point_type	= typename std::iterator_traits<IN>::value_type;
+    using points_type	= std::vector<point_type>;
 
-    if (std::distance(pointSet.begin(), pointSet.end()) < model.ndataMin())
-	throw std::runtime_error("ransac<PointSet, Model>: not enough points in the given point set!!");
+    if (size_t(std::distance(ib, ie)) < model.ndataMin())
+	throw std::runtime_error(
+		"ransac(): not enough points in the given point set!!");
+
+    if (inlierRate >= 1)	// [ib, ie) が全てinlierなら...
+    {
+	model.fit(ib, ie);	// [ib, ie) にモデルを当てはめる.
+	return std::move(points_type(ib, ie));
+    }
+    
+    if (inlierRate <= 0)
+	throw std::invalid_argument(
+		"ransac(): given inline rate is not within (0, 1]!!");
+    if (hitRate < 0 || hitRate >= 1)
+	throw std::invalid_argument(
+		"ransac(): given hit rate is not within [0, 1)!!");
     
   // 与えられたhitRate，PointSetに含まれるinlierの割合およびModelの生成に
   // 要する最少点数から，サンプリングの必要回数を求める．
-    if (hitRate < 0.0 || hitRate >= 1.0)
-	throw std::invalid_argument("ransac<PointSet, Model>: given hit rate is not within [0, 1)!!");
-    const double	inlierRate = pointSet.inlierRate();
-    if (inlierRate < 0.0 || inlierRate >= 1.0)
-	throw std::invalid_argument("ransac<PointSet, Model>: inlier rate is not within [0, 1)!!");
-    double	tmp = 1.0;
-    for (size_t n = model.ndataMin(); n-- > 0; )
+    T		tmp = 1;
+    for (auto n = model.ndataMin(); n-- > 0; )
 	tmp *= inlierRate;
-    const size_t	ntrials = size_t(ceil(log(1.0 - hitRate) /
-					      log(1.0 - tmp)));
+    const auto	ntrials = size_t(std::ceil(std::log(1 - hitRate) /
+					   std::log(1 - tmp)));
 
   // 試行（最小個数の点をサンプル，モデル生成，inlier検出）をntrials回行う．
-    Container	inlierSetA, inlierSetB;
-    Container	*inliers = &inlierSetA, *inliersMax = &inlierSetB;
+    points_type maximalSet;
     for (size_t n = 0; n < ntrials; ++n)
     {
-      // 点集合からモデルの計算に必要な最小個数の点をサンプルする．
-	const Container&	minimalSet = pointSet.sample(model.ndataMin());
-
-      // サンプルした点からモデルを生成する．
 	try
 	{
+	  // 点集合からモデルの計算に必要な最少個数の点をサンプルする．
+	    points_type	minimalSet;
+	    std::sample(ib, ie, std::back_inserter(minimalSet),
+			model.ndataMin(),
+			std::mt19937(std::random_device()()));
+	    
+	  // サンプルした点からモデルを生成する．
 	    model.fit(minimalSet.begin(), minimalSet.end());
 	}
 	catch (const std::runtime_error& err)	// 当てはめに失敗したら
@@ -94,24 +110,24 @@ ransac(const PointSet& pointSet, Model& model, Conform conform,
 	}
 	
       // 全点の中で生成したモデルに適合する(inlier)ものを集める．
-	inliers->clear();
-	for (typename PointSet::const_iterator iter = pointSet.begin();
-	     iter != pointSet.end(); ++iter)
-	    if (conform(*iter, model))
-		inliers->push_back(*iter);
+	points_type	inliers;
+	std::copy_if(ib, ie, std::back_inserter(inliers),
+		     [&](const auto& in){ return conform(in, model); });
 
       // これまでのどのモデルよりもinlierの数が多ければその集合を記録する．
-	if (inliers->size() > inliersMax->size())
-	    swap(inliers, inliersMax);
+      // なお，サンプルされた点（minimalSetの点）が持つ自由度がモデルの自由度
+      // よりも大きい場合は，これらに誤差0でモデルを当てはめられるとは限らない
+      // ので，minimalSetの点が全てinliersに含まれる保証はない．よって，
+      // inliersのサイズがモデル計算に必要な最少点数以上であることもチェックする．
+	if (inliers.size() >= model.ndataMin() &&
+	    inliers.size() >  maximalSet.size())
+	    maximalSet = std::move(inliers);
     }
-  // 最大集合に含まれる点を真のinlierとし，それら全てからモデルを生成する．
-  // サンプルされた点（minimalSetに含まれる点）が持つ自由度がモデルの自由度
-  // よりも大きい場合は，これらに誤差0でモデルを当てはめられるとは限らないので，
-  // これらの点が必ずinlierに含まれる保証はない．よって，inlierが足りなくて
-  // 次の当てはめが失敗することもあり得る．
-    model.fit(inliersMax->begin(), inliersMax->end());
 
-    return *inliersMax;
+  // maximalSetに含まれる点を真のinlierとし，それら全てからモデルを生成する．
+    model.fit(maximalSet.begin(), maximalSet.end());
+
+    return std::move(maximalSet);
 }
     
 }

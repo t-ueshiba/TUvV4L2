@@ -9,7 +9,6 @@
 #include <utility>
 #include <vector>
 #include "TU/Geometry++.h"
-#include "TU/Random.h"
 #include "TU/Ransac.h"
 #include "TU/Manip.h"
 
@@ -21,8 +20,8 @@ namespace TU
 class FeatureMatch
 {
   public:
-    typedef double			value_type;
-    typedef std::pair<Point2f, Point2f>	Match;		//!< 2画像間の点対応
+    using value_type	= double;
+    using Match		= std::pair<Point2f, Point2f>;	//!< 2画像間の点対応
 
     struct Parameters
     {
@@ -38,39 +37,9 @@ class FeatureMatch
 	value_type	conformThresh;	//!< インライアとなる最大当てはめ誤差
     };
 
-    struct Inserter
-    {
-	virtual void	operator ()(const Match& match)	= 0;
-    };
-    
   private:
-    class Sampler
-    {
-      public:
-	typedef std::vector<Match>		Container;
-	typedef Container::const_iterator	const_iterator;
-
-	Sampler(const_iterator begin, const_iterator end, double inlierRate)
-	    :_begin(begin), _end(end),
-	     _size(std::distance(_begin, _end)),
-	     _inlierRate(inlierRate), _random()		{}
-
-	value_type	inlierRate()		const	{ return _inlierRate; }
-	const_iterator	begin()			const	{ return _begin; }
-	const_iterator	end()			const	{ return _end; }
-	size_t		size()			const	{ return _size; }
-	Container	sample(size_t npoints)	const	;
-    
-      private:
-	const const_iterator	_begin;		//!< 点対応列の先頭
-	const const_iterator	_end;		//!< 点対応列の末尾の次
-	const size_t		_size;		//!< 点対応の総数
-	const value_type	_inlierRate;	//!< inlierの割合
-	mutable Random		_random;	//!< 乱数発生器
-    };
-	
     template <class MAP>
-    class Conform : public std::binary_function<Match, MAP, bool>
+    class Conform
     {
       public:
 	Conform(value_type thresh)    :_sqThresh(thresh * thresh)	{}
@@ -143,12 +112,10 @@ template <class MAP, class IN, class OUT> void
 FeatureMatch::operator ()(MAP& map, IN begin0, IN end0,
 			  IN begin1, IN end1, OUT out) const
 {
-    typedef Sampler::Container			Container;
-    
   // 特徴間の全対応候補を求める．
-    Container	candidates;
+    std::vector<Match>	candidates;
     findCandidateMatches(begin0, end0,
-			 begin1, end1, back_inserter(candidates));
+			 begin1, end1, std::back_inserter(candidates));
 
   // RANSACによって誤対応を除去するとともに，画像間変換を求める．
     selectMatches(map, candidates.begin(), candidates.end(), out);
@@ -169,21 +136,21 @@ FeatureMatch::findCandidateMatches(IN begin0, IN end0,
   // [begin0, end0), [begin1, end1) を angle によって分類する．
     std::vector<IN>	buckets0[NBUCKETS];
     std::vector<IN>	buckets1[NBUCKETS];
-    for (IN feature0 = begin0; feature0 != end0; ++feature0)
+    for (auto feature0 = begin0; feature0 != end0; ++feature0)
     {
-	int	i = int(fraction(feature0->angle, NBUCKETS));
+	const auto	i = int(fraction(feature0->angle, NBUCKETS));
 
 	buckets0[i].push_back(feature0);
     }
-    for (IN feature1 = begin1; feature1 != end1; ++feature1)
+    for (auto feature1 = begin1; feature1 != end1; ++feature1)
     {
-	int	i = int(fraction(feature1->angle, NBUCKETS));
+	const auto	i = int(fraction(feature1->angle, NBUCKETS));
 
 	buckets1[i].push_back(feature1);
     }
 
   // [begin0, end0)の各特徴に対し特徴記述子間の距離をもとに対応候補を検出する．
-    for (IN feature0 = begin0; feature0 != end0; ++feature0)
+    for (auto feature0 = begin0; feature0 != end0; ++feature0)
     {
       // feature0 に対する最良の対応を探す．
 	IN	feature_best1;
@@ -211,23 +178,19 @@ FeatureMatch::findCandidateMatches(IN begin0, IN end0,
 template <class MAP, class IN, class OUT> void
 FeatureMatch::selectMatches(MAP& map, IN begin, IN end, OUT out) const
 {
-    using namespace		std;
-    typedef Sampler::Container	Container;
-    
-  // RANSACによって誤対応を除去するとともに，画像間変換を求める．
-    Sampler	sampler(begin, end, _params.inlierRate);
-    Container	matchSet = ransac(sampler, map,
-				  Conform<MAP>(_params.conformThresh));
-    cerr << setw(3) << matchSet.size() << " matches selected from "
-	 << distance(begin, end) << " candidates." << endl;
+    auto	matchSet = ransac(begin, end, map,
+				  Conform<MAP>(_params.conformThresh),
+				  _params.inlierRate);
+    std::cerr << std::setw(3) << matchSet.size() << " matches selected from "
+	      << distance(begin, end) << " candidates." << std::endl;
 
     std::copy(matchSet.begin(), matchSet.end(), out);
 }
     
 //! 指定された特徴に最も良く対応する特徴を指定されたバケット群の中から探索する．
 /*!
-  \param feature	特徴
-  \param feature_best	featureに対する最良の特徴が返される
+  \param feature	特徴への反復子
+  \param feature_best	featureに対する最良の特徴への反復子が返される
   \param buckets	対応相手となる特徴を格納したバケット群
   \return		最良のマッチングのスコアが2位のマッチングのスコアの
 			separation倍未満ならばtrue, そうでなければfalse
@@ -236,34 +199,28 @@ template <class IN> bool
 FeatureMatch::findBestMatch(IN feature, IN& feature_best,
 			    const std::vector<IN> buckets[]) const
 {
-    using namespace	std;
-
-    typedef typename iterator_traits<IN>::value_type	feature_type;
-    typedef typename feature_type::value_type		value_type;
-    typedef vector<IN>					bucket_t;
+    using value_type	= typename std::iterator_traits<IN>::value_type
+							   ::value_type;
     
   // 該当区間を検索する．
-    value_type	sqd_best   = numeric_limits<value_type>::max(),
-		sqd_second = numeric_limits<value_type>::max();
-    const int	idx	   = int(fraction(feature->angle, NBUCKETS)),
-		range	   = int(ceil(fraction(_params.diffAngleMax,
-					       NBUCKETS)));
-    for (int i = idx - range; i <= idx + range; ++i)
+    auto	sqd_best   = std::numeric_limits<value_type>::max();
+    auto	sqd_second = std::numeric_limits<value_type>::max();
+    const auto	idx	   = int(fraction(feature->angle, NBUCKETS));
+    const auto	range	   = int(std::ceil(fraction(_params.diffAngleMax,
+						    NBUCKETS)));
+    for (auto i = idx - range; i <= idx + range; ++i)
     {
-	const int	j = (i < 0	   ? i + NBUCKETS :
+	const auto	j = (i < 0	   ? i + NBUCKETS :
 			     i >= NBUCKETS ? i - NBUCKETS : i);
-	const bucket_t&	bucket = buckets[j];
-	
-	for (typename bucket_t::const_iterator
-		 iter = bucket.begin(); iter !=  bucket.end(); ++iter)
+	for (auto candidate : buckets[j])
 	{
-	    value_type	sqd = feature->sqdistOfFeature(**iter);
+	    const auto	sqd = feature->sqdistOfFeature(*candidate);
 
 	    if (sqd < sqd_best)
 	    {
 		sqd_second   = sqd_best;
 		sqd_best     = sqd;
-		feature_best = *iter;
+		feature_best = candidate;
 	    }
 	    else if (sqd < sqd_second)
 	    {
