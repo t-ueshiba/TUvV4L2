@@ -178,9 +178,6 @@
   - #TU::PM16C_04
   - #TU::SHOT602
 
-  <b>乱数発生器</b>
-  - #TU::Random
-
   <b>SIMD命令</b>
   - #TU::simd::vec
   
@@ -204,10 +201,9 @@ namespace std
 #if __cplusplus < 201700L
 namespace detail
 {
-  template <class IN_ITER, class RAN_ITER, class SIZE, class GEN>
-  RAN_ITER
-  sample(IN_ITER in, IN_ITER ie, input_iterator_tag,
-	 RAN_ITER out, random_access_iterator_tag, SIZE n, GEN&& gen)
+  template <class IN, class OUT, class SIZE, class GEN> OUT
+  sample(IN in, IN ie, input_iterator_tag, OUT out, random_access_iterator_tag,
+	 SIZE n, GEN&& gen)
   {
       using distrib_type = std::uniform_int_distribution<SIZE>;
       using param_type   = typename distrib_type::param_type;
@@ -229,10 +225,8 @@ namespace detail
       return out + nsampled;
   }
 
-  template<class FWD_ITER, class OUT_ITER, class CAT, class SIZE, class GEN>
-  OUT_ITER
-  sample(FWD_ITER in, FWD_ITER ie, forward_iterator_tag,
-	 OUT_ITER out, CAT, SIZE n, GEN&& gen)
+  template<class IN, class OUT, class CAT, class SIZE, class GEN> OUT
+  sample(IN in, IN ie, forward_iterator_tag, OUT out, CAT, SIZE n, GEN&& gen)
   {
       using distrib_type = std::uniform_int_distribution<SIZE>;
       using param_type	 = typename distrib_type::param_type;
@@ -255,16 +249,14 @@ namespace detail
 }	// namespace detail
     
 /// Take a random sample from a population.
-template<class POP_ITER, class SMPL_ITER, class SIZE, class GEN> SMPL_ITER
-sample(POP_ITER in, POP_ITER ie, SMPL_ITER out, SIZE n, GEN&& gen)
+template<class IN, class OUT, class SIZE, class GEN> OUT
+sample(IN in, IN ie, OUT out, SIZE n, GEN&& gen)
 {
-    using pop_cat  = typename std::iterator_traits<POP_ITER>
-				 ::iterator_category;
-    using samp_cat = typename std::iterator_traits<SMPL_ITER>
-				 ::iterator_category;
+    using in_cat  = typename std::iterator_traits<IN>::iterator_category;
+    using out_cat = typename std::iterator_traits<OUT>::iterator_category;
 
-    return detail::sample(in, ie, pop_cat{},
-			  out, samp_cat{}, n, std::forward<GEN>(gen));
+    return detail::sample(in, ie, in_cat{}, out, out_cat{},
+			  n, std::forward<GEN>(gen));
 }
 #endif    
 }	// namespace std
