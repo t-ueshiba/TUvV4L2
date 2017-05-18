@@ -240,44 +240,22 @@ using decayed_iterator_value = typename detail::decayed_iterator_value<ITER>
 /************************************************************************
 *  TU::[begin|end|rbegin|rend](std::tuple<T...>)			*
 ************************************************************************/
-/*
- *  icpc-17.0.2 のバグ回避のため，lambda関数ではなくgenericな関数オブジェクトを
- *  用いて実装
- */ 
-namespace detail
-{
-  struct generic_begin
-  {
-      template <class T_>
-      auto	operator ()(T_&& x) const
-		{
-		    using std::begin;	// ADLが働かない時は std::begin を使用
-		    return begin(x);
-		}
-  };
-  struct generic_end
-  {
-      template <class T_>
-      auto	operator ()(T_&& x) const
-		{
-		    using std::end;	// ADLが働かない時は std::end を使用
-		    return end(x);
-		}
-  };
-}	// namespace detail
-    
 template <class TUPLE,
 	  std::enable_if_t<is_tuple<TUPLE>::value>* = nullptr> inline auto
 begin(TUPLE&& t)
 {
-    return make_zip_iterator(tuple_transform(detail::generic_begin(), t));
+    return make_zip_iterator(
+		tuple_transform(
+		    [](auto&& x){ using std::begin; return begin(x); }, t));
 }
 
 template <class TUPLE,
 	  std::enable_if_t<is_tuple<TUPLE>::value>* = nullptr> inline auto
 end(TUPLE&& t)
 {
-    return make_zip_iterator(tuple_transform(detail::generic_end(), t));
+    return make_zip_iterator(
+		tuple_transform(
+		    [](auto&& x){ using std::end; return end(x); }, t));
 }
 
 template <class TUPLE,
