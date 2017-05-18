@@ -277,22 +277,6 @@ std::ostream&	operator <<(std::ostream& out, const sizes_holder<E>& holder);
 /************************************************************************
 *  generic algorithms							*
 ************************************************************************/
-//! 条件を満たす要素が前半に，そうでないものが後半になるように並べ替える．
-/*!
-  \param begin	データ列の先頭を示す反復子
-  \param end	データ列の末尾を示す反復子
-  \param pred	条件を指定する単項演算子
-  \return	条件を満たさない要素の先頭を示す反復子
-*/
-template <class Iter, class Pred> Iter
-pull_if(Iter begin, Iter end, Pred pred)
-{
-    for (Iter iter = begin; iter != end; ++iter)
-	if (pred(*iter))
-	    std::iter_swap(begin++, iter);
-    return begin;
-}
-
 //! 2つの引数の差の絶対値を返す．
 template <class T> inline T
 diff(const T& a, const T& b)
