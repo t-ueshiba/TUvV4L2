@@ -33,7 +33,7 @@ BINDIR		= $(PREFIX)/bin
 LIBDIR		= $(PREFIX)/lib
 INCDIR		= $(PREFIX)/include
 
-OTHER_DIR	= $(HOME)/projects/HRP-5P/hrp5p-calib/src/TUv++
+OTHER_DIR	= $(HOME)/projects/HRP-5P/hrp5p-calib/libraries/TUv++
 
 #########################
 #  Macros set by mkmf	#
