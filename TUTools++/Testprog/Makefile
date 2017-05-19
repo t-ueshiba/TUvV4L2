@@ -11,7 +11,6 @@ SUBDIR	= BandMatrix		\
 	  List			\
 	  NDTree		\
 	  Quantizer		\
-	  Random		\
 	  Serial		\
 	  Sparse		\
 	  Spline		\
