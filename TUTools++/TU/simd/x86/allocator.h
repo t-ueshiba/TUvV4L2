@@ -6,7 +6,7 @@
 
 #include <new>			// for std::bad_alloc()
 #include <type_traits>
-#include <boost/align/aligned_alloc.hpp>
+#include <cstdlib>
 
 namespace TU
 {
@@ -46,9 +46,8 @@ class allocator
 			return nullptr;
 			    
 		    auto	p = static_cast<T*>(
-					boost::alignment::aligned_alloc(
-					    align<T>::value,
-					    sizeof(value_type)*n));
+					aligned_alloc(align<T>::value,
+						      sizeof(value_type)*n));
 		    if (p == nullptr)
 			throw std::bad_alloc();
 		    return p;
@@ -56,7 +55,7 @@ class allocator
     void	deallocate(T* p, std::size_t)
 		{
 		    if (p != nullptr)
-			boost::alignment::aligned_free(p);
+			free(p);
 		}
 };
     
