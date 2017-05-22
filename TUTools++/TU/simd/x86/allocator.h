@@ -6,7 +6,7 @@
 
 #include <new>			// for std::bad_alloc()
 #include <type_traits>
-#include <cstdlib>
+#include <stdlib.h>
 
 namespace TU
 {
@@ -44,13 +44,12 @@ class allocator
 		{
 		    if (n == 0)
 			return nullptr;
-			    
-		    auto	p = static_cast<T*>(
-					aligned_alloc(align<T>::value,
-						      sizeof(value_type)*n));
-		    if (p == nullptr)
+
+		    void*	p;
+		    if (posix_memalign(&p, align<T>::value, n*sizeof(T)))
 			throw std::bad_alloc();
-		    return p;
+			
+		    return static_cast<T*>(p);
 		}
     void	deallocate(T* p, std::size_t)
 		{
