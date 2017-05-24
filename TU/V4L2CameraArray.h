@@ -5,8 +5,8 @@
   \file		V4L2CameraArray.h
   \brief	クラス TU::V4L2CameraArray の定義と実装
 */
-#ifndef __TU_V4L2CAMERAARRAY_H
-#define __TU_V4L2CAMERAARRAY_H
+#ifndef TU_V4L2CAMERAARRAY_H
+#define TU_V4L2CAMERAARRAY_H
 
 #include "TU/V4L2++.h"
 #include <algorithm>	// for std::for_each()
@@ -199,4 +199,4 @@ syncedSnap(CAMERAS&& cameras, uint64_t maxSkew=1000)
 }
     
 }
-#endif	// ! __TU_V4L2CAMERARRAY_H
+#endif	// ! TU_V4L2CAMERARRAY_H
