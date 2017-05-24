@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#if !defined(__TU_SIMD_ARM_VEC_H)
-#define __TU_SIMD_ARM_VEC_H
+#if !defined(TU_SIMD_ARM_VEC_H)
+#define TU_SIMD_ARM_VEC_H
 
 #include "TU/simd/arm/arch.h"
 
@@ -72,4 +72,4 @@ inline void	empty()	{}
 
 }	// namespace simd
 }	// namespace TU
-#endif	// !__TU_SIMD_ARM_VEC_H
+#endif	// !TU_SIMD_ARM_VEC_H

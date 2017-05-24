@@ -3,8 +3,8 @@
   \author	Toshio UESHIBA
   \brief	RANSACを行う関数の定義と実装
 */
-#ifndef __TU_RANSAC_H
-#define __TU_RANSAC_H
+#ifndef TU_RANSAC_H
+#define TU_RANSAC_H
 
 #include <vector>
 #include <random>
@@ -192,4 +192,4 @@ ransac(IN ib, IN ie,
 }
     
 }	// namespace TU
-#endif	// !__TU_RANSAC_H
+#endif	// !TU_RANSAC_H

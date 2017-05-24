@@ -3,8 +3,8 @@
   \author	Toshio UESHIBA
   \brief	Bezier曲線およびBezier曲面に関連するクラスの定義と実装
 */
-#ifndef __TU_BEZIERPP_H
-#define __TU_BEZIERPP_H
+#ifndef TU_BEZIERPP_H
+#define TU_BEZIERPP_H
 
 #include "TU/Vector++.h"
 
@@ -322,4 +322,4 @@ using RationalBezierSurface3d	= BezierSurface<Vector4d>;
 
  
 }
-#endif	// !__TU_BEZIERPP_H
+#endif	// !TU_BEZIERPP_H

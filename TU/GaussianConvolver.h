@@ -3,8 +3,8 @@
   \author	Toshio UESHIBA
   \brief	Gauss核による畳み込みに関するクラスの定義と実装
 */
-#ifndef	__TU_GAUSSIANCONVOLVER_H
-#define	__TU_GAUSSIANCONVOLVER_H
+#ifndef	TU_GAUSSIANCONVOLVER_H
+#define	TU_GAUSSIANCONVOLVER_H
 
 #include "TU/Vector++.h"
 #include "TU/IIRFilter.h"
@@ -294,4 +294,4 @@ GaussianConvolver2<T>::diffVV(IN ib, IN ie, OUT out)
 }
 
 }
-#endif	// !__TU_GAUSSIANCONVOLVER_H
+#endif	// !TU_GAUSSIANCONVOLVER_H

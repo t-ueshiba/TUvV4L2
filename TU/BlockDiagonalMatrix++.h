@@ -3,8 +3,8 @@
   \author	Toshio UESHIBA
   \brief	クラス TU::BlockDiagonalMatrix の定義と実装
 */
-#ifndef __TU_BLOCKDIAGONALMATRIXPP_H
-#define __TU_BLOCKDIAGONALMATRIXPP_H
+#ifndef TU_BLOCKDIAGONALMATRIXPP_H
+#define TU_BLOCKDIAGONALMATRIXPP_H
 
 #include "TU/Vector++.h"
 
@@ -244,4 +244,4 @@ operator *(const Vector<T>& v, const BlockDiagonalMatrix<T>& b)
 }
  
 }
-#endif	// !__TU_BLOCKDIAGONALMATRIXPP_H
+#endif	// !TU_BLOCKDIAGONALMATRIXPP_H

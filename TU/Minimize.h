@@ -3,8 +3,8 @@
   \author	Toshio UESHIBA
   \brief	汎用最小自乗法に関連する関数の定義と実装
 */
-#ifndef __TU_MINIMIZE_H
-#define __TU_MINIMIZE_H
+#ifndef TU_MINIMIZE_H
+#define TU_MINIMIZE_H
 
 #include "TU/Vector++.h"
 #include <stdexcept>
@@ -594,4 +594,4 @@ minimizeSquareSparseDebug(const F& f, const G& g, ATA& a, IB bbegin, IB bend,
 }
 
 }
-#endif	// !__TU_MINIMIZE_H
+#endif	// !TU_MINIMIZE_H

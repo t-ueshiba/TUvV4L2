@@ -3,6 +3,9 @@
   \author	Toshio UESHIBA
   \brief	Gauss核による畳み込みに関連するクラスの定義と実装
 */ 
+#ifndef	TU_FIRGAUSSIANCONVOLVER_H
+#define	TU_FIRGAUSSIANCONVOLVER_H
+
 #include "TU/FIRFilter.h"
 
 namespace TU
@@ -241,3 +244,4 @@ FIRGaussianConvolver2<D, T>::diffVV(IN ib, IN ie, OUT out)
 }
     
 }
+#endif	// !TU_FIRGAUSSIANCONVOLVER_H

@@ -3,8 +3,8 @@
   \author	Toshio UESHIBA
   \brief	Guided Filterステレオマッチングクラスの定義と実装
 */
-#ifndef __TU_GFSTEREO_H
-#define __TU_GFSTEREO_H
+#ifndef TU_GFSTEREO_H
+#define TU_GFSTEREO_H
 
 #include "TU/StereoBase.h"
 #include "TU/BoxFilter.h"
@@ -864,4 +864,4 @@ GFStereo<SCORE, DISP>::Buffers::initialize(size_t N, size_t D,
 }
 
 }
-#endif	// !__TU_GFSTEREO_H
+#endif	// !TU_GFSTEREO_H

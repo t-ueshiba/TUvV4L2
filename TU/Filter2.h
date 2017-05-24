@@ -3,8 +3,8 @@
   \author	Toshio UESHIBA
   \brief	水平/垂直方向に分離不可能な2次元フィルタを表すクラスの定義
 */
-#ifndef __TU_FILTER2_H
-#define __TU_FILTER2_H
+#ifndef TU_FILTER2_H
+#define TU_FILTER2_H
 
 #include "TU/iterator.h"
 #if defined(USE_TBB)
@@ -90,4 +90,4 @@ Filter2<F>::convolve(IN_ ib, IN_ ie, OUT_ out) const
 }
 
 }
-#endif	// !__TU_FILTER2_H
+#endif	// !TU_FILTER2_H

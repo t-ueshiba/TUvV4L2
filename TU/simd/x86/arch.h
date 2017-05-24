@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#if !defined(__TU_SIMD_X86_ARCH_H)
-#define __TU_SIMD_X86_ARCH_H
+#if !defined(TU_SIMD_X86_ARCH_H)
+#define TU_SIMD_X86_ARCH_H
 
 #include <sys/types.h>
 #include <immintrin.h>
@@ -275,4 +275,4 @@
     SIMD_SPECIALIZED_FUNC(vec<type> func(vec<type> x, vec<type> y),	\
 			  op, (x, y), void, type, SIMD_SUFFIX)
 
-#endif	// !__TU_SIMD_X86_ARCH_H
+#endif	// !TU_SIMD_X86_ARCH_H

@@ -3,8 +3,8 @@
   \author	Toshio UESHIBA
   \brief	画素と画像に関連するクラスの定義と実装
 */
-#ifndef	__TU_IMAGEPP_H
-#define	__TU_IMAGEPP_H
+#ifndef	TU_IMAGEPP_H
+#define	TU_IMAGEPP_H
 
 #include <cstring>		// for memcpy()
 #include <boost/operators.hpp>
@@ -1710,4 +1710,4 @@ GenericImage::save(std::ostream& out) const
 }
 
 }
-#endif	// !__TU_IMAGEPP_H
+#endif	// !TU_IMAGEPP_H

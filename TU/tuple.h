@@ -3,8 +3,8 @@
   \author	Toshio UESHIBA
   \brief	std::tupleの用途拡張のためのユティリティ
 */
-#ifndef __TU_TUPLE_H
-#define __TU_TUPLE_H
+#ifndef TU_TUPLE_H
+#define TU_TUPLE_H
 
 #include <tuple>
 #include <utility>		// for std::index_sequence<IDX...>
@@ -539,4 +539,4 @@ operator <<(ostream& out, const tuple<T...>& t)
 }
 
 }	// namespace std
-#endif	// !__TU_TUPLE_H
+#endif	// !TU_TUPLE_H

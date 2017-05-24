@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#if !defined(__TU_SIMD_CVT_H)
-#define	__TU_SIMD_CVT_H
+#if !defined(TU_SIMD_CVT_H)
+#define	TU_SIMD_CVT_H
 
 #include "TU/tuple.h"
 #include "TU/simd/zero.h"
@@ -138,4 +138,4 @@ using cvt_above_type = typename detail::cvt_adjacent_type<T, S, MASK>::A;
 #  include "TU/simd/arm/cvt.h"
 #endif
 
-#endif	// !__TU_SIMD_CVT_H
+#endif	// !TU_SIMD_CVT_H

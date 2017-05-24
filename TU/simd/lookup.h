@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#if !defined(__TU_SIMD_LOOKUP_H)
-#define __TU_SIMD_LOOKUP_H
+#if !defined(TU_SIMD_LOOKUP_H)
+#define TU_SIMD_LOOKUP_H
 
 #include "TU/simd/cvt.h"
 #include "TU/simd/insert_extract.h"
@@ -45,4 +45,4 @@ lookup(const P* p, Is16vec row, Is16vec col, int32_t stride)
 #  include "TU/simd/arm/lookup.h"
 #endif
 
-#endif	// !__TU_SIMD_LOOKUP_H
+#endif	// !TU_SIMD_LOOKUP_H

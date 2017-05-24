@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#if !defined(__TU_SIMD_ARITHMETIC_H)
-#define __TU_SIMD_ARITHMETIC_H
+#if !defined(TU_SIMD_ARITHMETIC_H)
+#define TU_SIMD_ARITHMETIC_H
 
 #include "TU/tuple.h"
 #include "TU/simd/vec.h"
@@ -120,4 +120,4 @@ diff(const L& l, const R& r)
 #  include "TU/simd/arm/arithmetic.h"
 #endif
 
-#endif	// !__TU_SIMD_ARITHMETIC_H
+#endif	// !TU_SIMD_ARITHMETIC_H

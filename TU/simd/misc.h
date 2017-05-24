@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#if !defined(__TU_SIMD_MISC_H)
-#define __TU_SIMD_MISC_H
+#if !defined(TU_SIMD_MISC_H)
+#define TU_SIMD_MISC_H
 
 #include "TU/iterator.h"
 #include "TU/simd/vec.h"
@@ -27,4 +27,4 @@ make_iterator_tuple(ITERS... iters)
 #  include "TU/simd/x86/svml.h"
 #endif
 
-#endif	// !__TU_SIMD_MISC_H
+#endif	// !TU_SIMD_MISC_H

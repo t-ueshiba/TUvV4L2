@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#if !defined(__TU_SIMD_DUP_H)
-#define __TU_SIMD_DUP_H
+#if !defined(TU_SIMD_DUP_H)
+#define TU_SIMD_DUP_H
 
 #include "TU/simd/cvt.h"
 #include "TU/simd/logical.h"
@@ -25,4 +25,4 @@ template <bool HI, class T> vec<T>	dup(vec<T> x)			;
 #  include "TU/simd/arm/dup.h"
 #endif
 
-#endif	// !__TU_SIMD_DUP_H
+#endif	// !TU_SIMD_DUP_H

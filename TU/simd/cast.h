@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#if !defined(__TU_SIMD_CAST_H)
-#define __TU_SIMD_CAST_H
+#if !defined(TU_SIMD_CAST_H)
+#define TU_SIMD_CAST_H
 
 #include "TU/simd/vec.h"
 
@@ -25,4 +25,4 @@ template <class T, class S> vec<T>	cast(vec<S> x)			;
 #  include "TU/simd/arm/cast.h"
 #endif
 
-#endif	// !__TU_SIMD_CAST_H
+#endif	// !TU_SIMD_CAST_H

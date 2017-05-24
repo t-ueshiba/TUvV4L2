@@ -3,8 +3,8 @@
   \author	Toshio UESHIBA
   \brief	graph cutに関するクラスの定義と実装
 */
-#ifndef __TU_GRAPHCUTS_H
-#define __TU_GRAPHCUTS_H
+#ifndef TU_GRAPHCUTS_H
+#define TU_GRAPHCUTS_H
 
 #include <boost/version.hpp>
 #include <boost/graph/graph_traits.hpp>
@@ -836,4 +836,4 @@ GraphCuts<T, ID, L, EL>::flow(edge_t e) const
 }
 
 }
-#endif	// !__TU_GRAPHCUTS_H
+#endif	// !TU_GRAPHCUTS_H

@@ -3,8 +3,8 @@
   \author	Toshio UESHIBA
   \brief	一般的なfinite impulse response filterを表すクラスの定義と実装
 */
-#ifndef	__TU_FIRFILTER_H
-#define	__TU_FIRFILTER_H
+#ifndef	TU_FIRFILTER_H
+#define	TU_FIRFILTER_H
 
 #include "TU/SeparableFilter2.h"
 
@@ -303,4 +303,4 @@ FIRFilter2<D, T>::convolve(IN ib, IN ie, OUT out) const
 }
 
 }
-#endif	// !__TU_FIRFILTER_H
+#endif	// !TU_FIRFILTER_H

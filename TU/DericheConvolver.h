@@ -3,8 +3,8 @@
   \author	Toshio UESHIBA
   \brief	Canny-Deriche核による畳み込みに関するクラスの定義と実装
 */
-#ifndef	__TU_DERICHECONVOLVER_H
-#define	__TU_DERICHECONVOLVER_H
+#ifndef	TU_DERICHECONVOLVER_H
+#define	TU_DERICHECONVOLVER_H
 
 #include "TU/IIRFilter.h"
 
@@ -262,5 +262,5 @@ DericheConvolver2<T>::diffVV(IN ib, IN ie, OUT out)
 }
 
 }
-#endif	// !__TU_DERICHECONVOLVER_H
+#endif	// !TU_DERICHECONVOLVER_H
 

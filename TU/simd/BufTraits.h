@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#if !defined(__TU_SIMD_BUFTRAITS_H)
-#define __TU_SIMD_BUFTRAITS_H
+#if !defined(TU_SIMD_BUFTRAITS_H)
+#define TU_SIMD_BUFTRAITS_H
 
 #include <memory>
 #include "TU/simd/store_iterator.h"
@@ -31,4 +31,4 @@ class BufTraits<simd::vec<T>, ALLOC>
 };
 
 }	// namespace TU
-#endif	// !__TU_SIMD_BUFTRAITS_H
+#endif	// !TU_SIMD_BUFTRAITS_H

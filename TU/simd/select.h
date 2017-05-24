@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#if !defined(__TU_SIMD_SELECT_H)
-#define __TU_SIMD_SELECT_H
+#if !defined(TU_SIMD_SELECT_H)
+#define TU_SIMD_SELECT_H
 
 #include "TU/simd/vec.h"
 
@@ -33,4 +33,4 @@ vec<T>	select(vec<mask_type<T> > mask, vec<T> x, vec<T> y)		;
 #  include "TU/simd/arm/select.h"
 #endif
 
-#endif	// !__TU_SIMD_SELECT_H
+#endif	// !TU_SIMD_SELECT_H

@@ -3,8 +3,8 @@
   \author	Toshio UESHIBA
   \brief	クラス TU::Quantizer, TU::Quantizer2 の定義と実装
 */
-#ifndef __TU_QUANTIZER_H
-#define __TU_QUANTIZER_H
+#ifndef TU_QUANTIZER_H
+#define TU_QUANTIZER_H
 
 #include <vector>
 #include "TU/Vector++.h"
@@ -373,4 +373,4 @@ Quantizer2<T>::operator ()(ROW ib, ROW ie, size_t nbins)
 }
 
 }
-#endif	// !__TU_QUANTIZER_H
+#endif	// !TU_QUANTIZER_H

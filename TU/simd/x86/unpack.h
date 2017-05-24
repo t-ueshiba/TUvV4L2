@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#if !defined(__TU_SIMD_X86_UNPACK_H)
-#define __TU_SIMD_X86_UNPACK_H
+#if !defined(TU_SIMD_X86_UNPACK_H)
+#define TU_SIMD_X86_UNPACK_H
 
 namespace TU
 {
@@ -80,4 +80,4 @@ unpack(vec<T> x, vec<T> y)
 #endif    
 }	// namespace simd
 }	// namespace TU
-#endif	// !__TU_SIMD_X86_UNPACK_H
+#endif	// !TU_SIMD_X86_UNPACK_H

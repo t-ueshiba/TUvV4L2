@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#if !defined(__TU_SIMD_ARM_LOGICAL_H)
-#define __TU_SIMD_ARM_LOGICAL_H
+#if !defined(TU_SIMD_ARM_LOGICAL_H)
+#define TU_SIMD_ARM_LOGICAL_H
 
 namespace TU
 {
@@ -43,4 +43,4 @@ SIMD_LOGICALS(uint64_t)
 
 }	// namespace simd
 }	// namespace TU
-#endif	// !__TU_SIMD_ARM_LOGICAL_H
+#endif	// !TU_SIMD_ARM_LOGICAL_H

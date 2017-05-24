@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#if !defined(__TU_SIMD_INSERT_EXTRACT_H)
-#define __TU_SIMD_INSERT_EXTRACT_H
+#if !defined(TU_SIMD_INSERT_EXTRACT_H)
+#define TU_SIMD_INSERT_EXTRACT_H
 
 #include "TU/simd/vec.h"
 
@@ -38,4 +38,4 @@ template <size_t I, class T> int	extract(vec<T> x)		;
 #  include "TU/simd/arm/insert_extract.h"
 #endif
 
-#endif	// !__TU_SIMD_INSERT_EXTRACT_H
+#endif	// !TU_SIMD_INSERT_EXTRACT_H

@@ -3,8 +3,8 @@
   \author	Toshio UESHIBA
   \brief	各種入出力関数の定義と実装
 */
-#ifndef __TU_IO_H
-#define __TU_IO_H
+#ifndef TU_IO_H
+#define TU_IO_H
 
 #include <fstream>
 #include <string>
@@ -18,4 +18,4 @@ std::string	openFile(std::ifstream& in, const std::string& name,
 			 const std::string& dirs, const char* ext)	;
 }
 
-#endif	// !__TU_IO_H
+#endif	// !TU_IO_H

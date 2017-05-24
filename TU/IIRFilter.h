@@ -3,8 +3,8 @@
   \author	Toshio UESHIBA
   \brief	各種infinite impulse response filterに関するクラスの定義と実装
 */
-#ifndef	__TU_IIRFILTER_H
-#define	__TU_IIRFILTER_H
+#ifndef	TU_IIRFILTER_H
+#define	TU_IIRFILTER_H
 
 #include "TU/SeparableFilter2.h"
 
@@ -698,4 +698,4 @@ BidirectionalIIRFilter2<D, T>::initialize(const T cHF[], Order orderH,
 }
 
 }
-#endif	// !__TU_IIRFILTER_H
+#endif	// !TU_IIRFILTER_H

@@ -3,8 +3,8 @@
   \author	Toshio UESHIBA
   \brief	クラス#TU::Featureの定義と実装
 */
-#ifndef __TU_FEATURE_H
-#define __TU_FEATURE_H
+#ifndef TU_FEATURE_H
+#define TU_FEATURE_H
 
 #include "TU/Geometry++.h"
 #include "TU/Manip.h"
@@ -275,4 +275,4 @@ typedef Feature<float, 64u>	SURF;
 typedef Feature<float, 128u>	SURF128;
 
 }
-#endif	// !__TU_FEATURE_H
+#endif	// !TU_FEATURE_H

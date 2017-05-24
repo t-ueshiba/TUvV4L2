@@ -3,8 +3,8 @@
   \author	Toshio UESHIBA
   \brief	非有理/有理B-spline曲線/曲面に関連するクラスの定義と実装
 */
-#ifndef __TU_NURBSPP_H
-#define __TU_NURBSPP_H
+#ifndef TU_NURBSPP_H
+#define TU_NURBSPP_H
 
 #include "TU/Vector++.h"
 
@@ -884,4 +884,4 @@ using BSplineSurface3d		= BSplineSurface<Vector3d>;
 using RationalBSplineSurface3d	= BSplineSurface<Vector4d>;
 
 }
-#endif	// !__TU_NURBSPP_H
+#endif	// !TU_NURBSPP_H

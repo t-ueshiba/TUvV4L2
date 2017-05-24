@@ -3,8 +3,8 @@
   \author	Toshio UESHIBA
   \brief	クラス TU::PM16C_04 の定義と実装
 */
-#ifndef __TU_PM16C_04_H
-#define __TU_PM16C_04_H
+#ifndef TU_PM16C_04_H
+#define TU_PM16C_04_H
 
 #include "TU/Serial.h"
 
@@ -137,4 +137,4 @@ class PM16C_04 : public Serial
 };
     
 }
-#endif	// !__TU_PM16C_04_H
+#endif	// !TU_PM16C_04_H

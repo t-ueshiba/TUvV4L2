@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#if !defined(__TU_SIMD_X86_CAST_H)
-#define __TU_SIMD_X86_CAST_H
+#if !defined(TU_SIMD_X86_CAST_H)
+#define TU_SIMD_X86_CAST_H
 
 namespace TU
 {
@@ -76,4 +76,4 @@ cast(vec<S> x)
 }	// namespace simd
 }	// namespace TU
 
-#endif	// !__TU_SIMD_X86_CAST_H
+#endif	// !TU_SIMD_X86_CAST_H

@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#if !defined(__TU_SIMD_LOGICAL_H)
-#define __TU_SIMD_LOGICAL_H
+#if !defined(TU_SIMD_LOGICAL_H)
+#define TU_SIMD_LOGICAL_H
 
 #include "TU/tuple.h"
 #include "TU/simd/vec.h"
@@ -42,4 +42,4 @@ andnot(const L& l, const R& r)
 #  include "TU/simd/arm/logical.h"
 #endif
 
-#endif	// !__TU_SIMD_LOGICAL_H
+#endif	// !TU_SIMD_LOGICAL_H

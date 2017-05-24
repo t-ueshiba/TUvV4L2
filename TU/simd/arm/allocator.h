@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#if !defined(__TU_SIMD_ARM_ALLOCATOR_H)
-#define __TU_SIMD_ARM_ALLOCATOR_H
+#if !defined(TU_SIMD_ARM_ALLOCATOR_H)
+#define TU_SIMD_ARM_ALLOCATOR_H
 
 #include <memory>
 
@@ -13,4 +13,4 @@ namespace simd
 template <class T> using allocator = std::allocator<T>;
 }	// namespace simd
 }	// namespace TU
-#endif	// !__TU_SIMD_ARM_ALLOCATOR_H
+#endif	// !TU_SIMD_ARM_ALLOCATOR_H

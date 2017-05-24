@@ -3,8 +3,8 @@
   \author	Toshio UESHIBA
   \brief	クラス TU::SHOT602 の定義と実装
 */
-#ifndef __TU_SHOT602_H
-#define __TU_SHOT602_H
+#ifndef TU_SHOT602_H
+#define TU_SHOT602_H
 
 #include "TU/Serial.h"
 
@@ -71,4 +71,4 @@ class SHOT602 : public Serial
 };
     
 }
-#endif	// !__TU_SHOT602_H
+#endif	// !TU_SHOT602_H

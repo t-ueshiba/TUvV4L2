@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#if !defined(__TU_SIMD_VEC_H)
-#define __TU_SIMD_VEC_H
+#if !defined(TU_SIMD_VEC_H)
+#define TU_SIMD_VEC_H
 
 #include <iostream>
 #include <utility>
@@ -164,4 +164,4 @@ void	empty()								;
 #  include "TU/simd/arm/vec.h"
 #endif
 
-#endif	// !__TU_SIMD_VEC_H
+#endif	// !TU_SIMD_VEC_H

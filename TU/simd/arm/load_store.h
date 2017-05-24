@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#if !defined(__TU_SIMD_ARM_LOAD_STORE_H)
-#define __TU_SIMD_ARM_LOAD_STORE_H
+#if !defined(TU_SIMD_ARM_LOAD_STORE_H)
+#define TU_SIMD_ARM_LOAD_STORE_H
 
 namespace TU
 {
@@ -32,4 +32,4 @@ SIMD_LOAD_STORE(float)
 
 }	// namespace simd
 }	// namespace TU
-#endif	// !__TU_SIMD_ARM_LOAD_STORE_H
+#endif	// !TU_SIMD_ARM_LOAD_STORE_H

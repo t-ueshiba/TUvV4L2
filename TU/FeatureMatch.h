@@ -3,8 +3,8 @@
   \author	Toshio UESHIBA
   \brief	クラス TU::FeatureMatch の定義と実装
 */
-#ifndef __TU_FEATUREMATCH_H
-#define __TU_FEATUREMATCH_H
+#ifndef TU_FEATUREMATCH_H
+#define TU_FEATUREMATCH_H
 
 #include <utility>
 #include <vector>
@@ -265,4 +265,4 @@ operator <<(std::ostream& out, const FeatureMatch::Match& match)
 }
     
 }
-#endif	// !__TU_FEATUREMATCH_H
+#endif	// !TU_FEATUREMATCH_H
