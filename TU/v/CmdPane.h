@@ -27,8 +27,8 @@
  *
  *  $Id$  
  */
-#ifndef __TU_V_CMDPANE_H
-#define __TU_V_CMDPANE_H
+#ifndef TU_V_CMDPANE_H
+#define TU_V_CMDPANE_H
 
 #include "TU/v/CmdWindow.h"
 
@@ -53,4 +53,4 @@ class CmdPane : public Pane, public CmdParent
 
 }
 }
-#endif	// !__TU_V_CMDPANE_H
+#endif	// !TU_V_CMDPANE_H

@@ -27,8 +27,8 @@
  *
  *  $Id$  
  */
-#ifndef __TU_V_DC3_H
-#define __TU_V_DC3_H
+#ifndef TU_V_DC3_H
+#define TU_V_DC3_H
 
 #include "TU/Geometry++.h"
 #include "TU/Manip.h"
@@ -86,4 +86,4 @@ OManip1<DC3, double>	rotate(double angle)		;
 
 }
 }
-#endif	// !__TU_V_DC3_H
+#endif	// !TU_V_DC3_H

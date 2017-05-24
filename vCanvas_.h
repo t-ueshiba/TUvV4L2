@@ -27,8 +27,8 @@
  *
  *  $Id$  
  */
-#ifndef __VCANVAS_H
-#define __VCANVAS_H
+#ifndef V_CANVAS_H
+#define V_CANVAS_H
 
 /************************************************************************
 *  canvas Widget (subclass of Core)					*
@@ -62,4 +62,4 @@ typedef struct _VCanvasRec		*VCanvasWidget;
 
 extern WidgetClass			vCanvasWidgetClass;
 
-#endif	/* __VCANVAS_H	*/
+#endif	/* V_CANVAS_H	*/

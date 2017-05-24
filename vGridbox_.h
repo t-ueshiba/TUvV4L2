@@ -6,8 +6,8 @@
 
 
 
-#ifndef __VGRIDBOX_H
-#define __VGRIDBOX_H
+#ifndef V_GRIDBOX_H
+#define V_GRIDBOX_H
 
 #include <X11/Constraint.h>
 
@@ -106,4 +106,4 @@ _XFUNCPROTOBEGIN
 
 _XFUNCPROTOEND
  
-#endif	/* !__VGRIDBOX_H	*/
+#endif	/* !V_GRIDBOX_H	*/

@@ -27,8 +27,8 @@
  *
  *  $Id$  
  */
-#ifndef __TU_V_ICON_H
-#define __TU_V_ICON_H
+#ifndef TU_V_ICON_H
+#define TU_V_ICON_H
 
 #include "TU/v/Colormap.h"
 #include <X11/Xutil.h>
@@ -55,4 +55,4 @@ class Icon
 
 }
 }
-#endif	// !__TU_V_ICON_H
+#endif	// !TU_V_ICON_H

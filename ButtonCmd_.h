@@ -27,8 +27,8 @@
  *
  *  $Id$  
  */
-#ifndef __VBUTTONCMD_H
-#define __VBUTTONCMD_H
+#ifndef V_BUTTONCMD_H
+#define V_BUTTONCMD_H
 
 #include "TU/v/TUv++.h"
 #include "TU/v/Bitmap.h"
@@ -56,4 +56,4 @@ class ButtonCmd : public Cmd
 
 }
 }
-#endif	// !__VBUTTONCMD_H
+#endif	// !V_BUTTONCMD_H

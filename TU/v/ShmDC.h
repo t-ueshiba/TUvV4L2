@@ -27,8 +27,8 @@
  *
  *  $Id$  
  */
-#ifndef __TU_V_SHMDC_H
-#define __TU_V_SHMDC_H
+#ifndef TU_V_SHMDC_H
+#define TU_V_SHMDC_H
 
 #include "TU/v/CanvasPaneDC.h"
 #include <X11/extensions/XShm.h>
@@ -68,4 +68,4 @@ ShmDC::xShmInfo()
 
 }
 }
-#endif	// !__TU_V_SHMDC_H
+#endif	// !TU_V_SHMDC_H

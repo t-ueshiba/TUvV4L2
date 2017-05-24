@@ -1,8 +1,8 @@
 /*
  *  $Id$  
  */
-#ifndef __TU_V_COLORMAP_H
-#define __TU_V_COLORMAP_H
+#ifndef TU_V_COLORMAP_H
+#define TU_V_COLORMAP_H
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -348,4 +348,4 @@ Colormap::npixels() const
 
 }
 }
-#endif	// !__TU_V_COLORMAP_H
+#endif	// !TU_V_COLORMAP_H

@@ -27,8 +27,8 @@
  *
  *  $Id$  
  */
-#ifndef __VMENUBUTTONCMD_H
-#define __VMENUBUTTONCMD_H
+#ifndef V_MENUBUTTONCMD_H
+#define V_MENUBUTTONCMD_H
 
 #include "TU/v/Menu.h"
 
@@ -56,4 +56,4 @@ class MenuButtonCmd : public Cmd
 
 }
 }
-#endif	// !__VMENUBUTTONCMD_H
+#endif	// !V_MENUBUTTONCMD_H

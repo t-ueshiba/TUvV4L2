@@ -27,8 +27,8 @@
  *
  *  $Id$  
  */
-#ifndef __TU_V_CMDWINDOW_H
-#define __TU_V_CMDWINDOW_H
+#ifndef TU_V_CMDWINDOW_H
+#define TU_V_CMDWINDOW_H
 
 #include "TU/v/TUv++.h"
 #include "TU/v/Colormap.h"
@@ -92,4 +92,4 @@ class CmdWindow : public Window
 
 }
 }
-#endif	// !__TU_V_CMDWINDOW_H
+#endif	// !TU_V_CMDWINDOW_H

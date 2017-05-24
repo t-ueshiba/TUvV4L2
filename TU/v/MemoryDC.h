@@ -27,8 +27,8 @@
  *
  *  $Id$  
  */
-#ifndef __TU_V_MEMORYDC_H
-#define __TU_V_MEMORYDC_H
+#ifndef TU_V_MEMORYDC_H
+#define TU_V_MEMORYDC_H
 
 #include "TU/v/XDC.h"
 #include "TU/v/CanvasPane.h"
@@ -60,4 +60,4 @@ class MemoryDC : public XDC
 
 }
 }
-#endif	// !__TU_V_MEMORYDC_H
+#endif	// !TU_V_MEMORYDC_H

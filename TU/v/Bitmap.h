@@ -27,8 +27,8 @@
  *
  *  $Id$  
  */
-#ifndef __TU_V_BITMAP_H
-#define __TU_V_BITMAP_H
+#ifndef TU_V_BITMAP_H
+#define TU_V_BITMAP_H
 
 #include "TU/v/Colormap.h"
 
@@ -54,4 +54,4 @@ class Bitmap
 
 }
 }
-#endif	// !__TU_V_BITMAP_H
+#endif	// !TU_V_BITMAP_H

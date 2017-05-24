@@ -51,8 +51,8 @@ SOFTWARE.
 
 ******************************************************************/
 
-#ifndef __VSLIDERP_H
-#define __VSLIDERP_H
+#ifndef V_SLIDERP_H
+#define V_SLIDERP_H
 
 #include <X11/Xaw3d/Xaw3dP.h>
 #include <X11/Xaw3d/ThreeDP.h>
@@ -104,4 +104,4 @@ typedef struct _SliderClassRec {
 
 extern SliderClassRec sliderClassRec;
 
-#endif	/* __VSLIDERP_H	*/
+#endif	/* V_SLIDERP_H	*/
