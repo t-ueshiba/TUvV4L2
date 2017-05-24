@@ -3,8 +3,8 @@
   \author	Toshio UESHIBA
   \brief	クラス TU::Mesh の定義と実装
 */
-#ifndef __TU_MESHPP_H
-#define __TU_MESHPP_H
+#ifndef TU_MESHPP_H
+#define TU_MESHPP_H
 
 #include <list>
 #include <vector>
@@ -1085,4 +1085,4 @@ Mesh<V, F, M>::Edge::replaceVertex(viterator v) const
 }
 
 }
-#endif	// !__TU_MESHPP_H
+#endif	// !TU_MESHPP_H

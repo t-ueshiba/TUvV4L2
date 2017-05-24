@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#if !defined(__TU_SIMD_CONFIG_H)
-#define __TU_SIMD_CONFIG_H
+#if !defined(TU_SIMD_CONFIG_H)
+#define TU_SIMD_CONFIG_H
 
 #if defined(AVX2)		// Core-i7 Haswell (2013)
 #  define AVX
@@ -30,4 +30,4 @@
 #  define SIMD
 #endif
 
-#endif	// !__TU_SIMD_CONFIG_H
+#endif	// !TU_SIMD_CONFIG_H

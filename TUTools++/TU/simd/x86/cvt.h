@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#if !defined(__TU_SIMD_X86_CVT_H)
-#define __TU_SIMD_X86_CVT_H
+#if !defined(TU_SIMD_X86_CVT_H)
+#define TU_SIMD_X86_CVT_H
 
 #include "TU/simd/x86/unpack.h"
 
@@ -502,4 +502,4 @@ SIMD_CVTUP_MASK(uint32_t, uint64_t)	// u_int    -> u_long
 #endif
 }	// namespace simd
 }	// namespace TU
-#endif	// !__TU_SIMD_X86_CVT_H
+#endif	// !TU_SIMD_X86_CVT_H

@@ -27,8 +27,8 @@
  *
  *  $Id$  
  */
-#ifndef __TU_V_CANVASPANE_H
-#define __TU_V_CANVASPANE_H
+#ifndef TU_V_CANVASPANE_H
+#define TU_V_CANVASPANE_H
 
 #include "TU/v/TUv++.h"
 
@@ -65,4 +65,4 @@ class CanvasPane : public Pane
 
 }
 }
-#endif	// !__TU_V_CANVASPANE_H
+#endif	// !TU_V_CANVASPANE_H

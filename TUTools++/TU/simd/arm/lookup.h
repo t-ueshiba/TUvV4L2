@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#if !defined(__TU_SIMD_ARM_LOOKUP_H)
-#define __TU_SIMD_ARM_LOOKUP_H
+#if !defined(TU_SIMD_ARM_LOOKUP_H)
+#define TU_SIMD_ARM_LOOKUP_H
 
 namespace TU
 {
@@ -57,4 +57,4 @@ lookup(const P* p, Is16vec row, Is16vec col, int32_t stride)
 
 }	// namespace simd
 }	// namespace TU
-#endif	// !__TU_SIMD_ARM_LOOKUP_H
+#endif	// !TU_SIMD_ARM_LOOKUP_H

@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#ifndef __TU_V_VIIDCPP_H
-#define __TU_V_VIIDCPP_H
+#ifndef TU_V_VIIDCPP_H
+#define TU_V_VIIDCPP_H
 
 #include "TU/v/CmdPane.h"
 #include "TU/IIDCCameraArray.h"
@@ -141,4 +141,4 @@ setFeature(IIDCCamera& camera, CmdId id, CmdVal val, CmdPane& cmdPane)
 
 }	// namespace v
 }	// namespace TU
-#endif	// !__TU_V_IIDCPP_H
+#endif	// !TU_V_IIDCPP_H

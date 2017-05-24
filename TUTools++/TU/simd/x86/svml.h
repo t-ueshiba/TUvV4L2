@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#if !defined(__TU_SIMD_X86_SVML_H)
-#define __TU_SIMD_X86_SVML_H
+#if !defined(TU_SIMD_X86_SVML_H)
+#define TU_SIMD_X86_SVML_H
 
 #if defined(__INTEL_COMPILER)
 #  include "TU/simd/arithmetic.h"
@@ -171,4 +171,4 @@ template <class T> vec<T>	atanh(vec<T> x)				;
 }	// namespace TU
 #endif	// __INTEL_COMPILER
 
-#endif	// !__TU_SIMD_X86_SVML_H
+#endif	// !TU_SIMD_X86_SVML_H

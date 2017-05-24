@@ -3,8 +3,8 @@
   \author	Toshio UESHIBA
   \brief	クラス TU::IntegralImage, TU::DiagonalIntegralImage の定義と実装
 */
-#ifndef	__TU_INTEGRALIMAGE_H
-#define	__TU_INTEGRALIMAGE_H
+#ifndef	TU_INTEGRALIMAGE_H
+#define	TU_INTEGRALIMAGE_H
 
 #include "TU/Image++.h"
 #ifdef USE_TBB
@@ -424,4 +424,4 @@ DiagonalIntegralImage<T>::correct(int& u, int& v) const
 }
 
 }
-#endif	// !__TU_INTEGRALIMAGE_H
+#endif	// !TU_INTEGRALIMAGE_H

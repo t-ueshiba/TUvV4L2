@@ -3,8 +3,8 @@
   \author	Toshio UESHIBA
   \brief	クラス TU::SURFCreator の定義と実装
 */
-#ifndef __TU_SURFCREATOR_H
-#define __TU_SURFCREATOR_H
+#ifndef TU_SURFCREATOR_H
+#define TU_SURFCREATOR_H
 
 #include <vector>
 #include "TU/Feature.h"
@@ -585,4 +585,4 @@ Sieve<F>::clear()
 }
 
 }
-#endif	// !__TU_SURFCREATOR_H
+#endif	// !TU_SURFCREATOR_H

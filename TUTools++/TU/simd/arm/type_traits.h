@@ -1,8 +1,8 @@
 /*
  *  $id$
  */
-#if !defined(__TU_SIMD_ARM_TYPE_TRAITS_H)
-#define __TU_SIMD_ARM_TYPE_TRAITS_H
+#if !defined(TU_SIMD_ARM_TYPE_TRAITS_H)
+#define TU_SIMD_ARM_TYPE_TRAITS_H
 
 #include <arm_neon.h>
 
@@ -101,4 +101,4 @@ template <class T> using half_type = typename type_traits<T>::half_type;
     
 }	// namespace simd
 }	// namespace TU
-#endif	// !__TU_SIMD_ARM_TYPE_TRAITS_H
+#endif	// !TU_SIMD_ARM_TYPE_TRAITS_H

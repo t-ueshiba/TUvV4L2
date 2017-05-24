@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#if !defined(__TU_SIMD_SHIFT_H)
-#define __TU_SIMD_SHIFT_H
+#if !defined(TU_SIMD_SHIFT_H)
+#define TU_SIMD_SHIFT_H
 
 #include "TU/tuple.h"
 #include "TU/simd/zero.h"
@@ -156,4 +156,4 @@ shift_rmost_to_lmost(const std::tuple<T...>& t)
 #  include "TU/simd/arm/shift.h"
 #endif
 
-#endif	// !__TU_SIMD_ARM_SHIFT_H
+#endif	// !TU_SIMD_ARM_SHIFT_H

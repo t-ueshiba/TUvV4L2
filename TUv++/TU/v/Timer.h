@@ -27,8 +27,8 @@
  *
  *  $Id$  
  */
-#ifndef __TU_V_TIMER_H
-#define __TU_V_TIMER_H
+#ifndef TU_V_TIMER_H
+#define TU_V_TIMER_H
 
 #include "TU/v/TUv++.h"
 
@@ -61,4 +61,4 @@ class Timer
 
 }
 }
-#endif	// !__TU_V_TIMER_H
+#endif	// !TU_V_TIMER_H

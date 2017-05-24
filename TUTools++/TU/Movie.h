@@ -3,8 +3,8 @@
   \author	Toshio UESHIBA
   \brief	クラス TU::Movie の定義と実装
 */
-#ifndef __TU_MOVIE_H
-#define __TU_MOVIE_H
+#ifndef TU_MOVIE_H
+#define TU_MOVIE_H
 
 #include <utility>
 #include <list>
@@ -628,4 +628,4 @@ Movie<YUV411>::npixels(size_t n)
 }
 
 }
-#endif	// !__TU_MOVIE_H
+#endif	// !TU_MOVIE_H

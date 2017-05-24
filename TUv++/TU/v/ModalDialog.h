@@ -27,8 +27,8 @@
  *
  *  $Id$  
  */
-#ifndef __TU_V_MODALDIALOG_H
-#define __TU_V_MODALDIALOG_H
+#ifndef TU_V_MODALDIALOG_H
+#define TU_V_MODALDIALOG_H
 
 #include "TU/v/Dialog.h"
 
@@ -55,4 +55,4 @@ class ModalDialog : public Dialog
 
 }
 }
-#endif	// !__TU_V_MODALDIALOG_H
+#endif	// !TU_V_MODALDIALOG_H

@@ -126,8 +126,8 @@
   \file		IIDC++.h
   \brief	IEEE1394デバイスに関連するクラスの定義と実装
 */
-#ifndef __TU_IIDCPP_H
-#define __TU_IIDCPP_H
+#ifndef TU_IIDCPP_H
+#define TU_IIDCPP_H
 
 #if defined(HAVE_CONFIG_H)
 #  include <config.h>
@@ -1002,4 +1002,4 @@ std::ostream&	operator <<(std::ostream& out, const IIDCCamera& camera);
 std::istream&	operator >>(std::istream& in, IIDCCamera& camera)	;
 
 }
-#endif	// !__TU_IIDCPP_H
+#endif	// !TU_IIDCPP_H

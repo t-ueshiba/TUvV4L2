@@ -5,8 +5,8 @@
   \file		Ieee1394CameraArray.h
   \brief	クラス TU::Ieee1394CameraArray の定義と実装
 */
-#ifndef __TU_IEEE1394CAMERAARRAY_H
-#define __TU_IEEE1394CAMERAARRAY_H
+#ifndef TU_IEEE1394CAMERAARRAY_H
+#define TU_IEEE1394CAMERAARRAY_H
 
 #include "TU/Ieee1394++.h"
 
@@ -96,4 +96,4 @@ operator <<(std::ostream& out, const Ieee1394CameraArray& cameras)	;
 
 }
 #endif	// HAVE_LIBTUTOOLS__
-#endif	// ! __TU_IEEE1394CAMERAARRAY_H
+#endif	// ! TU_IEEE1394CAMERAARRAY_H

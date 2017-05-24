@@ -3,8 +3,8 @@
   \author	Toshio UESHIBA
   \brief	クラス TU::BandMatrix の定義と実装
 */
-#ifndef __TU_BANDMATRIXPP_H
-#define __TU_BANDMATRIXPP_H
+#ifndef TU_BANDMATRIXPP_H
+#define TU_BANDMATRIXPP_H
 
 #include "TU/Vector++.h"
 
@@ -343,4 +343,4 @@ operator <<(std::ostream& out, const BandMatrix<T, P, Q>& A)
 }
 
 }
-#endif	// !__TU_BANDMATRIXPP_H
+#endif	// !TU_BANDMATRIXPP_H

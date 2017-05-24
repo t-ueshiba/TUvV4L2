@@ -3,8 +3,8 @@
   \author	Toshio UESHIBA
   \brief	カメラ内部パラメータおよびカメラ自身に関するクラスの定義と実装
 */
-#ifndef __TU_CAMERAPP_H
-#define __TU_CAMERAPP_H
+#ifndef TU_CAMERAPP_H
+#define TU_CAMERAPP_H
 
 #include "TU/Geometry++.h"
 
@@ -1780,4 +1780,4 @@ operator <<(std::ostream& out, const Camera<I>& camera)
 }
 
 }
-#endif	// !__TU_CAMERAPP_H
+#endif	// !TU_CAMERAPP_H

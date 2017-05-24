@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#if !defined(__TU_SIMD_X86_DUP_H)
-#define __TU_SIMD_X86_DUP_H
+#if !defined(TU_SIMD_X86_DUP_H)
+#define TU_SIMD_X86_DUP_H
 
 #include "TU/simd/x86/unpack.h"
 
@@ -21,4 +21,4 @@ dup(vec<T> x)
     
 }	// namespace simd
 }	// namespace TU
-#endif	// !__TU_SIMD_X86_DUP_H
+#endif	// !TU_SIMD_X86_DUP_H

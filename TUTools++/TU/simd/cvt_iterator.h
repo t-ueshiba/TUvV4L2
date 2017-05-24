@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#if !defined(__TU_SIMD_CVT_ITERATOR_H)
-#define __TU_SIMD_CVT_ITERATOR_H
+#if !defined(TU_SIMD_CVT_ITERATOR_H)
+#define TU_SIMD_CVT_ITERATOR_H
 
 #include "TU/iterator.h"
 #include "TU/simd/pack.h"
@@ -108,4 +108,4 @@ make_cvt_mask_iterator(ITER iter)
     
 }	// namespace simd
 }	// namespace TU
-#endif	// !__TU_SIMD_CVT_ITERATOR_H
+#endif	// !TU_SIMD_CVT_ITERATOR_H

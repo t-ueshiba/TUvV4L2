@@ -3,8 +3,8 @@
   \author	Toshio UESHIBA
   \brief	クラス TU::Profiler の定義と実装
 */
-#ifndef __TU_PROFILER_H
-#define __TU_PROFILER_H
+#ifndef TU_PROFILER_H
+#define TU_PROFILER_H
 
 #include <chrono>
 #include <string>
@@ -165,4 +165,4 @@ struct Profiler<void>
 };
 
 }
-#endif	// !__TU_ROFILER_H
+#endif	// !TU_ROFILER_H

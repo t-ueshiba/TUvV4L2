@@ -3,8 +3,8 @@
   \author	Toshio UESHIBA
   \brief	guided filterに関するクラスの定義と実装
 */
-#ifndef __TU_GUIDEDFILTER_H
-#define __TU_GUIDEDFILTER_H
+#ifndef TU_GUIDEDFILTER_H
+#define TU_GUIDEDFILTER_H
 
 #include "TU/BoxFilter.h"
 
@@ -325,4 +325,4 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, OUT out) const
 }
 
 }
-#endif	// !__TU_GUIDEDFILTER_H
+#endif	// !TU_GUIDEDFILTER_H

@@ -3,8 +3,8 @@
   \author	Toshio UESHIBA
   \brief	クラス TU::Rectify の定義と実装
 */
-#ifndef __TU_RECTIFY_H
-#define __TU_RECTIFY_H
+#ifndef TU_RECTIFY_H
+#define TU_RECTIFY_H
 
 #include "TU/Warp.h"
 
@@ -377,4 +377,4 @@ Rectify::operator ()(const Image<T>& inL,
 }
 
 }
-#endif	// !__TU_RECTIFY_H
+#endif	// !TU_RECTIFY_H

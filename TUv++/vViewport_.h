@@ -46,8 +46,8 @@ SOFTWARE.
 
 ********************************************************/
 
-#ifndef __VVIEWPORT_H
-#define __VVIEWPORT_H
+#ifndef V_VIEWPORT_H
+#define V_VIEWPORT_H
 
 #include <X11/Xaw3d/Form.h>
 #include <X11/Xaw3d/Reports.h>
@@ -120,4 +120,4 @@ extern void vViewportSetCoordinates (
 
 _XFUNCPROTOEND
 
-#endif	/* !__VVIEWPORT_H	*/
+#endif	/* !V_VIEWPORT_H	*/

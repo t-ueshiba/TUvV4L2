@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#if !defined(__TU_SIMD_ARM_CAST_H)
-#define __TU_SIMD_ARM_CAST_H
+#if !defined(TU_SIMD_ARM_CAST_H)
+#define TU_SIMD_ARM_CAST_H
 
 namespace TU
 {
@@ -99,4 +99,4 @@ SIMD_CAST(float, uint64_t)
 
 }	// namespace simd
 }	// namespace TU
-#endif	// !__TU_SIMD_ARM_CAST_H
+#endif	// !TU_SIMD_ARM_CAST_H

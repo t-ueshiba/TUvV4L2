@@ -3,8 +3,8 @@
   \author	Toshio UESHIBA
   \brief	クラス TU::NDTree の定義と実装
 */
-#ifndef __TU_NDTREEPP_H
-#define __TU_NDTREEPP_H
+#ifndef TU_NDTREEPP_H
+#define TU_NDTREEPP_H
 
 #include <stack>
 #include "TU/Array++.h"
@@ -942,4 +942,4 @@ operator <<(std::ostream& out, const NDTree<T, D>& tree)
 }
 
 }
-#endif	// !__TU_NDTREE_H
+#endif	// !TU_NDTREE_H

@@ -27,8 +27,8 @@
  *
  *  $Id$  
  */
-#ifndef __TU_VAPP_H
-#define __TU_VAPP_H
+#ifndef TU_VAPP_H
+#define TU_VAPP_H
 
 #include "TU/v/TUv++.h"
 #include "TU/v/Colormap.h"
@@ -68,4 +68,4 @@ class App : public Window
 
 }
 }
-#endif	// !__TU_VAPP_H
+#endif	// !TU_VAPP_H

@@ -27,8 +27,8 @@
  *
  *  $Id$  
  */
-#ifndef __TU_VPP_H
-#define __TU_VPP_H
+#ifndef TU_VPP_H
+#define TU_VPP_H
 
 #include <X11/Intrinsic.h>
 #include <X11/StringDefs.h>
@@ -407,4 +407,4 @@ CmdParent::detachCmd()
 
 }	// namespace v
 }	// namespace TU
-#endif	// ! __TU_VPP_H
+#endif	// ! TU_VPP_H

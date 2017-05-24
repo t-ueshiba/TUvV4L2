@@ -27,8 +27,8 @@
  *  
  *  $Id$
  */
-#ifndef __TU_V_XVDC_H
-#define __TU_V_XVDC_H
+#ifndef TU_V_XVDC_H
+#define TU_V_XVDC_H
 
 #include "TU/v/ShmDC.h"
 #include <X11/extensions/Xvlib.h>
@@ -90,4 +90,4 @@ class XvDC : public ShmDC, public List<XvDC>::Node
 
 }
 }
-#endif	// !__TU_V_XVDC_H
+#endif	// !TU_V_XVDC_H

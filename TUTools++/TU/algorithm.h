@@ -184,8 +184,8 @@
   \file		algorithm.h
   \brief	各種アルゴリズムの定義と実装
 */
-#ifndef __TU_ALGORITHM_H
-#define __TU_ALGORITHM_H
+#ifndef TU_ALGORITHM_H
+#define TU_ALGORITHM_H
 
 #include <cmath>		// for std::sqrt()
 #include <iterator>		// for std::iterator_traits<ITER>
@@ -572,4 +572,4 @@ square(const T& val)
 }
     
 }	// namespace TU
-#endif	// !__TU_ALGORITHM_H
+#endif	// !TU_ALGORITHM_H

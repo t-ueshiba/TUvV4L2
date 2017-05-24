@@ -3,8 +3,8 @@
   \author	Toshio UESHIBA
   \brief	多次元配列クラスの定義と実装
 */
-#ifndef __TU_ARRAY_H
-#define __TU_ARRAY_H
+#ifndef TU_ARRAY_H
+#define TU_ARRAY_H
 
 #include <array>
 #include <iomanip>		// for std::ws
@@ -886,4 +886,4 @@ template <class T,
 using Array3 = array<T, ALLOC, Z, Y, X>;			//!< 3次元配列
 
 }	// namespace TU
-#endif	// !__TU_ARRAY_H
+#endif	// !TU_ARRAY_H

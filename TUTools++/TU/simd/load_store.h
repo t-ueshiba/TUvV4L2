@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#if !defined(__TU_SIMD_LOAD_STORE_H)
-#define __TU_SIMD_LOAD_STORE_H
+#if !defined(TU_SIMD_LOAD_STORE_H)
+#define TU_SIMD_LOAD_STORE_H
 
 #include "TU/pair.h"
 #include "TU/simd/vec.h"
@@ -80,4 +80,4 @@ store(T* p, std::pair<PACK, PACK> x)
 #  include "TU/simd/arm/load_store.h"
 #endif
 
-#endif	// !__TU_SIMD_LOAD_STORE_H
+#endif	// !TU_SIMD_LOAD_STORE_H

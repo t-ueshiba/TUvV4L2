@@ -3,8 +3,8 @@
   \author	Toshio UESHIBA
   \brief	クラス TU::EdgeDetector の定義と実装
 */
-#ifndef	__TU_EDGEDETECTOR_H
-#define	__TU_EDGEDETECTOR_H
+#ifndef	TU_EDGEDETECTOR_H
+#define	TU_EDGEDETECTOR_H
 
 #include "TU/Image++.h"
 
@@ -90,4 +90,4 @@ EdgeDetector::initialize(float th_low, float th_high)
 }
  
 }
-#endif	// !__TU_EDGEDETECTOR_H
+#endif	// !TU_EDGEDETECTOR_H

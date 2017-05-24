@@ -27,8 +27,8 @@
  *
  *  $Id$  
  */
-#ifndef __TU_V_NOTIFY_H
-#define __TU_V_NOTIFY_H
+#ifndef TU_V_NOTIFY_H
+#define TU_V_NOTIFY_H
 
 #include <sstream>
 #include "TU/v/ModalDialog.h"
@@ -53,4 +53,4 @@ class Notify : public ModalDialog, public std::ostringstream
 
 }
 }
-#endif // !__TU_V_NOTIFY_H
+#endif // !TU_V_NOTIFY_H

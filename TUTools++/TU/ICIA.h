@@ -3,8 +3,8 @@
   \author	Toshio UESHIBA
   \brief	クラス TU::ICIA の定義と実装
 */
-#ifndef __TU_ICIA_H
-#define __TU_ICIA_H
+#ifndef TU_ICIA_H
+#define TU_ICIA_H
 
 #include "TU/Geometry++.h"
 #include "TU/Image++.h"
@@ -330,4 +330,4 @@ ICIA<MAP>::moment(size_t u0, size_t v0, size_t w, size_t h) const
 }
     
 }
-#endif	// !__TU_ICIA_H
+#endif	// !TU_ICIA_H

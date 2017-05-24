@@ -3,8 +3,8 @@
   \author	Toshio UESHIBA
   \brief	点，直線，超平面および各種の幾何変換に関するクラスの定義と実装
 */
-#ifndef __TU_GEOMETRYPP_H
-#define __TU_GEOMETRYPP_H
+#ifndef TU_GEOMETRYPP_H
+#define TU_GEOMETRYPP_H
 
 #include "TU/Minimize.h"
 #include <limits>
@@ -1864,4 +1864,4 @@ operator <<(std::ostream& out, const BoundingBox<P>& bbox)
 }
     
 }
-#endif	// !__TU_GEOMETRYPP_H
+#endif	// !TU_GEOMETRYPP_H

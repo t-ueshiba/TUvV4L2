@@ -3,8 +3,8 @@
   \author	Toshio UESHIBA
   \brief	クラス TU::List の定義と実装
 */
-#ifndef __TU_LIST_H
-#define __TU_LIST_H
+#ifndef TU_LIST_H
+#define TU_LIST_H
 #include <iterator>
 
 namespace TU
@@ -207,4 +207,4 @@ List<T>::remove(const T& x)
 }
 
 }
-#endif	// !__TU_LIST_H
+#endif	// !TU_LIST_H

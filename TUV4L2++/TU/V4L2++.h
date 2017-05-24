@@ -5,8 +5,8 @@
   \mainpage	libTUV4L2++ - Video for Linux v.2デバイスを制御するC++ライブラリ
   \anchor	libTUV4L2
 */
-#ifndef __TU_V4L2PP_H
-#define __TU_V4L2PP_H
+#ifndef TU_V4L2PP_H
+#define TU_V4L2PP_H
 
 #include <cstddef>		// for size_t
 #include <cstdint>		// for uintXX_t
@@ -590,4 +590,4 @@ std::ostream&	operator <<(std::ostream& out, const V4L2Camera& camera);
 std::istream&	operator >>(std::istream& in, V4L2Camera& camera)	;
     
 }
-#endif	// !__TU_V4L2PP_H
+#endif	// !TU_V4L2PP_H

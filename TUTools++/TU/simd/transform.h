@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#if !defined(__TU_SIMD_TRANSFORM_H)
-#define	__TU_SIMD_TRANSFORM_H
+#if !defined(TU_SIMD_TRANSFORM_H)
+#define	TU_SIMD_TRANSFORM_H
 
 #include "TU/iterator.h"
 #include "TU/functional.h"
@@ -304,4 +304,4 @@ copy(const zip_iterator<ITER_TUPLE>& ib,
     
 }	// namespace simd
 }	// namespace TU
-#endif	// !__TU_SIMD_TRANSFORM_H
+#endif	// !TU_SIMD_TRANSFORM_H

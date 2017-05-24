@@ -27,8 +27,8 @@
  *
  *  $Id$  
  */
-#ifndef __TU_V_MENU_H
-#define __TU_V_MENU_H
+#ifndef TU_V_MENU_H
+#define TU_V_MENU_H
 
 #include "TU/v/TUv++.h"
 
@@ -90,4 +90,4 @@ class ChoiceMenu : public Menu
 
 }
 }
-#endif	// !__TU_V_MENU_H
+#endif	// !TU_V_MENU_H

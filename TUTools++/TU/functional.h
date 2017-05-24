@@ -3,8 +3,8 @@
   \author	Toshio UESHIBA
   \brief	関数オブジェクトの定義と実装
 */
-#ifndef __TU_FUNCTIONAL_H
-#define __TU_FUNCTIONAL_H
+#ifndef TU_FUNCTIONAL_H
+#define TU_FUNCTIONAL_H
 
 #include <type_traits>				// std::integral_constant
 
@@ -129,4 +129,4 @@ struct bit_xor_assign
 };
 
 }	// End of namespace TU
-#endif	// !__TU_FUNCTIONAL_H
+#endif	// !TU_FUNCTIONAL_H

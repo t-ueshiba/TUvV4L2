@@ -3,8 +3,8 @@
   \author	Toshio UESHIBA
   \brief	クラス TU::Serial の定義と実装
 */
-#ifndef __TU_SERIAL_H
-#define __TU_SERIAL_H
+#ifndef TU_SERIAL_H
+#define TU_SERIAL_H
 
 #include "TU/fdstream.h"
 #include <termios.h>
@@ -51,4 +51,4 @@ class Serial : public fdstream
 };
 
 }
-#endif	// !__TU_SERIAL_H
+#endif	// !TU_SERIAL_H

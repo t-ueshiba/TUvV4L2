@@ -3,8 +3,8 @@
   \author	Toshio UESHIBA
   \brief	各種反復子の定義と実装
 */
-#ifndef __TU_ITERATOR_H
-#define __TU_ITERATOR_H
+#ifndef TU_ITERATOR_H
+#define TU_ITERATOR_H
 
 #include <iterator>
 #include <functional>			// for std::function
@@ -654,4 +654,4 @@ template <class ITER> ring_iterator<ITER>
 make_ring_iterator(ITER begin, ITER end)	{ return {begin, end}; }
 
 }	// namespace TU
-#endif	// !__TU_ITERATOR_H
+#endif	// !TU_ITERATOR_H

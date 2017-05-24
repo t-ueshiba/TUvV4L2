@@ -3,8 +3,8 @@
   \author	Toshio UESHIBA
   \brief	CPUのSIMD命令に関連するクラスと関数の定義と実装
 */
-#if !defined(__TU_SIMD_SIMD_H)
-#define __TU_SIMD_SIMD_H
+#if !defined(TU_SIMD_SIMD_H)
+#define TU_SIMD_SIMD_H
 
 #include "TU/simd/config.h"
 
@@ -37,4 +37,4 @@
 #  include "TU/simd/BufTraits.h"
 #endif
 
-#endif	// !__TU_SIMD_SIMD_H
+#endif	// !TU_SIMD_SIMD_H

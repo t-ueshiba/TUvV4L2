@@ -3,8 +3,8 @@
   \author	Toshio UESHIBA
   \brief	SADステレオマッチングクラスの定義と実装
 */
-#ifndef __TU_SADSTEREO_H
-#define __TU_SADSTEREO_H
+#ifndef TU_SADSTEREO_H
+#define TU_SADSTEREO_H
 
 #include "TU/StereoBase.h"
 #include "TU/BoxFilter.h"
@@ -622,4 +622,4 @@ SADStereo<SCORE, DISP>::Buffers::initialize(size_t N, size_t D,
 }
 
 }
-#endif	// !__TU_SADSTEREO_H
+#endif	// !TU_SADSTEREO_H

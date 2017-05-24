@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#if !defined(__TU_SIMD_LOAD_ITERATOR_H)
-#define __TU_SIMD_LOAD_ITERATOR_H
+#if !defined(TU_SIMD_LOAD_ITERATOR_H)
+#define TU_SIMD_LOAD_ITERATOR_H
 
 #include "TU/iterator.h"
 #include "TU/simd/load_store.h"
@@ -97,4 +97,4 @@ make_load_iterator(zip_iterator<ITER_TUPLE> zip_iter)
 
 }	// namespace simd
 }	// namespace TU
-#endif	// !__TU_SIMD_LOAD_ITERATOR_H
+#endif	// !TU_SIMD_LOAD_ITERATOR_H

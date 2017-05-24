@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#if !defined(__TU_SIMD_COMPARE_H)
-#define __TU_SIMD_COMPARE_H
+#if !defined(TU_SIMD_COMPARE_H)
+#define TU_SIMD_COMPARE_H
 
 #include "TU/simd/vec.h"
 
@@ -29,4 +29,4 @@ template <class T> vec<mask_type<T> >	operator <=(vec<T> x, vec<T> y)	;
 #  include "TU/simd/arm/compare.h"
 #endif
 
-#endif	// !__TU_SIMD_COMPARE_H
+#endif	// !TU_SIMD_COMPARE_H

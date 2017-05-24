@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#if !defined(__TU_SIMD_X86_VEC_H)
-#define __TU_SIMD_X86_VEC_H
+#if !defined(TU_SIMD_X86_VEC_H)
+#define TU_SIMD_X86_VEC_H
 
 #include "TU/simd/x86/arch.h"
 
@@ -205,4 +205,4 @@ inline void	empty()	{ _mm_empty(); }
 
 }	// namespace simd
 }	// namespace TU
-#endif	// !__TU_SIMD_X86_VEC_H
+#endif	// !TU_SIMD_X86_VEC_H

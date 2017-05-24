@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#if !defined(__TU_SIMD_X86_LOGICAL_H)
-#define __TU_SIMD_X86_LOGICAL_H
+#if !defined(TU_SIMD_X86_LOGICAL_H)
+#define TU_SIMD_X86_LOGICAL_H
 
 #include "TU/simd/x86/logical_base.h"
 
@@ -21,4 +21,4 @@ andnot(vec<T> x, vec<T> y)	{ return detail::base_andnot(x, y); }
 
 }	// namespace simd
 }	// namespace TU
-#endif	// !__TU_SIMD_X86_LOGICAL_H
+#endif	// !TU_SIMD_X86_LOGICAL_H

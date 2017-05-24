@@ -3,8 +3,8 @@
   \author	Toshio UESHIBA
   \brief	動的計画法による最適化器の定義と実装
 */
-#ifndef __TU_DP_H
-#define __TU_DP_H
+#ifndef TU_DP_H
+#define TU_DP_H
 
 #include "TU/Array++.h"
 
@@ -219,4 +219,4 @@ DP<DOM, T>::put(std::ostream& out) const
 }
 
 }
-#endif	// !__TU_DP_H
+#endif	// !TU_DP_H

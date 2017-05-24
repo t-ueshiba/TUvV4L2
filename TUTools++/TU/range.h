@@ -3,8 +3,8 @@
   \author	Toshio UESHIBA
   \brief	2つの反復子によって指定されるレンジの定義と実装
 */
-#ifndef __TU_RANGE_H
-#define __TU_RANGE_H
+#ifndef TU_RANGE_H
+#define TU_RANGE_H
 
 #include <cassert>
 #include <initializer_list>
@@ -1385,4 +1385,4 @@ at(const E& expr, T x, T y)
 }
 
 }	// namespace TU
-#endif	// !__TU_RANGE_H
+#endif	// !TU_RANGE_H

@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#if !defined(__TU_SIMD_ALLOCATOR_H)
-#define __TU_SIMD_ALLOCATOR_H
+#if !defined(TU_SIMD_ALLOCATOR_H)
+#define TU_SIMD_ALLOCATOR_H
 
 #include "TU/simd/vec.h"
 
@@ -12,6 +12,6 @@
 #  include "TU/simd/arm/allocator.h"
 #endif
 
-#endif	// !__TU_SIMD_ALLOCATOR_H)
+#endif	// !TU_SIMD_ALLOCATOR_H)
 
 

@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#if !defined(__TU_SIMD_ARM_INSERT_EXTRACT_H)
-#define __TU_SIMD_ARM_INSERT_EXTRACT_H
+#if !defined(TU_SIMD_ARM_INSERT_EXTRACT_H)
+#define TU_SIMD_ARM_INSERT_EXTRACT_H
 
 namespace TU
 {
@@ -28,4 +28,4 @@ SIMD_INSERT_EXTRACT(float)
     
 }	// namespace simd
 }	// namespace TU
-#endif	// !__TU_SIMD_ARM_INSERT_EXTRACT_H
+#endif	// !TU_SIMD_ARM_INSERT_EXTRACT_H

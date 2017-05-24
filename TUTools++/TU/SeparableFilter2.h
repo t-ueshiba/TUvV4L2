@@ -3,8 +3,8 @@
   \author	Toshio UESHIBA
   \brief	水平/垂直方向に分離可能な2次元フィルタを実装するための基底クラスの定義
 */
-#ifndef __TU_SEPARABLEFILTER2_H
-#define __TU_SEPARABLEFILTER2_H
+#ifndef TU_SEPARABLEFILTER2_H
+#define TU_SEPARABLEFILTER2_H
 
 #include "TU/Array++.h"
 #if defined(USE_TBB)
@@ -194,4 +194,4 @@ SeparableFilter2<F>::convolve(IN_ ib, IN_ ie, OUT_ out) const
 }
 
 }
-#endif	// !__TU_SEPARABLEFILTER2_H
+#endif	// !TU_SEPARABLEFILTER2_H

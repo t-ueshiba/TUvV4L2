@@ -27,8 +27,8 @@
  *
  *  $Id$  
  */
-#ifndef __TU_V_DC_H
-#define __TU_V_DC_H
+#ifndef TU_V_DC_H
+#define TU_V_DC_H
 
 #include "TU/Geometry++.h"
 #include "TU/Image++.h"
@@ -243,4 +243,4 @@ operator <<(S& dc, DC& (*f)(DC&))
 
 }
 }
-#endif	// !__TU_V_DC_H
+#endif	// !TU_V_DC_H

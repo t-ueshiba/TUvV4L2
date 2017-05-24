@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#if !defined(__TU_SIMD_ARM_ARITHMETIC_H)
-#define __TU_SIMD_ARM_ARITHMETIC_H
+#if !defined(TU_SIMD_ARM_ARITHMETIC_H)
+#define TU_SIMD_ARM_ARITHMETIC_H
 
 namespace TU
 {
@@ -130,4 +130,4 @@ SIMD_DIFF(float)
 
 }	// namespace simd
 }	// namespace TU
-#endif	// !__TU_SIMD_ARM_ARITHMETIC_H
+#endif	// !TU_SIMD_ARM_ARITHMETIC_H

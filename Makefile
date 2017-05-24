@@ -6,9 +6,9 @@ SUBDIR	= TUTools++		\
 	  TUXv++		\
 	  TUV4L2++		\
 	  TUvV4L2++		\
-#	  TUCuda++		\
-#	  TUUSB++		\
-#	  TUHRP2++
+	  TUUSB++		\
+	  TUHRP2++		\
+#	  TUCuda++
 
 TARGETS	= all install clean depend
 

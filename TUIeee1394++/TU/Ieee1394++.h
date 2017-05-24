@@ -121,8 +121,8 @@
   \file		Ieee1394++.h
   \brief	IEEE1394デバイスに関連するクラスの定義と実装
 */
-#ifndef __TU_IEEE1394PP_H
-#define __TU_IEEE1394PP_H
+#ifndef TU_IEEE1394PP_H
+#define TU_IEEE1394PP_H
 
 //#define USE_VIDEO1394
 
@@ -900,4 +900,4 @@ exec(const Array<Ieee1394Camera*>& cameras,
 #endif
 
 }
-#endif	// !__TU_IEEE1394PP_H
+#endif	// !TU_IEEE1394PP_H

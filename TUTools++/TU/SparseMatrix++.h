@@ -3,8 +3,8 @@
   \author	Toshio UESHIBA
   \brief	クラス TU::SparseMatrix の定義と実装
 */
-#ifndef __TU_SPARSEMATRIXPP_H
-#define __TU_SPARSEMATRIXPP_H
+#ifndef TU_SPARSEMATRIXPP_H
+#define TU_SPARSEMATRIXPP_H
 
 #include "TU/Vector++.h"
 #include <vector>
@@ -1076,4 +1076,4 @@ operator <<(std::ostream& out, const SparseMatrix<T, SYM>& A)
 }
 
 }
-#endif	// ! __TU_SPARSEMATRIXPP_H
+#endif	// ! TU_SPARSEMATRIXPP_H

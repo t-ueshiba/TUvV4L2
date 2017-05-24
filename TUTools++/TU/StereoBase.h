@@ -3,8 +3,8 @@
   \author	Toshio UESHIBA
   \brief	ステレオマッチングクラスの定義と実装
 */
-#ifndef __TU_STEREOBASE_H
-#define __TU_STEREOBASE_H
+#ifndef TU_STEREOBASE_H
+#define TU_STEREOBASE_H
 
 #include <limits>		// Use std::numeric_limits<T>.
 #include <stack>
@@ -829,4 +829,4 @@ StereoBase<STEREO>::pruneDisparities(DMINV dminV,
 #  define PROFILE
 #endif
 
-#endif	// !__TU_STEREOBASE_H
+#endif	// !TU_STEREOBASE_H

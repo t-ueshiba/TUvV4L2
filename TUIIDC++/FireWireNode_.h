@@ -1,8 +1,8 @@
 /*
  *  $Id: FireWireNode_.h 1742 2014-11-14 09:48:38Z ueshiba $
  */
-#ifndef __TU_FIREWIRENode__H
-#define __TU_FIREWIRENode__H
+#ifndef TU_FIREWIRENODE__H
+#define TU_FIREWIRENODE__H
 
 #include <libraw1394/raw1394.h>
 #include <vector>
@@ -130,4 +130,4 @@ class FireWireNode : public IIDCNode
     
 
 }
-#endif	// !__TU_FIREWIRENODE__H
+#endif	// !TU_FIREWIRENODE__H

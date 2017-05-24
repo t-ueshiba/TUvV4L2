@@ -27,8 +27,8 @@
  *
  *  $Id$  
  */
-#ifndef __VSLIDERCMD_H
-#define __VSLIDERCMD_H
+#ifndef V_SLIDERCMD_H
+#define V_SLIDERCMD_H
 
 #include "TU/v/TUv++.h"
 
@@ -67,4 +67,4 @@ class SliderCmd : public Cmd
 
 }
 }
-#endif	// !__VSLIDERCMD_H
+#endif	// !V_SLIDERCMD_H

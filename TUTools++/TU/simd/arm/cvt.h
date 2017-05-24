@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#if !defined(__TU_SIMD_ARM_CVT_H)
-#define __TU_SIMD_ARM_CVT_H
+#if !defined(TU_SIMD_ARM_CVT_H)
+#define TU_SIMD_ARM_CVT_H
 
 namespace TU
 {
@@ -124,4 +124,4 @@ SIMD_CVT_MASK(float, uint32_t)	// float    -> uint32_t
 
 }	// namespace simd
 }	// namespace TU
-#endif	// !__TU_SIMD_ARM_CVT_H
+#endif	// !TU_SIMD_ARM_CVT_H

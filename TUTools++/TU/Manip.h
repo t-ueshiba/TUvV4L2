@@ -3,8 +3,8 @@
   \author	Toshio UESHIBA
   \brief	各種マニピュレータの定義と実装
 */
-#ifndef __TU_MANIP_H
-#define __TU_MANIP_H
+#ifndef TU_MANIP_H
+#define TU_MANIP_H
 
 #include <iostream>
 
@@ -176,4 +176,4 @@ operator <<(SS& s, const OManip2<S, T, U>& m)
 }
  
 }
-#endif	// !__TU_MANIP_H
+#endif	// !TU_MANIP_H

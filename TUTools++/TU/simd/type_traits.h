@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#if !defined(__TU_SIMD_TYPE_TRAITS_H)
-#define __TU_SIMD_TYPE_TRAITS_H
+#if !defined(TU_SIMD_TYPE_TRAITS_H)
+#define TU_SIMD_TYPE_TRAITS_H
 
 #include <cstdint>
 
@@ -140,4 +140,4 @@ using integral_type		= typename std::conditional<
 }	// namespace simd
 }	// namespace TU
 	
-#endif	// !__TU_SIMD_TYPE_TRAITS_H
+#endif	// !TU_SIMD_TYPE_TRAITS_H

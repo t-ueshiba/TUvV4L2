@@ -3,8 +3,8 @@
   \author	Toshio UESHIBA
   \brief	ベクトルと行列の演算およびそれに関連するクラスの定義と実装
 */
-#ifndef __TU_VECTORPP_H
-#define __TU_VECTORPP_H
+#ifndef TU_VECTORPP_H
+#define TU_VECTORPP_H
 
 #include "TU/Array++.h"
 
@@ -1987,4 +1987,4 @@ using Matrix34d	= Matrix<double, 3, 4>;
 using Matrix44f	= Matrix<float,  4, 4>;
 using Matrix44d	= Matrix<double, 4, 4>;
 }
-#endif	// !__TU_VECTORPP_H
+#endif	// !TU_VECTORPP_H

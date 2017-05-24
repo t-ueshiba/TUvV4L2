@@ -3,8 +3,8 @@
   \author	Toshio UESHIBA
   \brief	std::pairの用途拡張のためのユティリティ
 */
-#ifndef __TU_PAIR_H
-#define __TU_PAIR_H
+#ifndef TU_PAIR_H
+#define TU_PAIR_H
 
 #include <utility>
 #include <iostream>
@@ -379,4 +379,4 @@ operator <<(ostream& out, const pair<S, T>& x)
 }
 
 }	// namespace std
-#endif	// !__TU_PAIR_H
+#endif	// !TU_PAIR_H

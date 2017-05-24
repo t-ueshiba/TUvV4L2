@@ -27,8 +27,8 @@
  *
  *  $Id$  
  */
-#ifndef __VTOGGLEBUTTONCMD_H
-#define __VTOGGLEBUTTONCMD_H
+#ifndef V_TOGGLEBUTTONCMD_H
+#define V_TOGGLEBUTTONCMD_H
 
 #include "TU/v/TUv++.h"
 #include "TU/v/Bitmap.h"
@@ -58,4 +58,4 @@ class ToggleButtonCmd : public Cmd
 
 }
 }
-#endif	// !__VTOGGLEBUTTONCMD_H
+#endif	// !V_TOGGLEBUTTONCMD_H

@@ -3,8 +3,8 @@
   \author	Toshio UESHIBA
   \brief	ファイル記述子付きストリームバッファに関するクラスの定義と実装
 */
-#ifndef __TU_FDSTREAM_H
-#define __TU_FDSTREAM_H
+#ifndef TU_FDSTREAM_H
+#define TU_FDSTREAM_H
 
 #include <iostream>
 #include <streambuf>
@@ -172,4 +172,4 @@ fdstream::fd() const
 }
 
 }
-#endif	// !__TU_FDSTREAM_H
+#endif	// !TU_FDSTREAM_H

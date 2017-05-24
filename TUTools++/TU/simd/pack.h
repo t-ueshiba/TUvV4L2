@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#if !defined(__TU_SIMD_PACK_H)
-#define __TU_SIMD_PACK_H
+#if !defined(TU_SIMD_PACK_H)
+#define TU_SIMD_PACK_H
 
 #include "TU/pair.h"
 #include "TU/simd/cvt.h"
@@ -132,4 +132,4 @@ cvt_pack(const std::tuple<S...>& x)
 }	// namespace simd
 }	// namespace TU
 
-#endif	// !__TU_SIMD_PACK_H
+#endif	// !TU_SIMD_PACK_H

@@ -3,8 +3,8 @@
   \author	Toshio UESHIBA
   \brief	クラス TU::Warp の定義と実装
 */
-#ifndef	__TU_WARP_H
-#define	__TU_WARP_H
+#ifndef	TU_WARP_H
+#define	TU_WARP_H
 
 #include "TU/Image++.h"
 #include "TU/Camera++.h"
@@ -422,4 +422,4 @@ Warp::warpLine(IN in, OUT out, const FracArray& frac) const
 }
 
 }	// namespace TU
-#endif	// !__TU_WARP_H
+#endif	// !TU_WARP_H

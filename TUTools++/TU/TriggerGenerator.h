@@ -3,8 +3,8 @@
   \author	Toshio UESHIBA
   \brief	クラス TU::TriggerGenerator の定義と実装
 */
-#ifndef __TU_TRIGGERGENERATOR_H
-#define __TU_TRIGGERGENERATOR_H
+#ifndef TU_TRIGGERGENERATOR_H
+#define TU_TRIGGERGENERATOR_H
 
 #include "TU/Serial.h"
 
@@ -29,4 +29,4 @@ class TriggerGenerator : public Serial
 };
 
 }
-#endif	// !__TU_TRIGGERGENERATOR_H
+#endif	// !TU_TRIGGERGENERATOR_H

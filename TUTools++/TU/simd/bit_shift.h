@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#if !defined(__TU_SIMD_BIT_SHIFT_H)
-#define __TU_SIMD_BIT_SHIFT_H
+#if !defined(TU_SIMD_BIT_SHIFT_H)
+#define TU_SIMD_BIT_SHIFT_H
 
 #include "TU/simd/vec.h"
 
@@ -38,4 +38,4 @@ template <class T> vec<T>	operator >>(vec<T> x, int n)		;
 #  include "TU/simd/arm/bit_shift.h"
 #endif
 
-#endif	// !__TU_SIMD_BIT_SHIFT_H
+#endif	// !TU_SIMD_BIT_SHIFT_H

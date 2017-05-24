@@ -3,8 +3,8 @@
  * GridboxP.h - Private definitions for Gridbox widget
  */
 
-#ifndef __VGRIDBOXP_H
-#define __VGRIDBOXP_H
+#ifndef V_GRIDBOXP_H
+#define V_GRIDBOXP_H
 
 #include "vGridbox_.h"
 
@@ -83,4 +83,4 @@ typedef struct _GridboxConstraintsRec {
     GridboxConstraintsPart	gridbox;
 } GridboxConstraintsRec, *GridboxConstraints;
 
-#endif	/* __VGRIDBOXP_H	*/
+#endif	/* V_GRIDBOXP_H	*/

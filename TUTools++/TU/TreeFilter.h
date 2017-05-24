@@ -3,8 +3,8 @@
   \author	Toshio UESHIBA
   \brief	クラス TU::TreeFilter の定義と実装
 */
-#ifndef __TU_TREEFILTER_H
-#define __TU_TREEFILTER_H
+#ifndef TU_TREEFILTER_H
+#define TU_TREEFILTER_H
 
 #include <iostream>
 #include <cmath>
@@ -503,4 +503,4 @@ TreeFilter<T, W, CLOCK>::saveGrid(std::ostream& out) const
 }
 
 }
-#endif	// !__TU_TREEFILTER_H
+#endif	// !TU_TREEFILTER_H

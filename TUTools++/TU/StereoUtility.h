@@ -3,8 +3,8 @@
   \author	Toshio UESHIBA
   \brief	ステレオビジョンをサポートする各種クラスの定義と実装
 */
-#ifndef __TU_STEREOUTILITY_H
-#define __TU_STEREOUTILITY_H
+#ifndef TU_STEREOUTILITY_H
+#define TU_STEREOUTILITY_H
 
 #include <limits>
 #include "TU/algorithm.h"	// for TU::diff()
@@ -319,4 +319,4 @@ make_matching_iterator(OUT out, size_t dsw, size_t disparityMax, size_t thresh)
 }
     
 }
-#endif	// !__TU_STEREOUTILITY_H
+#endif	// !TU_STEREOUTILITY_H
