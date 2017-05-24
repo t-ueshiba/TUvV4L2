@@ -1,12 +1,12 @@
 /*
- *  $Id: IIDCCameraUtility.h 1681 2014-10-17 02:16:17Z ueshiba $
+ *  $Id: IIDCCameraArray.h 1681 2014-10-17 02:16:17Z ueshiba $
  */
 /*!
-  \file		IIDCCameraUtility.h
+  \file		IIDCCameraArray.h
   \brief	クラス TU::IIDCCameraArray の定義と実装
 */
-#ifndef __TU_IIDCCAMERAUTILITY_H
-#define __TU_IIDCCAMERAUTILITY_H
+#ifndef TU_IIDCCAMERAARRAY_H
+#define TU_IIDCCAMERAARRAY_H
 
 #include "TU/IIDC++.h"
 #include "TU/algorithm.h"
@@ -376,4 +376,4 @@ syncedSnap(CAMERAS&& cameras, uint64_t maxSkew=1000)
 }
     
 }
-#endif	// ! __TU_IIDCCAMERAUTILITY_H
+#endif	// ! TU_IIDCCAMERAARRAY_H

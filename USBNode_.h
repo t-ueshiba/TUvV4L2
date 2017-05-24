@@ -1,8 +1,8 @@
 /*
  *  $Id: USBNode_.h,v 1.1.1.1 2012-09-15 08:03:09 ueshiba Exp $
  */
-#ifndef __TU_USBNODE__H
-#define __TU_USBNODE__H
+#ifndef TU_USBNODE__H
+#define TU_USBNODE__H
 
 #include <libusb-1.0/libusb.h>
 #include <vector>
@@ -147,4 +147,4 @@ class USBNode : public IIDCNode
 };
 
 }
-#endif	// !__TU_USBNODE__H
+#endif	// !TU_USBNODE__H
