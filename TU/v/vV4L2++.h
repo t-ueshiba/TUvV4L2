@@ -1,8 +1,8 @@
 /*
  *  $Id$
  */
-#ifndef __TU_V_VV4L2PP_H
-#define __TU_V_VV4L2PP_H
+#ifndef TU_V_VV4L2PP_H
+#define TU_V_VV4L2PP_H
 
 #include "TU/v/CmdPane.h"
 #include "TU/V4L2CameraArray.h"
@@ -113,4 +113,4 @@ setFeature(V4L2Camera& camera, CmdId id, CmdVal val, CmdPane& cmdPane)
 
 }	// namespace v
 }	// namespace TU
-#endif	// !__TU_V_V4L2PP_H
+#endif	// !TU_V_V4L2PP_H
