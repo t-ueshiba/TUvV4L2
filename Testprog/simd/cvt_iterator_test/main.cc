@@ -17,8 +17,8 @@ doJob()
     
     using src_type	= SRC;
     using dst_type	= DST;
-    using siterator	= load_iterator<const src_type*>;
-    using diterator	= store_iterator<dst_type*>;
+    using siterator	= load_iterator<src_type>;
+    using diterator	= store_iterator<dst_type>;
     using src_iterator	= std::conditional_t<
 			      (vec<src_type>::size <= vec<dst_type>::size),
 			      cvtdown_iterator<dst_type, siterator>,

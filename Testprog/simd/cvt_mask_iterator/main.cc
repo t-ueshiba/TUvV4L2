@@ -15,8 +15,8 @@ doJob()
 {
     typedef SRC							src_type;
     typedef DST							dst_type;
-    typedef cvt_mask_iterator<dst_type,
-			      load_iterator<const src_type*> >	siterator;
+    typedef cvt_mask_iterator<dst_type, load_iterator<src_type> >
+								siterator;
     typedef typename std::iterator_traits<siterator>::value_type
 								value_type;
     

@@ -63,7 +63,7 @@ template <bool ALIGNED=false, class T> void
 store(T* p, vec<T> x)							;
 
 template <bool ALIGNED=false, class T, class PACK> inline void
-store(T* p, std::pair<PACK, PACK> x)
+store(T* p, const std::pair<PACK, PACK>& x)
 {
     constexpr size_t	D = vec<T>::size * pair_traits<PACK>::size;
     
