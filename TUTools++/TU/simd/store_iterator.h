@@ -12,91 +12,91 @@ namespace TU
 namespace simd
 {
 /************************************************************************
-*  class store_iterator<ITER, ALIGNED>					*
+*  class store_iterator<T, ALIGNED>					*
 ************************************************************************/
 namespace detail
 {
-  template <class ITER, bool ALIGNED=false>
+  template <class T, bool ALIGNED=false>
   class store_proxy
   {
     public:
-      using element_type = iterator_value<ITER>;
-      using value_type	 = decltype(load<ALIGNED>(std::declval<ITER>()));
+      using element_type = T;
+      using value_type	 = decltype(load<ALIGNED>(std::declval<const T*>()));
       
 	
     public:
-      store_proxy(ITER iter)		:_iter(iter)			{}
+      store_proxy(T* p)		:_p(p)			{}
 
 			operator value_type() const
 			{
-			    return load<ALIGNED>(_iter);
+			    return load<ALIGNED>(_p);
 			}
       store_proxy&	operator =(value_type val)
 			{
-			    store<ALIGNED>(_iter, val);
+			    store<ALIGNED>(_p, val);
 			    return *this;
 			}
       store_proxy&	operator +=(value_type val)
 			{
-			    return operator =(load<ALIGNED>(_iter) + val);
+			    return operator =(load<ALIGNED>(_p) + val);
 			}
       store_proxy&	operator -=(value_type val)
 			{
-			    return operator =(load<ALIGNED>(_iter) - val);
+			    return operator =(load<ALIGNED>(_p) - val);
 			}
       store_proxy&	operator *=(value_type val)
 			{
-			    return operator =(load<ALIGNED>(_iter) * val);
+			    return operator =(load<ALIGNED>(_p) * val);
 			}
       store_proxy&	operator /=(value_type val)
 			{
-			    return operator =(load<ALIGNED>(_iter) / val);
+			    return operator =(load<ALIGNED>(_p) / val);
 			}
       store_proxy&	operator %=(value_type val)
 			{
-			    return operator =(load<ALIGNED>(_iter) % val);
+			    return operator =(load<ALIGNED>(_p) % val);
 			}
       store_proxy&	operator &=(value_type val)
 			{
-			    return operator =(load<ALIGNED>(_iter) & val);
+			    return operator =(load<ALIGNED>(_p) & val);
 			}
       store_proxy&	operator |=(value_type val)
 			{
-			    return operator =(load<ALIGNED>(_iter) | val);
+			    return operator =(load<ALIGNED>(_p) | val);
 			}
       store_proxy&	operator ^=(value_type val)
 			{
-			    return operator =(load<ALIGNED>(_iter) ^ val);
+			    return operator =(load<ALIGNED>(_p) ^ val);
 			}
 
     private:
-      ITER 	_iter;
+      T* 	_p;
   };
 }	// namespace detail
 
 //! 反復子が指す書き込み先にSIMDベクトルを書き込む反復子
 /*!
-  \param ITER		SIMDベクトルの書き込み先を指す反復子の型
+  \param T		SIMDベクトルの成分の型
   \param ALIGNED	書き込み先アドレスがalignmentされていればtrue,
 			そうでなければfalse
 */
-template <class ITER, bool ALIGNED=false>
+template <class T, bool ALIGNED=false>
 class store_iterator
     : public boost::iterator_adaptor<
-		store_iterator<ITER, ALIGNED>,
-		ITER,
-		typename detail::store_proxy<ITER, ALIGNED>::value_type,
+		store_iterator<T, ALIGNED>,
+		T*,
+		typename detail::store_proxy<T, ALIGNED>::value_type,
   // boost::use_default とすると libc++ で std::fill() に適用できない
-		iterator_category<ITER>,
-		detail::store_proxy<ITER, ALIGNED> >
+		iterator_category<T*>,
+		detail::store_proxy<T, ALIGNED> >
 {
   private:
     using super	= boost::iterator_adaptor<
 		      store_iterator,
-		      ITER,
-		      typename detail::store_proxy<ITER, ALIGNED>::value_type,
-		      iterator_category<ITER>,
-		      detail::store_proxy<ITER, ALIGNED> >;
+		      T*,
+		      typename detail::store_proxy<T, ALIGNED>::value_type,
+		      iterator_category<T*>,
+		      detail::store_proxy<T, ALIGNED> >;
     friend	class boost::iterator_core_access;
 
   public:
@@ -105,9 +105,9 @@ class store_iterator
     using	typename super::reference;
     
   public:
-    store_iterator(ITER iter)	:super(iter)	{}
+    store_iterator(T* p)	:super(p)	{}
     store_iterator(value_type* p)
-	:super(reinterpret_cast<ITER>(p))	{}
+	:super(reinterpret_cast<T*>(p))		{}
 
     value_type		operator ()() const
 			{
@@ -141,13 +141,13 @@ class store_iterator
 			}
 };
 
-template <bool ALIGNED=false, class ITER> inline store_iterator<ITER, ALIGNED>
-make_store_iterator(ITER iter)
+template <bool ALIGNED=false, class T> inline store_iterator<T, ALIGNED>
+make_store_iterator(T* p)
 {
-    return {iter};
+    return {p};
 }
 
-template <bool ALIGNED=false, class T> inline store_iterator<T*, ALIGNED>
+template <bool ALIGNED=false, class T> inline store_iterator<T, ALIGNED>
 make_store_iterator(vec<T>* p)
 {
     return {p};

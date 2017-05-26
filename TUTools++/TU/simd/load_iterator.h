@@ -12,29 +12,29 @@ namespace TU
 namespace simd
 {
 /************************************************************************
-*  class load_iterator<ITER, ALIGNED>					*
+*  class load_iterator<T, ALIGNED>					*
 ************************************************************************/
 //! 反復子が指すアドレスからSIMDベクトルを読み込む反復子
 /*!
-  \param ITER		SIMDベクトルの読み込み元を指す反復子の型
+  \param T		SIMDベクトルの成分の型
   \param ALIGNED	読み込み元のアドレスがalignmentされていればtrue,
 			そうでなければfalse
 */
-template <class ITER, bool ALIGNED=false>
+template <class T, bool ALIGNED=false>
 class load_iterator
-    : public boost::iterator_adaptor<load_iterator<ITER, ALIGNED>,
-				     ITER,
-				     vec<iterator_value<ITER> >,
+    : public boost::iterator_adaptor<load_iterator<T, ALIGNED>,
+				     const T*,
+				     vec<T>,
 				     boost::use_default,
-				     vec<iterator_value<ITER> > >
+				     vec<T> >
 {
   private:
-    using element_type	= iterator_value<ITER>;
+    using element_type	= T;
     using super		= boost::iterator_adaptor<load_iterator,
-						  ITER,
-						  vec<element_type>,
+						  const T*,
+						  vec<T>,
 						  boost::use_default,
-						  vec<element_type> >;
+						  vec<T> >;
     friend	class boost::iterator_core_access;
 
   public:
@@ -43,9 +43,9 @@ class load_iterator
     using	typename super::reference;
     
   public:
-    load_iterator(ITER iter)	:super(iter)	{}
+    load_iterator(const T* p)	:super(p)	{}
     load_iterator(const value_type* p)
-	:super(reinterpret_cast<ITER>(p))	{}
+	:super(reinterpret_cast<const T*>(p))	{}
 	       
   private:
     reference		dereference() const
@@ -74,13 +74,13 @@ class load_iterator
 			}
 };
 
-template <bool ALIGNED=false, class ITER> inline load_iterator<ITER, ALIGNED>
-make_load_iterator(ITER iter)
+template <bool ALIGNED=false, class T> inline load_iterator<T, ALIGNED>
+make_load_iterator(const T* p)
 {
-    return {iter};
+    return {p};
 }
 
-template <bool ALIGNED=false, class T> inline load_iterator<const T*, ALIGNED>
+template <bool ALIGNED=false, class T> inline load_iterator<T, ALIGNED>
 make_load_iterator(const vec<T>* p)
 {
     return {p};
