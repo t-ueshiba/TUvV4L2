@@ -338,8 +338,11 @@ class range
     template <class E_> std::enable_if_t<rank<E_>() != 0, range&>
 		operator =(const E_& expr)
 		{
-		    assert(std::size(expr) == size());
-		    copy<SIZE>(std::begin(expr), size(), begin());
+		    using	std::begin;
+		    using	std::size;
+		    
+		    assert(size(expr) == SIZE);
+		    copy<SIZE>(begin(expr), SIZE, _begin);
 		    return *this;
 		}
 
@@ -350,15 +353,15 @@ class range
 		}
     range&	operator =(std::initializer_list<value_type> args)
 		{
-		    assert(args.size() == size());
-		    copy<SIZE>(args.begin(), size(), begin());
+		    assert(args.size() == SIZE);
+		    copy<SIZE>(args.begin(), SIZE, _begin);
 		    return *this;
 		}
 
     template <class T_> std::enable_if_t<rank<T_>() == 0, range&>
 		operator =(const T_& c)
 		{
-		    fill<SIZE>(begin(), size(), c);
+		    fill<SIZE>(_begin, SIZE, c);
 		    return *this;
 		}
 
@@ -407,7 +410,7 @@ class range<ITER, 0>
     range&	operator =(const range& r)
 		{
 		    assert(r.size() == size());
-		    copy<0>(r._begin, size(), begin());
+		    copy<0>(r._begin, _size, _begin);
 		    return *this;
 		}
 		range(range&&)					= default;
@@ -424,8 +427,11 @@ class range<ITER, 0>
     template <class E_> std::enable_if_t<rank<E_>() != 0, range&>
 		operator =(const E_& expr)
 		{
-		    assert(std::size(expr) == size());
-		    copy<TU::size0<E_>()>(std::begin(expr), size(), begin());
+		    using	std::begin;
+		    using	std::size;
+		    
+		    assert(size(expr) == _size);
+		    copy<TU::size0<E_>()>(begin(expr), _size, _begin);
 		    return *this;
 		}
 		
@@ -436,15 +442,15 @@ class range<ITER, 0>
 		}
     range&	operator =(std::initializer_list<value_type> args)
 		{
-		    assert(args.size() == size());
-		    copy<0>(args.begin(), size(), begin());
+		    assert(args.size() == _size);
+		    copy<0>(args.begin(), _size, _begin);
 		    return *this;
 		}
 		
     template <class T_> std::enable_if_t<rank<T_>() == 0, range&>
 		operator =(const T_& c)
 		{
-		    fill<0>(begin(), size(), c);
+		    fill<0>(_begin, _size, c);
 		    return *this;
 		}
 
@@ -989,9 +995,12 @@ make_column_iterator(ROW row, size_t nrows, size_t col)
 template <class E> inline auto
 column_begin(E&& expr)
 {
+    using	std::begin;
+    using	std::size;
+    
     constexpr auto	N = size0<std::remove_reference_t<E> >();
     
-    return make_column_iterator<N>(std::begin(expr), std::size(expr), 0);
+    return make_column_iterator<N>(begin(expr), size(expr), 0);
 }
 
 template <class E> inline auto
@@ -1003,10 +1012,12 @@ column_cbegin(const E& expr)
 template <class E> inline auto
 column_end(E&& expr)
 {
+    using	std::begin;
+    using	std::size;
+    
     constexpr auto	N = size0<std::remove_reference_t<E> >();
     
-    return make_column_iterator<N>(std::begin(expr), std::size(expr),
-				   size<1>(expr));
+    return make_column_iterator<N>(begin(expr), size(expr), size<1>(expr));
 }
 
 template <class E> inline auto

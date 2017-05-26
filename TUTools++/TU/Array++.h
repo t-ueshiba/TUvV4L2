@@ -529,19 +529,21 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 		array(const E_& expr)
 		    :super(sizes(expr, std::make_index_sequence<Rank>()))
 		{
+		    using		std::begin;
 		    constexpr auto	S = detail::max<size0(),
 							TU::size0<E_>()>::value;
-		    copy<S>(std::begin(expr), size(), begin());
+		    copy<S>(begin(expr), size(), this->begin());
 		}
     template <class E_>
     std::enable_if_t<rank<E_>() == Rank + rank<T>(), array&>
 		operator =(const E_& expr)
 		{
+		    using		std::begin;
 		    super::resize(sizes(expr,
 					std::make_index_sequence<Rank>()));
 		    constexpr auto	S = detail::max<size0(),
 							TU::size0<E_>()>::value;
-		    copy<S>(std::begin(expr), size(), begin());
+		    copy<S>(begin(expr), size(), this->begin());
 
 		    return *this;
 		}

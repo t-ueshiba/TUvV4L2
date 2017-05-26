@@ -4,6 +4,7 @@
 #if !defined(TU_SIMD_LOAD_STORE_H)
 #define TU_SIMD_LOAD_STORE_H
 
+#include <memory>
 #include "TU/pair.h"
 #include "TU/simd/vec.h"
 #include "TU/simd/pack.h"
@@ -16,23 +17,24 @@ namespace simd
 *  functions for supporting memory alignment				*
 ************************************************************************/
 template <class T> inline T*
-ceil(T* p)
+begin(T* p)
 {
-    constexpr size_t	vsize = vec<typename std::remove_cv<T>::type>::size;
-    const size_t	n = (reinterpret_cast<size_t>(p) - 1) / vsize;
+    constexpr size_t	vsize = sizeof(vec<typename std::remove_cv<T>::type>);
+    size_t		space = 2*vsize - 1;
+    void*		q = const_cast<void*>(p);
     
-    return reinterpret_cast<T*>(vsize * (n + 1));
-}
-    
-template <class T> inline T*
-floor(T* p)
-{
-    constexpr size_t	vsize = vec<typename std::remove_cv<T>::type>::size;
-    const size_t	n = reinterpret_cast<size_t>(p) / vsize;
-    
-    return reinterpret_cast<T*>(vsize * n);
+    return reinterpret_cast<T*>(std::align(vsize, vsize, q, space));
 }
 
+template <class T> inline T*
+end(T* p)
+{
+    constexpr size_t	vsize = sizeof(vec<typename std::remove_cv<T>::type>);
+    p = reinterpret_cast<T*>((char*)p - vsize + 1);
+
+    return begin(p);
+}
+    
 /************************************************************************
 *  Load/Store								*
 ************************************************************************/
