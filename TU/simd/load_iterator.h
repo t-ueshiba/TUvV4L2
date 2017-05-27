@@ -43,9 +43,9 @@ class load_iterator
     using	typename super::reference;
     
   public:
-    load_iterator(const T* p)	:super(p)	{}
+    load_iterator(const T* p=nullptr)	:super(p)	{}
     load_iterator(const value_type* p)
-	:super(reinterpret_cast<const T*>(p))	{}
+	:super(reinterpret_cast<const T*>(p))		{}
 	       
   private:
     reference		dereference() const

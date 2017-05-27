@@ -29,6 +29,8 @@ class BufTraits : public std::allocator_traits<ALLOC>
   protected:
     using			typename super::pointer;
 
+    constexpr static size_t	Alignment = 0;
+
     static auto null()		{ return nullptr; }
     static auto ptr(pointer p)	{ return p; }
 };
@@ -48,19 +50,27 @@ template <class T, class ALLOC, size_t SIZE, size_t... SIZES>
 class Buf : public BufTraits<T, ALLOC>
 {
   private:
+    using super			= BufTraits<T, ALLOC>;
+    using base_iterator		= typename super::iterator;
+    using const_base_iterator	= typename super::const_iterator;
+
   // このバッファの総容量をコンパイル時に計算
     template <size_t SIZE_, size_t... SIZES_>
-    struct prod
+    struct cap
     {
-	constexpr static size_t	value = SIZE_ * prod<SIZES_...>::value;
+	constexpr static size_t	value = SIZE_ * cap<SIZES_...>::value;
     };
     template <size_t SIZE_>
-    struct prod<SIZE_>
+    struct cap<SIZE_>
     {
-	constexpr static size_t value = SIZE_;
-    };
+      private:
+	constexpr static auto	n = lcm(sizeof(T),
+					super::Alignment ? super::Alignment : 1)
+				  / sizeof(T);
 
-    constexpr static size_t	Capacity = prod<SIZE, SIZES...>::value;
+      public:
+	constexpr static size_t value = n*((SIZE_ + n - 1)/n);
+    };
 
   // このバッファの各軸のサイズをコンパイル時に計算
     template <size_t I_, size_t SIZE_, size_t... SIZES_>
@@ -78,12 +88,11 @@ class Buf : public BufTraits<T, ALLOC>
     using siz			= nth<I_, SIZE, SIZES...>;
     template <size_t I_>
     using axis			= std::integral_constant<size_t, I_>;
-    using super			= BufTraits<T, ALLOC>;
-    
-  public:
-    constexpr static size_t	Rank = 1 + sizeof...(SIZES);
 
-    using sizes_type		= std::array<size_t, Rank>;
+  public:
+    constexpr static size_t	rank()	{ return 1 + sizeof...(SIZES); }
+
+    using sizes_type		= std::array<size_t, rank()>;
     using			typename super::value_type;
     using			typename super::pointer;
     using			typename super::const_pointer;
@@ -91,59 +100,77 @@ class Buf : public BufTraits<T, ALLOC>
   public:
   // 標準コンストラクタ/代入演算子およびデストラクタ
 		Buf()
-		{
-		    init(typename std::is_arithmetic<value_type>::type());
-		}
-		Buf(const Buf&)			= default;
+   		{
+   		    init(typename std::is_arithmetic<value_type>::type());
+   		}
+   		Buf(const Buf&)			= default;
     Buf&	operator =(const Buf&)		= default;
-		Buf(Buf&&)			= default;
+   		Buf(Buf&&)			= default;
     Buf&	operator =(Buf&&)		= default;
     
   // 各軸のサイズと最終軸のストライドを指定したコンストラクタとリサイズ関数
     explicit	Buf(const sizes_type& sizes, size_t=0)
-		{
-		    if (!check_sizes(sizes, axis<Rank>()))
-			throw std::logic_error("Buf<T, ALLOC, SIZE, SIZES...>::Buf(): mismatched size!");
-		    init(typename std::is_arithmetic<value_type>::type());
-		}
+   		{
+   		    if (!check_sizes(sizes, axis<rank()>()))
+   			throw std::logic_error("Buf<T, ALLOC, SIZE, SIZES...>::Buf(): mismatched size!");
+   		    init(typename std::is_arithmetic<value_type>::type());
+   		}
     bool	resize(const sizes_type& sizes, size_t=0)
-		{
-		    if (!check_sizes(sizes, axis<Rank>()))
-			throw std::logic_error("Buf<T, ALLOC, SIZE, SIZES...>::resize(): mismatched size!");
-		    return false;
-		}
+   		{
+   		    if (!check_sizes(sizes, axis<rank()>()))
+   			throw std::logic_error("Buf<T, ALLOC, SIZE, SIZES...>::resize(): mismatched size!");
+   		    return false;
+   		}
 
     template <size_t I_=0>
     constexpr static auto	size()		{ return siz<I_>::value; }
-    template <size_t I_=Rank-1>
-    constexpr static ptrdiff_t	stride()	{ return siz<I_>::value; }
+    constexpr static ptrdiff_t	stride()
+		   		{
+				    return cap<size<rank()-1>()>::value;
+				}
     constexpr static auto	nrow()		{ return siz<0>::value; }
     constexpr static auto	ncol()		{ return siz<1>::value; }
-    constexpr static auto	capacity()	{ return Capacity; }
-
+    constexpr static auto	capacity()
+				{
+				    return cap<SIZE, SIZES...>::value;
+				}
     auto	data()		{ return _a.data(); }
     auto	data()	const	{ return _a.data(); }
-    auto	begin()		{ return make_iterator<SIZES...>(_a.begin()); }
-    auto	begin()	const	{ return make_iterator<SIZES...>(_a.begin()); }
-    auto	end()		{ return make_iterator<SIZES...>(_a.end()); }
-    auto	end()	const	{ return make_iterator<SIZES...>(_a.end()); }
+    auto	begin()
+		{
+		    return make_iterator<SIZES...>(base_iterator(data()));
+		}
+    auto	begin() const
+		{
+		    return make_iterator<SIZES...>(const_base_iterator(data()));
+		}
+    auto	end()
+		{
+		    return make_iterator<SIZES...>(base_iterator(
+						       data() + capacity()));
+		}
+    auto	end() const
+		{
+		    return make_iterator<SIZES...>(const_base_iterator(
+						       data() + capacity()));
+		}
 
     std::istream&
-		get(std::istream& in)
-		{
-		    for (auto& val : _a)
-			in >> val;
-		    return in;
-		}
+   		get(std::istream& in)
+   		{
+   		    for (auto& val : _a)
+   			in >> val;
+   		    return in;
+   		}
 
     friend bool	operator ==(const Buf& a, const Buf& b)
-		{
-		    return a._a == b._a;
-		}
+   		{
+   		    return a._a == b._a;
+   		}
     friend bool	operator !=(const Buf& a, const Buf& b)
-		{
-		    return a._a != b._a;
-		}
+   		{
+   		    return a._a != b._a;
+   		}
     
   private:
     void	init(std::true_type)		{ _a.fill(0); }
@@ -159,7 +186,7 @@ class Buf : public BufTraits<T, ALLOC>
 		{
 		    return true;
 		}
-    
+
     template <class ITER_>
     static auto	make_iterator(ITER_ iter)
 		{
@@ -168,13 +195,18 @@ class Buf : public BufTraits<T, ALLOC>
     template <size_t SIZE_, size_t... SIZES_, class ITER_>
     static auto	make_iterator(ITER_ iter)
 		{
-		    return make_range_iterator<SIZE_, SIZE_>(
+		    constexpr ptrdiff_t
+			STRIDE = (sizeof...(SIZES_) ? SIZE_ : stride());
+
+		    return make_range_iterator<STRIDE, SIZE_>(
 			       make_iterator<SIZES_...>(iter));
 		}
 
   private:
-  //alignas(sizeof(T)) std::array<T, Capacity>	_a;
-    std::array<T, Capacity>	_a;
+#if !defined(__GNUG__)	// g++ には alignas(0) がエラーになるバグがある
+    alignas(super::Alignment)
+#endif
+    std::array<T, capacity()>	_a;
 };
 
 //! 可変長多次元バッファクラス
@@ -195,9 +227,9 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
     using axis			= std::integral_constant<size_t, I_>;
 
   public:
-    constexpr static size_t	Rank = 1 + sizeof...(SIZES);
+    constexpr static size_t	rank()	{ return 1 + sizeof...(SIZES); }
 
-    using sizes_type		= std::array<size_t, Rank>;
+    using sizes_type		= std::array<size_t, rank()>;
     using			typename super::value_type;
     using			typename super::pointer;
     using			typename super::const_pointer;
@@ -251,18 +283,17 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 		}
 
   // 各軸のサイズと最終軸のストライドを指定したコンストラクタとリサイズ関数
-    explicit	Buf(const sizes_type& sizes, ptrdiff_t stride=0)
+    explicit	Buf(const sizes_type& sizes, size_t alignment)
 		    :_sizes(sizes),
-		     _stride(stride ? stride : _sizes[Rank-1]),
-		     _capacity(capacity(axis<0>())),
+		     _stride(to_stride(alignment, _sizes[rank()-1])),
+		     _capacity(capacity_of(axis<0>())),
 		     _ext(false),
 		     _p(alloc(_capacity))
 		{
 		}
-    bool	resize(const sizes_type& sizes, ptrdiff_t stride=0)
+    bool	resize(const sizes_type& sizes, size_t alignment)
 		{
-		    if (stride == 0)
-			stride = sizes[Rank-1];
+		    const auto	stride = to_stride(alignment, sizes[rank()-1]);
 		    
 		    if ((stride == _stride) && (sizes == _sizes))
 			return false;
@@ -270,7 +301,7 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 		    free(_p, _capacity);
 		    _sizes    = sizes;
 		    _stride   = stride;
-		    _capacity = capacity(axis<0>());
+		    _capacity = capacity_of(axis<0>());
 		    _ext      = false;
 		    _p	      = alloc(_capacity);
 
@@ -279,23 +310,20 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 
   // 外部記憶領域および各軸のサイズと最終軸のストライドを指定したコンストラクタと
   // リサイズ関数
-    explicit	Buf(pointer p, const sizes_type& sizes, ptrdiff_t stride=0)
+    explicit	Buf(pointer p, const sizes_type& sizes, size_t alignment)
 		    :_sizes(sizes),
-		     _stride(stride ? stride : _sizes[Rank-1]),
-		     _capacity(capacity(axis<0>())),
+		     _stride(to_stride(alignment, _sizes[rank()-1])),
+		     _capacity(capacity_of(axis<0>())),
 		     _ext(true),
 		     _p(p)
 		{
 		}
-    void	resize(pointer p, const sizes_type& sizes, ptrdiff_t stride=0)
+    void	resize(pointer p, const sizes_type& sizes, size_t alignment)
 		{
-		    if (stride == 0)
-			stride = sizes[Rank-1];
-		    
 		    free(_p, _capacity);
 		    _sizes    = sizes;
-		    _stride   = stride;
-		    _capacity = capacity(axis<0>());
+		    _stride   = to_stride(alignment, _sizes[rank()-1]);
+		    _capacity = capacity_of(axis<0>());
 		    _ext      = true;
 		    _p	      = p;
 		}
@@ -303,8 +331,7 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
     const auto&	sizes()		const	{ return _sizes; }
     template <size_t I_=0>
     auto	size()		const	{ return _sizes[I_]; }
-    template <size_t I_=Rank-1>
-    ptrdiff_t	stride()	const	{ return stride_impl(axis<I_>()); }
+    auto	stride()	const	{ return _stride; }
     auto	capacity()	const	{ return _capacity; }
     auto	nrow()		const	{ return _sizes[0]; }
     auto	ncol()		const	{ return _sizes[1]; }
@@ -341,18 +368,30 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 		}
     
   private:
-    template <size_t I_>
-    ptrdiff_t	stride_impl(axis<I_>)		const	{ return _sizes[I_]; }
-    ptrdiff_t	stride_impl(axis<Rank-1>)	const	{ return _stride; }
+    static ptrdiff_t
+		to_stride(size_t alignment, size_t size)
+		{
+		    constexpr auto	elmsiz = sizeof(T);
 
-    size_t	capacity(axis<Rank-1>) const
+		    if (alignment == 0)
+			alignment = (super::Alignment ? super::Alignment : 1);
+		    const auto	n = lcm(elmsiz, alignment)/elmsiz;
+
+		    return n*((size + n - 1)/n);
+		}
+
+    ptrdiff_t	stride_of(axis<rank()-1>)	const	{ return _stride; }
+    template <size_t I_>
+    ptrdiff_t	stride_of(axis<I_>)		const	{ return _sizes[I_]; }
+
+    size_t	capacity_of(axis<rank()-1>) const
 		{
 		    return _stride;
 		}
     template <size_t I_>
-    size_t	capacity(axis<I_>) const
+    size_t	capacity_of(axis<I_>) const
 		{
-		    return _sizes[I_] * capacity(axis<I_+1>());
+		    return _sizes[I_] * capacity_of(axis<I_+1>());
 		}
 
     pointer	alloc(size_t siz)
@@ -381,11 +420,11 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
     template <size_t SIZE_, size_t... SIZES_, class ITER_>
     auto	make_iterator(ITER_ iter) const
 		{
-		    constexpr size_t	I = Rank - 1 - sizeof...(SIZES_);
-		    
+		    constexpr size_t	I = rank() - 1 - sizeof...(SIZES_);
+
 		    return make_range_iterator(
 			       make_iterator<SIZES_...>(iter),
-			       stride<I>(), size<I>());
+			       stride_of(axis<I>()), size<I>());
 		}
 
     base_iterator
@@ -398,7 +437,7 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 		    base_iterator	iter;
 		    size_t		n = 0;
 		    
-		    for (size_t d = Rank - 1; n < BufSiz; )
+		    for (size_t d = rank() - 1; n < BufSiz; )
 		    {
 			char	c;
 			
@@ -411,7 +450,7 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 			    in.putback(c);	// 1文字読み戻して
 			    in >> tmp[n++];	// 改めて要素をバッファに読み込む
 
-			    d = Rank - 1;	// 最下位軸に戻して
+			    d = rank() - 1;	// 最下位軸に戻して
 			    ++nvalues[d];	// 要素数を1だけ増やす
 			}
 			else			// 現在軸の末尾に到達したなら...
@@ -420,8 +459,8 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 				sizes[d] = nvalues[d];	// 現在軸の要素数を記録
 
 			    if (d == 0)		// 最上位軸の末尾ならば...
-			    {
-				resize(sizes);	// 領域を確保して
+			    {			// 領域を確保して
+				resize(sizes, super::Alignment);
 				iter = base_iterator(_p + _capacity);
 				break;		// その末端をiterにセットして返す
 			    }
@@ -464,7 +503,6 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 {
   private:
     using super	= Buf<T, ALLOC, SIZE, SIZES...>;
-    using super::Rank;
     
   public:
     using typename super::sizes_type;
@@ -488,46 +526,55 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 		array(array&&)			= default;
     array&	operator =(array&&)		= default;
 
+    using	super::rank;
+    using	super::size;
+    using	super::stride;
+    using	super::nrow;
+    using	super::ncol;
+    using	super::data;
+    using	super::begin;
+    using	super::end;
 
     template <class... SIZES_,
 	      std::enable_if_t<
-		  sizeof...(SIZES_) == Rank &&
+		  sizeof...(SIZES_) == rank() &&
 		  all<std::is_integral, std::tuple<SIZES_...> >::value>*
 	      = nullptr>
     explicit	array(SIZES_... sizes)
-		    :super({to_size(sizes)...})
+		    :super({to_size(sizes)...}, super::Alignment)
 		{
 		}
     template <class... SIZES_>
-    std::enable_if_t<sizeof...(SIZES_) == Rank &&
+    std::enable_if_t<sizeof...(SIZES_) == rank() &&
 		     all<std::is_integral, std::tuple<SIZES_...> >::value, bool>
 		resize(SIZES_... sizes)
 		{
-		    return super::resize({to_size(sizes)...});
+		    return super::resize({to_size(sizes)...}, super::Alignment);
 		}
     
     template <class... SIZES_,
 	      std::enable_if_t<
-		  sizeof...(SIZES_) == Rank &&
+		  sizeof...(SIZES_) == rank() &&
 		  all<std::is_integral, std::tuple<SIZES_...> >::value>*
 	      = nullptr>
-    explicit	array(size_t unit, SIZES_... sizes)
-		    :super({to_size(sizes)...}, to_stride(unit, sizes...))
+    explicit	array(size_t alignment, SIZES_... sizes)
+		    :super({to_size(sizes)...}, alignment)
 		{
 		}
     template <class... SIZES_>
-    std::enable_if_t<sizeof...(SIZES_) == Rank &&
+    std::enable_if_t<sizeof...(SIZES_) == rank() &&
 		     all<std::is_integral, std::tuple<SIZES_...> >::value, bool>
-		resize(size_t unit, SIZES_... sizes)
+		resize(size_t alignment, SIZES_... sizes)
 		{
-		    return super::resize({to_size(sizes)...},
-					 to_stride(unit, sizes...));
+		    return super::resize({to_size(sizes)...}, alignment);
 		}
 
     template <class E_,
-	      std::enable_if_t<rank<E_>() == Rank + rank<T>()>* = nullptr>
+	      std::enable_if_t<TU::rank<E_>() == rank() + TU::rank<T>()>*
+	      = nullptr>
 		array(const E_& expr)
-		    :super(sizes(expr, std::make_index_sequence<Rank>()))
+		    :super(sizes(expr, std::make_index_sequence<rank()>()),
+			   super::Alignment)
 		{
 		    using		std::begin;
 		    constexpr auto	S = detail::max<size0(),
@@ -535,12 +582,13 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 		    copy<S>(begin(expr), size(), this->begin());
 		}
     template <class E_>
-    std::enable_if_t<rank<E_>() == Rank + rank<T>(), array&>
+    std::enable_if_t<TU::rank<E_>() == rank() + TU::rank<T>(), array&>
 		operator =(const E_& expr)
 		{
 		    using		std::begin;
 		    super::resize(sizes(expr,
-					std::make_index_sequence<Rank>()));
+					std::make_index_sequence<rank()>()),
+				  super::Alignment);
 		    constexpr auto	S = detail::max<size0(),
 							TU::size0<E_>()>::value;
 		    copy<S>(begin(expr), size(), this->begin());
@@ -549,13 +597,13 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 		}
 
 		array(std::initializer_list<const_value_type> args)
-		    :super(sizes(args))
+		    :super(sizes(args), super::Alignment)
 		{
 		    copy<size0()>(args.begin(), size(), begin());
 		}
     array&	operator =(std::initializer_list<const_value_type> args)
 		{
-		    super::resize(sizes(args));
+		    super::resize(sizes(args), super::Alignment);
 		    copy<size0()>(args.begin(), size(), begin());
 
 		    return *this;
@@ -563,61 +611,45 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 
     template <class... SIZES_,
 	      std::enable_if_t<
-		  sizeof...(SIZES_) == Rank &&
+		  sizeof...(SIZES_) == rank() &&
 		  all<std::is_integral, std::tuple<SIZES_...> >::value>*
 	      = nullptr>
     explicit	array(pointer p, SIZES_... sizes)
-		    :super(p, {to_size(sizes)...})
+		    :super(p, {to_size(sizes)...}, super::Alignment)
 		{
 		}
     template <class... SIZES_>
-    std::enable_if_t<sizeof...(SIZES_) == Rank &&
+    std::enable_if_t<sizeof...(SIZES_) == rank() &&
 		     all<std::is_integral, std::tuple<SIZES_...> >::value>
 		resize(pointer p, SIZES_... sizes)
 		{
-		    super::resize(p, {to_size(sizes)...});
+		    super::resize(p, {to_size(sizes)...}, super::Alignment);
 		}
 	    
     template <class... SIZES_,
 	      std::enable_if_t<
-		  sizeof...(SIZES_) == Rank &&
+		  sizeof...(SIZES_) == rank() &&
 		  all<std::is_integral, std::tuple<SIZES_...> >::value>*
 	      = nullptr>
-    explicit	array(pointer p, size_t unit, SIZES_... sizes)
-		    :super(p, {to_size(sizes)...}, to_stride(unit, sizes...))
+    explicit	array(pointer p, size_t alignment, SIZES_... sizes)
+		    :super(p, {to_size(sizes)...}, alignment)
 		{
 		}
     template <class... SIZES_>
-    std::enable_if_t<sizeof...(SIZES_) == Rank &&
+    std::enable_if_t<sizeof...(SIZES_) == rank() &&
 		     all<std::is_integral, std::tuple<SIZES_...> >::value>
-		resize(pointer p, size_t unit, SIZES_... sizes)
+		resize(pointer p, size_t alignment, SIZES_... sizes)
 		{
-		    super::resize(p, {to_size(sizes)...},
-				  to_stride(unit, sizes...));
+		    super::resize(p, {to_size(sizes)...}, alignment);
 		}
 	    
-    template <class T_> std::enable_if_t<rank<T_>() == 0, array&>
+    template <class T_> std::enable_if_t<TU::rank<T_>() == 0, array&>
 		operator =(const T_& c)
 		{
 		    TU::fill<size0()>(begin(), size(), c);
 
 		    return *this;
 		}
-    
-    template <class ALLOC_>
-    void	write(array<T, ALLOC_, SIZE, SIZES...>& a) const
-		{
-		    a.resize(sizes(), a.stride());
-		    super::copy(begin(), size(), a.begin());
-		}
-
-    using	super::size;
-    using	super::stride;
-    using	super::nrow;
-    using	super::ncol;
-    using	super::data;
-    using	super::begin;
-    using	super::end;
 
     template <class... IS_>
     auto	operator ()(IS_... is)
@@ -703,13 +735,13 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 		}
 
     template <class T_>
-    static std::enable_if_t<rank<T_>() == 0>
+    static std::enable_if_t<TU::rank<T_>() == 0>
 		set_sizes(sizes_iterator iter, sizes_iterator end, const T_& val)
 		{
 		    throw std::runtime_error("array<BUF>::set_sizes(): too shallow initializer list!");
 		}
     template <class T_>
-    static std::enable_if_t<rank<T_>() != 0>
+    static std::enable_if_t<TU::rank<T_>() != 0>
 		set_sizes(sizes_iterator iter, sizes_iterator end, const T_& r)
 		{
 		    *iter = r.size();
@@ -725,24 +757,6 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 		    return sizs;
 		}
     
-    static ptrdiff_t
-		to_stride(size_t unit, size_t size)
-		{
-		    constexpr auto	elmsiz = sizeof(element_type);
-
-		    if (unit == 0)
-			unit = 1;
-		    const auto	n = lcm(elmsiz, unit)/elmsiz;
-
-		    return n*((size + n - 1)/n);
-		}
-    template <class... SIZES_>
-    static ptrdiff_t
-		to_stride(size_t unit, size_t size, SIZES_... sizes)
-		{
-		    return to_stride(unit, sizes...);
-		}
-
     static void	restore(std::istream& in, pointer begin, size_t n)
 		{
 		    in.read(reinterpret_cast<char*>(begin),
