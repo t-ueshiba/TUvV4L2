@@ -297,7 +297,8 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 				  make_zip_iterator(
 				      std::make_tuple(
 					  cbegin(*rowRp),
-					  make_vertical_iterator(rowV, --cVp))),
+					  make_vertical_iterator(rowV,
+								 --cVp))),
 				  buffers->Q.begin());
 	    ++rowLp;
 	    ++rowRp;

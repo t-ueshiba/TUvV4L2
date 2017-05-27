@@ -105,9 +105,9 @@ class store_iterator
     using	typename super::reference;
     
   public:
-    store_iterator(T* p)	:super(p)	{}
+    store_iterator(T* p=nullptr)	:super(p)	{}
     store_iterator(value_type* p)
-	:super(reinterpret_cast<T*>(p))		{}
+	:super(reinterpret_cast<T*>(p))			{}
 
     value_type		operator ()() const
 			{

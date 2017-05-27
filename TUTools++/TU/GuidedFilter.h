@@ -321,7 +321,7 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, OUT out) const
 			    begin(std::make_tuple(*ib, *out))
 			    + colWinSize() - 1,
 			    trans_guides(n)),
-			std::make_tuple(ib.stride(), out.stride()), size(*out)));
+			std::make_tuple(stride(ib), stride(out)), size(*out)));
 }
 
 }

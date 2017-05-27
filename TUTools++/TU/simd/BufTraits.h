@@ -26,6 +26,8 @@ class BufTraits<simd::vec<T>, ALLOC>
   protected:
     using			typename super::pointer;
 
+    constexpr static size_t	Alignment = sizeof(simd::vec<T>);
+    
     static auto null()		{ return nullptr; }
     static auto ptr(pointer p)	{ return p; }
 };
