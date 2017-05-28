@@ -5,6 +5,7 @@
 #define TU_SIMD_LOAD_STORE_H
 
 #include <memory>
+#include <boost/iterator/iterator_adaptor.hpp>
 #include "TU/pair.h"
 #include "TU/simd/vec.h"
 #include "TU/simd/pack.h"
@@ -34,6 +35,22 @@ end(T* p)
 
     return begin(p);
 }
+    
+/************************************************************************
+*  ptr<T>								*
+************************************************************************/
+template <class T>
+class ptr : public boost::iterator_adaptor<ptr<T>, T*>
+{
+  private:
+    using	super = boost::iterator_adaptor<ptr, T*>;
+
+  public:
+    ptr(T* p=nullptr)	:super(p)	{}
+
+    T*	get()		const	{ return super::base(); }
+    operator T*()	const	{ return super::base(); }
+};
     
 /************************************************************************
 *  Load/Store								*

@@ -80,12 +80,12 @@ make_load_iterator(const T* p)
     return {p};
 }
 
-template <bool ALIGNED=false, class T> inline load_iterator<T, ALIGNED>
-make_load_iterator(const vec<T>* p)
+template <class T> inline load_iterator<T, true>
+make_load_iterator(ptr<const T> p)
 {
     return {p};
 }
-
+    
 template <bool ALIGNED=false, class ITER_TUPLE> inline auto
 make_load_iterator(zip_iterator<ITER_TUPLE> zip_iter)
 {
