@@ -17,7 +17,7 @@ namespace simd
 /************************************************************************
 *  Converting vecs							*
 ************************************************************************/
-//! S型ベクトルの上位または下位半分を要素数が半分のT型ベクトルに型変換する．
+//! S型ベクトルの上位または下位半分を1つ上位のT型ベクトル(要素数が半分)に型変換する．
 /*!
   S, Tは符号付き／符号なしのいずれでも良いが，符号付き -> 符号なしの変換はできない．
   \param HI	falseならば下位，trueならば上位を変換
@@ -27,7 +27,7 @@ namespace simd
 template <class T, bool HI=false, bool MASK=false, class S>
 vec<T>	cvt(vec<S> x)							;
 	
-//! 2つのS型ベクトルを要素数が2倍のT型ベクトルに型変換する．
+//! 2つのS型ベクトルを1つ下位のT型ベクトル(要素数が2倍)に型変換する．
 /*!
   Sが符号付き／符号なしのいずれの場合も飽和処理が行われる．
   \param x	変換されるベクトル
@@ -99,7 +99,7 @@ namespace detail
   };
 }
     
-//! 要素数がより少ないベクトルへの多段変換において直後の変換先の要素型を返す.
+//! より上位の要素を持つベクトルへの多段変換において直後の変換先の要素型を返す.
 /*!
   vec<S> を vec<T> に変換する過程で vec<S> の直後の変換先の要素型を返す.
   \param S	変換されるベクトルの要素型
@@ -109,7 +109,7 @@ namespace detail
 template <class T, class S, bool MASK>
 using cvt_upper_type = typename detail::cvt_adjacent_type<T, S, MASK>::U;
 
-//! 要素数がより多いベクトルへの多段変換において直後の変換先の要素型を返す.
+//! より下位の要素を持つベクトルへの多段変換において直後の変換先の要素型を返す.
 /*!
   vec<S> を vec<T> に変換する過程で vec<S> の直後の変換先の要素型を返す.
   \param S	変換されるベクトルの要素型
@@ -119,12 +119,12 @@ using cvt_upper_type = typename detail::cvt_adjacent_type<T, S, MASK>::U;
 template <class T, class S, bool MASK>
 using cvt_lower_type = typename detail::cvt_adjacent_type<T, S, MASK>::L;
 
-//! 要素数がより多いベクトルへの多段変換において最終的な変換先の直前の要素型を返す.
+//! より下位の要素を持つベクトルへの多段変換において最終的な変換先の直上の要素型を返す.
 /*!
   vec<S> を vec<T> に変換する過程で vec<T> に達する直前のベクトルの要素型を返す.
   \param S	変換されるベクトルの要素型
   \param T	最終的な変換先のベクトルの要素型
-  \return	最終的な変換先に達する直前のベクトルの要素型
+  \return	最終的な変換先の直上のベクトルの要素型
 */
 template <class T, class S, bool MASK>
 using cvt_above_type = typename detail::cvt_adjacent_type<T, S, MASK>::A;

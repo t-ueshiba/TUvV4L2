@@ -51,11 +51,11 @@ namespace detail
     //! 変換関数に入力するSIMDベクトルの要素型
       using I = std::conditional_t<std::is_void<T>::value, O, T>;
 
-    //! vec<I> よりも要素数が少ない入力SIMDベクトルを vec<I> に変換
-      struct generic_downArg
+    //! vec<I> よりも上位の入力SIMDベクトルを vec<I> に変換
+      struct generic_cvtdown
       {
 	  template <class T_=I, class ITER_>
-	  std::enable_if_t<(vec<T_>::size == iterator_value<ITER_>::size),
+	  std::enable_if_t<(iterator_value<ITER_>::size == vec<T_>::size),
 			   vec<T_> >
 			operator ()(ITER_& iter) const
 			{
@@ -64,7 +64,7 @@ namespace detail
 			    return cvt<T_, false, MASK>(x);
 			}
 	  template <class T_=I, class ITER_>
-	  std::enable_if_t<(vec<T_>::size > iterator_value<ITER_>::size),
+	  std::enable_if_t<(iterator_value<ITER_>::size < vec<T_>::size),
 			   vec<T_> >
 			operator ()(ITER_& iter) const
 			{
@@ -77,16 +77,16 @@ namespace detail
 			    return cvt<T_, MASK>(x, y);
 			}
 	  template <class S_>
-	  std::enable_if_t<vec<I>::size == vec<S_>::size, vec<I> >
+	  std::enable_if_t<vec<S_>::size == vec<I>::size, vec<I> >
 			operator ()(vec<S_> x) const
 			{
 			    return cvt<I, false, MASK>(x);
 			}
       };
 
-    //! vec<I> よりも要素数が多い入力SIMDベクトルを vec<I> に変換
+    //! vec<I> よりも下位の入力SIMDベクトルを vec<I> に変換
       template <size_t N_, bool HI_>
-      struct generic_upArg
+      struct generic_cvtup
       {
 	  template <class ITER_>
 	  std::enable_if_t<iterator_value<ITER_>::size == N_,
@@ -180,7 +180,7 @@ namespace detail
 		std::enable_if_t<(N_ == vec<I>::size)>* = nullptr>
       auto	upArg_downResult(TUPLE_&& x)
 		{
-		    return downResult(_func(tuple_transform(generic_downArg(),
+		    return downResult(_func(tuple_transform(generic_cvtdown(),
 							    x)));
 		}
       template <size_t N_, class TUPLE_,
@@ -189,10 +189,10 @@ namespace detail
 		{
 		    const auto	y = upArg_downResult<N_/2>(
 					tuple_transform(
-					    generic_upArg<N_/2, false>(), x));
+					    generic_cvtup<N_/2, false>(), x));
 		    const auto	z = upArg_downResult<N_/2>(
 					tuple_transform(
-					    generic_upArg<N_/2, true >(), x));
+					    generic_cvtup<N_/2, true >(), x));
 		    return downResult(y, z);
 		}
 
@@ -201,7 +201,7 @@ namespace detail
       std::enable_if_t<(N_ == vec<I>::size && N_ > vec<O>::size)>
 		upArg(TUPLE_&& x)
 		{
-		    upResult(_func(tuple_transform(generic_downArg(), x)));
+		    upResult(_func(tuple_transform(generic_cvtdown(), x)));
 		}
       template <size_t N_, class TUPLE_>
       std::enable_if_t<(N_ == vec<O>::size)>
@@ -214,9 +214,9 @@ namespace detail
       std::enable_if_t<(N_ > vec<I>::size && N_ > vec<O>::size)>
 		upArg(TUPLE_&& x)
 		{
-		    upArg<N_/2>(tuple_transform(generic_upArg<N_/2, false>(),
+		    upArg<N_/2>(tuple_transform(generic_cvtup<N_/2, false>(),
 						x));
-		    upArg<N_/2>(tuple_transform(generic_upArg<N_/2, true >(),
+		    upArg<N_/2>(tuple_transform(generic_cvtup<N_/2, true >(),
 						x));
 		}
 
@@ -232,7 +232,7 @@ namespace detail
 			    N = (max_size<ITER_TUPLE>::value > vec<O>::size ?
 				 max_size<ITER_TUPLE>::value : vec<O>::size);
 
-			upArg<N>(tuple_transform(generic_upArg<N, false>(),
+			upArg<N>(tuple_transform(generic_cvtup<N, false>(),
 						 _t));
 		    }
 		    return _out;
