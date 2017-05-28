@@ -147,8 +147,8 @@ make_store_iterator(T* p)
     return {p};
 }
 
-template <bool ALIGNED=false, class T> inline store_iterator<T, ALIGNED>
-make_store_iterator(vec<T>* p)
+template <class T> inline store_iterator<T, true>
+make_store_iterator(ptr<T> p)
 {
     return {p};
 }

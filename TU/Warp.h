@@ -393,7 +393,7 @@ Warp::warpLine(IN in, OUT out, const FracArray& frac) const
     auto	dv = std::cbegin(frac.dv);
     out += frac.lmost;
 #if defined(SIMD)
-    using value_type = typename Interpolate<IN>::value_type;
+    using	value_type = typename Interpolate<IN>::value_type;
     using	T = std::conditional_t<(sizeof(value_type) > sizeof(int16_t)),
 				       int32_t, int16_t>;
     using	O = std::conditional_t<(sizeof(value_type) > sizeof(int16_t)),
@@ -404,11 +404,11 @@ Warp::warpLine(IN in, OUT out, const FracArray& frac) const
     simd::transform<T>(interpolate,
 		       simd::make_store_iterator<false>(
 			   reinterpret_cast<O>(out)),
-		       simd::make_load_iterator<false>(u),
-		       simd::make_load_iterator<false>(u + n),
-		       simd::make_load_iterator<false>(v),
-		       simd::make_load_iterator<false>(du),
-		       simd::make_load_iterator<false>(dv));
+		       simd::make_load_iterator(u),
+		       simd::make_load_iterator(u + n),
+		       simd::make_load_iterator(v),
+		       simd::make_load_iterator(du),
+		       simd::make_load_iterator(dv));
     simd::empty();
 
     std::advance(u,   n);
