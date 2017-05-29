@@ -4,14 +4,13 @@
 #if !defined(TU_SIMD_BUFTRAITS_H)
 #define TU_SIMD_BUFTRAITS_H
 
-#include <memory>
+#include "TU/Array++.h"
+#include "TU/simd/allocator.h"
 #include "TU/simd/store_iterator.h"
 #include "TU/simd/load_iterator.h"
-#include "TU/simd/zero.h"
 
 namespace TU
 {
-template <class T, class ALLOC>	class BufTraits;
 template <class T, class ALLOC>
 class BufTraits<simd::vec<T>, ALLOC>
     : public std::allocator_traits<simd::allocator<simd::vec<T> > >

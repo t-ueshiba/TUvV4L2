@@ -4,7 +4,7 @@
 #################################
 #  User customizable macros	#
 #################################
-PROGRAM		= $(shell basename $(PWD))_test
+PROGRAM		= $(shell basename $(PWD))
 #LIBRARY		= lib$(shell basename $(PWD))
 
 VPATH		=
@@ -13,20 +13,19 @@ IDLS		=
 MOCHDRS		=
 
 INCDIRS		= -I../..
-CPPFLAGS	= -DNDEBUG -DTU_DEBUG
-CFLAGS		= -g #-Wall
+CPPFLAGS	= -DNDEBUG
+CFLAGS		= -O3
 NVCCFLAGS	= -O
 ifeq ($(shell arch), armv7l)
   CPPFLAGS     += -DNEON
 else ifeq ($(shell arch), aarch64)
   CPPFLAGS     += -DNEON
 else
-  CPPFLAGS     += -DSSE4
-  CFLAGS       += -msse4
+  CPPFLAGS     += -DSSE3
 endif
 CCFLAGS		= $(CFLAGS)
 
-LIBS		=
+LIBS		= -lTUTools++
 LINKER		= $(CXX)
 
 BINDIR		= $(PREFIX)/bin
@@ -38,9 +37,16 @@ INCDIR		= $(PREFIX)/include
 #########################
 SUFFIX		= .cc:sC .cpp:sC .cu:sC
 EXTHDRS		= ../../TU/Array++.h \
+		../../TU/DericheConvolver.h \
+		../../TU/EdgeDetector.h \
+		../../TU/GaussianConvolver.h \
+		../../TU/IIRFilter.h \
+		../../TU/Image++.h \
+		../../TU/SeparableFilter2.h \
 		../../TU/Vector++.h \
 		../../TU/algorithm.h \
 		../../TU/iterator.h \
+		../../TU/pair.h \
 		../../TU/range.h \
 		../../TU/tuple.h
 HDRS		=
@@ -53,5 +59,8 @@ OBJS		= main.o
 #include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
-main.o: ../../TU/Vector++.h ../../TU/Array++.h ../../TU/range.h \
-	../../TU/algorithm.h ../../TU/iterator.h ../../TU/tuple.h
+main.o: ../../TU/Image++.h ../../TU/pair.h ../../TU/Vector++.h \
+	../../TU/Array++.h ../../TU/range.h ../../TU/algorithm.h \
+	../../TU/iterator.h ../../TU/tuple.h ../../TU/GaussianConvolver.h \
+	../../TU/IIRFilter.h ../../TU/SeparableFilter2.h \
+	../../TU/DericheConvolver.h ../../TU/EdgeDetector.h
