@@ -12,9 +12,10 @@
 
 namespace std
 {
-#if __GNUC__ < 5
+#if !defined(__clang__) && (__GNUG__ <= 4)
 inline void*
-align(std::size_t alignment, std::size_t size, void *&ptr, std::size_t &space)
+align(std::size_t alignment,
+      std::size_t size, void *&ptr, std::size_t &space) noexcept
 {
     std::uintptr_t	pn	= reinterpret_cast<std::uintptr_t>(ptr);
     std::uintptr_t	aligned = (pn + alignment - 1)& - alignment;
