@@ -6,9 +6,9 @@
 #ifndef	TU_WARP_H
 #define	TU_WARP_H
 
+#include "TU/simd/simd.h"
 #include "TU/Image++.h"
 #include "TU/Camera++.h"
-#include "TU/simd/simd.h"
 #if defined(USE_TBB)
 #  include <tbb/parallel_for.h>
 #  include <tbb/blocked_range.h>

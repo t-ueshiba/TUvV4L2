@@ -24,7 +24,7 @@
 #  include "TU/simd/compare.h"
 #  include "TU/simd/select.h"
 #  include "TU/simd/arithmetic.h"
-//#  include "TU/simd/misc.h"
+#  include "TU/simd/misc.h"
 #  include "TU/simd/transform.h"
 #  include "TU/simd/lookup.h"
 
