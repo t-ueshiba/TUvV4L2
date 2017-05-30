@@ -4,10 +4,10 @@
 #if !defined(TU_SIMD_BUFTRAITS_H)
 #define TU_SIMD_BUFTRAITS_H
 
-#include "TU/Array++.h"
 #include "TU/simd/allocator.h"
 #include "TU/simd/store_iterator.h"
 #include "TU/simd/load_iterator.h"
+#include "TU/Array++.h"
 
 namespace TU
 {
