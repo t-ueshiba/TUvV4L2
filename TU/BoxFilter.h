@@ -51,7 +51,6 @@ class box_filter_iterator
 		    if (w > 0)
 		    {
 			_val = *super::base();
-				
 			while (--w > 0)
 			    _val += *++super::base_reference();
 		    }
@@ -77,6 +76,7 @@ class box_filter_iterator
 		{
 		    if (!_valid)
 		    {
+		      //(_val += *super::base()) -= *_head;
 			_val += (*super::base() - *_head);
 			++_head;
 			_valid = true;
@@ -112,7 +112,7 @@ class box_filter_iterator
   \return	box filter反復子
 */
 template <class T=void, class ITER> box_filter_iterator<ITER, T>
-make_box_filter_iterator(ITER iter, size_t w=0)
+make_box_filter_iterator(const ITER& iter, size_t w=0)
 {
     return {iter, w};
 }
@@ -156,7 +156,8 @@ class BoxFilter
   private:
     size_t	_winSize;		//!< box filterのウィンドウ幅
 };
-    
+
+//! 与えられた1次元配列とこのフィルタの畳み込みを行う
 /*!
   \param ib	1次元入力データ列の先頭を示す反復子
   \param ie	1次元入力データ列の末尾の次を示す反復子

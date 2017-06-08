@@ -278,7 +278,7 @@ class iir_filter_iterator
 */
 template <size_t D, bool FWD, class COEFF, class ITER>
 iir_filter_iterator<D, FWD, COEFF, ITER>
-make_iir_filter_iterator(ITER iter, COEFF ci, COEFF co)
+make_iir_filter_iterator(const ITER& iter, COEFF ci, COEFF co)
 {
     return {iter, ci, co};
 }

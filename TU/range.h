@@ -311,7 +311,6 @@ class range
     using reverse_iterator	= std::reverse_iterator<iterator>;
     using value_type		= iterator_value<iterator>;
     using reference		= iterator_reference<iterator>;
-    using element_type		= element_t<value_type>;
     
   public:
 		range(iterator begin)		:_begin(begin)	{}
@@ -399,7 +398,6 @@ class range<ITER, 0>
     using reverse_iterator	= std::reverse_iterator<iterator>;
     using value_type		= iterator_value<iterator>;
     using reference		= iterator_reference<iterator>;
-    using element_type		= element_t<value_type>;
     
   public:
 		range(iterator begin, size_t size)
@@ -529,19 +527,24 @@ namespace detail
 			    boost::iterator_adaptor<ITER_, BASE_, VAL_,
 						    CAT_, REF_, DIFF_>)	;
       static void	check_base_type(...)				;
-
       using base_type	= decltype(check_base_type(std::declval<ITER>()));
 
+      template <class ITER_>
+      static auto	check_difference(ITER_)
+			    -> iterator_difference<ITER_>		;
+      static ptrdiff_t	check_difference(...)				;
+      using diff_type	= decltype(check_difference(std::declval<ITER>()));
+      
     public:
       using type	= typename std::conditional_t<
 				       std::is_void<base_type>::value,
-				       identity<iterator_difference<ITER> >,
+				       identity<diff_type>,
 				       iterator_stride<base_type> >::type;
   };
-  template <class ITER_TUPLE>
-  struct iterator_stride<zip_iterator<ITER_TUPLE> >
+  template <class... ITER_>
+  struct iterator_stride<zip_iterator<std::tuple<ITER_...> > >
   {
-      using type	= typename zip_iterator<ITER_TUPLE>::stride_t;
+      using type	= std::tuple<typename iterator_stride<ITER_>::type...>;
   };
 }	// namespace detail
 
@@ -657,15 +660,15 @@ class range_iterator
 		}
     void	increment()
 		{
-		    advance(stride(), is_tuple<stride_t>());
+		    advance(super::base_reference(), stride());
 		}
     void	decrement()
 		{
-		    advance(-stride(), is_tuple<stride_t>());
+		    advance(super::base_reference(), -stride());
 		}
     void	advance(difference_type n)
 		{
-		    advance(n*stride(), is_tuple<stride_t>());
+		    advance(super::base_reference(), n*stride());
 		}
     difference_type
 		distance_to(const range_iterator& iter) const
@@ -673,26 +676,26 @@ class range_iterator
 		    return (iter.base() - super::base()) / stride();
 		}
 
-    void	advance(stride_t stride, std::false_type)
+    template <class ITER_, class STRIDE_>
+    static void	advance(ITER_& iter, STRIDE_ stride)
 		{
-		    super::base_reference() += stride;
+		    iter += stride;
 		}
-    void	advance(stride_t stride, std::true_type)
+    template <class ITER_TUPLE_, class... STRIDE_>
+    static void	advance(zip_iterator<ITER_TUPLE_>& iter,
+			std::tuple<STRIDE_...> stride)
 		{
-		    const auto&	iter = base_zip_iterator(super::base());
-		    const_cast<std::decay_t<decltype(iter)>&>(iter)
-			.advance(stride);
+		    tuple_for_each([](auto&& x, auto y)
+				   { range_iterator::advance(x, y); },
+				   const_cast<ITER_TUPLE_&>(
+				       iter.get_iterator_tuple()),
+				   stride);
 		}
-
-    template <class ITER_TUPLE_> static const auto&
-		base_zip_iterator(const zip_iterator<ITER_TUPLE_>& iter)
+    template <class ITER_, class... STRIDE_>
+    static void	advance(ITER_& iter, std::tuple<STRIDE_...> stride)
 		{
-		    return iter;
-		}
-    template <class ITER_> static const auto&
-		base_zip_iterator(const ITER_& iter)
-		{
-		    return base_zip_iterator(iter.base());
+		    advance(const_cast<typename ITER_::base_type&>(iter.base()),
+			    stride);
 		}
 };
 
@@ -919,7 +922,7 @@ slice(RANGE&& r, size_t idx, INDICES... indices)
 *  supports for range tuples						*
 ************************************************************************/
 template <size_t... SIZES, class ITER_TUPLE, class... ARGS> inline auto
-make_range(zip_iterator<ITER_TUPLE> zip_iter, ARGS... args)
+make_range(const zip_iterator<ITER_TUPLE>& zip_iter, ARGS... args)
 {
     return tuple_transform([args...](auto iter)
 			   {
