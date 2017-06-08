@@ -134,7 +134,7 @@ class fir_filter_iterator
   \return	finite impulse response filter反復子
 */
 template <size_t D, class COEFF, class ITER> fir_filter_iterator<D, COEFF, ITER>
-make_fir_filter_iterator(ITER iter, COEFF c)
+make_fir_filter_iterator(const ITER& iter, COEFF c)
 {
     return {iter, c};
 }

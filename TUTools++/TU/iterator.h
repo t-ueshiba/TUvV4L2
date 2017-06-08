@@ -147,9 +147,8 @@ class zip_iterator : public boost::iterator_facade<
     friend	class boost::iterator_core_access;
     
   public:
-    using		typename super::reference;
-    using		typename super::difference_type;
-    using stride_t    = replace_element<ITER_TUPLE, ptrdiff_t>;
+    using	typename super::reference;
+    using	typename super::difference_type;
     
   public:
 		zip_iterator(ITER_TUPLE iter_tuple)
@@ -161,10 +160,8 @@ class zip_iterator : public boost::iterator_facade<
 		zip_iterator(const zip_iterator<ITER_TUPLE_>& iter)
 		    :_iter_tuple(iter.get_iterator_tuple())		{}
 
-    const ITER_TUPLE&
-		get_iterator_tuple()	const	{ return _iter_tuple; }
-    void	advance(stride_t stride)	{ _iter_tuple += stride; }
-
+    const auto&	get_iterator_tuple()	const	{ return _iter_tuple; }
+    
   private:
     reference	dereference() const
 		{
@@ -240,22 +237,42 @@ using decayed_iterator_value = typename detail::decayed_iterator_value<ITER>
 /************************************************************************
 *  TU::[begin|end|rbegin|rend](std::tuple<T...>)			*
 ************************************************************************/
+namespace detail
+{
+  struct generic_begin
+  {
+      template <class T>
+      auto	operator ()(T&& x) const
+		{
+		    using	std::begin;
+		    return begin(std::forward<T>(x));
+		}
+  };
+  struct generic_end
+  {
+      template <class T>
+      auto	operator ()(T&& x) const
+		{
+		    using	std::end;
+		    return end(std::forward<T>(x));
+		}
+  };
+}
+    
 template <class TUPLE,
 	  std::enable_if_t<is_tuple<TUPLE>::value>* = nullptr> inline auto
 begin(TUPLE&& t)
 {
-    return make_zip_iterator(
-		tuple_transform(
-		    [](auto&& x){ using std::begin; return begin(x); }, t));
+  // icpc-17.0.4 のバグ対策のため，lambdaを用いずに実装
+    return TU::make_zip_iterator(tuple_transform(detail::generic_begin(), t));
 }
 
 template <class TUPLE,
 	  std::enable_if_t<is_tuple<TUPLE>::value>* = nullptr> inline auto
 end(TUPLE&& t)
 {
-    return make_zip_iterator(
-		tuple_transform(
-		    [](auto&& x){ using std::end; return end(x); }, t));
+  // icpc-17.0.4 のバグ対策のため，lambdaを用いずに実装
+    return TU::make_zip_iterator(tuple_transform(detail::generic_end(), t));
 }
 
 template <class TUPLE,
@@ -372,7 +389,8 @@ class transform_iterator2
     using	typename super::reference;
 	
   public:
-		transform_iterator2(ITER0 iter0, ITER1 iter1, FUNC func)
+		transform_iterator2(const ITER0& iter0,
+				    const ITER1& iter1, FUNC func)
 		    :super(iter0), _iter(iter1), _func(func)
 		{
 		}
@@ -405,7 +423,7 @@ class transform_iterator2
 
 template <class FUNC, class ITER0, class ITER1>
 inline transform_iterator2<FUNC, ITER0, ITER1>
-make_transform_iterator2(ITER0 iter0, ITER1 iter1, FUNC func)
+make_transform_iterator2(const ITER0& iter0, const ITER1& iter1, FUNC func)
 {
     return {iter0, iter1, func};
 }
@@ -421,10 +439,10 @@ namespace detail
   {
     private:
       template <class T_>
-      static auto	check_func(ITER iter, T_&& val, FUNC func)
+      static auto	check_func(ITER iter, const T_& val, FUNC func)
 			    -> decltype(func(*iter, val), std::true_type());
       template <class T_>
-      static auto	check_func(ITER iter, T_&& val, FUNC func)
+      static auto	check_func(ITER iter, const T_& val, FUNC func)
 			    -> decltype(*iter = func(val), std::false_type());
       template <class T_>
       using is_binary_func	= decltype(check_func(std::declval<ITER>(),
@@ -439,56 +457,56 @@ namespace detail
       std::enable_if_t<is_binary_func<T_>::value, assignment_proxy&>
 			operator =(T_&& val)
 			{
-			    _func(*_iter, val);
+			    _func(*_iter, std::forward<T_>(val));
 			    return *this;
 			}
       template <class T_>
       std::enable_if_t<!is_binary_func<T_>::value, assignment_proxy&>
 			operator =(T_&& val)
 			{
-			    *_iter  = _func(val);
+			    *_iter  = _func(std::forward<T_>(val));
 			    return *this;
 			}
       template <class T_>
       assignment_proxy&	operator +=(T_&& val)
 			{
-			    *_iter += _func(val);
+			    *_iter += _func(std::forward<T_>(val));
 			    return *this;
 			}
       template <class T_>
       assignment_proxy&	operator -=(T_&& val)
 			{
-			    *_iter -= _func(val);
+			    *_iter -= _func(std::forward<T_>(val));
 			    return *this;
 			}
       template <class T_>
       assignment_proxy&	operator *=(T_&& val)
 			{
-			    *_iter *= _func(val);
+			    *_iter *= _func(std::forward<T_>(val));
 			    return *this;
 			}
       template <class T_>
       assignment_proxy&	operator /=(T_&& val)
 			{
-			    *_iter /= _func(val);
+			    *_iter /= _func(std::forward<T_>(val));
 			    return *this;
 			}
       template <class T_>
       assignment_proxy&	operator &=(T_&& val)
 			{
-			    *_iter &= _func(val);
+			    *_iter &= _func(std::forward<T_>(val));
 			    return *this;
 			}
       template <class T_>
       assignment_proxy&	operator |=(T_&& val)
 			{
-			    *_iter |= _func(val);
+			    *_iter |= _func(std::forward<T_>(val));
 			    return *this;
 			}
       template <class T_>
       assignment_proxy&	operator ^=(T_&& val)
 			{
-			    *_iter ^= _func(val);
+			    *_iter ^= _func(std::forward<T_>(val));
 			    return *this;
 			}
 

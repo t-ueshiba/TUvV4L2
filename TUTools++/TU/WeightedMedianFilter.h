@@ -354,11 +354,11 @@ class WeightedMedianFilter2 : public detail::WeightedMedianFilterBase<W>,
 			      public Profiler<CLOCK>
 {
   private:
-    using value_type		= T;
-    using guide_type		= typename W::argument_type;
-    using super			= detail::WeightedMedianFilterBase<W>;
-    using pf_type		= Profiler<CLOCK>;
-    using HistogramArray	= typename super::HistogramArray;
+    using value_type	= T;
+    using guide_type	= typename W::argument_type;
+    using pf_type	= Profiler<CLOCK>;
+    using super		= detail::WeightedMedianFilterBase<W>;
+    using		typename super::HistogramArray;
 #if defined(USE_TBB)
     template <class ROW_I, class ROW_G, class ROW_O>
     class Filter
