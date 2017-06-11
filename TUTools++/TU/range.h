@@ -1236,8 +1236,7 @@ operator *=(E&& expr, element_t<E> c)
 {
     constexpr size_t	N = size0<E>();
     
-    for_each<N>(std::begin(expr), std::size(expr),
-		[c](auto&& x){ std::forward<decltype(x)>(x) *= c; });
+    for_each<N>(std::begin(expr), std::size(expr), [c](auto&& x){ x *= c; });
     return expr;
 }
 
@@ -1252,8 +1251,7 @@ operator /=(E&& expr, element_t<E> c)
 {
     constexpr size_t	N = size0<E>();
     
-    for_each<N>(std::begin(expr), std::size(expr),
-		[c](auto&& x){ std::forward<decltype(x)>(x) /= c; });
+    for_each<N>(std::begin(expr), std::size(expr), [c](auto&& x){ x /= c; });
     return expr;
 }
 
@@ -1299,12 +1297,10 @@ operator -(L&& l, R&& r)
 */
 template <class L, class R>
 inline std::enable_if_t<rank<L>() != 0 && rank<L>() == rank<R>(), L&>
-operator +=(L&& l, R&& r)
+operator +=(L&& l, const R& r)
 {
     for_each<size0<L>()>(std::begin(l), std::size(l), std::begin(r),
-			 [](auto&& x, auto&& y)
-			 { std::forward<decltype(x)>(x)
-				 += std::forward<decltype(y)>(y); });
+			 [](auto&& x, const auto& y){ x += y; });
     return l;
 }
 
@@ -1319,9 +1315,7 @@ inline std::enable_if_t<rank<L>() != 0 && rank<L>() == rank<R>(), L&>
 operator -=(L&& l, R&& r)
 {
     for_each<size0<L>()>(std::begin(l), std::size(l), std::begin(r),
-			 [](auto&& x, auto&& y)
-			 { std::forward<decltype(x)>(x)
-				 -= std::forward<decltype(y)>(y); });
+			 [](auto&& x, const auto& y){ x -= y; });
     return l;
 }
 
