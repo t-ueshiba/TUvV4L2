@@ -151,7 +151,7 @@ ransac(const SAMPLER& sampler,
   // maximalSetに含まれる点を真のinlierとし，それら全てからモデルを生成する．
     model.fit(maximalSet.begin(), maximalSet.end());
 
-    return std::move(maximalSet);
+    return maximalSet;
 }
     
 //! RANSACによってoutlierを含む点集合にモデルを当てはめる．

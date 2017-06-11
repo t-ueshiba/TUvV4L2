@@ -80,7 +80,7 @@ template <class E>
 using element_t	= typename detail::element_t<E>::type;
 
 /************************************************************************
-*  rank<E>(), size0<E>(), size<E>()					*
+*  rank<E>()								*
 ************************************************************************/
 namespace detail
 {
@@ -111,12 +111,43 @@ rank()
     return 1 + rank<value_t<E> >();
 }
     
+/************************************************************************
+*  size0<E>()								*
+************************************************************************/
 namespace detail
 {
   template <class E>
   auto		  has_size0(E) -> decltype(E::size0(), std::true_type());
   std::false_type has_size0(...)					;
+}	// namespace detail
 
+template <class E>
+using has_size0 = decltype(detail::has_size0(std::declval<E>()));
+    
+//! 式の最上位軸の要素数を返す
+/*!
+  本関数で返されるのは静的なサイズであり，式が可変個の要素を持つ場合，0が返される
+  \param E	式の型
+  \return	最上位軸の静的な要素数(可変サイズの場合0)
+ */
+template <class E> constexpr std::enable_if_t<!has_size0<E>::value, size_t>
+size0()
+{
+  // Array2<T, R, C> * Array<T, 0, 0> の評価結果の型が Array<T, R, 0>
+  // ではなく Array<T, 0, 0> になるために，0ではなく1を返すことが必要．
+    return 1;
+}
+template <class E> constexpr std::enable_if_t<has_size0<E>::value, size_t>
+size0()
+{
+    return std::decay_t<E>::size0();
+}
+    
+/************************************************************************
+*  size<E>()								*
+************************************************************************/
+namespace detail
+{
   /*
    *  A ^ b において演算子ノード product_opnode<bit_xor, L, R> が
    *  生成されるが，これを評価して2次元配列に代入する際に代入先の領域確保のため
@@ -146,28 +177,6 @@ namespace detail
   }
 }	// namespace detail
 
-template <class E>
-using has_size0 = decltype(detail::has_size0(std::declval<E>()));
-    
-//! 式の最上位軸の要素数を返す
-/*!
-  本関数で返されるのは静的なサイズであり，式が可変個の要素を持つ場合，0が返される
-  \param E	式の型
-  \return	最上位軸の静的な要素数(可変サイズの場合0)
- */
-template <class E> constexpr std::enable_if_t<!has_size0<E>::value, size_t>
-size0()
-{
-  // Array2<T, R, C> * Array<T, 0, 0> の評価結果の型が Array<T, R, 0>
-  // ではなく Array<T, 0, 0> になるために，0ではなく1を返すことが必要．
-    return 1;
-}
-template <class E> constexpr std::enable_if_t<has_size0<E>::value, size_t>
-size0()
-{
-    return E::size0();
-}
-    
 //! 与えられた式について，指定された軸の要素数を返す
 /*!
   \param I	軸を指定するindex (0 <= I < Dimension)
@@ -900,7 +909,7 @@ namespace detail
 }	// namespace detail
     
 template <class RANGE, class... IS,
-	  std::enable_if_t<rank<std::decay_t<RANGE>>() != 0>* = nullptr>
+	  std::enable_if_t<rank<RANGE>() != 0>* = nullptr>
 inline auto
 slice(RANGE&& r, size_t idx, size_t size, IS... is)
 {
@@ -909,7 +918,7 @@ slice(RANGE&& r, size_t idx, size_t size, IS... is)
 }
 
 template <size_t SIZE, size_t... SIZES, class RANGE, class... INDICES,
-	  std::enable_if_t<rank<std::decay_t<RANGE>>() != 0 &&
+	  std::enable_if_t<rank<RANGE>() != 0 &&
 			   sizeof...(SIZES) == sizeof...(INDICES)>* = nullptr>
 inline auto
 slice(RANGE&& r, size_t idx, INDICES... indices)
@@ -1050,26 +1059,22 @@ namespace detail
   /**********************************************************************
   *  struct opnode							*
   **********************************************************************/
-  class opnode;
+  //! 演算子のノードを表すクラス
+  class opnode
+  {
+  };
 
   template <class E>
   using is_opnode = std::is_convertible<E, opnode>;
     
-  //! 演算子のノードを表すクラス
-  class opnode
-  {
-    protected:
-      template <class E_>
-      using argument_t	= std::conditional_t<is_opnode<E_>::value ||
-					     is_range<E_>::value,
-					     const E_, const E_&>;
-  };
-
   /**********************************************************************
   *  class unary_opnode<OP, E>						*
   **********************************************************************/
   //! 配列式に対する単項演算子を表すクラス
   /*!
+    与えられた配列式が一時オブジェクトの場合は，その内容を本クラスオブジェクト内に
+    保持した実体にmoveする．そうでない場合は，それへの参照を本クラスオブジェクト
+    内に保持する．
     \param OP	各成分に適用される単項演算子の型
     \param E	単項演算子の引数となる式の型
   */
@@ -1081,8 +1086,8 @@ namespace detail
       using reference	= iterator_reference<iterator>;
       
     public:
-		unary_opnode(const E& expr, OP op)
-		    :_expr(expr), _op(op)				{}
+		unary_opnode(E&& expr, OP op)
+		    :_expr(std::forward<E>(expr)), _op(op)	{}
 
       constexpr static size_t
 		size0()		{ return TU::size0<E>(); }
@@ -1096,14 +1101,16 @@ namespace detail
 		}
       
     private:
-      argument_t<E>	_expr;
-      const OP		_op;
+      const E	_expr;
+      const OP	_op;
   };
     
-  template <class OP, class E> inline unary_opnode<OP, E>
-  make_unary_opnode(const E& expr, OP op)
+  template <class OP, class E> inline auto
+  make_unary_opnode(E&& expr, OP op)
   {
-      return {expr, op};
+    // exprの実引数がX&&型(X型の一時オブジェクト)ならば E = X,
+    // そうでなければ E = X& または E = const X& となる．
+      return unary_opnode<OP, E>(std::forward<E>(expr), op);
   }
 
   /**********************************************************************
@@ -1111,6 +1118,9 @@ namespace detail
   **********************************************************************/
   //! 配列式に対する2項演算子を表すクラス
   /*!
+    与えられた配列式が一時オブジェクトの場合は，その内容を本クラスオブジェクト内に
+    保持した実体にmoveする．そうでない場合は，それへの参照を本クラスオブジェクト
+    内に保持する．
     \param OP	各成分に適用される2項演算子の型
     \param L	2項演算子の第1引数となる式の型
     \param R	2項演算子の第2引数となる式の型
@@ -1124,8 +1134,8 @@ namespace detail
       using reference	= iterator_reference<iterator>;
 
     public:
-		binary_opnode(const L& l, const R& r, OP op)
-		    :_l(l), _r(r), _op(op)
+		binary_opnode(L&& l, R&& r, OP op)
+		    :_l(std::forward<L>(l)), _r(std::forward<R>(r)), _op(op)
 		{
 		    assert(std::size(_l) == std::size(_r));
 		}
@@ -1145,15 +1155,18 @@ namespace detail
 		}
 
     private:
-      argument_t<L>	_l;
-      argument_t<R>	_r;
-      const OP		_op;
+      const L	_l;
+      const R	_r;
+      const OP	_op;
   };
     
-  template <class OP, class L, class R> inline binary_opnode<OP, L, R>
-  make_binary_opnode(const L& l, const R& r, OP op)
+  template <class OP, class L, class R> inline auto
+  make_binary_opnode(L&& l, R&& r, OP op)
   {
-      return {l, r, op};
+    // l(r)の実引数がX&&型(Y&&型)ならば L = X (R = Y), そうでなければ
+    // L = X& (R = Y&) または L = const X& (R = const Y&) となる．
+      return binary_opnode<OP, L, R>(std::forward<L>(l),
+				     std::forward<R>(r), op);
   }
 }	// namespace detail
 
@@ -1163,9 +1176,11 @@ namespace detail
   \return	符号反転演算子ノード
 */
 template <class E, std::enable_if_t<rank<E>() != 0>* = nullptr> inline auto
-operator -(const E& expr)
+operator -(E&& expr)
 {
-    return detail::make_unary_opnode(expr, [](const auto& x){ return -x; });
+    return detail::make_unary_opnode(std::forward<E>(expr),
+				     [](auto&& x)
+				     { return -std::forward<decltype(x)>(x); });
 }
 
 //! 与えられた式の各要素に定数を掛ける.
@@ -1175,9 +1190,11 @@ operator -(const E& expr)
   \return	乗算演算子ノード
 */
 template <class E, std::enable_if_t<rank<E>() != 0>* = nullptr> inline auto
-operator *(const E& expr, element_t<E> c)
+operator *(E&& expr, element_t<E> c)
 {
-    return detail::make_unary_opnode(expr, [c](const auto& x){ return x*c; });
+    return detail::make_unary_opnode(std::forward<E>(expr),
+				     [c](auto&& x)
+				     { return std::forward<decltype(x)>(x)*c; });
 }
 
 //! 与えられた式の各要素に定数を掛ける.
@@ -1187,9 +1204,11 @@ operator *(const E& expr, element_t<E> c)
   \return	乗算演算子ノード
 */
 template <class E, std::enable_if_t<rank<E>() != 0>* = nullptr> inline auto
-operator *(element_t<E> c, const E& expr)
+operator *(element_t<E> c, E&& expr)
 {
-    return detail::make_unary_opnode(expr, [c](const auto& x){ return c*x; });
+    return detail::make_unary_opnode(std::forward<E>(expr),
+				     [c](auto&& x)
+				     { return c*std::forward<decltype(x)>(x); });
 }
 
 //! 与えられた式の各要素を定数で割る.
@@ -1199,9 +1218,11 @@ operator *(element_t<E> c, const E& expr)
   \return	除算演算子ノード
 */
 template <class E, std::enable_if_t<rank<E>() != 0>* = nullptr> inline auto
-operator /(const E& expr, element_t<E> c)
+operator /(E&& expr, element_t<E> c)
 {
-    return detail::make_unary_opnode(expr, [c](const auto& x){ return x/c; });
+    return detail::make_unary_opnode(std::forward<E>(expr),
+				     [c](auto&& x)
+				     { return std::forward<decltype(x)>(x)/c; });
 }
 
 //! 与えられた式の各要素に定数を掛ける.
@@ -1210,12 +1231,13 @@ operator /(const E& expr, element_t<E> c)
   \param c	乗数
   \return	各要素にcが掛けられた結果の式
 */
-template <class E> inline std::enable_if_t<rank<std::decay_t<E> >() != 0, E&>
-operator *=(E&& expr, element_t<std::decay_t<E> > c)
+template <class E> inline std::enable_if_t<rank<E>() != 0, E&>
+operator *=(E&& expr, element_t<E> c)
 {
-    constexpr size_t	N = size0<std::decay_t<E> >();
+    constexpr size_t	N = size0<E>();
     
-    for_each<N>(std::begin(expr), std::size(expr), [c](auto&& x){ x *= c; });
+    for_each<N>(std::begin(expr), std::size(expr),
+		[c](auto&& x){ std::forward<decltype(x)>(x) *= c; });
     return expr;
 }
 
@@ -1225,12 +1247,13 @@ operator *=(E&& expr, element_t<std::decay_t<E> > c)
   \param c	除数
   \return	各要素がcで割られた結果の式
 */
-template <class E> inline std::enable_if_t<rank<std::decay_t<E> >() != 0, E&>
-operator /=(E&& expr, element_t<std::decay_t<E> > c)
+template <class E> inline std::enable_if_t<rank<E>() != 0, E&>
+operator /=(E&& expr, element_t<E> c)
 {
-    constexpr size_t	N = size0<std::decay_t<E> >();
+    constexpr size_t	N = size0<E>();
     
-    for_each<N>(std::begin(expr), std::size(expr), [c](auto&& x){ x /= c; });
+    for_each<N>(std::begin(expr), std::size(expr),
+		[c](auto&& x){ std::forward<decltype(x)>(x) /= c; });
     return expr;
 }
 
@@ -1243,10 +1266,12 @@ operator /=(E&& expr, element_t<std::decay_t<E> > c)
 template <class L, class R,
 	  std::enable_if_t<rank<L>() != 0 && rank<L>() == rank<R>()>* = nullptr>
 inline auto
-operator +(const L& l, const R& r)
+operator +(L&& l, R&& r)
 {
-    return detail::make_binary_opnode(l, r, [](const auto& x, const auto& y)
-					    { return x + y; });
+    return detail::make_binary_opnode(std::forward<L>(l), std::forward<R>(r),
+				      [](auto&& x, auto&& y)
+				      { return std::forward<decltype(x)>(x)
+					     + std::forward<decltype(y)>(y); });
 }
 
 //! 与えられた2つの式の各要素の差をとる.
@@ -1258,10 +1283,12 @@ operator +(const L& l, const R& r)
 template <class L, class R,
 	  std::enable_if_t<rank<L>() != 0 && rank<L>() == rank<R>()>* = nullptr>
 inline auto
-operator -(const L& l, const R& r)
+operator -(L&& l, R&& r)
 {
-    return detail::make_binary_opnode(l, r, [](const auto& x, const auto& y)
-					    { return x - y; });
+    return detail::make_binary_opnode(std::forward<L>(l), std::forward<R>(r),
+				      [](auto&& x, auto&& y)
+				      { return std::forward<decltype(x)>(x)
+					     - std::forward<decltype(y)>(y); });
 }
 
 //! 与えられた左辺の式の各要素に右辺の式の各要素を加える.
@@ -1271,14 +1298,13 @@ operator -(const L& l, const R& r)
   \return	各要素が加算された左辺の式
 */
 template <class L, class R>
-inline std::enable_if_t<rank<std::decay_t<L> >() != 0 &&
-			rank<std::decay_t<L> >() == rank<R>(), L&>
-operator +=(L&& l, const R& r)
+inline std::enable_if_t<rank<L>() != 0 && rank<L>() == rank<R>(), L&>
+operator +=(L&& l, R&& r)
 {
-    constexpr size_t	N = size0<std::decay_t<L> >();
-    
-    for_each<N>(std::begin(l), std::size(l), std::begin(r),
-		[](auto&& x, const auto& y){ x += y; });
+    for_each<size0<L>()>(std::begin(l), std::size(l), std::begin(r),
+			 [](auto&& x, auto&& y)
+			 { std::forward<decltype(x)>(x)
+				 += std::forward<decltype(y)>(y); });
     return l;
 }
 
@@ -1289,14 +1315,13 @@ operator +=(L&& l, const R& r)
   \return	各要素が減じられた左辺の式
 */
 template <class L, class R>
-inline std::enable_if_t<rank<std::decay_t<L> >() != 0 &&
-			rank<std::decay_t<L> >() == rank<R>(), L&>
-operator -=(L&& l, const R& r)
+inline std::enable_if_t<rank<L>() != 0 && rank<L>() == rank<R>(), L&>
+operator -=(L&& l, R&& r)
 {
-    constexpr size_t	N = size0<std::decay_t<L> >();
-    
-    for_each<N>(std::begin(l), std::size(l), std::begin(r),
-		[](auto&& x, const auto& y){ x -= y; });
+    for_each<size0<L>()>(std::begin(l), std::size(l), std::begin(r),
+			 [](auto&& x, auto&& y)
+			 { std::forward<decltype(x)>(x)
+				 -= std::forward<decltype(y)>(y); });
     return l;
 }
 
@@ -1369,7 +1394,7 @@ distance(const L& x, const R& y)
 		  \TUvec{e}{}\leftarrow\frac{\TUvec{e}{}}{\TUnorm{\TUvec{e}{}}}
 		\f$
 */
-template <class E> inline std::enable_if_t<rank<std::decay_t<E> >() != 0, E&>
+template <class E> inline std::enable_if_t<rank<E>() != 0, E&>
 normalize(E&& expr)
 {
     return expr /= length(expr);

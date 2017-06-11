@@ -24,7 +24,7 @@ main(int argc, char* argv[])
 	    break;
 	}
      
-  // guided filter¤ò2¤Ä¤Î1D array¤ËÅ¬ÍÑ¤¹¤ë¡¥
+  // guided filterã‚’2ã¤ã®1D arrayã«é©ç”¨ã™ã‚‹ï¼
     Array<int>		a;
     cerr << "a> ";
     cin >> a;
@@ -33,11 +33,11 @@ main(int argc, char* argv[])
     Array<float>	c(a.size());
 
     GuidedFilter<float>	gf(w, e);
-  //gf.convolve(a.begin(), a.end(), b.begin(), b.end(), c.begin() + w - 1);
-    gf.convolve(a.begin(), a.end(), c.begin() + w - 1);
+    gf.convolve(a.begin(), a.end(), b.begin(), b.end(), c.begin() + w - 1);
+  //gf.convolve(a.begin(), a.end(), c.begin() + w - 1);
     cout << c;
-
-  // guided filter¤ò2¤Ä¤Î2D array¤ËÅ¬ÍÑ¤¹¤ë¡¥
+    
+  // guided filterã‚’2ã¤ã®2D arrayã«é©ç”¨ã™ã‚‹ï¼
     Array2<short>	A;
     cerr << "A> ";
     cin >> A;
@@ -46,8 +46,8 @@ main(int argc, char* argv[])
     Array2<float>	C(A.nrow(), A.ncol());
 
     GuidedFilter2<float>	gf2(w, w, e);
-  //gf2.convolve(A.begin(), A.end(), B.begin(), B.end(), C.begin());
-    gf2.convolve(A.begin(), A.end(), C.begin());
+    gf2.convolve(A.begin(), A.end(), B.begin(), B.end(), C.begin());
+  //gf2.convolve(A.begin(), A.end(), C.begin());
     cout << C;
 
     return 0;

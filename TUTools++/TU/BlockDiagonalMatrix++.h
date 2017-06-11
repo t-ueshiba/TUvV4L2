@@ -134,7 +134,7 @@ transpose(const BlockDiagonalMatrix<T>& b)
     BlockDiagonalMatrix<T>	val(b.size());
     for (size_t i = 0; i < val.size(); ++i)
 	val[i] = transpose(b[i]);
-    return std::move(val);
+    return val;
 }
 
 //! 2つのブロック対角行列の積
@@ -150,7 +150,7 @@ operator *(const BlockDiagonalMatrix<T>& a, const BlockDiagonalMatrix<T>& b)
     BlockDiagonalMatrix<T>	val(a.size());
     for (size_t i = 0; i < val.size(); ++i)
 	val[i] = a[i] * b[i];
-    return std::move(val);
+    return val;
 }
 
 //! ブロック対角行列と通常の行列の積
@@ -173,7 +173,7 @@ operator *(const BlockDiagonalMatrix<T>& b, const Matrix<T>& m)
     }
     if (c != m.nrow())
 	throw std::invalid_argument("TU::operator *(const BlockDiagonalMatrix<T>&, const Matrix<T>&): dimension mismatch!!");
-    return std::move(val);
+    return val;
 }
 
 //! 通常の行列とブロック対角行列の積
@@ -196,7 +196,7 @@ operator *(const Matrix<T>& m, const BlockDiagonalMatrix<T>& b)
     }
     if (r != m.ncol())
 	throw std::invalid_argument("TU::operator *(const Matrix<T>&, const BlockDiagonalMatrix<T>&): dimension mismatch!!");
-    return std::move(val);
+    return val;
 }
 
 //! ブロック対角行列とベクトルの積
@@ -218,7 +218,7 @@ operator *(const BlockDiagonalMatrix<T>& b, const Vector<T>& v)
     }
     if (c != v.size())
 	throw std::invalid_argument("TU::operator *(const BlockDiagonalMatrix<T>&, const Vector<T>&): dimension mismatch!!");
-    return std::move(val);
+    return val;
 }
 
 //! ベクトルとブロック対角行列の積
@@ -240,7 +240,7 @@ operator *(const Vector<T>& v, const BlockDiagonalMatrix<T>& b)
     }
     if (r != v.size())
 	throw std::invalid_argument("TU::operator *(const Vector<T>&, const BlockDiagonalMatrix<T>&): dimension mismatch!!");
-    return std::move(val);
+    return val;
 }
  
 }
