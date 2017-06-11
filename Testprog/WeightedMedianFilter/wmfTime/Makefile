@@ -13,7 +13,7 @@ IDLS		=
 MOCHDRS		=
 
 INCDIRS		= -I../../.. -I$(PREFIX)/include
-CPPFLAGS	= -DNDEBUG -DUSE_TBB
+CPPFLAGS	= -DNDEBUG #-DUSE_TBB
 CFLAGS		= -g -O3
 NVCCFLAGS	= -g
 ifneq ($(findstring icpc,$(CXX)),)
@@ -49,8 +49,7 @@ EXTHDRS		= ../../../TU/Array++.h \
 		../../../TU/iterator.h \
 		../../../TU/pair.h \
 		../../../TU/range.h \
-		../../../TU/tuple.h \
-		../../../TU/types.h
+		../../../TU/tuple.h
 HDRS		=
 SRCS		= main.cc
 OBJS		= main.o
@@ -61,8 +60,8 @@ OBJS		= main.o
 #include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
-main.o: ../../../TU/Image++.h ../../../TU/types.h ../../../TU/pair.h \
-	../../../TU/Vector++.h ../../../TU/Array++.h ../../../TU/range.h \
-	../../../TU/algorithm.h ../../../TU/iterator.h ../../../TU/tuple.h \
+main.o: ../../../TU/Image++.h ../../../TU/pair.h ../../../TU/Vector++.h \
+	../../../TU/Array++.h ../../../TU/range.h ../../../TU/algorithm.h \
+	../../../TU/iterator.h ../../../TU/tuple.h \
 	../../../TU/WeightedMedianFilter.h ../../../TU/Quantizer.h \
 	../../../TU/Profiler.h

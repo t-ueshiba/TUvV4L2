@@ -20,8 +20,7 @@ namespace TU
   \param E	配列式の型
 */
 template <class E>
-using result_t	= std::conditional_t<detail::is_opnode<E>::value ||
-				     detail::is_range<E>::value,
+using result_t	= std::conditional_t<detail::is_opnode<E>::value,
 				     typename detail::substance_t<
 					 E, detail::is_opnode>::type,
 				     const E&>;
@@ -63,14 +62,22 @@ namespace detail
       class binder2nd
       {
 	public:
-	  binder2nd(OP op, const R& r)	:_r(r), _op(op)	{}
+	  binder2nd(OP op, R&& r) :_r(std::forward<R>(r)), _op(op)	{}
 
 	  template <class T_>
-	  auto	operator ()(const T_& arg)	const	{ return _op(arg, _r); }
+	  auto	operator ()(T_&& arg) const
+		{
+		    return _op(std::forward<T_>(arg), _r);
+		}
 
 	private:
-	  TU::result_t<R>	_r;	// 評価後に固定された第2引数
-	  const OP		_op;
+	  using	cache_t = std::conditional_t<
+				std::is_reference<R>::value,
+				R,
+				typename substance_t<R, is_opnode>::type>;
+	  
+	  const cache_t	_r;	// 評価後に固定された第2引数
+	  const OP	_op;
       };
 
     public:
@@ -80,8 +87,10 @@ namespace detail
 						 iterator_t<const L> >;
       
     public:
-		product_opnode(const L& l, const R& r, OP op)
-		    :_l(l), _binder(op, r)				{}
+		product_opnode(L&& l, R&& r, OP op)
+		    :_l(std::forward<L>(l)), _binder(op, std::forward<R>(r))
+		{
+		}
 
       constexpr static size_t
 		size0()		{ return TU::size0<L>(); }
@@ -94,22 +103,23 @@ namespace detail
 		}
 
     private:
-      argument_t<L>	_l;
+      const L		_l;
       const binder2nd	_binder;
   };
 
-  template <class OP, class L, class R> inline product_opnode<OP, L, R>
-  make_product_opnode(const L& l, const R& r, OP op)
+  template <class OP, class L, class R> inline auto
+  make_product_opnode(L&& l, R&& r, OP op)
   {
-      return {l, r, op};
+      return product_opnode<OP, L, R>(std::forward<L>(l),
+				      std::forward<R>(r), op);
   }
 
   struct bit_xor
   {
       template <class X_, class Y_>
-      auto	operator ()(const X_& x, const Y_& y) const
+      auto	operator ()(X_&& x, Y_&& y) const
 		{
-		    return x ^ y;
+		    return std::forward<X_>(x) ^ std::forward<Y_>(y);
 		}
   };
 }	// namespace detail
@@ -144,10 +154,13 @@ template <class L, class R, std::enable_if_t<rank<L>() == 2 &&
 					     rank<R>() >= 1 &&
 					     rank<R>() <= 2>* = nullptr>
 inline auto
-operator *(const L& l, const R& r)
+operator *(L&& l, R&& r)
 {
-    return detail::make_product_opnode(l, r, [](const auto& x, const auto& y)
-					     { return x * y; });
+    return detail::make_product_opnode(
+		std::forward<L>(l), std::forward<R>(r),
+		[](auto&& x, auto&& y)
+		{ return std::forward<decltype(x)>(x)
+		       * std::forward<decltype(y)>(y); });
 }
 
 //! 1次元配列式と2次元配列式の積をとる.
@@ -159,12 +172,15 @@ operator *(const L& l, const R& r)
 template <class L, class R,
 	  std::enable_if_t<rank<L>() == 1 && rank<R>() == 2>* = nullptr>
 inline auto
-operator *(const L& l, const R& r)
+operator *(L&& l, R&& r)
 {
     constexpr size_t	S = size0<value_t<R> >();
     return detail::make_product_opnode(
-      	       make_range<S>(column_begin(r), size<1>(r)), l,
-	       [](const auto& x, const auto& y){ return x * y; });
+		make_range<S>(column_begin(r), size<1>(r)),
+		std::forward<L>(l),
+		[](auto&& x, auto&& y)
+		{ return std::forward<decltype(x)>(x)
+		       * std::forward<decltype(y)>(y); });
 }
     
 //! 2つの1次元配列式の外積をとる.
@@ -176,10 +192,13 @@ operator *(const L& l, const R& r)
 template <class L, class R,
 	  std::enable_if_t<rank<L>() == 1 && rank<R>() == 1>* = nullptr>
 inline auto
-operator %(const L& l, const R& r)
+operator %(L&& l, R&& r)
 {
-    return detail::make_product_opnode(l, r, [](const auto& x, const auto& y)
-					     { return x * y; });
+    return detail::make_product_opnode(
+		std::forward<L>(l), std::forward<R>(r),
+		[](auto&& x, auto&& y)
+		{ return std::forward<decltype(x)>(x)
+		       * std::forward<decltype(y)>(y); });
 }
 
 //! 2つの1次元配列式のベクトル積をとる.
@@ -217,9 +236,10 @@ operator ^(const L& l, const R& r)
 template <class L, class R, std::enable_if_t<rank<L>() == 2 &&
 					     rank<R>() == 1>* = nullptr>
 inline auto
-operator ^(const L& l, const R& r)
+operator ^(L&& l, R&& r)
 {
-    return detail::make_product_opnode(l, r, detail::bit_xor());
+    return detail::make_product_opnode(std::forward<L>(l), std::forward<R>(r),
+				       detail::bit_xor());
 }
 
 /************************************************************************
@@ -298,7 +318,7 @@ diag(T c, size_t n=N)
     Array2<T, N, N>	a(n, n);
     for (size_t i = 0; i != a.size(); ++i)
 	a[i][i] = c;
-    return std::move(a);
+    return a;
 }
 
 //! 正方行列のtraceを返す．
@@ -349,7 +369,7 @@ cholesky(const E& A)
 		Lt[j][k] -= (Li[j] * Li[k]);
     }
     
-    return std::move(Lt);
+    return Lt;
 }
 
 //! 正方行列の下半三角部分を上半三角部分にコピーして対称化する．
@@ -396,16 +416,15 @@ class LUDecomposition
     template <class E_, std::enable_if_t<rank<E_>() == 2>* = nullptr>
     LUDecomposition(const E_& expr)			;
 
-    template <class E_>
-    std::enable_if_t<rank<std::decay_t<E_> >() == 1, E_&>
-		substitute(E_&& expr)		const	;
+    template <class E_> std::enable_if_t<rank<E_>() == 1, E_&>
+			substitute(E_&& expr)	const	;
 
   //! もとの正方行列の行列式を返す．
   /*!
     \return	もとの正方行列の行列式
   */
-    T		det()				const	{ return _det; }
-    size_t	size()				const	{ return _A.size(); }
+    auto		det()			const	{ return _det; }
+    auto		size()			const	{ return _A.size(); }
 	
   private:
     Array2<T, N, N>	_A;
@@ -500,7 +519,7 @@ LUDecomposition<T, N>::LUDecomposition(const E_& expr)
   \throw std::runtime_error	もとの正方行列が正則でない場合に送出
 */
 template <class T, size_t N>
-template <class E_> std::enable_if_t<rank<std::decay_t<E_> >() == 1, E_&>
+template <class E_> std::enable_if_t<rank<E_>() == 1, E_&>
 LUDecomposition<T, N>::substitute(E_&& b) const
 {
     if (std::size(b) != size())
@@ -585,7 +604,7 @@ adjoint(const E& A)
     for (size_t i = 0; i < val.nrow(); ++i)
 	for (size_t j = 0; j < val.ncol(); ++j)
 	    val[i][j] = ((i + j) % 2 ? -det(A, j, i) : det(A, j, i));
-    return std::move(val);
+    return val;
 }
 
 //! 連立1次方程式を解く．
@@ -595,10 +614,11 @@ adjoint(const E& A)
 		の解ベクトル，すなわち \f$\TUtvec{b}{}\TUinv{A}{}\f$
 */
 template <class E, class F>
-inline std::enable_if_t<rank<E>() == 2 && rank<std::decay_t<F> >() == 1, F&>
+inline std::enable_if_t<rank<E>() == 2 && rank<F>() == 1, F&>
 solve(const E& A, F&& b)
 {
-    return LUDecomposition<element_t<E>, size0<E>()>(A).substitute(b);
+    return LUDecomposition<element_t<E>, size0<E>()>(A)
+	  .substitute(std::forward<F>(b));
 }
 
 //! 連立1次方程式を解く．
@@ -609,12 +629,13 @@ solve(const E& A, F&& b)
 		の解を納めた行列，すなわち	\f$\TUvec{B}{}\TUinv{A}{}\f$
 */
 template <class E, class F>
-inline std::enable_if_t<rank<E>() == 2 && rank<std::decay_t<F> >() == 2, F&>
+inline std::enable_if_t<rank<E>() == 2 && rank<F>() == 2, F&>
 solve(const E& A, F&& B)
 {
     LUDecomposition<element_t<E>, size0<E>()>	lu(A);
-    for_each<size0<std::decay_t<F> >()>(std::begin(B), std::size(B),
-					[&lu](auto&& b){ lu.substitute(b); });
+    for_each<size0<F>()>(std::begin(B), std::size(B),
+			 [&lu](auto&& b)
+			 { lu.substitute(std::forward<decltype(b)>(b)); });
     return B;
 }
     
@@ -630,7 +651,7 @@ inverse(const E& A)
     
     constexpr size_t		N = size0<E>();
     Array2<element_type, N, N>	B = diag<N>(element_type(1), std::size(A));
-    return std::move(solve(A, B));
+    return solve(A, B);
 }
     
 /************************************************************************
@@ -1011,7 +1032,7 @@ class Rotation
 		\f$\TUvec{A}{}\leftarrow\TUtvec{R}{}\TUvec{A}{}\f$
   */
     template <class E_>
-    std::enable_if_t<rank<std::decay_t<E_> >() == 2, E_&>
+    std::enable_if_t<rank<E_>() == 2, E_&>
 		apply_from_left(E_&& A) const
 		{
 		    for (size_t j = 0; j < size<1>(A); ++j)
@@ -1030,7 +1051,7 @@ class Rotation
 		\f$\TUvec{A}{}\leftarrow\TUvec{A}{}\TUvec{R}{}\f$
   */
     template <class E_>
-    std::enable_if_t<rank<std::decay_t<E_> >() == 2, E_&>
+    std::enable_if_t<rank<E_>() == 2, E_&>
 		apply_from_right(E_&& A) const
 		{
 		    for (auto&& a : A)
@@ -1095,7 +1116,7 @@ class TriDiagonal
     void		diagonalize(bool abs=true)	;
 
     template <class E_>
-    std::enable_if_t<rank<std::decay_t<E_> >() == 1, Array2<T> >
+    std::enable_if_t<rank<E_>() == 1, Array2<T> >
 			move(E_&& evals)
 			{
 			    evals = std::move(_diagonal);
@@ -1271,8 +1292,7 @@ TriDiagonal<T>::initialize_rotation(size_t m, size_t n, T& x, T& y) const
 		なる\f$\TUtvec{U}{}\f$
 */
 template <class E, class F,
-	  std::enable_if_t<rank<E>() == 2 &&
-			   rank<std::decay_t<F> >() == 1>* = nullptr> auto
+	  std::enable_if_t<rank<E>() == 2 && rank<F>() == 1>* = nullptr> auto
 eigen(const E& A, F&& evals, bool abs=true)
 {
     TriDiagonal<element_t<E> >	tri(A);
@@ -1300,12 +1320,12 @@ eigen(const E& A, F&& evals, bool abs=true)
 template <class E, class F, class G,
 	  std::enable_if_t<rank<E>() == 2 &&
 			   rank<F>() == 2 &&
-			   rank<std::decay_t<G> >() == 1>* = nullptr> auto
+			   rank<G>() == 1>* = nullptr> auto
 geigen(const E& A, const F& BB, G&& evals, bool abs=true)
 {
     const auto	Ltinv = inverse(BB.cholesky());
     const auto	Linv  = transpose(Ltinv);
-    return std::move(evaluate(eigen(Linv * A * Ltinv, evals, abs) * Linv));
+    return evaluate(eigen(Linv * A * Ltinv, std::forward<G>(evals), abs) * Linv);
 }
 
 /************************************************************************
