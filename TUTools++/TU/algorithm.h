@@ -596,5 +596,16 @@ square(ITER begin, ARG arg)
     return detail::square(begin, arg, std::integral_constant<size_t, N>());
 }
 
+//! 与えられた数値の2乘値を返す
+/*
+  \param val	数値
+  \retrun	2乘値
+*/ 
+template <class T> inline std::enable_if_t<std::is_arithmetic<T>::value, T>
+square(const T& val)
+{
+    return detail::square(val);
+}
+    
 }	// namespace TU
 #endif	// !TU_ALGORITHM_H
