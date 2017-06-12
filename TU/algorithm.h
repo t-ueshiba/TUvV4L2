@@ -34,7 +34,8 @@
   - #TU::minimizeSquareSparse(const F&, const G&, ATA&, IB, IB, size_t, double)
 
   <b>RANSAC</b>
-  - #TU::ransac(const PointSet&, Model&, Conform, double)
+  - #TU::ransac(const SAMPLER&, MODEL&, CONFORM&&, T, T)
+  - #TU::ransac(IN, IN, MODEL&, CONFORM&&, T, T)
 
   <b>グラフカット</b>
   - #boost::GraphCuts
@@ -101,7 +102,7 @@
   - #TU::FIRFilter
   - #TU::FIRGaussianConvolver
   - #TU::WeightedMedianFilter
-  - #TU::TreeFilter
+  - #boost::TreeFilter
 
   <b>特殊データ構造</b>
   - #TU::List

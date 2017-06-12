@@ -9,8 +9,7 @@
 #include <limits>
 #include "TU/algorithm.h"	// for TU::diff()
 #include "TU/Image++.h"
-//#define OLD
-#undef OLD
+#include "TU/StereoBase.h"
 
 namespace TU
 {
@@ -105,31 +104,35 @@ class MinIdx
 /************************************************************************
 *  class diff_iterator<COL, COL_RV, T>					*
 ************************************************************************/
-template <class ITER_TUPLE, class T>
+template <class COL, class COL_RV, class T=iterator_value<COL> >
 class diff_iterator
-    : public boost::iterator_adaptor<diff_iterator<ITER_TUPLE, T>,
-				     zip_iterator<ITER_TUPLE>,
-				     Array<T>,
+    : public boost::iterator_adaptor<diff_iterator<COL, COL_RV, T>,
+				     zip_iterator<std::tuple<COL, COL_RV> >,
+				     range<boost::transform_iterator<
+					       Diff<T>, COL_RV> >,
 				     boost::use_default,
-				     Array<T> >
+				     range<boost::transform_iterator<
+					       Diff<T>, COL_RV> > >
 {
   private:
     using super	= boost::iterator_adaptor<diff_iterator,
-					  zip_iterator<ITER_TUPLE>,
-					  Array<T>,
+					  zip_iterator<
+					      std::tuple<COL, COL_RV> >,
+					  range<boost::transform_iterator<
+						    Diff<T>, COL_RV> >,
 					  boost::use_default,
-					  Array<T> >;
+					  range<boost::transform_iterator<
+						    Diff<T>, COL_RV> > >;
     friend	class boost::iterator_core_access;
 
   public:
-    using col_t	= iterator_value<tuple_head<ITER_TUPLE> >;
     using	typename super::reference;
     using	typename super::difference_type;
     
   public:
-		diff_iterator(const zip_iterator<ITER_TUPLE>& col,
-			      size_t dsw, col_t thresh)
-		    :super(col), _dsw(dsw), _thresh(thresh)
+		diff_iterator(COL colL, COL_RV colRV, size_t dsw, T thresh)
+		    :super(std::make_tuple(colL, colRV)),
+		     _dsw(dsw), _thresh(thresh)
 		{
 		}
     
@@ -137,28 +140,24 @@ class diff_iterator
     reference	dereference() const
 		{
 		    const auto	iter_tuple = super::base().get_iterator_tuple();
-		    const auto	colL = *std::get<0>(iter_tuple);
-		    auto	colR =  std::get<1>(iter_tuple);
-		    Array<T>	P(_dsw);
-		    for (auto& val : P)
-		    {
-			val = std::min(diff(colL, *colR), _thresh);
-			++colR;
-		    }
-		    return P;
+		    const auto	pixL  = *std::get<0>(iter_tuple);
+		    const auto	colRV =  std::get<1>(iter_tuple);
+
+		    return make_range(boost::make_transform_iterator(
+					  colRV, Diff<T>(pixL, _thresh)),
+				      _dsw);
 		}
     
   private:
     size_t	_dsw;
-    col_t	_thresh;
+    T		_thresh;
 };
 
-template <class T, class ITER_TUPLE>
-inline diff_iterator<ITER_TUPLE, T>
-make_diff_iterator(const zip_iterator<ITER_TUPLE>& col,
-		   size_t dsw, iterator_value<tuple_head<ITER_TUPLE> > thresh)
+template <class T, class COL, class COL_RV>
+inline diff_iterator<COL, COL_RV, T>
+make_diff_iterator(COL colL, COL_RV colRV, size_t dsw, T thresh)
 {
-    return {col, dsw, thresh};
+    return {colL, colRV, dsw, thresh};
 }
 
 /************************************************************************
@@ -199,7 +198,7 @@ class matching_iterator
 				matching_iterator,
 				OUT,
 				size_t,
-    //boost::single_pass_traversal_tag,
+			      //boost::single_pass_traversal_tag,
 				std::input_iterator_tag,
 				detail::matching_proxy<matching_iterator> >;
     
@@ -273,7 +272,7 @@ class matching_iterator
 		    super::base_reference() += n;
 		    return *this;
 		}
-    
+
   private:
     reference	dereference() const
 		{
