@@ -66,10 +66,10 @@ class ptr : public boost::iterator_adaptor<ptr<T>, T*>
     using	super = boost::iterator_adaptor<ptr, T*>;
 
   public:
-    ptr(T* p=nullptr)	:super(p)	{}
+	ptr(T* p=nullptr) :super(p)	{}
 
-    T*	get()		const	{ return super::base(); }
-    operator T*()	const	{ return super::base(); }
+    T*	get()			const	{ return super::base(); }
+	operator T*()		const	{ return super::base(); }
 };
     
 /************************************************************************

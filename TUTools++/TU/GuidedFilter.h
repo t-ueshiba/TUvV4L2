@@ -27,8 +27,12 @@ class GuidedFilter : public BoxFilter
 		{
 		    using	VAL = replace_element<std::decay_t<IN_>, T>;
 		    using	std::get;
-
+		  /*
 		    return std::tuple<VAL, T, VAL, T>(
+				get<0>(t),	     get<1>(t),
+				get<0>(t)*get<1>(t), get<1>(t)*get<1>(t));
+		  */
+		    return std::make_tuple(
 				get<0>(t),	     get<1>(t),
 				get<0>(t)*get<1>(t), get<1>(t)*get<1>(t));
 		}
@@ -261,7 +265,7 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out) const
 			   make_assignment_iterator(begin(*begin(c)),
 						    init_coeffs(n, _e)),
 			   stride(begin(c)), nrow));
-    
+
   // 係数ベクトルの平均値を求め，それによってガイドデータ列を線型変換する．
     std::advance(gb,  rowWinSize() - 1);
     std::advance(out, rowWinSize() - 1);

@@ -15,8 +15,8 @@ namespace TU
 ************************************************************************/
 //! 演算子の評価結果の型を返す
 /*!
-  Eの型が演算子ならばその評価結果である配列の型を，rangeならばE自体を，
-  どちらでもなければEへの定数参照を返す
+  Eが演算子に変換可能ならばその評価結果である配列の型を，そうでなければ
+  Eへの定数参照を返す
   \param E	配列式の型
 */
 template <class E>
@@ -76,13 +76,13 @@ namespace detail
 				R,
 				typename substance_t<R, is_opnode>::type>;
 	  
-	  const cache_t	_r;	// 評価後に固定された第2引数
+	  const cache_t	_r;	// 第2引数を評価してキャッシュに保存
 	  const OP	_op;
       };
 
     public:
     // transform_iterator への第1テンプレートパラメータを，binder2nd そのもの
-    // ではなく，それへの定数参照とすることにより cache のコピーを防ぐ
+    // ではなく，それへの定数参照とすることにより，キャッシュのコピーを防ぐ
       using iterator = boost::transform_iterator<const binder2nd&,
 						 iterator_t<const L> >;
       
