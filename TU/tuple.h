@@ -127,12 +127,12 @@ using replace_element = typename detail::replace_element<S, T>::type;
 		非定数参照ならばstd::ref(x)
 */
 template <class T>
-inline std::conditional_t<std::is_reference<T>::value,
+inline std::conditional_t<std::is_lvalue_reference<T>::value,
 			  std::reference_wrapper<std::remove_reference_t<T> >,
-			  T>
+			  T&&>
 make_reference_wrapper(T&& x)
 {
-    return x;
+    return std::forward<T>(x);
 }
     
 /************************************************************************
@@ -144,13 +144,13 @@ namespace detail
   inline decltype(auto)
   tuple_get(T&& x)
   {
-      return x;
+      return std::forward<T>(x);
   }
   template <size_t I, class T, std::enable_if_t<is_tuple<T>::value>* = nullptr>
   inline decltype(auto)
   tuple_get(T&& x)
   {
-      return std::get<I>(x);
+      return std::get<I>(std::forward<T>(x));
   }
     
   template <class... T>

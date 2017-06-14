@@ -880,14 +880,51 @@ namespace detail
   {
       using type = std::tuple<typename substance_t<E, PRED>::type...>;
   };
+
+  template <class T>
+  using	is_range_or_opnode	= std::integral_constant<bool,
+							 is_range<T>::value ||
+							 is_opnode<T>::value>;
 }	// namespace detail
 
-//! 反復子が指す型. ただし，それがrangeならば，そのrangeが表現する配列型
+//! 反復子が指す型. ただし，それがrangeまたはopnodeならば，それが表現する配列型
 template <class ITER>
 using iterator_substance
 	  = typename detail::substance_t<decayed_iterator_value<ITER>,
-					 detail::is_range>::type;
+					 detail::is_range_or_opnode>::type;
 
+/************************************************************************
+*  evaluation of opnodes						*
+************************************************************************/
+//! 演算子の評価結果の型を返す
+/*!
+  Eが演算子に変換可能ならばその評価結果である配列の型を，そうでなければ
+  Eへの定数参照を返す
+  \param E	配列式の型
+*/
+template <class E>
+using result_t	= typename detail::substance_t<const E&,
+					       detail::is_opnode>::type;
+    
+//! 式の評価結果を返す
+/*!
+  \param expr	式
+  \return	exprが演算子ならばその評価結果である配列を，そうでなければ
+		expr自体の参照を返す
+*/
+template <class E> inline result_t<E>
+evaluate(const E& expr)
+{
+    return expr;
+}
+
+template <class E>
+inline std::enable_if_t<detail::is_opnode<E>::value, std::ostream&>
+operator <<(std::ostream& out, const E& expr)
+{
+    return out << evaluate(expr);
+}
+    
 /************************************************************************
 *  type definitions for convenience					*
 ************************************************************************/

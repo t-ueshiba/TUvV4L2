@@ -11,40 +11,6 @@
 namespace TU
 {
 /************************************************************************
-*  evaluation of opnodes						*
-************************************************************************/
-//! 演算子の評価結果の型を返す
-/*!
-  Eが演算子に変換可能ならばその評価結果である配列の型を，そうでなければ
-  Eへの定数参照を返す
-  \param E	配列式の型
-*/
-template <class E>
-using result_t	= std::conditional_t<detail::is_opnode<E>::value,
-				     typename detail::substance_t<
-					 E, detail::is_opnode>::type,
-				     const E&>;
-
-//! 配列式の評価結果を返す
-/*!
-  \param expr	配列式
-  \return	exprが演算子ならばその評価結果である配列を，そうでなければ
-		expr自体の参照を返す
-*/
-template <class E> inline result_t<E>
-evaluate(const E& expr)
-{
-    return expr;
-}
-
-template <class E>
-inline std::enable_if_t<detail::is_opnode<E>::value, std::ostream&>
-operator <<(std::ostream& out, const E& expr)
-{
-    return out << evaluate(expr);
-}
-    
-/************************************************************************
 *  products of two ranges						*
 ************************************************************************/
 namespace detail
@@ -71,10 +37,9 @@ namespace detail
 		}
 
 	private:
-	  using	cache_t = std::conditional_t<
-				std::is_reference<R>::value,
-				R,
-				typename substance_t<R, is_opnode>::type>;
+	// R が opnode に変換可能（参照型も可）であれば，その評価結果の型
+	// opnode に変換できなければ R そのもの
+	  using	cache_t = typename substance_t<R, is_opnode>::type;
 	  
 	  const cache_t	_r;	// 第2引数を評価してキャッシュに保存
 	  const OP	_op;

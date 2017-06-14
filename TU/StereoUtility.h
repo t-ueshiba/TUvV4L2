@@ -188,7 +188,6 @@ class matching_iterator
     : public boost::iterator_adaptor<matching_iterator<OUT, SCORE>,
 				     OUT,
 				     size_t,
-				   //boost::single_pass_traversal_tag,
 				     std::input_iterator_tag,
 				     detail::matching_proxy<
 					 matching_iterator<OUT, SCORE> > >
@@ -198,7 +197,6 @@ class matching_iterator
 				matching_iterator,
 				OUT,
 				size_t,
-			      //boost::single_pass_traversal_tag,
 				std::input_iterator_tag,
 				detail::matching_proxy<matching_iterator> >;
     
