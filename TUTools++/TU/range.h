@@ -31,7 +31,7 @@ namespace TU
 ************************************************************************/
 //! 式が持つ反復子の型を返す
 /*!
-  \param E	式の型
+  \param E	式またはそれへの参照の型
   \return	E が反復子を持てばその型，持たなければ void
 */
 template <class E>
@@ -39,8 +39,9 @@ using iterator_t = decltype(std::check_begin(std::declval<E>()));
 
 //! 式が持つ逆反復子の型を返す
 /*!
-  \param E	式の型
-  \return	E が逆反復子を持てばその型，持たなければ void
+  反復子を持たない式を与えるとコンパイルエラーとなる.
+  \param E	式またはそれへの参照の型
+  \return	E が持つ逆反復子の型
 */
 template <class E>
 using reverse_iterator_t = std::reverse_iterator<iterator_t<E> >;
@@ -48,7 +49,7 @@ using reverse_iterator_t = std::reverse_iterator<iterator_t<E> >;
 //! 式が持つ反復子が指す型を返す
 /*!
   反復子を持たない式を与えるとコンパイルエラーとなる.
-  \param E	反復子を持つ式の型
+  \param E	反復子を持つ式またはそれへの参照の型
   \return	E の反復子が指す型
 */
 template <class E>
@@ -73,7 +74,7 @@ namespace detail
     
 //! 式が持つ反復子が指す型を再帰的に辿って到達する型を返す
 /*!
-  \param E	式の型
+  \param E	式またはそれへの参照の型
   \return	E が反復子を持てばそれが指す型を再帰的に辿って到達する型，
 		持たなければ E 自身
 */
@@ -128,7 +129,7 @@ using has_size0 = decltype(detail::has_size0(std::declval<E>()));
 //! 式の最上位軸の要素数を返す
 /*!
   本関数で返されるのは静的なサイズであり，式が可変個の要素を持つ場合，0が返される
-  \param E	式の型
+  \param E	式またはそれへの参照の型
   \return	最上位軸の静的な要素数(可変サイズの場合0)
  */
 template <class E> constexpr std::enable_if_t<!has_size0<E>::value, size_t>

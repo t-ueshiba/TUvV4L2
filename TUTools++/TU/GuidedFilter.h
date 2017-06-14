@@ -23,23 +23,21 @@ class GuidedFilter : public BoxFilter
     struct init_params
     {
 	template <class IN_, class GUIDE_>
-	auto	operator ()(std::tuple<IN_, GUIDE_> t) const
+	auto	operator ()(const std::tuple<IN_, GUIDE_>& t) const
 		{
-		    using	VAL = replace_element<std::decay_t<IN_>, T>;
 		    using	std::get;
-		  /*
-		    return std::tuple<VAL, T, VAL, T>(
-				get<0>(t),	     get<1>(t),
-				get<0>(t)*get<1>(t), get<1>(t)*get<1>(t));
-		  */
-		    return std::make_tuple(
-				get<0>(t),	     get<1>(t),
-				get<0>(t)*get<1>(t), get<1>(t)*get<1>(t));
+
+		    return std::make_tuple(get<0>(t), get<1>(t),
+					   evaluate(get<0>(t)*get<1>(t)),
+					   get<1>(t)*get<1>(t));
 		}
+
+      // 引数型をuniversal reference(IN_&&)にすると上記関数とオーバーロード
+      // できなくなるので，const IN_& とする．
 	template <class IN_>
-	auto	operator ()(IN_ p) const
+	auto	operator ()(const IN_& p) const
 		{
-		    return std::tuple<T, T>(p, p*p);
+		    return std::make_tuple(p, p*p);
 		}
     };
 
@@ -53,12 +51,12 @@ class GuidedFilter : public BoxFilter
 		{
 		    using	std::get;
 		    
-		    const auto	a = (_n*get<2>(params) -
+		    VAL_	a = (_n*get<2>(params) -
 				     get<0>(params)*get<1>(params))
 				  / (_n*(get<3>(params) + _n*_sq_e) -
 				     get<1>(params)*get<1>(params));
-		    return std::tuple<VAL_, VAL_>(
-				a, (get<0>(params) - a*get<1>(params))/_n);
+		    VAL_	b = (get<0>(params) - a*get<1>(params))/_n;
+		    return std::make_tuple(std::move(a), std::move(b));
 		}
 	auto	operator ()(const std::tuple<T, T>& params) const
 		{
@@ -67,7 +65,7 @@ class GuidedFilter : public BoxFilter
 		    const auto	var = _n*get<1>(params)
 				    - get<0>(params)*get<0>(params);
 		    const auto	a   = var/(var + _n*_n*_sq_e);
-		    return std::tuple<T, T>(
+		    return std::make_tuple(
 				a, (get<0>(params) - a*get<0>(params))/_n);
 		}
 	
@@ -130,23 +128,24 @@ class GuidedFilter : public BoxFilter
 template <class T> template <class IN, class GUIDE, class OUT> void
 GuidedFilter<T>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out) const
 {
-    using varray_t	= Array<replace_element<iterator_substance<IN>, T> >;
+    using coeff_t	= replace_element<iterator_substance<IN>, T>;
+    using coeffs_t	= std::tuple<coeff_t, coeff_t>;
     
+    Array<coeffs_t>	c(super::outLength(std::distance(ib, ie)));
+
   // guided filterの2次元係数ベクトルを計算する．
-    const auto	siz = super::outLength(std::distance(ib, ie));
-    auto	c   = std::make_tuple(varray_t(siz), varray_t(siz));
     super::convolve<T>(boost::make_transform_iterator(
 			   make_zip_iterator(std::make_tuple(ib, gb)),
 			   init_params()),
 		       boost::make_transform_iterator(
 			   make_zip_iterator(std::make_tuple(ie, ge)),
 			   init_params()),
-		       make_assignment_iterator(begin(c),
-					     init_coeffs(winSize(), _e)));
+		       make_assignment_iterator(c.begin(),
+						init_coeffs(winSize(), _e)));
     
   // 係数ベクトルの平均値を求め，それによってガイドデータ列を線型変換する．
     std::advance(gb, winSize() - 1);
-    super::convolve<T>(cbegin(c), cend(c),
+    super::convolve<T>(c.cbegin(), c.cend(),
 		       make_assignment_iterator(
 			   make_zip_iterator(std::make_tuple(gb, out)),
 			   trans_guides(winSize())));
@@ -164,19 +163,20 @@ GuidedFilter<T>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out) const
 template <class T> template <class IN, class OUT> void
 GuidedFilter<T>::convolve(IN ib, IN ie, OUT out) const
 {
-    using varray_t	= Array<replace_element<iterator_substance<IN>, T> >;
+    using coeff_t	= replace_element<iterator_substance<IN>, T>;
+    using coeffs_t	= std::tuple<coeff_t, coeff_t>;
     
+    Array<coeffs_t>	c(super::outLength(std::distance(ib, ie)));
+
   // guided filterの2次元係数ベクトルを計算する．
-    const auto	siz = super::outLength(std::distance(ib, ie));
-    auto	c   = std::make_tuple(varray_t(siz), varray_t(siz));
     super::convolve<T>(boost::make_transform_iterator(ib, init_params()),
 		       boost::make_transform_iterator(ie, init_params()),
-		       make_assignment_iterator(begin(c),
+		       make_assignment_iterator(c.begin(),
 						init_coeffs(winSize(), _e)));
 
   // 係数ベクトルの平均値を求め，それによって入力データ列を線型変換する．
     std::advance(ib, winSize() - 1);
-    super::convolve<T>(cbegin(c), cend(c),
+    super::convolve<T>(c.cbegin(), c.cend(),
 		       make_assignment_iterator(
 			   make_zip_iterator(std::make_tuple(ib, out)),
 			   trans_guides(winSize())));
@@ -234,21 +234,21 @@ class GuidedFilter2 : private BoxFilter2
 template <class T> template <class IN, class GUIDE, class OUT> void
 GuidedFilter2<T>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out) const
 {
-    using varray2_t = Array2<replace_element<
+    using		std::cbegin;
+    using		std::size;
+    using coeff_t	= replace_element<
 				iterator_substance<
 				    iterator_t<
-					decayed_iterator_value<IN> > >, T> >;
-    using	std::cbegin;
-    using	std::size;
+					decayed_iterator_value<IN> > >, T>;
+    using coeffs_t	= std::tuple<coeff_t, coeff_t>;
 
     if (ib == ie)
 	return;
 
-    const auto	n    = rowWinSize() * colWinSize();
-    const auto	nrow = super::outRowLength(std::distance(ib, ie));
-    const auto	ncol = super::outColLength(size(*ib));
-    auto	c    = std::make_tuple(varray2_t(nrow, ncol),
-				       varray2_t(nrow, ncol));
+    const auto		n    = rowWinSize() * colWinSize();
+    const auto		nrow = super::outRowLength(std::distance(ib, ie));
+    const auto		ncol = super::outColLength(size(*ib));
+    Array2<coeffs_t>	c(nrow, ncol);
     
   // guided filterの2次元係数ベクトルを計算する．
     super::convolve<T>(make_range_iterator(
@@ -262,14 +262,14 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out) const
 			       init_params()),
 			   std::make_tuple(stride(ie), stride(ge)), size(*ie)),
 		       make_range_iterator(
-			   make_assignment_iterator(begin(*begin(c)),
+			   make_assignment_iterator(c.begin()->begin(),
 						    init_coeffs(n, _e)),
-			   stride(begin(c)), nrow));
+			   stride(c.begin()), nrow));
 
   // 係数ベクトルの平均値を求め，それによってガイドデータ列を線型変換する．
     std::advance(gb,  rowWinSize() - 1);
     std::advance(out, rowWinSize() - 1);
-    super::convolve<T>(cbegin(c), cend(c),
+    super::convolve<T>(c.cbegin(), c.cend(),
 		       make_range_iterator(
 			   make_assignment_iterator(
 			       begin(std::make_tuple(*gb, *out))
@@ -290,21 +290,21 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out) const
 template <class T> template <class IN, class OUT> void
 GuidedFilter2<T>::convolve(IN ib, IN ie, OUT out) const
 {
-    using varray2_t = Array2<replace_element<
+    using		std::cbegin;
+    using		std::size;
+    using coeff_t	= replace_element<
 				iterator_substance<
 				    iterator_t<
-					decayed_iterator_value<IN> > >, T> >;
-    using	std::cbegin;
-    using	std::size;
+					decayed_iterator_value<IN> > >, T>;
+    using coeffs_t	= std::tuple<coeff_t, coeff_t>;
     
     if (ib == ie)
 	return;
 
-    const auto	n    = rowWinSize() * colWinSize();
-    const auto	nrow = super::outRowLength(std::distance(ib, ie));
-    const auto	ncol = super::outColLength(size(*ib));
-    auto	c    = std::make_tuple(varray2_t(nrow, ncol),
-				       varray2_t(nrow, ncol));
+    const auto		n    = rowWinSize() * colWinSize();
+    const auto		nrow = super::outRowLength(std::distance(ib, ie));
+    const auto		ncol = super::outColLength(size(*ib));
+    Array2<coeffs_t>	c(nrow, ncol);
 
   // guided filterの2次元係数ベクトルを計算する．
     super::convolve<T>(make_range_iterator(
@@ -316,14 +316,14 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, OUT out) const
 							  init_params()),
 			   stride(ie), size(*ie)),
 		       make_range_iterator(
-			   make_assignment_iterator(begin(*begin(c)),
+			   make_assignment_iterator(c.begin()->begin(),
 						    init_coeffs(n, _e)),
-			   stride(begin(c)), nrow));
+			   stride(c.begin()), nrow));
 
   // 係数ベクトルの平均値を求め，それによって入力データ列を線型変換する．
     std::advance(ib,  rowWinSize() - 1);
     std::advance(out, rowWinSize() - 1);
-    super::convolve<T>(cbegin(c), cend(c),
+    super::convolve<T>(c.cbegin(), c.cend(),
 		       make_range_iterator(
 			   make_assignment_iterator(
 			       begin(std::make_tuple(*ib, *out))
