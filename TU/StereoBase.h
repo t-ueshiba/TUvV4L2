@@ -27,8 +27,6 @@
 
 namespace TU
 {
-  //template <class ITER>
-  //using decayed_iterator_value = tuple_decay_t<iterator_value<ITER> >;
 template <class ITER>
 using subiterator = iterator_t<decayed_iterator_value<ITER> >;
     
@@ -43,8 +41,12 @@ struct Diff
 #if defined(SIMD)
     auto	operator ()(T y) const
 		{
-		    using signed_type	= std::make_signed_t<
-					      typename T::element_type>;
+		    using element_type = typename T::element_type;
+		    using signed_type
+			= typename std::conditional_t<
+				std::is_integral<element_type>::value,
+				std::make_signed<element_type>,
+				detail::identity<element_type> >::type;
 		    using namespace	simd;
 
 		    return cast<signed_type>(min(diff(_x, y), _thresh));
@@ -52,7 +54,14 @@ struct Diff
 #else
     auto	operator ()(T y) const
 		{
-		    return std::min(diff(_x, y), _thresh);
+		    using signed_type
+			= typename std::conditional_t<
+				std::is_integral<T>::value,
+				std::make_signed<T>,
+				detail::identity<T> >::type;
+
+		    return static_cast<signed_type>(std::min(diff(_x, y),
+							     _thresh));
 		}
 #endif
     auto	operator ()(std::tuple<T, T> y) const
