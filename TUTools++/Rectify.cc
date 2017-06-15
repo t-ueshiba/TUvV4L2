@@ -77,10 +77,10 @@ Rectify::computeBaseHomographies(const camera_type& cameraL,
 	const auto	Cr = evaluate((Ar - Jr * Br) / (w*Br*w));
 	const auto	Dl = evaluate(Bl / (w*Bl*w));
 	const auto	Dr = evaluate(Br / (w*Br*w));
-	auto		grad = evaluate(w * (Cl + Cr));
+	const auto	gg = evaluate(w * (Cl + Cr));
 	const auto	Hessian = evaluate(Cl - (Cl*w)%(w*Dl) - (Dl*w)%(w*Cl) +
 					   Cr - (Cr*w)%(w*Dr) - (Dr*w)%(w*Cr));
-	grad = evaluate(grad * pseudo_inverse(Hessian, 1.0e6));
+	const auto	grad = evaluate(gg * pseudo_inverse(Hessian, 1.0e6));
 #if defined(_DEBUG)
 	cerr << grad;
 #endif
