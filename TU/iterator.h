@@ -122,8 +122,16 @@ namespace detail
 {
   struct generic_dereference
   {
+    // assignment_iterator<FUNC, ITER> のように dereference すると
+    // その base iterator への参照を内包する proxy を返す反復子もあるので，
+    // 引数は const ITER_& 型にする．もしも ITER_ 型にすると，呼出側から
+    // コピーされたローカルな反復子 iter への参照を内包する proxy を
+    // 返してしまい，dangling reference が生じる．
       template <class ITER_>
-      decltype(auto)	operator ()(ITER_ iter)	const	{ return *iter; }
+      decltype(auto)	operator ()(const ITER_& iter) const
+			{
+			    return *iter;
+			}
   };
 }	// namespace detail
     

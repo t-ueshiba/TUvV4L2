@@ -13,7 +13,7 @@ IDLS		=
 MOCHDRS		=
 
 INCDIRS		= -I../../..
-CPPFLAGS	= #-DNDEBUG #-DUSE_TBB
+CPPFLAGS	= -DNDEBUG #-DUSE_TBB
 CFLAGS		= -g -O #-O3
 NVCCFLAGS	= -g
 CCFLAGS		= $(CFLAGS) #-ftemplate-backtrace-limit=0

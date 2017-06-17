@@ -14,7 +14,7 @@
 #define DEFAULT_SCALE		1.0
 #define DEFAULT_GRAINSIZE	50
 
-#define SCORE_ARRAY2
+//#define SCORE_ARRAY2
 
 namespace TU
 {
