@@ -127,7 +127,6 @@ class diff_iterator
 
   public:
     using	typename super::reference;
-    using	typename super::difference_type;
     
   public:
 		diff_iterator(COL colL, COL_RV colRV, size_t dsw, T thresh)
@@ -139,13 +138,11 @@ class diff_iterator
   private:
     reference	dereference() const
 		{
-		    const auto	iter_tuple = super::base().get_iterator_tuple();
-		    const auto	pixL  = *std::get<0>(iter_tuple);
-		    const auto	colRV =  std::get<1>(iter_tuple);
-
-		    return make_range(boost::make_transform_iterator(
-					  colRV, Diff<T>(pixL, _thresh)),
-				      _dsw);
+		    const auto&	iter_tuple = super::base().get_iterator_tuple();
+		    return {boost::make_transform_iterator(
+			        std::get<1>(iter_tuple),
+				Diff<T>(*std::get<0>(iter_tuple), _thresh)),
+			    _dsw};
 		}
     
   private:
@@ -174,7 +171,7 @@ namespace detail
       template <class SCORES_>
       matching_proxy&	operator =(const SCORES_& R)
 			{
-			    _iter.read(R);
+			    _iter.load_scores(R);
 			    return *this;
 			}
 	
@@ -188,7 +185,7 @@ class matching_iterator
     : public boost::iterator_adaptor<matching_iterator<OUT, SCORE>,
 				     OUT,
 				     size_t,
-				     std::input_iterator_tag,
+				     std::random_access_iterator_tag,
 				     detail::matching_proxy<
 					 matching_iterator<OUT, SCORE> > >
 {
@@ -197,19 +194,19 @@ class matching_iterator
 				matching_iterator,
 				OUT,
 				size_t,
-				std::input_iterator_tag,
+				std::random_access_iterator_tag,
 				detail::matching_proxy<matching_iterator> >;
     
     struct Element
     {
-	Element()	:dminL(0), RminR(_infty), dminR(0)	{}
-
-	size_t		dminL;
-	SCORE		RminR;
-	size_t		dminR;
+	size_t		dminL = 0;
+	SCORE		RminR = _infty;
+	size_t		dminR = 0;
     };
     using buf_type	= Array<Element>;
     using biterator	= ring_iterator<typename buf_type::iterator>;
+    using const_biterator
+			= ring_iterator<typename buf_type::const_iterator>;
 
   public:
     using		typename super::reference;
@@ -219,14 +216,16 @@ class matching_iterator
 
   public:
 		matching_iterator(OUT out, size_t dsw,
-				  size_t disparityMax, size_t thresh)
+				  size_t disparityMax, size_t thresh,
+				  bool doHorizontalBackMatch)
 		    :super(out),
 		     _dsw(dsw),
 		     _disparityMax(disparityMax),
 		     _thresh(thresh),
+		     _doHorizontalBackMatch(doHorizontalBackMatch),
 		     _buf(2*_dsw - 1),
-		     _curr(_buf.begin(), _buf.end()),
-		     _next(_curr)
+		     _curr(_buf.cbegin(), _buf.cend()),
+		     _next(_buf.begin(),  _buf.end())
 		{
 		}
 		matching_iterator(const matching_iterator& iter)
@@ -234,9 +233,10 @@ class matching_iterator
 		     _dsw(iter._dsw),
 		     _disparityMax(iter._disparityMax),
 		     _thresh(iter._thresh),
+		     _doHorizontalBackMatch(iter._doHorizontalBackMatch),
 		     _buf(iter._buf),
-		     _curr(_buf.begin(), _buf.end()),
-		     _next(_curr)
+		     _curr(_buf.cbegin(), _buf.cend()),
+		     _next(_buf.begin(),  _buf.end())
 		{
 		    _curr += iter._curr.position();
 		    _next += iter._next.position();
@@ -251,9 +251,9 @@ class matching_iterator
 			_disparityMax = iter._disparityMax;
 			_thresh	      = iter._thresh;
 			_buf	      = iter._buf;
-			_curr	      = biterator(_buf.begin(), _buf.end());
+			_curr	      = {_buf.cbegin(), _buf.cend()};
 			_curr	     += iter._curr.position();
-			_next	      = _curr;
+			_next	      = {_buf.begin(), _buf.end()};
 			_next	     += iter._next.position();
 		    }
 		    return *this;
@@ -261,14 +261,7 @@ class matching_iterator
 		~matching_iterator()
 		{
 		    while (_curr != _next)
-			assign();
-		}
-
-    matching_iterator&
-		operator +=(ptrdiff_t n)
-		{
-		    super::base_reference() += n;
-		    return *this;
+		  	store_disparity();
 		}
 
   private:
@@ -278,9 +271,12 @@ class matching_iterator
 		}
     void	increment()
 		{
+		    if (_next == _curr + _dsw)
+			store_disparity();
 		}
+
     template <class SCORES_>
-    void	read(const SCORES_& R) const
+    void	load_scores(const SCORES_& R) const
 		{
 		    auto	RminL = std::cbegin(R);
 		    auto	b = _next;
@@ -299,36 +295,40 @@ class matching_iterator
 		    }
 		    _next->dminL = RminL - R.begin();
 		    b->RminR = _infty;
+
 		    ++_next;
-		    
-		    if (_next - _curr == _dsw)
-			const_cast<matching_iterator*>(this)->assign();
 		}
-    void	assign()
+    void	store_disparity()
 		{
-		    auto	dminL = _curr->dminL;
-		    auto	dminR = (_curr + dminL)->dminR;
-		    *super::base_reference() = (diff(dminL, dminR) <= _thresh ?
-						_disparityMax - dminL : 0);
-		  //*super::base_reference() = _disparityMax - dminL;
-		    ++super::base_reference();
+		    const auto	dminL = _curr->dminL;
+		    const auto	dminR = (_curr + dminL)->dminR;
+		    if (_doHorizontalBackMatch)
+			*super::base_reference()
+			    = (diff(dminL, dminR) <= _thresh ?
+			       _disparityMax - dminL : 0);
+		    else
+			*super::base_reference() = _disparityMax - dminL;
+
 		    ++_curr;
+		    ++super::base_reference();
 		}
     
   private:
     size_t			_dsw;	// 代入可能にするためconstを付けない
     size_t			_disparityMax;	// 同上
     size_t			_thresh;	// 同上
+    bool			_doHorizontalBackMatch;
     buf_type			_buf;
-    biterator			_curr;
+    const_biterator		_curr;
     mutable biterator		_next;
     constexpr static SCORE	_infty = std::numeric_limits<SCORE>::max();
 };
 
 template <class SCORE, class OUT> inline matching_iterator<OUT, SCORE>
-make_matching_iterator(OUT out, size_t dsw, size_t disparityMax, size_t thresh)
+make_matching_iterator(OUT out, size_t dsw, size_t disparityMax,
+		       size_t thresh, bool doHorizontalBackMatch=true)
 {
-    return {out, dsw, disparityMax, thresh};
+    return {out, dsw, disparityMax, thresh, doHorizontalBackMatch};
 }
     
 }

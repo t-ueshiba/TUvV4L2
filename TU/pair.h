@@ -106,13 +106,13 @@ namespace detail
   inline decltype(auto)
   pair_get(T&& x)
   {
-      return x;
+      return std::forward<T>(x);
   }
   template <size_t I, class T, std::enable_if_t<is_pair<T>::value>* = nullptr>
   inline decltype(auto)
   pair_get(T&& x)
   {
-      return std::get<I>(x);
+      return std::get<I>(std::forward<T>(x));
   }
 }	// namespace detail
     
@@ -120,8 +120,8 @@ template <class FUNC, class... PAIRS>
 inline std::enable_if_t<any_pair<PAIRS...>::value>
 pair_for_each(FUNC f, PAIRS&&... x)
 {
-    f(detail::pair_get<0>(x)...);
-    f(detail::pair_get<1>(x)...);
+    f(detail::pair_get<0>(std::forward<PAIRS>(x))...);
+    f(detail::pair_get<1>(std::forward<PAIRS>(x))...);
 }
 
 /************************************************************************
@@ -131,57 +131,68 @@ template <class FUNC, class... PAIRS,
 	  std::enable_if_t<any_pair<PAIRS...>::value>* = nullptr> inline auto
 pair_transform(FUNC f, PAIRS&&... x)
 {
-    return std::make_pair(f(detail::pair_get<0>(x)...),
-			  f(detail::pair_get<1>(x)...));
+    return std::make_pair(f(detail::pair_get<0>(std::forward<PAIRS>(x))...),
+			  f(detail::pair_get<1>(std::forward<PAIRS>(x))...));
 }
 
 /************************************************************************
 *  Arithmetic operators							*
 ************************************************************************/
-template <class S, class T> inline auto
-operator -(const std::pair<S, T>& t)
+template <class E, std::enable_if_t<is_pair<E>::value>* = nullptr> inline auto
+operator -(E&& expr)
 {
-    return pair_transform([](const auto& x){ return -x; }, t);
+    return pair_transform([](auto&& x){ return -std::forward<decltype(x)>(x); },
+			  std::forward<E>(expr));
 }
 
 template <class L, class R, std::enable_if_t<any_pair<L, R>::value>* = nullptr>
 inline auto
-operator +(const L& l, const R& r)
+operator +(L&& l, R&& r)
 {
-    return pair_transform([](const auto& x, const auto& y)
-			  { return x + y; }, l, r);
+    return pair_transform([](auto&& x, auto&& y)
+			  { return std::forward<decltype(x)>(x)
+				 + std::forward<decltype(y)>(y); },
+			  std::forward<L>(l), std::forward<R>(r));
 }
 
 template <class L, class R, std::enable_if_t<any_pair<L, R>::value>* = nullptr>
 inline auto
-operator -(const L& l, const R& r)
+operator -(L&& l, R&& r)
 {
-    return pair_transform([](const auto& x, const auto& y)
-			  { return x - y; }, l, r);
+    return pair_transform([](auto&& x, auto&& y)
+			  { return std::forward<decltype(x)>(x)
+				 - std::forward<decltype(y)>(y); },
+			  std::forward<L>(l), std::forward<R>(r));
 }
 
 template <class L, class R, std::enable_if_t<any_pair<L, R>::value>* = nullptr>
 inline auto
-operator *(const L& l, const R& r)
+operator *(L&& l, R&& r)
 {
-    return pair_transform([](const auto& x, const auto& y)
-			  { return x * y; }, l, r);
+    return pair_transform([](auto&& x, auto&& y)
+			  { return std::forward<decltype(x)>(x)
+				 * std::forward<decltype(y)>(y); },
+			  std::forward<L>(l), std::forward<R>(r));
 }
 
 template <class L, class R, std::enable_if_t<any_pair<L, R>::value>* = nullptr>
 inline auto
-operator /(const L& l, const R& r)
+operator /(L&& l, R&& r)
 {
-    return pair_transform([](const auto& x, const auto& y)
-			  { return x / y; }, l, r);
+    return pair_transform([](auto&& x, auto&& y)
+			  { return std::forward<decltype(x)>(x)
+				 / std::forward<decltype(y)>(y); },
+			  std::forward<L>(l), std::forward<R>(r));
 }
 
 template <class L, class R, std::enable_if_t<any_pair<L, R>::value>* = nullptr>
 inline auto
-operator %(const L& l, const R& r)
+operator %(L&& l, R&& r)
 {
-    return pair_transform([](const auto& x, const auto& y)
-			  { return x % y; }, l, r);
+    return pair_transform([](auto&& x, auto&& y)
+			  { return std::forward<decltype(x)>(x)
+				 % std::forward<decltype(y)>(y); },
+			  std::forward<L>(l), std::forward<R>(r));
 }
 
 template <class L, class R> inline std::enable_if_t<is_pair<L>::value, L&>
@@ -235,10 +246,15 @@ operator --(T&& t)
 
 template <class L, class C, class R,
 	  std::enable_if_t<any_pair<L, C, R>::value>* = nullptr> inline auto
-fma(const L& l, const C& c, const R& r)
+fma(L&& l, C&& c, R&& r)
 {
-    return pair_transform([](const auto& x, const auto& y, const auto& z)
-			  { return fma(x, y, z); }, l, c, r);
+    return pair_transform([](auto&& x, auto&& y, auto&& z)
+			  { return fma(std::forward<decltype(x)>(x),
+				       std::forward<decltype(y)>(y),
+				       std::forward<decltype(z)>(z)); },
+			  std::forward<L>(l),
+			  std::forward<C>(c),
+			  std::forward<R>(r));
 }
 
 /************************************************************************
@@ -246,26 +262,32 @@ fma(const L& l, const C& c, const R& r)
 ************************************************************************/
 template <class L, class R, std::enable_if_t<any_pair<L, R>::value>* = nullptr>
 inline auto
-operator &(const L& l, const R& r)
+operator &(L&& l, R&& r)
 {
-    return pair_transform([](const auto& x, const auto& y)
-			  { return x & y; }, l, r);
+    return pair_transform([](auto&& x, auto&& y)
+			  { return std::forward<decltype(x)>(x)
+				 & std::forward<decltype(y)>(y); },
+			  std::forward<L>(l), std::forward<R>(r));
 }
     
 template <class L, class R, std::enable_if_t<any_pair<L, R>::value>* = nullptr>
 inline auto
-operator |(const L& l, const R& r)
+operator |(L&& l, R&& r)
 {
-    return pair_transform([](const auto& x, const auto& y)
-			  { return x | y; }, l, r);
+    return pair_transform([](auto&& x, auto&& y)
+			  { return std::forward<decltype(x)>(x)
+				 | std::forward<decltype(y)>(y); },
+			  std::forward<L>(l), std::forward<R>(r));
 }
     
 template <class L, class R, std::enable_if_t<any_pair<L, R>::value>* = nullptr>
 inline auto
-operator ^(const L& l, const R& r)
+operator ^(L&& l, R&& r)
 {
-    return pair_transform([](const auto& x, const auto& y)
-			  { return x ^ y; }, l, r);
+    return pair_transform([](auto&& x, auto&& y)
+			  { return std::forward<decltype(x)>(x)
+				 ^ std::forward<decltype(y)>(y); },
+			  std::forward<L>(l), std::forward<R>(r));
 }
     
 template <class L, class R> inline std::enable_if_t<is_pair<L>::value, L&>

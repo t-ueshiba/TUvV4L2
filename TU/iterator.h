@@ -613,6 +613,8 @@ class ring_iterator : public boost::iterator_adaptor<ring_iterator<ITER>, ITER>
   private:
     using super	= boost::iterator_adaptor<ring_iterator, ITER>;
     friend	class boost::iterator_core_access;
+    template <class>
+    friend	class ring_iterator;
     
   public:
     using	typename super::difference_type;
@@ -624,6 +626,10 @@ class ring_iterator : public boost::iterator_adaptor<ring_iterator<ITER>, ITER>
     ring_iterator(ITER begin, ITER end)
 	:super(begin),
 	 _begin(begin), _end(end), _d(std::distance(_begin, _end))	{}
+    template <class ITER_>
+    ring_iterator(const ring_iterator<ITER_>& iter)
+	:super(iter.base()),
+	 _begin(iter._begin), _end(iter._end), _d(iter._d)		{}
 
     difference_type	position() const
 			{
@@ -660,6 +666,12 @@ class ring_iterator : public boost::iterator_adaptor<ring_iterator<ITER>, ITER>
 			{
 			    difference_type	n = iter.base() - super::base();
 			    return (n > 0 ? n - _d : n);
+			}
+
+    template <class ITER_>
+    bool		equal(const ring_iterator<ITER_>& iter) const
+			{
+			    return super::base() == iter.base();
 			}
     
   private:

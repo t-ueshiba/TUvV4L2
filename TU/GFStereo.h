@@ -137,7 +137,8 @@ class GFStereo : public StereoBase<GFStereo<SCORE, DISP> >
     using row_siterator		= iterator_t<ScoreVecArray2TupleArray>;
     using const_row_siterator	= iterator_t<const ScoreVecArray2TupleArray>;
     using row_sring		= ring_iterator<row_siterator>;
-    using row_sbox		= box_filter_iterator<row_sring>;
+    using const_row_sring	= ring_iterator<const_row_siterator>;
+    using const_row_sbox	= box_filter_iterator<const_row_sring>;
     using const_col_sbox	= box_filter_iterator<const_col_siterator>;
     using const_reverse_col_sbox
 			= box_filter_iterator<const_reverse_col_siterator>;
@@ -299,13 +300,13 @@ GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowR, ROW_D rowD)
     auto* const	buffers = _bufferPool.get();	// 各種作業領域を確保
     buffers->initialize(N, D, W);
     
-    auto	rowLp = rowL;
-    auto	rowRp = rowR;
-    row_sring	rowA(buffers->A.begin(), buffers->A.end());
-    row_sbox	boxB;
-    auto	rowG  = rowL;
-    const auto	rowL0 = rowL  + N - 1;
-    const auto	rowL1 = rowL0 + N - 1;
+    auto		rowLp = rowL;
+    auto		rowRp = rowR;
+    row_sring		rowA(buffers->A.begin(), buffers->A.end());
+    const_row_sbox	boxB;
+    auto		rowG  = rowL;
+    const auto		rowL0 = rowL  + N - 1;
+    const auto		rowL1 = rowL0 + N - 1;
 
     for (; rowL != rowLe; ++rowL)
     {
@@ -395,17 +396,17 @@ GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
     auto* const	buffers = _bufferPool.get();
     buffers->initialize(N, D, W, H);		// 各種作業領域を確保
 
-    auto	v = H;
-    size_t	cV = std::distance(rowL, rowLlast);
-    auto	rowLp = rowL;
-    auto	rowRp = rowR;
-    auto	cVp = cV;
-    row_sring	rowA(buffers->A.begin(), buffers->A.end());
-    row_sbox	boxB;
-    const auto	rowD0 = rowD + N - 1;
-    auto	rowG  = rowL;
-    const auto 	rowL0 = rowL  + N - 1;
-    const auto	rowL1 = rowL0 + N - 1;
+    auto		v = H;
+    size_t		cV = std::distance(rowL, rowLlast);
+    auto		rowLp = rowL;
+    auto		rowRp = rowR;
+    auto		cVp = cV;
+    row_sring		rowA(buffers->A.begin(), buffers->A.end());
+    const_row_sbox	boxB;
+    const auto		rowD0 = rowD + N - 1;
+    auto		rowG  = rowL;
+    const auto		rowL0 = rowL  + N - 1;
+    const auto		rowL1 = rowL0 + N - 1;
 
     for (; rowL != rowLe; ++rowL)
     {

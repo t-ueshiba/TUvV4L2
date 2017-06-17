@@ -123,7 +123,7 @@ using replace_element = typename detail::replace_element<S, T>::type;
 //! 与えられた値の型に応じて実引数を生成する
 /*!
   \param x	関数に渡す引数
-  \return	xの型Tが参照でなければx自身，定数参照ならばstd::cref(x),
+  \return	xが右辺値参照ならばx自身，定数参照ならばstd::cref(x),
 		非定数参照ならばstd::ref(x)
 */
 template <class T>
@@ -188,7 +188,7 @@ namespace detail
   template <size_t I, size_t... IDX, class FUNC, class... TUPLES> inline void
   tuple_for_each(std::index_sequence<I, IDX...>, FUNC f, TUPLES&&... x)
   {
-      f(tuple_get<I>(x)...);
+      f(tuple_get<I>(std::forward<TUPLES>(x))...);
       tuple_for_each(std::index_sequence<IDX...>(), f,
 		     std::forward<TUPLES>(x)...);
   }
@@ -216,10 +216,12 @@ namespace detail
   template <class FUNC, class... TUPLES, size_t I, size_t... IDX> inline auto
   tuple_transform(std::index_sequence<I, IDX...>, FUNC f, TUPLES&&... x)
   {
-      return std::tuple_cat(std::make_tuple(make_reference_wrapper(
-						f(tuple_get<I>(x)...))),
-			    tuple_transform(std::index_sequence<IDX...>(),
-					    f, std::forward<TUPLES>(x)...));
+      return std::tuple_cat(
+		std::make_tuple(
+		    make_reference_wrapper(
+			f(tuple_get<I>(std::forward<TUPLES>(x))...))),
+		tuple_transform(std::index_sequence<IDX...>(),
+				f, std::forward<TUPLES>(x)...));
   }
 }	// namespace detail
     
@@ -237,50 +239,63 @@ tuple_transform(FUNC f, TUPLES&&... x)
 /************************************************************************
 *  Arithmetic operators							*
 ************************************************************************/
-template <class... T> inline auto
-operator -(const std::tuple<T...>& t)
+template <class E,
+	  std::enable_if_t<is_tuple<E>::value>* = nullptr> inline auto
+operator -(E&& expr)
 {
-    return tuple_transform([](const auto& x){ return -x; }, t);
+    return tuple_transform([](auto&& x)
+			   { return -std::forward<decltype(x)>(x); },
+			   std::forward<E>(expr));
 }
 
 template <class L, class R,
 	  std::enable_if_t<any_tuple<L, R>::value>* = nullptr> inline auto
-operator +(const L& l, const R& r)
+operator +(L&& l, R&& r)
 {
-    return tuple_transform([](const auto& x, const auto& y)
-			   { return x + y; }, l, r);
+    return tuple_transform([](auto&& x, auto&& y)
+			   { return std::forward<decltype(x)>(x)
+				  + std::forward<decltype(y)>(y); },
+			   std::forward<L>(l), std::forward<R>(r));
 }
 
 template <class L, class R,
 	  std::enable_if_t<any_tuple<L, R>::value>* = nullptr> inline auto
-operator -(const L& l, const R& r)
+operator -(L&& l, R&& r)
 {
-    return tuple_transform([](const auto& x, const auto& y)
-			   { return x - y; }, l, r);
+    return tuple_transform([](auto&& x, auto&& y)
+			   { return std::forward<decltype(x)>(x)
+				  - std::forward<decltype(y)>(y); },
+			   std::forward<L>(l), std::forward<R>(r));
 }
 
 template <class L, class R,
 	  std::enable_if_t<any_tuple<L, R>::value>* = nullptr> inline auto
-operator *(const L& l, const R& r)
+operator *(L&& l, R&& r)
 {
-    return tuple_transform([](const auto& x, const auto& y)
-			   { return x * y; }, l, r);
+    return tuple_transform([](auto&& x, auto&& y)
+			   { return std::forward<decltype(x)>(x)
+				  * std::forward<decltype(y)>(y); },
+			   std::forward<L>(l), std::forward<R>(r));
 }
 
 template <class L, class R,
 	  std::enable_if_t<any_tuple<L, R>::value>* = nullptr> inline auto
-operator /(const L& l, const R& r)
+operator /(L&& l, R&& r)
 {
-    return tuple_transform([](const auto& x, const auto& y)
-			   { return x / y; }, l, r);
+    return tuple_transform([](auto&& x, auto&& y)
+			   { return std::forward<decltype(x)>(x)
+				  / std::forward<decltype(y)>(y); },
+			   std::forward<L>(l), std::forward<R>(r));
 }
 
 template <class L, class R,
 	  std::enable_if_t<any_tuple<L, R>::value>* = nullptr> inline auto
-operator %(const L& l, const R& r)
+operator %(L&& l, R&& r)
 {
-    return tuple_transform([](const auto& x, const auto& y)
-			   { return x % y; }, l, r);
+    return tuple_transform([](auto&& x, auto&& y)
+			   { return std::forward<decltype(x)>(x)
+				  % std::forward<decltype(y)>(y); },
+			   std::forward<L>(l), std::forward<R>(r));
 }
 
 template <class L, class R> inline std::enable_if_t<is_tuple<L>::value, L&>
@@ -334,10 +349,15 @@ operator --(T&& t)
 
 template <class L, class C, class R,
 	  std::enable_if_t<any_tuple<L, C, R>::value>* = nullptr> inline auto
-fma(const L& l, const C& c, const R& r)
+fma(L&& l, C&& c, R&& r)
 {
-    return tuple_transform([](const auto& x, const auto& y, const auto& z)
-			   { return fma(x, y, z); }, l, c, r);
+    return tuple_transform([](auto&& x, auto&& y, auto&& z)
+			   { return fma(std::forward<decltype(x)>(x),
+					std::forward<decltype(y)>(y),
+					std::forward<decltype(z)>(z)); },
+			   std::forward<L>(l),
+			   std::forward<C>(c),
+			   std::forward<R>(r));
 }
 
 /************************************************************************
@@ -345,26 +365,32 @@ fma(const L& l, const C& c, const R& r)
 ************************************************************************/
 template <class L, class R,
 	  std::enable_if_t<any_tuple<L, R>::value>* = nullptr> inline auto
-operator &(const L& l, const R& r)
+operator &(L&& l, R&& r)
 {
-    return tuple_transform([](const auto& x, const auto& y)
-			   { return x & y; }, l, r);
+    return tuple_transform([](auto&& x, auto&& y)
+			   { return std::forward<decltype(x)>(x)
+				  & std::forward<decltype(y)>(y); },
+			   std::forward<L>(l), std::forward<R>(r));
+}
+
+template <class L, class R,
+	  std::enable_if_t<any_tuple<L, R>::value>* = nullptr> inline auto
+operator |(L&& l, R&& r)
+{
+    return tuple_transform([](auto&& x, auto&& y)
+			   { return std::forward<decltype(x)>(x)
+				  | std::forward<decltype(y)>(y); },
+			   std::forward<L>(l), std::forward<R>(r));
 }
     
 template <class L, class R,
 	  std::enable_if_t<any_tuple<L, R>::value>* = nullptr> inline auto
-operator |(const L& l, const R& r)
+operator ^(L&& l, R&& r)
 {
-    return tuple_transform([](const auto& x, const auto& y)
-			   { return x | y; }, l, r);
-}
-    
-template <class L, class R,
-	  std::enable_if_t<any_tuple<L, R>::value>* = nullptr> inline auto
-operator ^(const L& l, const R& r)
-{
-    return tuple_transform([](const auto& x, const auto& y)
-			   { return x ^ y; }, l, r);
+    return tuple_transform([](auto&& x, auto&& y)
+			   { return std::forward<decltype(x)>(x)
+				  ^ std::forward<decltype(y)>(y); },
+			   std::forward<L>(l), std::forward<R>(r));
 }
     
 template <class L, class R> inline std::enable_if_t<is_tuple<L>::value, L&>
@@ -468,17 +494,20 @@ operator >=(const L& l, const R& r)
 *  Selection								*
 ************************************************************************/
 template <class X, class Y> inline auto
-select(bool s, const X& x, const Y& y)
+select(bool s, X&& x, Y&& y)
 {
-    return (s ? x : y);
+    return (s ? std::forward<X>(x) : std::forward<Y>(y));
 }
     
 template <class... S, class X, class Y,
 	  std::enable_if_t<any_tuple<X, Y>::value>* = nullptr> inline auto
-select(const std::tuple<S...>& s, const X& x, const Y& y)
+select(const std::tuple<S...>& s, X&& x, Y&& y)
 {
-    return tuple_transform([](const auto& t, const auto& u, const auto& v)
-			   { return select(t, u, v); }, s, x, y);
+    return tuple_transform([](const auto& t, auto&& u, auto&& v)
+			   { return select(t,
+					   std::forward<delctype(u)>(u),
+					   std::forward<delctype(v)>(v)); },
+			   s, std::forward<X>(x), std::forward<Y>(y));
 }
 
 /************************************************************************
