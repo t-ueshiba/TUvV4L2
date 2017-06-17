@@ -77,6 +77,7 @@ class box_filter_iterator
 		    if (!_valid)
 		    {
 			_val += (*super::base() - *_head);
+		      //(_val += *super::base()) -= *_head;
 			++_head;
 			_valid = true;
 		    }
@@ -91,6 +92,7 @@ class box_filter_iterator
 		    if (!_valid)
 		    {
 			_val += (*super::base() - *_head);
+		      //(_val += *super::base()) -= *_head;
 			++_head;
 		    }
 		    else

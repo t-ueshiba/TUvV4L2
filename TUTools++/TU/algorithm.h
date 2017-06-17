@@ -396,8 +396,7 @@ for_each(ITER begin, ARG arg, FUNC func)
 template <size_t N, class ITER, class ARG, class T> inline void
 fill(ITER begin, ARG arg, const T& val)
 {
-    for_each<N>(begin, arg,
-		[&val](auto&& dst){ std::forward<decltype(dst)>(dst) = val; });
+    for_each<N>(begin, arg, [&val](auto&& dst){ dst = val; });
 }
     
 /************************************************************************
@@ -474,10 +473,7 @@ copy(IN in, ARG arg, OUT out)
     std::cout << "copy<" << N << "> ["
 	      << print_sizes(range<IN, N>(in, arg)) << ']' << std::endl;
 #endif
-    for_each<N>(in, arg, out,
-		[](auto&& src, auto&& dst)
-		{ std::forward<decltype(dst)>(dst)
-			= std::forward<decltype(src)>(src); });
+    for_each<N>(in, arg, out, [](const auto& src, auto&& dst){ dst = src; });
 }
 
 /************************************************************************
