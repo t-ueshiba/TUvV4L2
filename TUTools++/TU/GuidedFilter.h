@@ -84,7 +84,7 @@ class GuidedFilter : public BoxFilter
 			    const std::tuple<COEFF_, COEFF_>& coeffs) const
 		{
 		    using	std::get;
-		    
+
 		    get<1>(t) = (get<0>(coeffs)*get<0>(t) + get<1>(coeffs))/_n;
 		}
 	
@@ -263,13 +263,13 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out) const
 			   stride(c.begin()), c.ncol()));
 
   // 係数ベクトルの平均値を求め，それによってガイドデータ列を線型変換する．
-    std::advance(gb,  rowWinSize() - 1);
-    std::advance(out, rowWinSize() - 1);
+    gb  += (rowWinSize() - 1);
+    out += (rowWinSize() - 1);
     super::convolve<T>(c.cbegin(), c.cend(),
 		       make_range_iterator(
 			   make_assignment_iterator(
 			       begin(std::make_tuple(*gb, *out))
-			       + colWinSize() - 1,
+			       += (colWinSize() - 1),
 			       trans_guides(n)),
 			   std::make_tuple(stride(gb), stride(out)),
 			   size(*out)));

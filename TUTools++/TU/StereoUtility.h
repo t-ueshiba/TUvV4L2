@@ -139,10 +139,12 @@ class diff_iterator
     reference	dereference() const
 		{
 		    const auto&	iter_tuple = super::base().get_iterator_tuple();
-		    return {boost::make_transform_iterator(
-			        std::get<1>(iter_tuple),
-				Diff<T>(*std::get<0>(iter_tuple), _thresh)),
-			    _dsw};
+
+		    return make_range(boost::make_transform_iterator(
+					  std::get<1>(iter_tuple),
+					  Diff<T>(*std::get<0>(iter_tuple),
+						  _thresh)),
+				      _dsw);
 		}
     
   private:
@@ -210,6 +212,7 @@ class matching_iterator
 
   public:
     using		typename super::reference;
+    using		typename super::difference_type;
 
     friend class	boost::iterator_core_access;
     friend class	detail::matching_proxy<matching_iterator>;
@@ -258,6 +261,9 @@ class matching_iterator
 		    }
 		    return *this;
 		}
+		matching_iterator(matching_iterator&&)	= default;
+    matching_iterator&
+		operator =(matching_iterator&&)		= default;
 		~matching_iterator()
 		{
 		    while (_curr != _next)
@@ -278,23 +284,27 @@ class matching_iterator
     template <class SCORES_>
     void	load_scores(const SCORES_& R) const
 		{
-		    auto	RminL = std::cbegin(R);
-		    auto	b = _next;
-		    for (auto iter = std::cbegin(R); iter != std::cend(R);
-			 ++iter)
+		    auto	RminL = _infty;
+		    auto	bynd  = _next;
+		    size_t	d     = 0;
+		    for (auto val : R)
 		    {
-			if (*iter < *RminL)
-			    RminL = iter;
-
-			if (*iter < b->RminR)
+			if (val < RminL)
 			{
-			    b->RminR = *iter;
-			    b->dminR = iter - std::cbegin(R);
+			    RminL	 = val;
+			    _next->dminL = d;
 			}
-			++b;
+			
+			if (val < bynd->RminR)
+			{
+			    bynd->RminR = val;
+			    bynd->dminR = d;
+			}
+
+			++bynd;
+			++d;
 		    }
-		    _next->dminL = RminL - R.begin();
-		    b->RminR = _infty;
+		    bynd->RminR = _infty;
 
 		    ++_next;
 		}
