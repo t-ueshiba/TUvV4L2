@@ -13,7 +13,7 @@ IDLS		=
 MOCHDRS		=
 
 INCDIRS		= -I../..
-CPPFLAGS	= -DNDEBUG
+CPPFLAGS	= #-DNDEBUG
 CFLAGS		= -g #-O3
 NVCCFLAGS	= -g
 ifeq ($(shell arch), armv7l)

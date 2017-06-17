@@ -18,6 +18,7 @@ SUBDIR	= BandMatrix		\
 	  Vector		\
 	  WeightedMedianFilter	\
 	  array			\
+	  filterStereo		\
 	  pair			\
 	  tuple			\
 	  simd			\
