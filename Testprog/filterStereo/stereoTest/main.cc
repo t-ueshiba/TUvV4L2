@@ -21,11 +21,10 @@ namespace TU
 enum Algorithm	{SAD, GF, WMF, TF};
     
 /************************************************************************
-*  class Diff<S, T>							*
+*  class MyDiff<S, T>							*
 ************************************************************************/
-  /*
 template <class S, class T>
-struct Diff
+struct MyDiff
 {
     typedef S	argument_type;
     typedef T	result_type;
@@ -35,7 +34,7 @@ struct Diff
 		    return std::abs(x - y);
 		}
 };
-  */
+
 /************************************************************************
 *  static functions							*
 ************************************************************************/
@@ -144,42 +143,45 @@ doJob(const Image<T>& imageL, const Image<T>& imageR,
 #endif
       }
 	break;
-      /*
+
       case TF:
       {
-	typedef Diff<T, float>		wfunc_type;
+	using wfunc_type	= MyDiff<T, float>;
 
-	boost::TreeFilter<ScoreArray, wfunc_type>	filter(wfunc_type(),
-							       params.sigma);
+	boost::TreeFilter<Array<S>, wfunc_type>	filter(wfunc_type(),
+						       params.sigma);
 	
-	filter.convolve(make_row_iterator<in_iterator>(
-			    make_fast_zip_iterator(
-				boost::make_tuple(rectifiedImageL.cbegin(),
-						  rectifiedImageR.cbegin())),
-			    params.disparitySearchWidth,
-			    params.intensityDiffMax),
-			make_row_iterator<in_iterator>(
-			    make_fast_zip_iterator(
-				boost::make_tuple(rectifiedImageL.cend(),
-						  rectifiedImageR.cend())),
-			    params.disparitySearchWidth,
-			    params.intensityDiffMax),
-			rectifiedImageL.cbegin(),
-			rectifiedImageL.cend(),
-			make_row_iterator<out_iterator>(
-			    disparityMap.begin(),
-#ifdef NO_BACKMATCH
-			    MinIdx<ScoreArray>(params.disparityMax)
+	filter.convolve(make_range_iterator(
+			    make_diff_iterator<S>(std::cbegin(*rowL),
+						  std::cbegin(*rowR),
+						  params.disparitySearchWidth,
+						  params.intensityDiffMax),
+			    std::make_tuple(stride(rowL), stride(rowR)),
+			    std::size(*rowL)),
+			make_range_iterator(
+			    make_diff_iterator<S>(std::cbegin(*rowLe),
+						  std::cbegin(*rowRe),
+						  params.disparitySearchWidth,
+						  params.intensityDiffMax),
+			    std::make_tuple(stride(rowLe), stride(rowRe)),
+			    std::size(*rowLe)),
+			rowL, rowLe,
+#ifdef SCORE_ARRAY2
+			scores.begin(),
 #else
-			    params.disparitySearchWidth,
-			    params.disparityMax,
-			    params.disparityInconsistency
+			make_range_iterator(
+			    make_matching_iterator<S>(
+				std::begin(*rowD),
+				params.disparitySearchWidth,
+				params.disparityMax,
+				params.disparityInconsistency,
+				params.doHorizontalBackMatch),
+			    stride(rowD), std::size(*rowD)),
 #endif
-			    ),
 			true);
       }
 	break;
-      */
+
       default:
 	break;
     }
