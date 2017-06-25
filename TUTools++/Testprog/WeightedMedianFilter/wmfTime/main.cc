@@ -25,7 +25,7 @@ doJob(const Image<T>& in, const Image<G>& guide,
 
     wmf.setGrainSize(grainSize);
     
-    for (size_t n = 0; n < 10; ++n)
+    for (size_t n = 0; n < 100; ++n)
     {
 	profiler.start(0);
 	wmf.convolve(in.begin(), in.end(),
@@ -52,11 +52,11 @@ main(int argc, char* argv[])
     using		std::cerr;
     using		std::endl;
 
-    typedef float	pixel_type;
-    typedef float	guide_type;
+    typedef u_char	pixel_type;
+    typedef u_char	guide_type;
 
     float		sigma = 5.5;
-    size_t		winSize = 5;
+    size_t		winSize = 11;
     size_t		grainSize = 100;
     extern char*	optarg;
     for (int c; (c = getopt(argc, argv, "s:w:g:")) != -1; )

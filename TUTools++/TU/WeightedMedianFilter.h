@@ -64,7 +64,8 @@ class WeightedMedianFilterBase
 {
   public:
     using weight_type	= typename W::result_type;
-    using warray_type	= Array<weight_type>;
+    using warray2_type	= Array2<weight_type>;
+    using warray_type	= decltype(*std::declval<warray2_type>().cbegin());
     
   protected:
     class Bin : public boost::intrusive::list_base_hook<>
@@ -249,7 +250,7 @@ class WeightedMedianFilterBase
     size_t		_nbinsI;
     size_t		_nbinsG;
     bool		_initialized;
-    Array2<weight_type>	_weights;	// weight function
+    warray2_type	_weights;	// weight function
 };
 
 template <class W> inline
