@@ -257,14 +257,14 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 		    }
 		    return *this;
 		}
-		Buf(Buf&& b)
+		Buf(Buf&& b) noexcept
 		    :_sizes(b._sizes), _stride(b._stride),
 		     _capacity(b._capacity), _ext(b._ext), _p(b._p)
 		{
 		  // b の 破壊時に this->_p がdeleteされることを防ぐ．
 		    b._p = super::null();
 		}
-    Buf&	operator =(Buf&& b)
+    Buf&	operator =(Buf&& b) noexcept
 		{
 		    _sizes    = b._sizes;
 		    _stride   = b._stride;

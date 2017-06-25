@@ -126,7 +126,6 @@ HDRS		= TU/Array++.h \
 		TU/simd/cvtup_iterator.h \
 		TU/simd/dup.h \
 		TU/simd/insert_extract.h \
-		TU/simd/iterator.h \
 		TU/simd/load_iterator.h \
 		TU/simd/load_store.h \
 		TU/simd/logical.h \

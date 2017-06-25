@@ -272,7 +272,8 @@ template <class TUPLE,
 begin(TUPLE&& t)
 {
   // icpc-17.0.4 のバグ対策のため，lambdaを用いずに実装
-    return TU::make_zip_iterator(tuple_transform(detail::generic_begin(), t));
+    return TU::make_zip_iterator(tuple_transform(detail::generic_begin(),
+						 std::forward<TUPLE>(t)));
 }
 
 template <class TUPLE,
@@ -280,21 +281,22 @@ template <class TUPLE,
 end(TUPLE&& t)
 {
   // icpc-17.0.4 のバグ対策のため，lambdaを用いずに実装
-    return TU::make_zip_iterator(tuple_transform(detail::generic_end(), t));
+    return TU::make_zip_iterator(tuple_transform(detail::generic_end(),
+						 std::forward<TUPLE>(t)));
 }
 
 template <class TUPLE,
 	  std::enable_if_t<is_tuple<TUPLE>::value>* = nullptr> inline auto
 rbegin(TUPLE&& t)
 {
-    return std::make_reverse_iterator(end(t));
+    return std::make_reverse_iterator(end(std::forward<TUPLE>(t)));
 }
 
 template <class TUPLE,
 	  std::enable_if_t<is_tuple<TUPLE>::value>* = nullptr> inline auto
 rend(TUPLE&& t)
 {
-    return std::make_reverse_iterator(begin(t));
+    return std::make_reverse_iterator(begin(std::forward<TUPLE>(t)));
 }
 
 template <class... T> inline auto
@@ -603,7 +605,7 @@ template <class ROW>
 using vertical_iterator = boost::transform_iterator<row2col<ROW>, ROW>;
 
 template <class ROW> inline vertical_iterator<ROW>
-make_vertical_iterator(ROW row, size_t col)
+make_vertical_iterator(const ROW& row, size_t col)
 {
     return {row, {col}};
 }
