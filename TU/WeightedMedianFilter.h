@@ -160,54 +160,46 @@ class WeightedMedianFilterBase
 			remove(*idxI, *idxG);
 		    return idxG;
 		}
+
 	auto	median(const warray_type& weights)
 		{
-		    auto	balance = current(weights);
-		    
-		    if (balance >= 0)	// balance < 0 となるまで左にシフト
-			while ((balance = backward(weights)) >= 0)
-			    ;
-		    else		// balance >= 0 となるまで右にシフト
-			while ((balance = forward(weights)) < 0)
-			    ;
+		  // 現在の balance 値を計算する．
+		    weight_type	balance = 0;
+		    for (const auto& box : _nonzero_boxes)
+			balance += box * weights[idx(box)];
 
+		    if (balance >= 0)
+			do
+			{
+			    balance = 0;
+			    const auto&	hist = _histogram[--_median];
+			    for (auto& box : _nonzero_boxes)
+			    {
+				const auto	idxG = idx(box);
+			    
+				box	-= 2*hist[idxG];
+				balance += box * weights[idxG];
+			    }
+			} while (balance >= 0);
+		    else
+			do
+			{
+			    balance = 0;
+			    const auto&	hist = _histogram[_median];
+			    for (auto& box : _nonzero_boxes)
+			    {
+				const auto	idxG = idx(box);
+			    
+				box	+= 2*hist[idxG];
+				balance += box * weights[idxG];
+			    }
+			    ++_median;
+			} while (balance < 0);
+		    
 		    return _median;
 		}
 	
       private:
-	auto	current(const warray_type& weights) const
-		{
-		    weight_type	val = 0;
-		    for (const auto& box : _nonzero_boxes)
-			val += box * weights[idx(box)];
-		    return val;
-		}
-	auto	forward(const warray_type& weights)
-		{
-		    const auto&	hist = _histogram[_median++];
-		    weight_type	val  = 0;
-		    for (auto& box : _nonzero_boxes)
-		    {
-			const auto	idxG = idx(box);
-
-			box += 2*hist[idxG];
-			val += box * weights[idxG];
-		    }
-		    return val;
-		}
-	auto	backward(const warray_type& weights)
-		{
-		    const auto&	hist = _histogram[--_median];
-		    weight_type	val  = 0;
-		    for (auto& box : _nonzero_boxes)
-		    {
-			const auto	idxG = idx(box);
-
-			box -= 2*hist[idxG];
-			val += box * weights[idxG];
-		    }
-		    return val;
-		}
 	auto	idx(const BalanceCountingBox& b) const
 		{
 		    return &b - _boxes.data();
