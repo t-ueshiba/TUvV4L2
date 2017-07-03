@@ -7,7 +7,6 @@
 #define TU_WEIGHTEDMEDIANFILTER_H
 
 #include <boost/intrusive/list.hpp>
-#include <boost/intrusive/set.hpp>
 #include <boost/iterator/counting_iterator.hpp>
 #include "TU/Quantizer.h"
 #include "TU/algorithm.h"	// diff(const T&, const T&)
@@ -99,27 +98,55 @@ class WeightedMedianFilterBase
 	auto	operator -=(ptrdiff_t m)	{ return _diff -= m; }
 	    
       private:
-	ptrdiff_t	_diff = 0;
-	size_t		_n    = 0;
+	ptrdiff_t	_diff = 0;	// cut point前後の点の数の差
+	size_t		_n    = 0;	// この box 中の点の数
+    };
+
+    class Histogram : public Array<size_t>
+    {
+      public:
+	void	clear()
+		{
+		    Array<size_t>::operator =(0);
+		    _n = 0;
+		}
+	void	add(size_t idxG)		{ ++(*this)[idxG]; ++_n; }
+	void	remove(size_t idxG)		{ --(*this)[idxG]; --_n; }
+	auto	npoints()		const	{ return _n; }
+	    
+      private:
+	size_t	_n = 0;		// ヒストグラムに登録されている点の総数
     };
 
     class MedianTracker
     {
       private:
-	using	boxes_t = boost::intrusive::list<BalanceCountingBox>;
+	using	nonzero_boxes_t	= boost::intrusive::list<BalanceCountingBox>;
 	
       public:
-		MedianTracker()	:_median(0)				{}
+		MedianTracker()
+		    :_histograms(),
+		     _boxes(), _nonzero_boxes(), _median(0)		{}
 		MedianTracker(size_t nbinsI, size_t nbinsG)
-		    :_histogram(nbinsI, nbinsG), _boxes(nbinsG), _median(0)
+		    :_histograms(nbinsI),
+		     _boxes(nbinsG), _nonzero_boxes(), _median(0)
 		{
+		    for (auto& hist : _histograms)
+			hist.resize(nbinsG);
+
+		    for (auto& box : _boxes)
+			box.clear();
 		}
 	
 	void	initialize(size_t nbinsI, size_t nbinsG)
 		{
-		    _histogram.resize(nbinsI, nbinsG);
-		    _histogram = 0;
-		    
+		    _histograms.resize(nbinsI);
+		    for (auto& hist : _histograms)
+		    {
+			hist.resize(nbinsG);
+			hist.clear();
+		    }
+
 		    _boxes.resize(nbinsG);
 		    for (auto& box : _boxes)
 			box.clear();
@@ -129,8 +156,8 @@ class WeightedMedianFilterBase
 
 	void	add(size_t idxI, size_t idxG)
 		{
-		    ++_histogram[idxI][idxG];
-
+		    _histograms[idxI].add(idxG);
+		    
 		    auto&	box = _boxes[idxG];
 		    if (box.add(idxI < _median) == 1)
 			_nonzero_boxes.push_back(box);
@@ -138,7 +165,7 @@ class WeightedMedianFilterBase
 
 	void	remove(size_t idxI, size_t idxG)
 		{
-		    --_histogram[idxI][idxG];
+		    _histograms[idxI].remove(idxG);
 
 		    auto&	box = _boxes[idxG];
 		    if (box.remove(idxI < _median) == 0)
@@ -168,47 +195,53 @@ class WeightedMedianFilterBase
 		    for (const auto& box : _nonzero_boxes)
 			balance += box * weights[idx(box)];
 
-		    if (balance >= 0)
-			do
-			{
+		    if (balance >= 0)		// balance >= 0 ならば...
+			do			// balance < 0 となるまで
+			{			// cut point を左にシフト
+			    while (_histograms[--_median].npoints() == 0)
+				;
+			    
+			    const auto&	hist = _histograms[_median];
+
 			    balance = 0;
-			    const auto&	hist = _histogram[--_median];
 			    for (auto& box : _nonzero_boxes)
 			    {
-				const auto	idxG = idx(box);
-			    
+				const auto	idxG  = idx(box);
 				box	-= 2*hist[idxG];
 				balance += box * weights[idxG];
 			    }
 			} while (balance >= 0);
-		    else
-			do
-			{
+		    else			// balance < 0 ならば...
+			do			// balance >= 0 となるまで
+			{			// cut point を右にシフト
+			    while (_histograms[_median].npoints() == 0)
+				++_median;
+
+			    const auto&	hist = _histograms[_median];
+			    ++_median;
+			    
 			    balance = 0;
-			    const auto&	hist = _histogram[_median];
 			    for (auto& box : _nonzero_boxes)
 			    {
 				const auto	idxG = idx(box);
-			    
 				box	+= 2*hist[idxG];
 				balance += box * weights[idxG];
 			    }
-			    ++_median;
 			} while (balance < 0);
-		    
-		    return _median;
+
+		    return (balance < 0 ? _median + 1 : _median);
 		}
 	
       private:
-	auto	idx(const BalanceCountingBox& b) const
+	auto	idx(const BalanceCountingBox& box) const
 		{
-		    return &b - _boxes.data();
+		    return &box - _boxes.data();
 		}
 	
       private:
-	Array2<size_t>			_histogram;	// 2D histogram
+	Array<Histogram>		_histograms;
 	Array<BalanceCountingBox>	_boxes;
-	boxes_t				_nonzero_boxes;
+	nonzero_boxes_t			_nonzero_boxes;
 	size_t				_median;
     };
 
@@ -320,7 +353,7 @@ WeightedMedianFilter<T, W>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out)
   // median点を探索し，その値を出力
     for (; tailI != indicesI.end(); ++tailI)
     {
-	_tracker.add(*tailI, *tailG);	// tail点をヒストグラムに追加
+	_tracker.add(*tailI, *tailG);		// tail点をヒストグラムに追加
 	*out = _quantizerI[_tracker.median(super::weights(*idxG))];
 	_tracker.remove(*headI, *headG);	// head点をヒストグラムから除去
 
@@ -488,21 +521,20 @@ WeightedMedianFilter2<T, W>::filter(ROW_I rowI, ROW_I rowIe,
 
     pf_type::start(2);
     auto	endI = rowI;
-    auto	midG = rowG;
-    const auto	mid = winSize()/2;
-    const auto	rmid = (winSize()-1)/2;
     std::advance(endI, winSize() - 1);	// ウィンドウの最下行
-    std::advance(midG, mid);		// ウィンドウの中央行
-    std::advance(rowO, mid);		// 出力行をウィンドウの中央に合わせる
+    auto	midG = rowG;
 
   // ウィンドウ初期位置におけるヒストグラムをセット
     MedianTracker	tracker(_quantizerI.size(), _quantizerG.size());
-    for (size_t c = 0; c < winSize() - 1; ++c)
-	tracker.add(make_vertical_iterator(rowI, c),
-		    make_vertical_iterator(endI, c),
-		    make_vertical_iterator(rowG, c));
+    for (auto row = rowI; row != endI; ++row, ++midG)
+	tracker.add(row->begin(), row->begin() + winSize() - 1, midG->begin());
     
     pf_type::start(3);
+    const auto	mid  = winSize()/2;
+    const auto	rmid = (winSize()-1)/2;
+    midG = rowG;
+    std::advance(midG, mid);		// ウィンドウの中央行
+    std::advance(rowO, mid);		// 出力行をウィンドウの中央に合わせる
   // 左から右／右から左に交互に走査してmedian点を探索
     for (bool reverse = false; rowI != rowIe; ++rowI)
     {
