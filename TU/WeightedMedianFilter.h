@@ -105,8 +105,9 @@ class WeightedMedianFilterBase
     class Histogram : public Array<size_t>
     {
       public:
-	void	clear()
+	void	resize(size_t nbinsG)
 		{
+		    Array<size_t>::resize(nbinsG);
 		    Array<size_t>::operator =(0);
 		    _n = 0;
 		}
@@ -124,28 +125,19 @@ class WeightedMedianFilterBase
 	using	nonzero_boxes_t	= boost::intrusive::list<BalanceCountingBox>;
 	
       public:
-		MedianTracker()
-		    :_histograms(),
-		     _boxes(), _nonzero_boxes(), _median(0)		{}
+		MedianTracker()	:_median(0)				{}
 		MedianTracker(size_t nbinsI, size_t nbinsG)
-		    :_histograms(nbinsI),
-		     _boxes(nbinsG), _nonzero_boxes(), _median(0)
+		    :_histograms(nbinsI), _boxes(nbinsG), _median(0)
 		{
 		    for (auto& hist : _histograms)
 			hist.resize(nbinsG);
-
-		    for (auto& box : _boxes)
-			box.clear();
 		}
 	
 	void	initialize(size_t nbinsI, size_t nbinsG)
 		{
 		    _histograms.resize(nbinsI);
 		    for (auto& hist : _histograms)
-		    {
 			hist.resize(nbinsG);
-			hist.clear();
-		    }
 
 		    _boxes.resize(nbinsG);
 		    for (auto& box : _boxes)
@@ -206,7 +198,7 @@ class WeightedMedianFilterBase
 			    balance = 0;
 			    for (auto& box : _nonzero_boxes)
 			    {
-				const auto	idxG  = idx(box);
+				const auto	idxG = idx(box);
 				box	-= 2*hist[idxG];
 				balance += box * weights[idxG];
 			    }
