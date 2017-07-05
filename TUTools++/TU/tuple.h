@@ -505,8 +505,8 @@ select(const std::tuple<S...>& s, X&& x, Y&& y)
 {
     return tuple_transform([](const auto& t, auto&& u, auto&& v)
 			   { return select(t,
-					   std::forward<delctype(u)>(u),
-					   std::forward<delctype(v)>(v)); },
+					   std::forward<decltype(u)>(u),
+					   std::forward<decltype(v)>(v)); },
 			   s, std::forward<X>(x), std::forward<Y>(y));
 }
 
