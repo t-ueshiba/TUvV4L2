@@ -37,25 +37,21 @@ class Filter2
 
 	void	operator ()(const tbb::blocked_range<size_t>& r) const
 		{
-		    using S = std::conditional_t<std::is_void<T_>::value,
-						 value_t<iterator_value<IN_> >,
-						 T_>;
-		    
 		    auto	ib = _ib;
 		    auto	ie = _ib;
 		    std::advance(ib, r.begin());
 		    std::advance(ie, r.end() + _filter.overlap());
 		    auto	out = _out;
 		    std::advance(out, r.begin());
-		    _filter.template convolveRows<S>(ib, std::min(ie, _ie),
-						     out);
+		    _filter.template convolveRows<T_>(ib, std::min(ie, _ie),
+						      out);
 		}
 
       private:
-	F	const&	_filter;
-	IN_	const	_ib;
-	IN_	const	_ie;
-	OUT_	const	_out;
+	const F&	_filter;
+	const IN_	_ib;
+	const IN_	_ie;
+	const OUT_	_out;
     };
 #endif
   public:
@@ -67,7 +63,7 @@ class Filter2
     void	setGrainSize(size_t gs)			{ _grainSize = gs; }
 	
   private:
-    F const&	_filter;	// 2次元フィルタ
+    const F&	_filter;	// 2次元フィルタ
     size_t	_grainSize;
 };
     

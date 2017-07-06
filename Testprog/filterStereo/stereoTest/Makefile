@@ -13,12 +13,12 @@ IDLS		=
 MOCHDRS		=
 
 INCDIRS		= -I../../..
-CPPFLAGS	= -DNDEBUG #-DUSE_TBB
+CPPFLAGS	= -DNDEBUG -DUSE_TBB
 CFLAGS		= -g -O #-O3
 NVCCFLAGS	= -g
 CCFLAGS		= $(CFLAGS) #-ftemplate-backtrace-limit=0
 
-LIBS		= -lTUTools++ #-ltbb
+LIBS		= -lTUTools++ -ltbb
 ifneq ($(findstring darwin,$(OSTYPE)),)
   LIBS	       += -framework IOKit -framework CoreFoundation \
 		  -framework CoreServices

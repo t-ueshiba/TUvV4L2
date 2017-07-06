@@ -684,7 +684,7 @@ class range_iterator
     difference_type
 		distance_to(const range_iterator& iter) const
 		{
-		    return (iter.base() - super::base()) / stride();
+		    return (iter.base() - super::base()) / leftmost(stride());
 		}
 
     template <class ITER_, class STRIDE_>
@@ -707,6 +707,17 @@ class range_iterator
 		{
 		    advance(const_cast<typename ITER_::base_type&>(iter.base()),
 			    stride);
+		}
+
+    template <class STRIDE_>
+    static auto	leftmost(STRIDE_ stride)
+		{
+		    return stride;
+		}
+    template <class... STRIDE_>
+    static auto	leftmost(std::tuple<STRIDE_...> stride)
+		{
+		    return leftmost(std::get<0>(stride));
 		}
 };
 

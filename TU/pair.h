@@ -63,7 +63,7 @@ struct pair_traits<std::pair<S, T> >
     constexpr static size_t	size = pair_traits<S>::size
 				     + pair_traits<T>::size;
     using leftmost_type		= typename pair_traits<S>::leftmost_type;
-    using rightmost_type	= typename pair_traits<S>::rightmost_type;
+    using rightmost_type	= typename pair_traits<T>::rightmost_type;
 };
 
 /************************************************************************
