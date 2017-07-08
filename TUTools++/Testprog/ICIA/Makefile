@@ -57,7 +57,6 @@ EXTHDRS		= ../../TU/Array++.h \
 		../../TU/simd/BufTraits.h \
 		../../TU/simd/allocator.h \
 		../../TU/simd/arithmetic.h \
-		../../TU/simd/arm/allocator.h \
 		../../TU/simd/arm/arch.h \
 		../../TU/simd/arm/arithmetic.h \
 		../../TU/simd/arm/bit_shift.h \
@@ -83,8 +82,8 @@ EXTHDRS		= ../../TU/Array++.h \
 		../../TU/simd/cvtup_iterator.h \
 		../../TU/simd/dup.h \
 		../../TU/simd/insert_extract.h \
-		../../TU/simd/load_iterator.h \
 		../../TU/simd/load_store.h \
+		../../TU/simd/load_store_iterator.h \
 		../../TU/simd/logical.h \
 		../../TU/simd/lookup.h \
 		../../TU/simd/misc.h \
@@ -93,11 +92,9 @@ EXTHDRS		= ../../TU/Array++.h \
 		../../TU/simd/shift.h \
 		../../TU/simd/shift_iterator.h \
 		../../TU/simd/simd.h \
-		../../TU/simd/store_iterator.h \
 		../../TU/simd/transform.h \
 		../../TU/simd/type_traits.h \
 		../../TU/simd/vec.h \
-		../../TU/simd/x86/allocator.h \
 		../../TU/simd/x86/arch.h \
 		../../TU/simd/x86/arithmetic.h \
 		../../TU/simd/x86/bit_shift.h \
@@ -135,10 +132,9 @@ main.o: ../../TU/Warp.h ../../TU/simd/simd.h ../../TU/simd/config.h \
 	../../TU/simd/x86/type_traits.h ../../TU/simd/arm/type_traits.h \
 	../../TU/simd/x86/vec.h ../../TU/simd/x86/arch.h \
 	../../TU/simd/arm/vec.h ../../TU/simd/arm/arch.h \
-	../../TU/simd/allocator.h ../../TU/simd/x86/allocator.h \
-	../../TU/simd/arm/allocator.h ../../TU/simd/load_store.h \
-	../../TU/pair.h ../../TU/simd/pack.h ../../TU/simd/cvt.h \
-	../../TU/tuple.h ../../TU/simd/zero.h ../../TU/simd/x86/zero.h \
+	../../TU/simd/allocator.h ../../TU/simd/load_store.h ../../TU/pair.h \
+	../../TU/simd/pack.h ../../TU/simd/cvt.h ../../TU/tuple.h \
+	../../TU/simd/zero.h ../../TU/simd/x86/zero.h \
 	../../TU/simd/arm/zero.h ../../TU/simd/cast.h \
 	../../TU/simd/x86/cast.h ../../TU/simd/arm/cast.h \
 	../../TU/simd/shift.h ../../TU/simd/x86/shift.h \
@@ -160,11 +156,10 @@ main.o: ../../TU/Warp.h ../../TU/simd/simd.h ../../TU/simd/config.h \
 	../../TU/simd/x86/svml.h ../../TU/simd/transform.h \
 	../../TU/iterator.h ../../TU/functional.h ../../TU/simd/lookup.h \
 	../../TU/simd/x86/lookup.h ../../TU/simd/arm/lookup.h \
-	../../TU/simd/load_iterator.h ../../TU/simd/store_iterator.h \
-	../../TU/simd/cvtdown_iterator.h ../../TU/simd/cvtup_iterator.h \
-	../../TU/simd/shift_iterator.h ../../TU/simd/BufTraits.h \
-	../../TU/Array++.h ../../TU/range.h ../../TU/algorithm.h \
-	../../TU/Image++.h ../../TU/Vector++.h ../../TU/Camera++.h \
-	../../TU/Geometry++.h ../../TU/Minimize.h ../../TU/ICIA.h \
-	../../TU/DericheConvolver.h ../../TU/IIRFilter.h \
+	../../TU/simd/load_store_iterator.h ../../TU/simd/cvtdown_iterator.h \
+	../../TU/simd/cvtup_iterator.h ../../TU/simd/shift_iterator.h \
+	../../TU/simd/BufTraits.h ../../TU/Array++.h ../../TU/range.h \
+	../../TU/algorithm.h ../../TU/Image++.h ../../TU/Vector++.h \
+	../../TU/Camera++.h ../../TU/Geometry++.h ../../TU/Minimize.h \
+	../../TU/ICIA.h ../../TU/DericheConvolver.h ../../TU/IIRFilter.h \
 	../../TU/SeparableFilter2.h ../../TU/Profiler.h

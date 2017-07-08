@@ -371,6 +371,9 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
     static ptrdiff_t
 		to_stride(size_t alignment, size_t size)
 		{
+		    if (rank() == 1)
+			return size;
+		    
 		    constexpr auto	elmsiz = sizeof(T);
 
 		    if (alignment == 0)

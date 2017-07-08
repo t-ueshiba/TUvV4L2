@@ -4,48 +4,41 @@
 #include <iomanip>
 #include "TU/simd/cvtdown_iterator.h"
 #include "TU/simd/cvtup_iterator.h"
-#include "TU/simd/load_iterator.h"
-#include "TU/simd/store_iterator.h"
+#include "TU/simd/load_store_iterator.h"
 
 namespace TU
 {
 namespace simd
 {
-template <class SRC, class DST> void
+template <class S, class T> void
 doJob()
 {
-    using namespace	std;
-    
-    typedef SRC						src_type;
-    typedef DST						dst_type;
-    typedef load_iterator<src_type>			siterator;
-    typedef store_iterator<dst_type>			diterator;
-    typedef typename boost::mpl::if_c<
-	vec<src_type>::size <= vec<dst_type>::size,
-	cvtdown_mask_iterator<dst_type, siterator>,
-	siterator>::type				src_iterator;
-    typedef typename boost::mpl::if_c<
-	vec<src_type>::size <= vec<dst_type>::size,
-	diterator,
-	cvtup_mask_iterator<diterator> >::type		dst_iterator;
+    using siterator	= load_iterator<S>;
+    using diterator	= store_iterator<T>;
+    using src_iterator	= std::conditional_t<(vec<S>::size <= vec<T>::size),
+					     cvtdown_mask_iterator<T,
+								   siterator>,
+					     siterator>;
+    using dst_iterator	= std::conditional_t<(vec<S>::size <= vec<T>::size),
+					     diterator,
+					     cvtup_mask_iterator<diterator> >;
 
-    constexpr src_type	f = src_type(~0);
-    src_type		src[] = {0, f, 0, f, 0, 0, f, f,
-				 0, 0, 0, 0, f, f, f, f,
-				 0, f, 0, f, 0, 0, f, f,
-				 0, 0, 0, 0, f, f, f, f};
-    dst_type		dst[32];
-    size_t		n = sizeof(src)/sizeof(src[0]);
+    constexpr S	f = S(~0);
+    S		src[] = {0, f, 0, f, 0, 0, f, f,
+			 0, 0, 0, 0, f, f, f, f,
+			 0, f, 0, f, 0, 0, f, f,
+			 0, 0, 0, 0, f, f, f, f};
+    T		dst[32];
 
-    copy(src_iterator(src), src_iterator(src + n),
-	 dst_iterator(dst));
-
+    std::copy(src_iterator(std::cbegin(src)), src_iterator(std::cend(src)),
+	      dst_iterator(std::begin(dst)));
     empty();
 
-    for (const dst_type* q = dst; q != dst + n; ++q)
-	cout << ' ' << setfill('0') << setw(2*sizeof(dst_type)) << hex
-	     << (u_int64_t(*q) & (u_int64_t(~0) >> (64 - 8*sizeof(dst_type))));
-    cout << endl;
+    for (auto x : dst)
+	std::cout << ' ' << std::setfill('0') << std::setw(2*sizeof(T))
+		  << std::hex
+		  << (u_int64_t(x) & (u_int64_t(~0) >> (64 - 8*sizeof(T))));
+    std::cout << std::endl;
 }
     
 }

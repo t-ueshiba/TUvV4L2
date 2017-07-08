@@ -67,6 +67,17 @@ template <> inline Iu64vec	abs(Iu64vec x)		{ return x; }
 template <class T> vec<T>	diff(vec<T> x, vec<T> y)		;
   
 /************************************************************************
+*  Fused multiply-add							*
+************************************************************************/
+template <class T>
+inline vec<T>	fma(vec<T> x, vec<T> y, vec<T> z)	{return x*y + z;}
+
+/************************************************************************
+*  Horizontal addition							*
+************************************************************************/
+template <class T> inline T	hadd(vec<T> x)				;
+
+/************************************************************************
 *  Arithmetic operators for vec tuples					*
 ************************************************************************/
 template <class L, class R,
@@ -109,6 +120,20 @@ template <class L, class R,
 diff(const L& l, const R& r)
 {
     return tuple_transform([](auto x, auto y){ return diff(x, y); }, l, r);
+}
+
+template <class L, class C, class R,
+	  std::enable_if_t<any_tuple<L, C, R>::value>* = nullptr> inline auto
+fma(const L& l, const C& c, const R& r)
+{
+    return tuple_transform([](auto x, auto y, auto z)
+			   { return fma(x, y, z); }, l, c, r);
+}
+
+template <class... T> inline auto
+hadd(const std::tuple<vec<T>...>& t)
+{
+    return tuple_transform([](auto x){ return hadd(x); }, t);
 }
 
 }	// namespace simd

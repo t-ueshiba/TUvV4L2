@@ -144,6 +144,35 @@
   }
 #endif
 
+// AVX以降では hadd が上下のlaneに分断されて使いにくいので，自然なバージョンを定義
+#if defined(AVX)
+#  if defined(AVX2)
+  inline __m256i
+  _mm256_emu_hadd_epi16(__m256i x, __m256i y)
+  {
+      return _mm256_permute4x64_epi64(_mm256_hadd_epi16(x, y), 0xd8);
+  }
+
+  inline __m256i
+  _mm256_emu_hadd_epi32(__m256i x, __m256i y)
+  {
+      return _mm256_permute4x64_epi64(_mm256_hadd_epi32(x, y), 0xd8);
+  }
+#  endif
+  inline __m256
+  _mm256_emu_hadd_ps(__m256 x, __m256 y)
+  {
+      return _mm256_permutevar8x32_ps(_mm256_hadd_ps(x, y),
+				      _mm256_set_epi32(7, 6, 3, 2, 5, 4, 1, 0));
+  }
+
+  inline __m256d
+  _mm256_emu_hadd_pd(__m256d x, __m256d y)
+  {
+      return _mm256_permute4x64_pd(_mm256_hadd_pd(x, y), 0xd8);
+  }
+#endif
+
 /************************************************************************
 *  Macros for constructing mnemonics of intrinsics			*
 ************************************************************************/
@@ -274,5 +303,10 @@
 #define SIMD_BINARY_FUNC(func, op, type)				\
     SIMD_SPECIALIZED_FUNC(vec<type> func(vec<type> x, vec<type> y),	\
 			  op, (x, y), void, type, SIMD_SUFFIX)
+
+#define SIMD_TRINARY_FUNC(func, op, type)				\
+    SIMD_SPECIALIZED_FUNC(vec<type> func(vec<type> x,			\
+					 vec<type> y, vec<type> z),	\
+			  op, (x, y, z), void, type, SIMD_SUFFIX)
 
 #endif	// !TU_SIMD_X86_ARCH_H

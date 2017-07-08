@@ -2,8 +2,7 @@
  *  $Id$
  */
 #include "TU/simd/transform.h"
-#include "TU/simd/load_iterator.h"
-#include "TU/simd/store_iterator.h"
+#include "TU/simd/load_store_iterator.h"
 #include "TU/simd/arithmetic.h"
 
 namespace TU
@@ -48,21 +47,21 @@ doJob()
     O	w[32];
 
     simd::copy<T>(std::ostream_iterator<target_type>(std::cout, "\n"),
-		  make_load_iterator(std::cbegin(x)),
-		  make_load_iterator(std::cend(x)),
-		  make_load_iterator(std::cbegin(y)),
-		  make_load_iterator(std::cbegin(z)));
+		  make_accessor(std::cbegin(x)),
+		  make_accessor(std::cend(x)),
+		  make_accessor(std::cbegin(y)),
+		  make_accessor(std::cbegin(z)));
     std::cout << std::endl;
     
     simd::transform<T>(sum(),
-		       make_store_iterator(std::begin(w)),
-		       make_load_iterator(std::cbegin(x)),
-		       make_load_iterator(std::cend(x)),
-		       make_load_iterator(std::cbegin(y)),
-		       make_load_iterator(std::cbegin(z)));
+		       make_accessor(std::begin(w)),
+		       make_accessor(std::cbegin(x)),
+		       make_accessor(std::cend(x)),
+		       make_accessor(std::cbegin(y)),
+		       make_accessor(std::cbegin(z)));
 		       
-    std::copy(make_load_iterator(std::cbegin(w)),
-	      make_load_iterator(std::cend(w)),
+    std::copy(make_accessor(std::cbegin(w)),
+	      make_accessor(std::cend(w)),
 	      std::ostream_iterator<vec<O> >(std::cout, "\n"));
 }
     

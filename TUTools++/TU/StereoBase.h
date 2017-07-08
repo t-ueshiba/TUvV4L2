@@ -123,53 +123,23 @@ struct Blend
 };
 
 /************************************************************************
-*  make_col_load_iterator(COL)						*
+*  make_col_accessor(COL)						*
 ************************************************************************/
 template <class COL> inline auto
-make_col_load_iterator(COL col)
+make_col_accessor(COL col)
 {
 #if defined(SIMD)
-    return simd::make_load_iterator(col);
+    return simd::make_accessor(col);
 #else
     return col;
 #endif
 }
     
 template <class ITER_TUPLE> inline auto
-make_col_load_iterator(const zip_iterator<ITER_TUPLE>& col)
+make_col_accessor(const zip_iterator<ITER_TUPLE>& col)
 {
 #if defined(SIMD)
-    return simd::make_load_iterator(
-	       make_zip_iterator(
-		   std::make_tuple(
-		       std::get<0>(col.get_iterator_tuple()),
-		       std::get<1>(col.get_iterator_tuple()).operator ->())));
-#else
-    return make_zip_iterator(
-	       std::make_tuple(
-		   std::get<0>(col.get_iterator_tuple()),
-		   std::get<1>(col.get_iterator_tuple()).operator ->()));
-#endif
-}
-    
-/************************************************************************
-*  make_col_store_iterator(COL)						*
-************************************************************************/
-template <class COL> inline auto
-make_col_store_iterator(COL col)
-{
-#if defined(SIMD)
-    return simd::make_store_iterator(col);
-#else
-    return col;
-#endif
-}
-    
-template <class ITER_TUPLE> inline auto
-make_col_store_iterator(const zip_iterator<ITER_TUPLE>& col)
-{
-#if defined(SIMD)
-    return simd::make_store_iterator(
+    return simd::make_accessor(
 	       make_zip_iterator(
 		   std::make_tuple(
 		       std::get<0>(col.get_iterator_tuple()),

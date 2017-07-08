@@ -4,8 +4,9 @@
 #if !defined(TU_SIMD_X86_ARITHMETIC_H)
 #define TU_SIMD_X86_ARITHMETIC_H
 
-#include "TU/simd/zero.h"
 #include "TU/simd/x86/unpack.h"
+#include "TU/simd/zero.h"
+#include "TU/simd/insert_extract.h"
 
 namespace TU
 {
@@ -152,12 +153,68 @@ abs(vec<T> x)				{return max(x, -x);}
 *  Absolute differences							*
 ************************************************************************/
 template <class T> inline vec<T>
-diff(vec<T> x, vec<T> y)	{return select(x > y, x - y, y - x);}
+diff(vec<T> x, vec<T> y)		{return select(x > y, x - y, y - x);}
 template <> inline Iu8vec
-diff(Iu8vec x, Iu8vec y)	{return (x - y) | (y - x);}
+diff(Iu8vec x, Iu8vec y)		{return (x - y) | (y - x);}
 template <> inline Iu16vec
-diff(Iu16vec x, Iu16vec y)	{return (x - y) | (y - x);}
+diff(Iu16vec x, Iu16vec y)		{return (x - y) | (y - x);}
   
+/************************************************************************
+*  Fused multiply-add							*
+************************************************************************/
+#if defined(AVX2)
+  SIMD_TRINARY_FUNC(fma, fmadd, float)
+  SIMD_TRINARY_FUNC(fma, fmadd, double)
+#endif
+
+/************************************************************************
+*  Horizontal addition							*
+************************************************************************/
+template <class T> vec<T>	hadd(vec<T> x, vec<T> y)		;
+  
+#if defined(SSE3)
+#  define SIMD_HADD(type)	SIMD_BINARY_FUNC(hadd, hadd, type)
+#  define SIMD_EMU_HADD(type)	SIMD_BINARY_FUNC(hadd, emu_hadd, type)
+
+#  if defined(AVX2)
+  SIMD_EMU_HADD(int16_t)
+  SIMD_EMU_HADD(int32_t)
+#  elif defined(SSE4)
+  SIMD_HADD(int16_t)
+  SIMD_HADD(int32_t)
+#  endif
+  
+#  if defined(AVX)
+  SIMD_EMU_HADD(float)
+  SIMD_EMU_HADD(double)
+#  else
+  SIMD_HADD(float)
+  SIMD_HADD(double)
+#  endif
+
+#  undef SIMD_HADD
+#  undef SIMD_EMU_HADD
+#endif
+  
+template <class T> inline T
+hadd_impl(vec<T> x, std::integral_constant<size_t, 1>)
+{
+    return extract<0>(x);
+}
+    
+template <class T, size_t I> inline T
+hadd_impl(vec<T> x, std::integral_constant<size_t, I>)
+{
+    return hadd_impl(hadd(x, zero<T>()),
+		     std::integral_constant<size_t, (I >> 1)>());
+}
+
+template <class T> inline T
+hadd(vec<T> x)
+{
+    return hadd_impl(x, std::integral_constant<size_t, vec<T>::size>());
+}
+
 }	// namespace simd
 }	// namespace TU
 #endif	// !TU_SIMD_X86_ARITHMETIC_H

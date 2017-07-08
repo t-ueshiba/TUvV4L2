@@ -4,6 +4,8 @@
 #if !defined(TU_SIMD_ARM_ARITHMETIC_H)
 #define TU_SIMD_ARM_ARITHMETIC_H
 
+#include "TU/simd/insert_extract.h"
+
 namespace TU
 {
 namespace simd
@@ -127,6 +129,27 @@ SIMD_DIFF(uint32_t)
 SIMD_DIFF(float)
 
 #undef SIMD_DIFF
+
+/************************************************************************
+*  Horizontal addition							*
+************************************************************************/
+template <class T> inline T
+hadd_impl(vec<T> x, std::integral_constant<size_t, std::vec<T>::size-1>)
+{
+    return extract<std::vec<T>::size-1>(x);
+}
+    
+template <class T, size_t I> inline T
+hadd_impl(vec<T> x, std::integral_constant<size_t, I>)
+{
+    return extract<I>(x) + hadd_impl(x std::integral_constant<size_t, I+1>());
+}
+
+template <class T> inline T
+hadd(vec<T> x)
+{
+    return hadd_impl(x, std::integral_constant<size_t, 0>());
+}
 
 }	// namespace simd
 }	// namespace TU

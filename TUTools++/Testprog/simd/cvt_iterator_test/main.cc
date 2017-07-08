@@ -3,44 +3,38 @@
  */
 #include "TU/simd/cvtdown_iterator.h"
 #include "TU/simd/cvtup_iterator.h"
-#include "TU/simd/load_iterator.h"
-#include "TU/simd/store_iterator.h"
+#include "TU/simd/load_store_iterator.h"
 
 namespace TU
 {
 namespace simd
 {
-template <class SRC, class DST> void
+template <class S, class T> void
 doJob()
 {
-    using namespace	std;
-    
-    using src_type	= SRC;
-    using dst_type	= DST;
-    using siterator	= load_iterator<src_type>;
-    using diterator	= store_iterator<dst_type>;
-    using src_iterator	= std::conditional_t<
-			      (vec<src_type>::size <= vec<dst_type>::size),
-			      cvtdown_iterator<dst_type, siterator>,
-			      siterator>;
-    using dst_iterator	= std::conditional_t<
-			      (vec<src_type>::size <= vec<dst_type>::size),
-			      diterator,
-			      cvtup_iterator<diterator> >;
+    using siterator	= load_iterator<S>;
+    using diterator	= store_iterator<T>;
+    using src_iterator	= std::conditional_t<(vec<S>::size <= vec<T>::size),
+					     cvtdown_iterator<T, siterator>,
+					     siterator>;
+    using dst_iterator	= std::conditional_t<(vec<S>::size <= vec<T>::size),
+					     diterator,
+					     cvtup_iterator<diterator> >;
 
-    src_type	src[] = { 0,  1,  2,  3,  4,  5,  6,  7,
-			  8,  9, 10, 11, 12, 13, 14, 15,
-			 16, 17, 18, 19, 20, 21, 22, 23,
-			 24, 25, 26, 27, 28, 29, 30, 31};
-    dst_type	dst[32];
+    S	src[] = { 0,  1,  2,  3,  4,  5,  6,  7,
+		  8,  9, 10, 11, 12, 13, 14, 15,
+		 16, 17, 18, 19, 20, 21, 22, 23,
+		 24, 25, 26, 27, 28, 29, 30, 31};
+    T	dst[32];
 
-    copy(src_iterator(&src[0]), src_iterator(&src[32]), dst_iterator(&dst[0]));
+    std::copy(src_iterator(std::cbegin(src)), src_iterator(std::cend(src)),
+	      dst_iterator(std::begin(dst)));
 
     empty();
     
-    for (const dst_type* q = dst; q != dst + 32; ++q)
-	cout << ' ' << int(*q);
-    cout << endl;
+    for (auto x : dst)
+	std::cout << ' ' << int(x);
+    std::cout << std::endl;
 }
     
 }

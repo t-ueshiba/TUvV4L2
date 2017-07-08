@@ -402,13 +402,12 @@ Warp::warpLine(IN in, OUT out, const FracArray& frac) const
     const auto	n = simd::vec<u_char>::floor(std::distance(u, ue));
 
     simd::transform<T>(interpolate,
-		       simd::make_store_iterator<false>(
-			   reinterpret_cast<O>(out)),
-		       simd::make_load_iterator(u),
-		       simd::make_load_iterator(u + n),
-		       simd::make_load_iterator(v),
-		       simd::make_load_iterator(du),
-		       simd::make_load_iterator(dv));
+		       simd::make_accessor(reinterpret_cast<O>(out)),
+		       simd::make_accessor(u),
+		       simd::make_accessor(u + n),
+		       simd::make_accessor(v),
+		       simd::make_accessor(du),
+		       simd::make_accessor(dv));
     simd::empty();
 
     std::advance(u,   n);

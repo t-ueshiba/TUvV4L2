@@ -2,28 +2,25 @@
  *  $Id$
  */
 #include "TU/simd/cvt_iterator.h"
-#include "TU/simd/load_iterator.h"
-#include "TU/simd/store_iterator.h"
+#include "TU/simd/load_store_iterator.h"
 #include <typeinfo>
 
 namespace TU
 {
 namespace simd
 {
-template <class SRC, class DST> void
+template <class S, class T> void
 doJob()
 {
-    using src_type	= SRC;
-    using dst_type	= DST;
-    using siterator	= cvt_iterator<dst_type, load_iterator<src_type> >;
-    using value_type	= typename std::iterator_traits<siterator>::value_type;
+    using value_type = typename cvt_iterator<T, load_iterator<S> >::value_type;
     
-    src_type	src[] = { 0,  1,  2,  3,  4,  5,  6,  7,
-			  8,  9, 10, 11, 12, 13, 14, 15,
-			 16, 17, 18, 19, 20, 21, 22, 23,
-			 24, 25, 26, 27, 28, 29, 30, 31};
+    S	src[] = { 0,  1,  2,  3,  4,  5,  6,  7,
+		  8,  9, 10, 11, 12, 13, 14, 15,
+		 16, 17, 18, 19, 20, 21, 22, 23,
+		 24, 25, 26, 27, 28, 29, 30, 31};
 
-    std::copy(siterator(std::cbegin(src)), siterator(std::cend(src)),
+    std::copy(make_cvt_iterator<T>(make_accessor(std::cbegin(src))),
+	      make_cvt_iterator<T>(make_accessor(std::cend(src))),
 	      std::ostream_iterator<value_type>(std::cout, " "));
     std::cout << std::endl;
   /*

@@ -5,8 +5,7 @@
 #define TU_SIMD_BUFTRAITS_H
 
 #include "TU/simd/allocator.h"
-#include "TU/simd/store_iterator.h"
-#include "TU/simd/load_iterator.h"
+#include "TU/simd/load_store_iterator.h"
 #include "TU/Array++.h"
 
 namespace TU

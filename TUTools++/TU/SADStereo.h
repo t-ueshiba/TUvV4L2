@@ -384,13 +384,13 @@ SADStereo<SCORE, DISP>::initializeDissimilarities(COL colL, COL colLe,
 	    auto	P = make_zip_iterator(
 				std::make_tuple(
 				    boost::make_transform_iterator(
-					make_col_load_iterator(colRV),
+					make_col_accessor(colRV),
 					diff_t(*colL,
 					       _params.intensityDiffMax)),
 				    boost::make_transform_iterator(
 					make_transform_iterator2(
-					    make_col_load_iterator(colRV) + 1,
-					    make_col_load_iterator(colRV) - 1,
+					    make_col_accessor(colRV) + 1,
+					    make_col_accessor(colRV) - 1,
 					    Minus()),
 					ddiff_t(*(colL + 1) - *(colL - 1),
 						_params.derivativeDiffMax))));
@@ -412,7 +412,7 @@ SADStereo<SCORE, DISP>::initializeDissimilarities(COL colL, COL colLe,
 	for (; colL != colLe; ++colL)
 	{
 	    const auto	diff = diff_t(*colL, _params.intensityDiffMax);
-	    auto	in   = make_col_load_iterator(colRV);
+	    auto	in   = make_col_accessor(colRV);
 	    
 	    for (qiterator Q(colQ->begin()), Qe(colQ->end());
 		 Q != Qe; ++Q, ++in)
@@ -461,24 +461,24 @@ SADStereo<SCORE, DISP>::updateDissimilarities(COL colL,  COL colLe,
 	    auto	P = make_zip_iterator(
 				std::make_tuple(
 				    boost::make_transform_iterator(
-					make_col_load_iterator(colRV),
+					make_col_accessor(colRV),
 					diff_t(*colL,
 					       _params.intensityDiffMax)),
 				    boost::make_transform_iterator(
 					make_transform_iterator2(
-					    make_col_load_iterator(colRV) + 1,
-					    make_col_load_iterator(colRV) - 1,
+					    make_col_accessor(colRV) + 1,
+					    make_col_accessor(colRV) - 1,
 					    Minus()),
 					ddiff_t(*(colL + 1) - *(colL - 1),
 						_params.derivativeDiffMax)),
 				    boost::make_transform_iterator(
-					make_col_load_iterator(colRVp),
+					make_col_accessor(colRVp),
 					diff_t(*colLp,
 					       _params.intensityDiffMax)),
 				    boost::make_transform_iterator(
 					make_transform_iterator2(
-					    make_col_load_iterator(colRVp) + 1,
-					    make_col_load_iterator(colRVp) - 1,
+					    make_col_accessor(colRVp) + 1,
+					    make_col_accessor(colRVp) - 1,
 					    Minus()),
 					ddiff_t(*(colLp + 1) - *(colLp - 1),
 						_params.derivativeDiffMax))));
@@ -501,8 +501,8 @@ SADStereo<SCORE, DISP>::updateDissimilarities(COL colL,  COL colLe,
 	{
 	    const auto	diff_p = diff_t(*colLp, _params.intensityDiffMax);
 	    const auto	diff_n = diff_t(*colL,  _params.intensityDiffMax);
-	    auto	in_p   = make_col_load_iterator(colRVp);
-	    auto	in_n   = make_col_load_iterator(colRV);
+	    auto	in_p   = make_col_accessor(colRVp);
+	    auto	in_n   = make_col_accessor(colRV);
 	
 	    for (qiterator Q(colQ->begin()), Qe(colQ->end());
 		 Q != Qe; ++Q, ++in_p, ++in_n)
@@ -549,7 +549,7 @@ SADStereo<SCORE, DISP>::computeDisparities(const_reverse_col_siterator colQ,
 					subiterator<RMIN_RV> >;
 #endif
 	Idx<DisparityVec>	index;
-	auto			dminRVt = make_col_store_iterator(--dminRV);
+	auto			dminRVt = make_col_accessor(--dminRV);
 #if defined(SIMD) && defined(WITHOUT_CVTDOWN)
 	miterator	maskRV(make_mask_iterator(boxR->cbegin(),
 						  begin(*RminRV)));

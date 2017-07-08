@@ -50,7 +50,7 @@ begin(T* p)
 template <class T> inline T*
 end(T* p)
 {
-    constexpr size_t	vsize = sizeof(vec<typename std::remove_cv<T>::type>);
+    constexpr size_t	vsize = sizeof(vec<std::remove_cv_t<T> >);
     p = reinterpret_cast<T*>((char*)p - vsize + 1);
 
     return begin(p);
@@ -71,6 +71,14 @@ class ptr : public boost::iterator_adaptor<ptr<T>, T*>
     T*	get()			const	{ return super::base(); }
 	operator T*()		const	{ return super::base(); }
 };
+
+template <class T> inline ptr<T>
+mid(ptr<T> p, size_t n)
+{
+    constexpr size_t	vsize = vec<std::remove_cv_t<T> >::size;
+    
+    return {p.get() + (n/vsize)*vsize};
+}
     
 /************************************************************************
 *  Load/Store								*
