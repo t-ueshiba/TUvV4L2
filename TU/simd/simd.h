@@ -28,8 +28,7 @@
 #  include "TU/simd/transform.h"
 #  include "TU/simd/lookup.h"
 
-#  include "TU/simd/load_iterator.h"
-#  include "TU/simd/store_iterator.h"
+#  include "TU/simd/load_store_iterator.h"
 #  include "TU/simd/cvtdown_iterator.h"
 #  include "TU/simd/cvtup_iterator.h"
 #  include "TU/simd/shift_iterator.h"

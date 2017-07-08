@@ -400,7 +400,7 @@ fill(ITER begin, ARG arg, const T& val)
 }
     
 /************************************************************************
-*  for_each<N>(ITER0 begin, ARG arg, ITER1 BEGIN1, FUNC func)		*
+*  for_each<N>(ITER0 begin, ARG arg, ITER1 begin1, FUNC func)		*
 ************************************************************************/
 namespace detail
 {
@@ -477,40 +477,41 @@ copy(IN in, ARG arg, OUT out)
 }
 
 /************************************************************************
-*  inner_product<N>(ITER0 begin0, ARG arg, ITER1 begin1, const T& init)	*
+*  inner_product<N>(ITER0 begin0, ARG arg, ITER1 begin1, T init)	*
 ************************************************************************/
+template <class X, class Y, class Z>
+inline Z	fma(X x, Y y, Z z)	{ return x*y + z; }
+    
 namespace detail
 {
-  template <class ITER0, class ITER1, class T> inline T
-  inner_product(ITER0 begin0, ITER0 end0, ITER1 begin1, const T& init,
+  template <class ITER0, class ITER1, class T> T
+  inner_product(ITER0 begin0, ITER0 end0, ITER1 begin1, T init,
 		std::integral_constant<size_t, 0>)
   {
-      auto	val = init;
       for (; begin0 != end0; ++begin0, ++begin1)
-	  val += *begin0 * *begin1;
-      return val;
+	  init = fma(*begin0, *begin1, init);
+      return init;
   }
   template <class ITER0, class ITER1, class T> T
-  inner_product(ITER0 begin0, size_t n, ITER1 begin1, const T& init,
+  inner_product(ITER0 begin0, size_t n, ITER1 begin1, T init,
 		std::integral_constant<size_t, 0>)
   {
-      auto	val = init;
       for (size_t i = 0; i != n; ++i, ++begin0, ++begin1)
-	  val += *begin0 * *begin1;
-      return val;
+	  init = fma(*begin0, *begin1, init);
+      return init;
   }
   template <class ITER0, class ARG, class ITER1, class T> inline T
-  inner_product(ITER0 begin0, ARG, ITER1 begin1, const T& init,
+  inner_product(ITER0 begin0, ARG, ITER1 begin1, T init,
 		std::integral_constant<size_t, 1>)
   {
-      return init + *begin0 * *begin1;
+      return fma(*begin0, *begin1, init);
   }
   template <class ITER0, class ARG, class ITER1, class T, size_t N> inline T
-  inner_product(ITER0 begin0, ARG arg, ITER1 begin1, const T& init,
+  inner_product(ITER0 begin0, ARG arg, ITER1 begin1, T init,
 		std::integral_constant<size_t, N>)
   {
       return inner_product(begin0 + 1, arg, begin1 + 1,
-			   init + *begin0 * *begin1,
+			   fma(*begin0, *begin1, init),
 			   std::integral_constant<size_t, N-1>());
   }
 }	// namespace detail
@@ -526,7 +527,7 @@ namespace detail
   \return	内積の値
 */
 template <size_t N, class ITER0, class ARG, class ITER1, class T> inline T
-inner_product(ITER0 begin0, ARG arg, ITER1 begin1, const T& init)
+inner_product(ITER0 begin0, ARG arg, ITER1 begin1, T init)
 {
 #ifdef TU_DEBUG
     std::cout << "inner_product<" << N << "> ["
@@ -599,7 +600,7 @@ square(ITER begin, ARG arg)
   \retrun	2乘値
 */ 
 template <class T> inline std::enable_if_t<std::is_arithmetic<T>::value, T>
-square(const T& val)
+square(T val)
 {
     return detail::square(val);
 }

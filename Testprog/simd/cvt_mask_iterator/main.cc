@@ -3,34 +3,29 @@
  */
 #include <iomanip>
 #include "TU/simd/cvt_iterator.h"
-#include "TU/simd/load_iterator.h"
-#include "TU/simd/store_iterator.h"
+#include "TU/simd/load_store_iterator.h"
 
 namespace TU
 {
 namespace simd
 {
-template <class SRC, class DST> void
+template <class S, class T> void
 doJob()
 {
-    typedef SRC							src_type;
-    typedef DST							dst_type;
-    typedef cvt_mask_iterator<dst_type, load_iterator<src_type> >
-								siterator;
-    typedef typename std::iterator_traits<siterator>::value_type
-								value_type;
+    using value_type
+	= typename cvt_mask_iterator<T, load_iterator<S> >::value_type;
     
-    constexpr src_type	f = src_type(~0);
-    src_type		src[] = {0, f, 0, f, 0, 0, f, f,
-				 0, 0, 0, 0, f, f, f, f,
-				 0, f, 0, f, 0, 0, f, f,
-				 0, 0, 0, 0, f, f, f, f};
+    constexpr S	f = S(~0);
+    S		src[] = {0, f, 0, f, 0, 0, f, f,
+			 0, 0, 0, 0, f, f, f, f,
+			 0, f, 0, f, 0, 0, f, f,
+			 0, 0, 0, 0, f, f, f, f};
 
     std::cout << std::hex;
-    copy(siterator(std::cbegin(src)), siterator(std::cend(src)),
-	 std::ostream_iterator<value_type>(std::cout, " "));
+    std::copy(make_cvt_mask_iterator<T>(make_accessor(std::cbegin(src))),
+	      make_cvt_mask_iterator<T>(make_accessor(std::cend(src))),
+	      std::ostream_iterator<value_type>(std::cout, " "));
     std::cout << std::endl;
-
     empty();
 }
     

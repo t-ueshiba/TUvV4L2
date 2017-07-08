@@ -549,13 +549,13 @@ GFStereo<SCORE, DISP>::initializeFilterParameters(COL colL, COL colLe,
 	    auto	P = make_zip_iterator(
 				std::make_tuple(
 				    boost::make_transform_iterator(
-					make_col_load_iterator(colRV),
+					make_col_accessor(colRV),
 					diff_t(pixL,
 					       _params.intensityDiffMax)),
 				    boost::make_transform_iterator(
 					make_transform_iterator2(
-					    make_col_load_iterator(colRV) + 1,
-					    make_col_load_iterator(colRV) - 1,
+					    make_col_accessor(colRV) + 1,
+					    make_col_accessor(colRV) - 1,
 					    Minus()),
 					ddiff_t(*(colL + 1) - *(colL - 1),
 						_params.derivativeDiffMax))));
@@ -586,7 +586,7 @@ GFStereo<SCORE, DISP>::initializeFilterParameters(COL colL, COL colLe,
 	{
 	    const auto		pixL = *colL;
 	    const diff_t	diff(pixL, _params.intensityDiffMax);
-	    auto		in = make_col_load_iterator(colRV);
+	    auto		in = make_col_accessor(colRV);
 	
 	    for (qiterator Q( make_assignment_iterator(begin(*colQ),
 						       init_params(pixL))),
@@ -643,24 +643,24 @@ GFStereo<SCORE, DISP>::updateFilterParameters(COL colL, COL colLe, COL_RV colRV,
 	    auto	P = make_zip_iterator(
 				std::make_tuple(
 				    boost::make_transform_iterator(
-					make_col_load_iterator(colRV),
+					make_col_accessor(colRV),
 					diff_t(*colL,
 					       _params.intensityDiffMax)),
 				    boost::make_transform_iterator(
 					make_transform_iterator2(
-					    make_col_load_iterator(colRV) + 1,
-					    make_col_load_iterator(colRV) - 1,
+					    make_col_accessor(colRV) + 1,
+					    make_col_accessor(colRV) - 1,
 					    Minus()),
 					ddiff_t(*(colL + 1) - *(colL - 1),
 						_params.derivativeDiffMax)),
 				    boost::make_transform_iterator(
-					make_col_load_iterator(colRVp),
+					make_col_accessor(colRVp),
 					diff_t(*colLp,
 					       _params.intensityDiffMax)),
 				    boost::make_transform_iterator(
 					make_transform_iterator2(
-					    make_col_load_iterator(colRVp) + 1,
-					    make_col_load_iterator(colRVp) - 1,
+					    make_col_accessor(colRVp) + 1,
+					    make_col_accessor(colRVp) - 1,
 					    Minus()),
 					ddiff_t(*(colLp + 1) - *(colLp - 1),
 						_params.derivativeDiffMax))));
@@ -693,8 +693,8 @@ GFStereo<SCORE, DISP>::updateFilterParameters(COL colL, COL colLe, COL_RV colRV,
 	    const auto		pixL  = *colL;
 	    const diff_t	diff_p(pixLp, _params.intensityDiffMax),
 				diff_n(pixL,  _params.intensityDiffMax);
-	    auto		in_p = make_col_load_iterator(colRVp);
-	    auto		in_n = make_col_load_iterator(colRV);
+	    auto		in_p = make_col_accessor(colRVp);
+	    auto		in_n = make_col_accessor(colRV);
 	
 	    for (qiterator Q( make_assignment_iterator(
 				  begin(*colQ),
@@ -776,7 +776,7 @@ GFStereo<SCORE, DISP>::computeDisparities(const_reverse_col_siterator colB,
 					subiterator<RMIN_RV> >;
 #endif
 	Idx<DisparityVec>	index;
-	auto			dminRVt = make_col_store_iterator(--dminRV);
+	auto			dminRVt = make_col_accessor(--dminRV);
 #if defined(SIMD) && defined(WITHOUT_CVTDOWN)
 	miterator	maskRV(make_mask_iterator(R.cbegin(),
 						  begin(*RminRV)));
