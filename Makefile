@@ -136,7 +136,6 @@ HDRS		= TU/Array++.h \
 		TU/simd/shift_iterator.h \
 		TU/simd/simd.h \
 		TU/simd/transform.h \
-		TU/simd/transform_iterator.h \
 		TU/simd/type_traits.h \
 		TU/simd/vec.h \
 		TU/simd/x86/arch.h \

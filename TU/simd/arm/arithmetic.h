@@ -134,21 +134,21 @@ SIMD_DIFF(float)
 *  Horizontal addition							*
 ************************************************************************/
 template <class T> inline T
-hadd_impl(vec<T> x, std::integral_constant<size_t, std::vec<T>::size-1>)
+hadd_impl(vec<T> x, std::integral_constant<size_t, 0>)
 {
-    return extract<std::vec<T>::size-1>(x);
+    return extract<0>(x);
 }
     
 template <class T, size_t I> inline T
 hadd_impl(vec<T> x, std::integral_constant<size_t, I>)
 {
-    return extract<I>(x) + hadd_impl(x std::integral_constant<size_t, I+1>());
+    return hadd_impl(x, std::integral_constant<size_t, I-1>()) + extract<I>(x);
 }
 
 template <class T> inline T
 hadd(vec<T> x)
 {
-    return hadd_impl(x, std::integral_constant<size_t, 0>());
+    return hadd_impl(x, std::integral_constant<size_t, vec<T>::size-1>());
 }
 
 }	// namespace simd
