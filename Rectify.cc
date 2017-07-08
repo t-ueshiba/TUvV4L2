@@ -4,7 +4,6 @@
   \brief	クラス TU::Rectify の実装
 */
 #include "TU/Rectify.h"
-#include "TU/algorithm.h"
 
 namespace TU
 {
