@@ -1347,6 +1347,17 @@ transpose(const E& expr)
     return make_range<SIZE>(column_begin(expr), size<1>(expr));
 }
 
+//! 転置された2次元配列式をさらに転置して元に戻す
+/*
+  \param r	転置された2次元配列式を表すレンジ
+  \return	r をさらに転置した2次元配列式
+ */ 
+template <class ROW, size_t NROWS, size_t NCOLS> inline auto
+transpose(const range<column_iterator<ROW, NROWS>, NCOLS>& r)
+{
+    return make_range<NROWS>(r.begin()->begin().base(), size<1>(r));
+}
+
 //! 与えられた式の各要素の自乗和を求める.
 /*!
   \param x	式
