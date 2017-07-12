@@ -139,10 +139,8 @@ template <class L, class R,
 inline auto
 operator *(L&& l, R&& r)
 {
-    constexpr size_t	S = size0<value_t<R> >();
     return detail::make_product_opnode(
-		make_range<S>(column_begin(r), size<1>(r)),
-		std::forward<L>(l),
+		transpose(r), std::forward<L>(l),
 		[](auto&& x, auto&& y)
 		{ return std::forward<decltype(x)>(x)
 		       * std::forward<decltype(y)>(y); });
