@@ -119,8 +119,8 @@ main()
 		      domain_iterator(&domain + f.nrow(), domain));
 
 	domain_type	x(f.nrow());
-	value_type	val = dp(boost::make_transform_iterator(
-				     f.begin(), generator_type(g)),
+	value_type	val = dp(make_transform_iterator1(f.begin(),
+							  generator_type(g)),
 				 x.rbegin());
 	dp.put(cout);
 	

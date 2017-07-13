@@ -318,14 +318,11 @@ template <class ITER, size_t SIZE=0>
 class range
 {
   public:
-    using iterator		= ITER;
-    using reverse_iterator	= std::reverse_iterator<iterator>;
-    using value_type		= iterator_value<iterator>;
-    using reference		= iterator_reference<iterator>;
+    using value_type	= iterator_value<ITER>;
     
   public:
-		range(iterator begin)		:_begin(begin)	{}
-		range(iterator begin, size_t)	:_begin(begin)	{}
+		range(ITER begin)		:_begin(begin)	{}
+		range(ITER begin, size_t)	:_begin(begin)	{}
     
 		range()						= delete;
 		range(const range&)				= default;
@@ -338,7 +335,7 @@ class range
     range&	operator =(range&&)				= default;
     
     template <class ITER_,
-	      std::enable_if_t<std::is_convertible<ITER_, iterator>::value>*
+	      std::enable_if_t<std::is_convertible<ITER_, ITER>::value>*
 	      = nullptr>
 		range(const range<ITER_, SIZE>& r)
 		    :_begin(r.begin())
@@ -357,7 +354,7 @@ class range
 		}
 
 		range(std::initializer_list<value_type> args)
-		    :_begin(const_cast<iterator>(args.begin()))
+		    :_begin(const_cast<ITER>(args.begin()))
     		{
 		    assert(args.size() == size());
 		}
@@ -376,25 +373,26 @@ class range
 		}
 
     constexpr static
-    size_t	size0()			{ return SIZE; }
+    size_t	size0()		{ return SIZE; }
     constexpr static
-    size_t	size()			{ return SIZE; }
-    auto	begin()		const	{ return _begin; }
-    auto	end()		const	{ return _begin + SIZE; }
-    auto	cbegin()	const	{ return begin(); }
-    auto	cend()		const	{ return end(); }
-    auto	rbegin()	const	{ return reverse_iterator(end()); }
-    auto	rend()		const	{ return reverse_iterator(begin()); }
-    auto	crbegin()	const	{ return rbegin(); }
-    auto	crend()		const	{ return rend(); }
-    reference	operator [](size_t i) const
+    size_t	size()		{ return SIZE; }
+    auto	begin()	  const	{ return _begin; }
+    auto	end()	  const	{ return _begin + SIZE; }
+    auto	cbegin()  const	{ return begin(); }
+    auto	cend()	  const	{ return end(); }
+    auto	rbegin()  const	{ return std::make_reverse_iterator(end()); }
+    auto	rend()	  const	{ return std::make_reverse_iterator(begin()); }
+    auto	crbegin() const	{ return rbegin(); }
+    auto	crend()	  const	{ return rend(); }
+    decltype(auto)
+		operator [](size_t i) const
 		{
 		    assert(i < size());
 		    return *(_begin + i);
 		}
     
   private:
-    const iterator	_begin;
+    const ITER	_begin;
 };
 
 //! 可変長レンジ
@@ -405,13 +403,10 @@ template <class ITER>
 class range<ITER, 0>
 {
   public:
-    using iterator		= ITER;
-    using reverse_iterator	= std::reverse_iterator<iterator>;
-    using value_type		= iterator_value<iterator>;
-    using reference		= iterator_reference<iterator>;
+    using value_type	= iterator_value<ITER>;
     
   public:
-		range(iterator begin, size_t size)
+		range(ITER begin, size_t size)
 		    :_begin(begin), _size(size)			{}
     
 		range()						= delete;
@@ -426,7 +421,7 @@ class range<ITER, 0>
     range&	operator =(range&&)				= default;
     
     template <class ITER_,
-	      std::enable_if_t<std::is_convertible<ITER_, iterator>::value>*
+	      std::enable_if_t<std::is_convertible<ITER_, ITER>::value>*
 	      = nullptr>
 		range(const range<ITER_, 0>& r)
 		    :_begin(r.begin()), _size(r.size())
@@ -445,7 +440,7 @@ class range<ITER, 0>
 		}
 		
 		range(std::initializer_list<value_type> args)
-		    :_begin(const_cast<iterator>(args.begin())),
+		    :_begin(const_cast<ITER>(args.begin())),
 		     _size(args.size())
     		{
 		}
@@ -464,24 +459,25 @@ class range<ITER, 0>
 		}
 
     constexpr static
-    size_t	size0()			{ return 0; }
-    size_t	size()		const	{ return _size; }
-    auto	begin()		const	{ return _begin; }
-    auto	end()		const	{ return _begin + _size; }
-    auto	cbegin()	const	{ return begin(); }
-    auto	cend()		const	{ return end(); }
-    auto	rbegin()	const	{ return reverse_iterator(end()); }
-    auto	rend()		const	{ return reverse_iterator(begin()); }
-    auto	crbegin()	const	{ return rbegin(); }
-    auto	crend()		const	{ return rend(); }
-    reference	operator [](size_t i) const
+    size_t	size0()		{ return 0; }
+    size_t	size()	  const	{ return _size; }
+    auto	begin()	  const	{ return _begin; }
+    auto	end()	  const	{ return _begin + _size; }
+    auto	cbegin()  const	{ return begin(); }
+    auto	cend()	  const	{ return end(); }
+    auto	rbegin()  const	{ return std::make_reverse_iterator(end()); }
+    auto	rend()	  const	{ return std::make_reverse_iterator(begin()); }
+    auto	crbegin() const	{ return rbegin(); }
+    auto	crend()	  const	{ return rend(); }
+    decltype(auto)
+		operator [](size_t i) const
 		{
 		    assert(i < size());
 		    return *(_begin + i);
 		}
 
   private:
-    const iterator	_begin;
+    const ITER		_begin;
     const size_t	_size;
 };
 
@@ -1095,19 +1091,28 @@ namespace detail
   class unary_opnode : public opnode
   {
     public:
-      using iterator	= boost::transform_iterator<OP, iterator_t<const E> >;
-      using reference	= iterator_reference<iterator>;
-      
-    public:
 		unary_opnode(E&& expr, OP op)
 		    :_expr(std::forward<E>(expr)), _op(op)	{}
 
-      constexpr static size_t
-		size0()		{ return TU::size0<E>(); }
-      iterator	begin()	const	{ return {std::begin(_expr), _op}; }
-      iterator	end()	const	{ return {std::end(_expr),   _op}; }
-      size_t	size()	const	{ return std::size(_expr); }
-      reference	operator [](size_t i) const
+      constexpr static auto
+		size0()
+		{
+		    return TU::size0<E>();
+		}
+      auto	begin()	const
+		{
+		    return make_transform_iterator1(std::begin(_expr), _op);
+		}
+      auto	end() const
+		{
+		    return make_transform_iterator1(std::end(_expr), _op);
+		}
+      auto	size() const
+		{
+		    return std::size(_expr);
+		}
+      decltype(auto)
+		operator [](size_t i) const
 		{
 		    assert(i < size());
 		    return *(begin() + i);
@@ -1142,26 +1147,30 @@ namespace detail
   struct binary_opnode : public opnode
   {
     public:
-      using iterator	= transform_iterator2<OP, iterator_t<const L>,
-						  iterator_t<const R> >;
-      using reference	= iterator_reference<iterator>;
-
-    public:
 		binary_opnode(L&& l, R&& r, OP op)
 		    :_l(std::forward<L>(l)), _r(std::forward<R>(r)), _op(op)
 		{
 		    assert(std::size(_l) == std::size(_r));
 		}
 
-      constexpr static size_t
+      constexpr static auto
 		size0()
 	  	{
 		    return max<TU::size0<L>(), TU::size0<R>()>::value;
 		}
-      iterator	begin()	const	{ return {std::begin(_l), std::begin(_r), _op};}
-      iterator	end()	const	{ return {std::end(_l),   std::end(_r),   _op};}
-      size_t	size()	const	{ return std::size(_l); }
-      reference	operator [](size_t i) const
+      auto	begin()	const
+		{
+		    return make_transform_iterator2(std::begin(_l),
+						    std::begin(_r), _op);
+		}
+      auto	end() const
+		{
+		    return make_transform_iterator2(std::end(_l),
+						    std::end(_r), _op);
+		}
+      auto	size()	const	{ return std::size(_l); }
+      decltype(auto)
+		operator [](size_t i) const
 		{
 		    assert(i < size());
 		    return *(begin() + i);

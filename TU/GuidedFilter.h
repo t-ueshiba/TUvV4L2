@@ -132,10 +132,10 @@ GuidedFilter<T>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out) const
     
   // guided filterの2次元係数ベクトルを計算する．
     Array<coeffs_t>	c(super::outLength(std::distance(ib, ie)));
-    super::convolve<T>(boost::make_transform_iterator(
+    super::convolve<T>(make_transform_iterator1(
 			   make_zip_iterator(std::make_tuple(ib, gb)),
 			   init_params()),
-		       boost::make_transform_iterator(
+		       make_transform_iterator1(
 			   make_zip_iterator(std::make_tuple(ie, ge)),
 			   init_params()),
 		       make_assignment_iterator(c.begin(),
@@ -166,8 +166,8 @@ GuidedFilter<T>::convolve(IN ib, IN ie, OUT out) const
     
   // guided filterの2次元係数ベクトルを計算する．
     Array<coeffs_t>	c(super::outLength(std::distance(ib, ie)));
-    super::convolve<T>(boost::make_transform_iterator(ib, init_params()),
-		       boost::make_transform_iterator(ie, init_params()),
+    super::convolve<T>(make_transform_iterator1(ib, init_params()),
+		       make_transform_iterator1(ie, init_params()),
 		       make_assignment_iterator(c.begin(),
 						init_coeffs(winSize(), _e)));
 
@@ -248,12 +248,12 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out) const
     
   // guided filterの2次元係数ベクトルを計算する．
     super::convolve<T>(make_range_iterator(
-			   boost::make_transform_iterator(
+			   make_transform_iterator1(
 			       cbegin(std::make_tuple(*ib, *gb)),
 			       init_params()),
 			   std::make_tuple(stride(ib), stride(gb)), size(*ib)),
 		       make_range_iterator(
-			   boost::make_transform_iterator(
+			   make_transform_iterator1(
 			       cbegin(std::make_tuple(*ie, *ge)),
 			       init_params()),
 			   std::make_tuple(stride(ie), stride(ge)), size(*ie)),
@@ -304,12 +304,12 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, OUT out) const
 
   // guided filterの2次元係数ベクトルを計算する．
     super::convolve<T>(make_range_iterator(
-			   boost::make_transform_iterator(cbegin(*ib),
-							  init_params()),
+			   make_transform_iterator1(cbegin(*ib),
+						    init_params()),
 			   stride(ib), size(*ib)),
 		       make_range_iterator(
-			   boost::make_transform_iterator(cbegin(*ie),
-							  init_params()),
+			   make_transform_iterator1(cbegin(*ie),
+						    init_params()),
 			   stride(ie), size(*ie)),
 		       make_range_iterator(
 			   make_assignment_iterator(c.begin()->begin(),

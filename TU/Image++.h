@@ -1530,9 +1530,9 @@ Image<T, ALLOC>::restoreAndLookupRows(std::istream& in,
 	{
 	    if (!buf.restore(in) || !in.ignore(npads))
 		break;
-	    std::copy(make_pixel_iterator(boost::make_transform_iterator(
+	    std::copy(make_pixel_iterator(make_transform_iterator1(
 					      buf.cbegin(), colormap)),
-		      make_pixel_iterator(boost::make_transform_iterator(
+		      make_pixel_iterator(make_transform_iterator1(
 					      buf.cend(), colormap)),
 		      make_pixel_iterator(std::begin(*row)));
 	}
@@ -1543,9 +1543,9 @@ Image<T, ALLOC>::restoreAndLookupRows(std::istream& in,
 	{
 	    if (!buf.restore(in) || !in.ignore(npads))
 		break;
-	    std::copy(make_pixel_iterator(boost::make_transform_iterator(
+	    std::copy(make_pixel_iterator(make_transform_iterator1(
 					      buf.cbegin(), colormap)),
-		      make_pixel_iterator(boost::make_transform_iterator(
+		      make_pixel_iterator(make_transform_iterator1(
 					      buf.cend(), colormap)),
 		      make_pixel_iterator(std::begin(*row)));
 	}

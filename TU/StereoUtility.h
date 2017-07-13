@@ -140,7 +140,7 @@ class diff_iterator
 		{
 		    const auto&	iter_tuple = super::base().get_iterator_tuple();
 
-		    return make_range(boost::make_transform_iterator(
+		    return make_range(make_transform_iterator1(
 					  std::get<1>(iter_tuple),
 					  Diff<T>(*std::get<0>(iter_tuple),
 						  _thresh)),
