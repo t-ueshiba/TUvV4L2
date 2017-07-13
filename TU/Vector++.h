@@ -130,6 +130,8 @@ operator *(L&& l, R&& r)
 
 //! 1次元配列式と2次元配列式の積をとる.
 /*!
+  右辺の2次元配列式 r がrow major order. l の各要素を係数とした r の各行の
+  線型結合を計算する．
   \param l	左辺の1次元配列式
   \param r	右辺の2次元配列式
   \return	積を表す演算子ノード
@@ -138,6 +140,27 @@ template <class L, class R,
 	  std::enable_if_t<rank<L>() == 1 && rank<R>() == 2>* = nullptr>
 inline auto
 operator *(L&& l, R&& r)
+{
+    using result_type = decltype(evaluate(*std::cbegin(l) * *std::cbegin(r)));
+    
+    constexpr auto	S = detail::max<size0<L>(), size0<R>()>::value;
+    result_type		val(size<1>(r));
+    for_each<S>(std::cbegin(l), std::size(l), std::cbegin(r),
+		[&val](const auto& x, const auto& y){ val += x * y; });
+    return val;
+}
+
+//! 1次元配列式と2次元配列式の積をとる.
+/*!
+  右辺の2次元配列式 r がcolumn major order. l と r の各列の内積を計算する．
+  \param l	左辺の1次元配列式
+  \param r	右辺の2次元配列式
+  \return	積を表す演算子ノード
+*/
+template <class L, class ROW, size_t NROWS, size_t NCOLS,
+	  std::enable_if_t<rank<L>() == 1>* = nullptr>
+inline auto
+operator *(L&& l, const range<column_iterator<ROW, NROWS>, NCOLS>& r)
 {
     return detail::make_product_opnode(
 		transpose(r), std::forward<L>(l),
