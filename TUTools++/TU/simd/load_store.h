@@ -38,9 +38,9 @@ namespace simd
 *  functions for supporting memory alignment				*
 ************************************************************************/
 template <class T> inline T*
-begin(T* p)
+floor(T* p)
 {
-    constexpr size_t	vsize = sizeof(vec<typename std::remove_cv<T>::type>);
+    constexpr size_t	vsize = sizeof(vec<std::remove_cv_t<T> >);
     size_t		space = 2*vsize - 1;
     void*		q = const_cast<void*>(p);
     
@@ -48,12 +48,12 @@ begin(T* p)
 }
 
 template <class T> inline T*
-end(T* p)
+ceil(T* p)
 {
     constexpr size_t	vsize = sizeof(vec<std::remove_cv_t<T> >);
-    p = reinterpret_cast<T*>((char*)p - vsize + 1);
+    p = reinterpret_cast<T*>(reinterpret_cast<char*>(p) - vsize + 1);
 
-    return begin(p);
+    return floor(p);
 }
 
 /************************************************************************
@@ -72,12 +72,18 @@ class ptr : public boost::iterator_adaptor<ptr<T>, T*>
 	operator T*()		const	{ return super::base(); }
 };
 
-template <class T> inline ptr<T>
-mid(ptr<T> p, size_t n)
+template <class T> inline size_t
+end(size_t n)
 {
     constexpr size_t	vsize = vec<std::remove_cv_t<T> >::size;
     
-    return {p.get() + (n/vsize)*vsize};
+    return (n - 1)/vsize + 1;
+}
+    
+template <class T> inline auto
+end(ptr<T> p)
+{
+    return make_accessor(ceil(p.get()));
 }
     
 /************************************************************************

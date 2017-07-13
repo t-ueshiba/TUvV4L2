@@ -46,6 +46,8 @@ class allocator
 		    if (n == 0)
 			return nullptr;
 
+		    const auto	m = align<T>::value/sizeof(T);
+		    n = ((n - 1)/m + 1)*m;
 		    void*	p;
 		    if (posix_memalign(&p, align<T>::value, n*sizeof(T)))
 			throw std::bad_alloc();

@@ -330,6 +330,12 @@ size(const std::tuple<T...>& t)
     return size(std::get<0>(t));
 }
 
+template <class FUNC, class ITER> inline boost::transform_iterator<FUNC, ITER>
+make_transform_iterator1(const ITER& iter, FUNC func)
+{
+    return {iter, func};
+}
+
 /************************************************************************
 *  make_mbr_iterator<ITER, T>						*
 ************************************************************************/
@@ -341,7 +347,7 @@ size(const std::tuple<T...>& t)
 template <class ITER, class T> inline auto
 make_mbr_iterator(const ITER& iter, T iterator_value<ITER>::* mbr)
 {
-    return boost::make_transform_iterator(
+    return make_transform_iterator1(
 	       iter,
 	       std::function<std::conditional_t<
 				 std::is_same<iterator_pointer<ITER>,
