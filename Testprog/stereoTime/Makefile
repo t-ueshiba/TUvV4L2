@@ -13,7 +13,7 @@ IDLS		=
 MOCHDRS		=
 
 INCDIRS		= -I../..
-CPPFLAGS	= -DNDEBUG -DPROFILE #-DUSE_TBB #-DWITHOUT_CVTDOWN
+CPPFLAGS	= -DNDEBUG -DPROFILE -DUSE_TBB #-DWITHOUT_CVTDOWN
 CFLAGS		= -O3
 NVCCFLAGS	= -O
 ifeq ($(shell arch),armv7l)
@@ -128,8 +128,10 @@ EXTHDRS		= ../../TU/Array++.h \
 		../../TU/simd/zero.h \
 		../../TU/tuple.h
 HDRS		=
-SRCS		= main.cc
-OBJS		= main.o
+SRCS		= Rectify.cc \
+		main.cc
+OBJS		= Rectify.o \
+		main.o
 
 #include $(PROJECT)/lib/rtc.mk		# IDLHDRS, IDLSRCS, CPPFLAGS, OBJS, LIBS
 #include $(PROJECT)/lib/qt.mk		# MOCSRCS, OBJS
