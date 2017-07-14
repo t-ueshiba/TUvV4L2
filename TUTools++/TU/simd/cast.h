@@ -1,6 +1,8 @@
-/*
- *  $Id$
- */
+/*!
+  \file		cast.h
+  \author	Toshio UESHIBA
+  \brief	SIMDベクトル間のキャスト関数の定義
+*/
 #if !defined(TU_SIMD_CAST_H)
 #define TU_SIMD_CAST_H
 

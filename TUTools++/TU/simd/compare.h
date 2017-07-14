@@ -1,6 +1,8 @@
-/*
- *  $Id$
- */
+/*!
+  \file		compare.h
+  \author	Toshio UESHIBA
+  \brief	SIMDベクトルに対する比較演算の定義
+*/
 #if !defined(TU_SIMD_COMPARE_H)
 #define TU_SIMD_COMPARE_H
 

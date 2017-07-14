@@ -1,6 +1,8 @@
-/*
- *  $Id$
- */
+/*!
+  \file		insert_extract.h
+  \author	Toshio UESHIBA
+  \brief	SIMDベクトルの指定された成分にアクセスする関数の定義
+*/
 #if !defined(TU_SIMD_INSERT_EXTRACT_H)
 #define TU_SIMD_INSERT_EXTRACT_H
 

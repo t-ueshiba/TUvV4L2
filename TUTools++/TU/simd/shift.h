@@ -1,6 +1,8 @@
-/*
- *  $Id$
- */
+/*!
+  \file		shift.h
+  \author	Toshio UESHIBA
+  \brief	SIMDベクトルの成分を左右にシフトする関数の定義
+*/
 #if !defined(TU_SIMD_SHIFT_H)
 #define TU_SIMD_SHIFT_H
 

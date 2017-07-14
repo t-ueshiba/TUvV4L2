@@ -581,7 +581,7 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 		{
 		    constexpr auto	S = detail::max<size0(),
 							TU::size0<E_>()>::value;
-		    copy<S>(std::begin(expr), size(), begin());
+		    copy<S>(std::cbegin(expr), size(), begin());
 		}
     template <class E_>
     std::enable_if_t<TU::rank<E_>() == rank() + TU::rank<T>(), array&>
@@ -592,7 +592,7 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 				  super::Alignment);
 		    constexpr auto	S = detail::max<size0(),
 							TU::size0<E_>()>::value;
-		    copy<S>(std::begin(expr), size(), begin());
+		    copy<S>(std::cbegin(expr), size(), begin());
 
 		    return *this;
 		}
@@ -986,11 +986,25 @@ namespace detail
 		{
 		}
 
-      constexpr static size_t
-		size0()		{ return TU::size0<L>(); }
-      iterator	begin()	const	{ return {std::begin(_l), _binder}; }
-      iterator	end()	const	{ return {std::end(_l),   _binder}; }
-      size_t	size()	const	{ return std::size(_l); }
+      constexpr static auto
+		size0()
+		{
+		    return TU::size0<L>();
+		}
+      auto	begin()	const
+		{
+		    return make_transform_iterator1(std::cbegin(_l),
+						    std::cref(_binder));
+		}
+      auto	end() const
+		{
+		    return make_transform_iterator1(std::cend(_l),
+						    std::cref(_binder));
+		}
+      auto	size() const
+		{
+		    return std::size(_l);
+		}
       auto	operator [](size_t i) const
 		{
 		    return *(begin() + i);
@@ -1070,11 +1084,13 @@ template <class L, class R,
 inline auto
 operator *(L&& l, R&& r)
 {
-    using result_type = decltype(evaluate(*std::cbegin(l) * *std::cbegin(r)));
-    
-    constexpr auto	S = detail::max<size0<L>(), size0<R>()>::value;
-    result_type		val(size<1>(r));
-    for_each<S>(std::cbegin(l), std::size(l), std::cbegin(r),
+    constexpr auto
+		S   = detail::max<detail::max<size0<L>(), size0<R>()>::value,
+				  1>::value - 1;
+    auto	a   = std::cbegin(l);
+    auto	b   = std::cbegin(r);
+    auto	val = evaluate(*a * *b);
+    for_each<S>(++a, std::size(l) - 1, ++b,
 		[&val](const auto& x, const auto& y){ val += x * y; });
     return val;
 }

@@ -1,6 +1,8 @@
-/*
- *  $Id$
- */
+/*!
+  \file		lookup.h
+  \author	Toshio UESHIBA
+  \brief	SIMDベクトルに収められたindexによりmemory lookupを行う関数の定義
+*/
 #if !defined(TU_SIMD_LOOKUP_H)
 #define TU_SIMD_LOOKUP_H
 

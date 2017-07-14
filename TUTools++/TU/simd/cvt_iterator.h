@@ -1,6 +1,8 @@
-/*
- *  $Id$
- */
+/*!
+  \file		cvt_iterator.h
+  \author	Toshio UESHIBA
+  \brief	SIMDベクトル間の型変換を行う反復子の定義
+*/
 #if !defined(TU_SIMD_CVT_ITERATOR_H)
 #define TU_SIMD_CVT_ITERATOR_H
 

@@ -1,6 +1,8 @@
-/*
- *  $Id$
- */
+/*!
+  \file		cvtdown_iterator.h
+  \author	Toshio UESHIBA
+  \brief	より小さな成分を持つSIMDベクトルへの型変換を行う反復子の定義
+*/
 #if !defined(TU_SIMD_CVTDOWN_ITERATOR_H)
 #define TU_SIMD_CVTDOWN_ITERATOR_H
 

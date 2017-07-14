@@ -1,6 +1,8 @@
-/*
- *  $Id$
- */
+/*!
+  \file		lookup.h
+  \author	Toshio UESHIBA
+  \brief	SIMDベクトルに対する雑多な関数の定義
+*/
 #if !defined(TU_SIMD_MISC_H)
 #define TU_SIMD_MISC_H
 

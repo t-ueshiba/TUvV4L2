@@ -1,6 +1,8 @@
-/*
- *  $Id$
- */
+/*!
+  \file		shift_iterator.h
+  \author	Toshio UESHIBA
+  \brief	SIMDベクトルの並びを1成分ずつ右シフトする反復子の定義
+*/
 #if !defined(TU_SIMD_SHIFT_ITERATOR_H)
 #define TU_SIMD_SHIFT_ITERATOR_H
 

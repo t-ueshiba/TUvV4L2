@@ -1,6 +1,8 @@
-/*
- *  $Id$
- */
+/*!
+  \file		vec.h
+  \author	Toshio UESHIBA
+  \brief	SIMDベクトルクラスの定義
+*/
 #if !defined(TU_SIMD_VEC_H)
 #define TU_SIMD_VEC_H
 

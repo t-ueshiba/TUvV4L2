@@ -1,6 +1,8 @@
-/*
- *  $Id$
- */
+/*!
+  \file		zero.h
+  \author	Toshio UESHIBA
+  \brief	全成分が0であるSIMDベクトルを生成する関数の定義
+*/
 #if !defined(TU_SIMD_ZERO_H)
 #define TU_SIMD_ZERO_H
 
