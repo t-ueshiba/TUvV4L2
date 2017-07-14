@@ -1,3 +1,8 @@
+/*!
+  \file		logical.h
+  \author	Toshio UESHIBA
+  \brief	SIMDベクトルに対する論理演算の定義
+*/
 /*
  *  $Id$
  */

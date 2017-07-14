@@ -1,6 +1,8 @@
 /*
- *  $Id$
- */
+  \file		config.h
+  \author	Toshio UESHIBA
+  \brief	SIMD命令のクラスを指定するマクロ
+*/
 #if !defined(TU_SIMD_CONFIG_H)
 #define TU_SIMD_CONFIG_H
 

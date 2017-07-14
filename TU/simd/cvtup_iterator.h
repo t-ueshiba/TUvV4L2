@@ -1,6 +1,8 @@
-/*
- *  $Id$
- */
+/*!
+  \file		cvtup_iterator.h
+  \author	Toshio UESHIBA
+  \brief	より大きな成分を持つSIMDベクトルへの型変換を行う反復子の定義
+*/
 #if !defined(TU_SIMD_CVTUP_ITERATOR_H)
 #define TU_SIMD_CVTUP_ITERATOR_H
 

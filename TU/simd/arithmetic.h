@@ -1,6 +1,8 @@
-/*
- *  $Id$
- */
+/*!
+  \file		arithmetic.h
+  \author	Toshio UESHIBA
+  \brief	SIMDベクトルに対する算術演算の定義
+*/
 #if !defined(TU_SIMD_ARITHMETIC_H)
 #define TU_SIMD_ARITHMETIC_H
 

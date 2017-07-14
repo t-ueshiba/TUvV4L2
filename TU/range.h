@@ -440,8 +440,7 @@ class range<ITER, 0>
 		}
 		
 		range(std::initializer_list<value_type> args)
-		    :_begin(const_cast<ITER>(args.begin())),
-		     _size(args.size())
+		    :_begin(args.begin()), _size(args.size())
     		{
 		}
     range&	operator =(std::initializer_list<value_type> args)
@@ -1101,11 +1100,11 @@ namespace detail
 		}
       auto	begin()	const
 		{
-		    return make_transform_iterator1(std::begin(_expr), _op);
+		    return make_transform_iterator1(std::cbegin(_expr), _op);
 		}
       auto	end() const
 		{
-		    return make_transform_iterator1(std::end(_expr), _op);
+		    return make_transform_iterator1(std::cend(_expr), _op);
 		}
       auto	size() const
 		{
@@ -1160,13 +1159,13 @@ namespace detail
 		}
       auto	begin()	const
 		{
-		    return make_transform_iterator2(std::begin(_l),
-						    std::begin(_r), _op);
+		    return make_transform_iterator2(std::cbegin(_l),
+						    std::cbegin(_r), _op);
 		}
       auto	end() const
 		{
-		    return make_transform_iterator2(std::end(_l),
-						    std::end(_r), _op);
+		    return make_transform_iterator2(std::cend(_l),
+						    std::cend(_r), _op);
 		}
       auto	size()	const	{ return std::size(_l); }
       decltype(auto)

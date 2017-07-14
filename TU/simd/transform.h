@@ -1,6 +1,8 @@
-/*
- *  $Id$
- */
+/*!
+  \file		transform.h
+  \author	Toshio UESHIBA
+  \brief	複数のSIMDベクトルを成分数が等しくなるように同時に変換する関数の定義
+*/
 #if !defined(TU_SIMD_TRANSFORM_H)
 #define	TU_SIMD_TRANSFORM_H
 

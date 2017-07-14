@@ -1,6 +1,8 @@
-/*
- *  $Id$
- */
+/*!
+  \file		load_store_iterator.h
+  \author	Toshio UESHIBA
+  \brief	メモリとSIMDベクトル間のデータ転送を行う反復子の定義
+*/
 #if !defined(TU_SIMD_LOAD_STORE_ITERATOR_H)
 #define TU_SIMD_LOAD_STORE_ITERATOR_H
 

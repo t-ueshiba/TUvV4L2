@@ -1,6 +1,8 @@
-/*
- *  $Id$
- */
+/*!
+  \file		load_store.h
+  \author	Toshio UESHIBA
+  \brief	メモリとSIMDベクトル間のデータ転送を行う関数の定義
+*/
 #if !defined(TU_SIMD_LOAD_STORE_H)
 #define TU_SIMD_LOAD_STORE_H
 
@@ -15,10 +17,10 @@ namespace std
 #if !defined(__clang__) && (__GNUG__ <= 4)
 inline void*
 align(std::size_t alignment,
-      std::size_t size, void *&ptr, std::size_t &space) noexcept
+      std::size_t size, void*& ptr, std::size_t& space) noexcept
 {
     std::uintptr_t	pn	= reinterpret_cast<std::uintptr_t>(ptr);
-    std::uintptr_t	aligned = (pn + alignment - 1)& - alignment;
+    std::uintptr_t	aligned = (pn + alignment - 1) & -alignment;
     std::size_t		padding = aligned - pn;
 
     if (space < size + padding)
@@ -38,7 +40,7 @@ namespace simd
 *  functions for supporting memory alignment				*
 ************************************************************************/
 template <class T> inline T*
-floor(T* p)
+ceil(T* p)
 {
     constexpr size_t	vsize = sizeof(vec<std::remove_cv_t<T> >);
     size_t		space = 2*vsize - 1;
@@ -48,12 +50,12 @@ floor(T* p)
 }
 
 template <class T> inline T*
-ceil(T* p)
+floor(T* p)
 {
     constexpr size_t	vsize = sizeof(vec<std::remove_cv_t<T> >);
     p = reinterpret_cast<T*>(reinterpret_cast<char*>(p) - vsize + 1);
 
-    return floor(p);
+    return ceil(p);
 }
 
 /************************************************************************
@@ -67,6 +69,9 @@ class ptr : public boost::iterator_adaptor<ptr<T>, T*>
 
   public:
 	ptr(T* p=nullptr) :super(p)	{}
+    template <class T_,
+	      std::enable_if_t<std::is_convertible<T_*, T*>::value>* = nullptr>
+	ptr(ptr<T_> p)	:super(p.get())	{}
 
     T*	get()			const	{ return super::base(); }
 	operator T*()		const	{ return super::base(); }

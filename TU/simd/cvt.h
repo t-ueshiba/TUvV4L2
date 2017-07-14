@@ -1,6 +1,8 @@
-/*
- *  $Id$
- */
+/*!
+  \file		cvt.h
+  \author	Toshio UESHIBA
+  \brief	SIMDベクトル間の型変換関数の定義
+*/
 #if !defined(TU_SIMD_CVT_H)
 #define	TU_SIMD_CVT_H
 

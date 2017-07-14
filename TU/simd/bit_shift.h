@@ -1,6 +1,8 @@
-/*
- *  $Id$
- */
+/*!
+  \file		bit_shift.h
+  \author	Toshio UESHIBA
+  \brief	SIMDベクトルを対象としたビットシフト関数の定義
+*/
 #if !defined(TU_SIMD_BIT_SHIFT_H)
 #define TU_SIMD_BIT_SHIFT_H
 

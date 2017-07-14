@@ -1,6 +1,8 @@
-/*
- *  $Id$
- */
+/*!
+  \file		type_traits.h
+  \author	Toshio UESHIBA
+  \brief	SIMDベクトルの成分となる型の特性
+*/
 #if !defined(TU_SIMD_TYPE_TRAITS_H)
 #define TU_SIMD_TYPE_TRAITS_H
 

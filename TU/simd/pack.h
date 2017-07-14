@@ -1,6 +1,8 @@
-/*
- *  $Id$
- */
+/*!
+  \file		pack.h
+  \author	Toshio UESHIBA
+  \brief	同一型のSIMDベクトルを2のベキ乗個集めた型とそれに関連した関数の定義
+*/
 #if !defined(TU_SIMD_PACK_H)
 #define TU_SIMD_PACK_H
 

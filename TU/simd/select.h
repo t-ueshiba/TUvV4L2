@@ -1,6 +1,8 @@
-/*
- *  $Id$
- */
+/*!
+  \file		select.h
+  \author	Toshio UESHIBA
+  \brief	マスクに基づいて2つのSIMDベクトルから成分を選択する関数の定義
+*/
 #if !defined(TU_SIMD_SELECT_H)
 #define TU_SIMD_SELECT_H
 

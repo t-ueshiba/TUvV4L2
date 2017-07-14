@@ -1,6 +1,8 @@
-/*
- *  $Id$
- */
+/*!
+  \file		dup.h
+  \author	Toshio UESHIBA
+  \brief	SIMDベクトルの上半/下半の複製を行う関数の定義
+*/
 #if !defined(TU_SIMD_DUP_H)
 #define TU_SIMD_DUP_H
 

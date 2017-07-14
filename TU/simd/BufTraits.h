@@ -1,6 +1,8 @@
-/*
- *  $Id$
- */
+/*!
+  \file		BufTraits.h
+  \author	Toshio UESHIBA
+  \brief	SIMDベクトルを要素とするバッファの特性
+*/
 #if !defined(TU_SIMD_BUFTRAITS_H)
 #define TU_SIMD_BUFTRAITS_H
 
