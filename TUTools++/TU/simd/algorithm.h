@@ -5,7 +5,12 @@
 #ifndef TU_SIMD_ALGORITHM_H
 #define TU_SIMD_ALGORITHM_H
 
-#include <TU/simd/simd.h>
+#include "TU/simd/arithmetic.h"
+#include "TU/simd/load_store_iterator.h"
+#include "TU/algorithm.h"
+#ifdef TU_DEBUG
+#  include <boost/core/demangle.hpp>
+#endif
 
 namespace TU
 {
@@ -57,13 +62,19 @@ for_each(ITER iter, ARG arg, simd::ptr<T> p, FUNC func)
 template <size_t N, class T, class ARG> inline T
 inner_product(simd::ptr<const T> p, ARG arg, simd::ptr<const T> q, T init)
 {
+#ifdef TU_DEBUG
+    std::cout << "(simd)inner_product<" << N << "> ["
+	      << print_sizes(range<simd::ptr<const T>, N>(p, arg)) << ']'
+	      << std::endl;
+#endif
     constexpr size_t	vsize = simd::vec<T>::size;
     constexpr size_t	M = (N > 0 ? (N - 1)/vsize + 1 : 0);
     
-    return detail::inner_product(simd::make_accessor(p),
-				 simd::end<const T>(arg),
-				 simd::make_accessor(q), simd::vec<T>(init),
-				 std::integral_constant<size_t, M>());
+    return hadd(detail::inner_product(simd::make_accessor(p),
+				      simd::end<const T>(arg),
+				      simd::make_accessor(q),
+				      simd::vec<T>(init),
+				      std::integral_constant<size_t, M>()));
 }
     
 template <size_t N, class T, class ARG> inline T
@@ -79,12 +90,25 @@ square(simd::ptr<const T> p, ARG arg)
 template <class FUNC, class T> inline auto
 make_transform_iterator1(simd::ptr<const T> p, FUNC func)
 {
+#ifdef TU_DEBUG
+    using	boost::core::demangle;
+
+    std::cout << "(simd)transform_iterator1:\n\t"
+	      << demangle(typeid(decltype(p)).name()) << std::endl;
+#endif		  
     return make_transform_iterator1(simd::make_accessor(p), func);
 }
 
 template <class FUNC, class S, class T> inline auto
 make_transform_iterator2(simd::ptr<const S> p, simd::ptr<const T> q, FUNC func)
 {
+#ifdef TU_DEBUG
+    using	boost::core::demangle;
+
+    std::cout << "(simd)transform_iterator2:\n\t"
+	      << demangle(typeid(decltype(p)).name()) << "\n\t"
+	      << demangle(typeid(decltype(q)).name()) << std::endl;
+#endif  
     return make_transform_iterator2(simd::make_accessor(p),
 				    simd::make_accessor(q), func);
 }
@@ -95,6 +119,13 @@ template <class FUNC, class T, class ITER,
 	  = nullptr> inline auto
 make_transform_iterator2(simd::ptr<const T> p, ITER iter, FUNC func)
 {
+#ifdef TU_DEBUG
+    using	boost::core::demangle;
+
+    std::cout << "(simd)transform_iterator2:\n\t"
+	      << demangle(typeid(decltype(p)).name()) << "\n\t"
+	      << demangle(typeid(decltype(iter)).name()) << std::endl;
+#endif		  
     return make_transform_iterator2(simd::make_accessor(p), iter, func);
 }
 
@@ -104,6 +135,13 @@ template <class FUNC, class ITER, class T,
 	  = nullptr> inline auto
 make_transform_iterator2(ITER iter, simd::ptr<const T> p, FUNC func)
 {
+#ifdef TU_DEBUG
+    using	boost::core::demangle;
+
+    std::cout << "(simd)transform_iterator2:\n\t"
+	      << demangle(typeid(decltype(iter)).name()) << "\n\t"
+	      << demangle(typeid(decltype(p)).name()) << std::endl;
+#endif		  
     return make_transform_iterator2(iter, simd::make_accessor(p), func);
 }
 

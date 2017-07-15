@@ -1,17 +1,19 @@
 /*!
   \file		BufTraits.h
   \author	Toshio UESHIBA
-  \brief	SIMDベクトルを要素とするバッファの特性
+  \brief	SIMDベクトルに関連したバッファの特性
 */
 #if !defined(TU_SIMD_BUFTRAITS_H)
 #define TU_SIMD_BUFTRAITS_H
 
 #include "TU/simd/allocator.h"
 #include "TU/simd/load_store_iterator.h"
-#include "TU/Array++.h"
 
 namespace TU
 {
+template <class T, class ALLOC>
+class BufTraits;
+
 template <class T, class ALLOC>
 class BufTraits<simd::vec<T>, ALLOC>
     : public std::allocator_traits<simd::allocator<simd::vec<T> > >
