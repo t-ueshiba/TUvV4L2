@@ -33,6 +33,7 @@
 #  include "TU/simd/cvtup_iterator.h"
 #  include "TU/simd/shift_iterator.h"
 
+#  include "TU/simd/algorithm.h"
 #  include "TU/simd/BufTraits.h"
 #endif
 

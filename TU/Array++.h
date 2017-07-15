@@ -846,15 +846,16 @@ using Array3 = array<T, ALLOC, Z, Y, X>;			//!< 3次元配列
 ************************************************************************/
 namespace detail
 {
-// array<S, std::allocator<S>, SIZE, SIZES...> のSをTに置換する
-  template <class S, size_t SIZE, size_t... SIZES, class T>
-  struct replace_element<array<S, std::allocator<S>, SIZE, SIZES...>, T>
+// array<S, ALLOC<S>, SIZE, SIZES...> のSをTに置換する
+  template <class S, template <class> class ALLOC,
+	    size_t SIZE, size_t... SIZES, class T>
+  struct replace_element<array<S, ALLOC<S>, SIZE, SIZES...>, T>
   {
     private:
       using U	 = typename replace_element<S, T>::type;
 
     public:
-      using type = array<U, std::allocator<U>, SIZE, SIZES...>;
+      using type = array<U, ALLOC<U>, SIZE, SIZES...>;
   };
 }	// namespace detail
     
@@ -877,10 +878,10 @@ namespace detail
       {
 	  using type = array<T_, std::allocator<T_>, SIZE_>;
       };
-      template <class T_, size_t SIZE_, size_t... SIZES_>
-      struct array_t<array<T_, std::allocator<T_>, SIZES_...>, SIZE_>
+      template <class T_, class ALLOC_, size_t SIZE_, size_t... SIZES_>
+      struct array_t<array<T_, ALLOC_, SIZES_...>, SIZE_>
       {
-	  using type = array<T_, std::allocator<T_>, SIZE_, SIZES_...>;
+	  using type = array<T_, ALLOC_, SIZE_, SIZES_...>;
       };
 
       using E1	 = typename substance_t<TU::value_t<E>, PRED>::type;
@@ -974,12 +975,7 @@ namespace detail
 	  const OP	_op;
       };
 
-    public:
-    // transform_iterator への第1テンプレートパラメータを，binder2nd そのもの
-    // ではなく，それへの定数参照とすることにより，キャッシュのコピーを防ぐ
-      using iterator = boost::transform_iterator<const binder2nd&,
-						 iterator_t<const L> >;
-      
+
     public:
 		product_opnode(L&& l, R&& r, OP op)
 		    :_l(std::forward<L>(l)), _binder(op, std::forward<R>(r))
@@ -993,6 +989,9 @@ namespace detail
 		}
       auto	begin()	const
 		{
+		  // transform_iterator への第1テンプレートパラメータを，
+		  // binder2nd そのものではなく，それへの定数参照とする
+		  // ことにより，キャッシュのコピーを防ぐ
 		    return make_transform_iterator1(std::cbegin(_l),
 						    std::cref(_binder));
 		}
@@ -1005,7 +1004,8 @@ namespace detail
 		{
 		    return std::size(_l);
 		}
-      auto	operator [](size_t i) const
+      decltype(auto)
+		operator [](size_t i) const
 		{
 		    return *(begin() + i);
 		}
