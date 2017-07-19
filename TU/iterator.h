@@ -330,6 +330,9 @@ size(const std::tuple<T...>& t)
     return size(std::get<0>(t));
 }
 
+/************************************************************************
+*  make_transform_iterator1<FUNC, ITER>					*
+************************************************************************/
 template <class FUNC, class ITER> inline boost::transform_iterator<FUNC, ITER>
 make_transform_iterator1(const ITER& iter, FUNC func)
 {

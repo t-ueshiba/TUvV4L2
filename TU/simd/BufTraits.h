@@ -25,6 +25,7 @@ class BufTraits<simd::vec<T>, ALLOC>
   public:
     using iterator		= simd::store_iterator<T, true>;
     using const_iterator	= simd::load_iterator<T, true>;
+    using element_type		= T;
     
   protected:
     using			typename super::pointer;
@@ -40,11 +41,12 @@ class BufTraits<T, simd::allocator<T> >
     : public std::allocator_traits<simd::allocator<T> >
 {
   private:
-    using super			= std::allocator_traits<simd::allocator<T > >;
+    using super			= std::allocator_traits<simd::allocator<T> >;
 
   public:
-    using iterator		= simd::ptr<T>;
-    using const_iterator	= simd::ptr<const T>;
+    using iterator		= simd::iterator_wrapper<T*>;
+    using const_iterator	= simd::iterator_wrapper<const T*>;
+    using element_type		= typename super::value_type;
     
   protected:
     using			typename super::pointer;

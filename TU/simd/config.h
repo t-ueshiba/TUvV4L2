@@ -1,4 +1,4 @@
-/*
+/*!
   \file		config.h
   \author	Toshio UESHIBA
   \brief	SIMD命令のクラスを指定するマクロ

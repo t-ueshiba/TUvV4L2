@@ -280,7 +280,7 @@ std::ostream&	operator <<(std::ostream& out, const sizes_holder<E>& holder);
 *  generic algorithms							*
 ************************************************************************/
 //! 2つの引数の差の絶対値を返す．
-template <class T> inline T
+template <class T> constexpr inline T
 diff(const T& a, const T& b)
 {
     return (a > b ? a - b : b - a);
@@ -363,7 +363,8 @@ namespace detail
   for_each(ITER begin, ARG arg, FUNC func, std::integral_constant<size_t, N>)
   {
       func(*begin);
-      return for_each(++begin, arg, func, std::integral_constant<size_t, N-1>());
+      return for_each(++begin, arg, func,
+		      std::integral_constant<size_t, N-1>());
   }
 }	// namespace detail
 
