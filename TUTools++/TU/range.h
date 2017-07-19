@@ -354,14 +354,16 @@ class range
 		}
 
 		range(std::initializer_list<value_type> args)
-		    :_begin(const_cast<ITER>(args.begin()))
+		    :_begin(const_cast<value_type*>(args.begin()))
     		{
 		    assert(args.size() == size());
 		}
     range&	operator =(std::initializer_list<value_type> args)
 		{
 		    assert(args.size() == SIZE);
-		    copy<SIZE>(args.begin(), SIZE, _begin);
+		  // initializer_list<T> はalignmentされないので，
+		  // SIMD命令が使われぬようcopy<N>()は使用しない．
+		    std::copy_n(args.begin(), SIZE, _begin);
 		    return *this;
 		}
 
@@ -440,13 +442,16 @@ class range<ITER, 0>
 		}
 		
 		range(std::initializer_list<value_type> args)
-		    :_begin(args.begin()), _size(args.size())
+		    :_begin(const_cast<value_type*>(args.begin())),
+		     _size(args.size())
     		{
 		}
     range&	operator =(std::initializer_list<value_type> args)
 		{
 		    assert(args.size() == _size);
-		    copy<0>(args.begin(), _size, _begin);
+		  // initializer_list<T> はalignmentされないので，
+		  // SIMD命令が使われぬようcopy<N>()は使用しない．
+		    std::copy_n(args.begin(), _size, _begin);
 		    return *this;
 		}
 		

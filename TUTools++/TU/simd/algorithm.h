@@ -14,136 +14,82 @@
 
 namespace TU
 {
-template <size_t N, class T, class ARG, class FUNC> inline FUNC
-for_each(simd::ptr<T> p, ARG arg, FUNC func)
+namespace simd
 {
-    constexpr size_t	vsize = simd::vec<std::remove_cv_t<T> >::size;
-    constexpr size_t	M = (N > 0 ? (N - 1)/vsize + 1 : 0);
+template <size_t N, class ITER, class ARG, class FUNC> inline FUNC
+for_each(iterator_wrapper<ITER> iter, ARG arg, FUNC func)
+{
+    constexpr auto	M = make_terminator<ITER>(N);
     
-    return detail::for_each(simd::make_accessor(p), simd::end<T>(arg), func,
-			    std::integral_constant<size_t, M>());
+    return TU::for_each<M>(make_accessor(iter),
+			   make_terminator(iter, arg), func);
 }
 
-template <size_t N, class S, class T, class ARG, class FUNC>
-inline std::enable_if_t<simd::vec<std::remove_cv_t<S> >::size ==
-			simd::vec<std::remove_cv_t<T> >::size, FUNC>
-for_each(simd::ptr<S> p, ARG arg, simd::ptr<T> q, FUNC func)
+template <size_t N, class ITER0, class ARG, class ITER1, class FUNC> inline FUNC
+for_each(iterator_wrapper<ITER0> iter0, ARG arg,
+	 iterator_wrapper<ITER1> iter1, FUNC func)
 {
-    constexpr size_t	vsize = simd::vec<std::remove_cv_t<S> >::size;
-    constexpr size_t	M = (N > 0 ? (N - 1)/vsize + 1 : 0);
-    
-    return detail::for_each(simd::make_accessor(p), simd::end<S>(arg),
-			    simd::make_accessor(q), func,
-			    std::integral_constant<size_t, M>());
+    constexpr auto	M = make_terminator<ITER0>(N);
+
+    return TU::for_each<M>(make_accessor(iter0),
+			   make_terminator<ITER0>(arg),
+			   make_accessor(iter1), func);
 }
     
-template <size_t N, class T, class ARG, class ITER, class FUNC>
-inline std::enable_if_t<simd::is_vec<iterator_value<ITER> >::value, FUNC>
-for_each(simd::ptr<T> p, ARG arg, ITER iter, FUNC func)
-{
-    constexpr size_t	vsize = simd::vec<std::remove_cv_t<T> >::size;
-    constexpr size_t	M = (N > 0 ? (N - 1)/vsize + 1 : 0);
-    
-    return detail::for_each(simd::make_accessor(p), simd::end<T>(arg), iter,
-			    func, std::integral_constant<size_t, M>());
-}
-    
-template <size_t N, class ITER, class ARG, class T, class FUNC>
-inline std::enable_if_t<simd::is_vec<iterator_value<ITER> >::value, FUNC>
-for_each(ITER iter, ARG arg, simd::ptr<T> p, FUNC func)
-{
-    constexpr size_t	vsize = simd::vec<std::remove_cv_t<T> >::size;
-    constexpr size_t	M = (N > 0 ? (N - 1)/vsize + 1 : 0);
-    
-    return detail::for_each(iter, simd::end<T>(arg), simd::make_accessor(p),
-			    func, std::integral_constant<size_t, M>());
-}
-    
-template <size_t N, class T, class ARG> inline T
-inner_product(simd::ptr<const T> p, ARG arg, simd::ptr<const T> q, T init)
+template <size_t N, class ITER0, class ARG, class ITER1, class T> inline T
+inner_product(iterator_wrapper<ITER0> iter0, ARG arg,
+	      iterator_wrapper<ITER1> iter1, T init)
 {
 #ifdef TU_DEBUG
     std::cout << "(simd)inner_product<" << N << "> ["
-	      << print_sizes(range<simd::ptr<const T>, N>(p, arg)) << ']'
-	      << std::endl;
+	      << print_sizes(range<iterator_wrapper<ITER0>, N>(iter0, arg))
+	      << ']' << std::endl;
 #endif
-    constexpr size_t	vsize = simd::vec<T>::size;
-    constexpr size_t	M = (N > 0 ? (N - 1)/vsize + 1 : 0);
+    constexpr auto	M = make_terminator<ITER0>(N);
     
-    return hadd(detail::inner_product(simd::make_accessor(p),
-				      simd::end<const T>(arg),
-				      simd::make_accessor(q),
-				      simd::vec<T>(init),
-				      std::integral_constant<size_t, M>()));
+    return hadd(TU::inner_product<M>(make_accessor(iter0),
+				     make_terminator<ITER0>(arg),
+				     make_accessor(iter1), vec<T>(init)));
 }
     
-template <size_t N, class T, class ARG> inline T
-square(simd::ptr<const T> p, ARG arg)
+template <size_t N, class ITER, class ARG> inline auto
+square(iterator_wrapper<ITER> iter, ARG arg)
 {
-    constexpr size_t	vsize = simd::vec<T>::size;
-    constexpr size_t	M = (N > 0 ? (N - 1)/vsize + 1 : 0);
+    constexpr auto	M = make_terminator<ITER>(N);
     
-    return detail::square(simd::make_accessor(p), simd::end<const T>(arg),
-			  std::integral_constant<size_t, M>());
+    return hadd(TU::square<M>(make_accessor(iter),
+			      make_terminator<ITER>(arg)));
 }
 
-template <class FUNC, class T> inline auto
-make_transform_iterator1(simd::ptr<const T> p, FUNC func)
+template <class FUNC, class ITER> inline auto
+make_transform_iterator1(iterator_wrapper<ITER> iter, FUNC func)
 {
 #ifdef TU_DEBUG
     using	boost::core::demangle;
 
     std::cout << "(simd)transform_iterator1:\n\t"
-	      << demangle(typeid(decltype(p)).name()) << std::endl;
+	      << demangle(typeid(ITER).name()) << std::endl;
 #endif		  
-    return make_transform_iterator1(simd::make_accessor(p), func);
+    return make_iterator_wrapper(TU::make_transform_iterator1(
+				     make_accessor(iter), func));
 }
 
-template <class FUNC, class S, class T> inline auto
-make_transform_iterator2(simd::ptr<const S> p, simd::ptr<const T> q, FUNC func)
+template <class FUNC, class ITER0, class ITER1> inline auto
+make_transform_iterator2(iterator_wrapper<ITER0> iter0,
+			 iterator_wrapper<ITER1> iter1, FUNC func)
 {
 #ifdef TU_DEBUG
     using	boost::core::demangle;
 
     std::cout << "(simd)transform_iterator2:\n\t"
-	      << demangle(typeid(decltype(p)).name()) << "\n\t"
-	      << demangle(typeid(decltype(q)).name()) << std::endl;
+	      << demangle(typeid(ITER0).name()) << "\n\t"
+	      << demangle(typeid(ITER1).name()) << std::endl;
 #endif  
-    return make_transform_iterator2(simd::make_accessor(p),
-				    simd::make_accessor(q), func);
+    return make_iterator_wrapper(TU::make_transform_iterator2(
+				     make_accessor(iter0),
+				     make_accessor(iter1), func));
 }
 
-template <class FUNC, class T, class ITER,
-	  std::enable_if_t<std::is_convertible<iterator_value<ITER>,
-					       simd::vec<T> >::value>*
-	  = nullptr> inline auto
-make_transform_iterator2(simd::ptr<const T> p, ITER iter, FUNC func)
-{
-#ifdef TU_DEBUG
-    using	boost::core::demangle;
-
-    std::cout << "(simd)transform_iterator2:\n\t"
-	      << demangle(typeid(decltype(p)).name()) << "\n\t"
-	      << demangle(typeid(decltype(iter)).name()) << std::endl;
-#endif		  
-    return make_transform_iterator2(simd::make_accessor(p), iter, func);
-}
-
-template <class FUNC, class ITER, class T,
-	  std::enable_if_t<std::is_convertible<iterator_value<ITER>,
-					       simd::vec<T> >::value>*
-	  = nullptr> inline auto
-make_transform_iterator2(ITER iter, simd::ptr<const T> p, FUNC func)
-{
-#ifdef TU_DEBUG
-    using	boost::core::demangle;
-
-    std::cout << "(simd)transform_iterator2:\n\t"
-	      << demangle(typeid(decltype(iter)).name()) << "\n\t"
-	      << demangle(typeid(decltype(p)).name()) << std::endl;
-#endif		  
-    return make_transform_iterator2(iter, simd::make_accessor(p), func);
-}
-
+}	// namespace simd
 }	// namespace TU
 #endif	// !TU_SIMD_ALGORITHM_H

@@ -83,7 +83,7 @@ make_accessor(const T* p)
 }
 
 template <class T> inline load_iterator<T, true>
-make_accessor(ptr<const T> p)
+make_accessor(iterator_wrapper<const T*> p)
 {
     return {p};
 }
@@ -225,7 +225,7 @@ make_accessor(T* p)
 }
 
 template <class T> inline store_iterator<T, true>
-make_accessor(ptr<T> p)
+make_accessor(iterator_wrapper<T*> p)
 {
     return {p};
 }

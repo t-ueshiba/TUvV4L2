@@ -25,6 +25,7 @@ class BufTraits : public std::allocator_traits<ALLOC>
   public:
     using iterator		= typename super::pointer;
     using const_iterator	= typename super::const_pointer;
+    using element_type		= typename super::value_type;
     
   protected:
     using			typename super::pointer;
@@ -64,9 +65,10 @@ class Buf : public BufTraits<T, ALLOC>
     struct cap<SIZE_>
     {
       private:
-	constexpr static auto	n = lcm(sizeof(T),
-					super::Alignment ? super::Alignment : 1)
-				  / sizeof(T);
+	constexpr static auto	n = (super::Alignment ?
+				     lcm(sizeof(T), super::Alignment) /
+				     sizeof(T) :
+				     1);
 
       public:
 	constexpr static size_t value = n*((SIZE_ + n - 1)/n);
@@ -147,12 +149,12 @@ class Buf : public BufTraits<T, ALLOC>
     auto	end()
 		{
 		    return make_iterator<SIZES...>(base_iterator(
-						       data() + capacity()));
+						       data() + span()));
 		}
     auto	end() const
 		{
 		    return make_iterator<SIZES...>(const_base_iterator(
-						       data() + capacity()));
+						       data() + span()));
 		}
 
     std::istream&
@@ -187,6 +189,12 @@ class Buf : public BufTraits<T, ALLOC>
 		    return true;
 		}
 
+    constexpr static auto
+		span()
+		{
+		    return (rank() == 1 ? size() : capacity());
+		}
+    
     template <class ITER_>
     static auto	make_iterator(ITER_ iter)
 		{
@@ -234,6 +242,9 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
     using			typename super::pointer;
     using			typename super::const_pointer;
     using			typename super::allocator_type;
+
+  private:
+    using is_1d			= std::integral_constant<bool, rank() == 1>;
 
   public:
   // 標準コンストラクタ/代入演算子およびデストラクタ
@@ -348,12 +359,12 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
     auto	end()
 		{
 		    return make_iterator<SIZES...>(base_iterator(
-						       _p + _capacity));
+						       _p + span(is_1d())));
 		}
     auto	end() const
 		{
 		    return make_iterator<SIZES...>(const_base_iterator(
-						       _p + _capacity));
+						       _p + span(is_1d())));
 		}
     std::istream&
 		get(std::istream& in)
@@ -371,9 +382,6 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
     static ptrdiff_t
 		to_stride(size_t alignment, size_t size)
 		{
-		    if (rank() == 1)
-			return size;
-		    
 		    constexpr auto	elmsiz = sizeof(T);
 
 		    if (alignment == 0)
@@ -397,6 +405,15 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 		    return _sizes[I_] * capacity_of(axis<I_+1>());
 		}
 
+    size_t	span(std::true_type) const
+		{
+		    return size();
+		}
+    size_t	span(std::false_type) const
+		{
+		    return capacity();
+		}
+    
     pointer	alloc(size_t siz)
 		{
 		    const auto	p = super::allocate(_allocator, siz);
@@ -600,12 +617,16 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 		array(std::initializer_list<const_value_type> args)
 		    :super(sizes(args), super::Alignment)
 		{
-		    copy<size0()>(args.begin(), size(), begin());
+		  // initializer_list<T> はalignmentされないので，
+		  // SIMD命令が使われぬようcopy<N>()は使用しない．
+		    std::copy_n(args.begin(), size(), begin());
 		}
     array&	operator =(std::initializer_list<const_value_type> args)
 		{
 		    super::resize(sizes(args), super::Alignment);
-		    copy<size0()>(args.begin(), size(), begin());
+		  // initializer_list<T> はalignmentされないので，
+		  // SIMD命令が使われぬようcopy<N>()は使用しない．
+		    std::copy_n(args.begin(), size(), begin());
 
 		    return *this;
 		}
@@ -887,8 +908,7 @@ namespace detail
       using E1	 = typename substance_t<TU::value_t<E>, PRED>::type;
       
     public:
-      using type = typename array_t<E1,
-				    (size0<E1>() == 0 ? 0 : size0<E>())>::type;
+      using type = typename array_t<E1, (size0<E1>() ? size0<E>() : 0)>::type;
   };
   template <class... E, template <class> class PRED>
   struct substance_t<std::tuple<E...>, PRED, false>
