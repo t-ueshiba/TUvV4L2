@@ -90,7 +90,7 @@ class Buf : public BufTraits<T, ALLOC>
     using siz			= nth<I_, SIZE, SIZES...>;
     template <size_t I_>
     using axis			= std::integral_constant<size_t, I_>;
-
+    
   public:
     constexpr static size_t	rank()	{ return 1 + sizeof...(SIZES); }
 
@@ -883,6 +883,14 @@ namespace detail
 /************************************************************************
 *  substance_t<E, PRED>							*
 ************************************************************************/
+#if defined(SIMD)
+namespace simd
+{
+  template <class T>	class vec;
+  template <class T>	class allocator;
+}
+#endif
+    
 namespace detail
 {
   template <class E, template <class> class PRED, bool=PRED<E>::value>
@@ -897,8 +905,19 @@ namespace detail
       template <class T_, size_t SIZE_>
       struct array_t
       {
+	//using traits_t = BufTraits<T_, std::allocator<T_> >;
+	//using type = array<typename traits_t::element_type,
+	//		     typename traits_t::allocator_type, SIZE_>;
 	  using type = array<T_, std::allocator<T_>, SIZE_>;
       };
+    //#if defined(SIMD)
+#if 0
+      template <class T_, size_t SIZE_>
+      struct array_t<simd::vec<T_>, SIZE_>
+      {
+	  using type = array<T_, simd::allocator<T_>, SIZE_>;
+      };
+#endif
       template <class T_, class ALLOC_, size_t SIZE_, size_t... SIZES_>
       struct array_t<array<T_, ALLOC_, SIZES_...>, SIZE_>
       {

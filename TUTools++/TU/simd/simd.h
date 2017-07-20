@@ -34,7 +34,7 @@
 #  include "TU/simd/shift_iterator.h"
 
 #  include "TU/simd/algorithm.h"
-#  include "TU/simd/BufTraits.h"
+#  include "TU/simd/Array++.h"
 #endif
 
 #endif	// !TU_SIMD_SIMD_H

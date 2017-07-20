@@ -8,8 +8,8 @@
 
 #include <cassert>
 #include <initializer_list>
-#include "TU/algorithm.h"	// for copy<N>(IN, ARG, OUT), etc...
 #include "TU/iterator.h"
+#include "TU/algorithm.h"
 
 namespace std
 {

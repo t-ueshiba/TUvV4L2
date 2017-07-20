@@ -7,7 +7,6 @@
 #define TU_SIMD_LOAD_STORE_H
 
 #include <memory>
-#include <boost/iterator/iterator_adaptor.hpp>
 #include "TU/simd/vec.h"
 #include "TU/simd/pack.h"
 
@@ -56,60 +55,6 @@ floor(T* p)
     return ceil(reinterpret_cast<T*>(reinterpret_cast<char*>(p) - vsize + 1));
 }
 
-/************************************************************************
-*  iterator_wrapper<ITER>						*
-************************************************************************/
-template <class ITER>
-class iterator_wrapper
-    : public boost::iterator_adaptor<iterator_wrapper<ITER>, ITER>
-{
-  private:
-    using	super = boost::iterator_adaptor<iterator_wrapper, ITER>;
-
-  public:
-		iterator_wrapper(ITER iter)	:super(iter)	{}
-    template <class ITER_,
-	      std::enable_if_t<std::is_convertible<ITER_, ITER>::value>*
-	      = nullptr>
-		iterator_wrapper(ITER_ iter)	:super(iter)	{}
-
-    ITER	get()			const	{ return super::base(); }
-		operator ITER()		const	{ return super::base(); }
-};
-
-template <class ITER> inline iterator_wrapper<ITER>
-make_iterator_wrapper(ITER iter)
-{
-    return {iter};
-}
-    
-template <class ITER> inline ITER
-make_accessor(iterator_wrapper<ITER> iter)
-{
-    return iter.get();
-}
-
-namespace detail
-{
-  template <class ITER>
-  struct vsize
-  {
-      constexpr static size_t	value = std::iterator_traits<ITER>::value_type
-								  ::size;
-  };
-  template <class T>
-  struct vsize<T*>
-  {
-      constexpr static size_t	value = vec<std::remove_cv_t<T> >::size;
-  };
-}
-
-template <class ITER> constexpr inline size_t
-make_terminator(size_t n)
-{
-    return (n ? (n - 1)/detail::vsize<ITER>::value + 1 : 0);
-}
-    
 /************************************************************************
 *  Load/Store								*
 ************************************************************************/

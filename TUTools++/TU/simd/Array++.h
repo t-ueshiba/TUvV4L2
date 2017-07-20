@@ -1,19 +1,17 @@
 /*!
-  \file		BufTraits.h
+  \file		Array++.h
   \author	Toshio UESHIBA
-  \brief	SIMDベクトルに関連したバッファの特性
+  \brief	SIMD命令を適用できる配列クラスの定義
 */
-#if !defined(TU_SIMD_BUFTRAITS_H)
-#define TU_SIMD_BUFTRAITS_H
+#if !defined(TU_SIMD_ARRAYPP_H)
+#define TU_SIMD_ARRAYPP_H
 
 #include "TU/simd/allocator.h"
 #include "TU/simd/load_store_iterator.h"
+#include "TU/Array++.h"
 
 namespace TU
 {
-template <class T, class ALLOC>
-class BufTraits;
-
 template <class T, class ALLOC>
 class BufTraits<simd::vec<T>, ALLOC>
     : public std::allocator_traits<simd::allocator<simd::vec<T> > >
@@ -57,5 +55,20 @@ class BufTraits<T, simd::allocator<T> >
     static auto ptr(pointer p)	{ return p; }
 };
 
+namespace simd
+{
+/************************************************************************
+*  simd::Array<T> and simd::Array2<T> type aliases			*
+************************************************************************/
+template <class T, size_t N=0>
+using Array = array<T, simd::allocator<T>,  N>;			//!< 1次元配列
+
+template <class T, size_t R=0, size_t C=0>
+using Array2 = array<T, simd::allocator<T>, R, C>;		//!< 2次元配列
+
+template <class T, size_t Z=0, size_t Y=0, size_t X=0>
+using Array3 = array<T, simd::allocator<T>, Z, Y, X>;		//!< 3次元配列
+    
+}	// namespace simd
 }	// namespace TU
-#endif	// !TU_SIMD_BUFTRAITS_H
+#endif	// !TU_SIMD_ARRAYPP_H
