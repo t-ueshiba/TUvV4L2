@@ -21,9 +21,7 @@ namespace simd
 //! SIMD演算を実行するためのメモリ領域を確保するアロケータを表すクラス
 /*!
   T が算術型の場合は sizeof(vec<T>) バイトに，T = vec<T_> の場合は
-  sizeof(vec<T_>) バイトに，それぞれalignされた領域を返す．また，確保される
-  領域の大きさが sizeof(vec<T>) (sizeof(vec<T_>)) バイトの倍数になるように
-  して，vec<T> (vec<T_>) 単位の読み書きでoverrunが発生しないようにする．
+  sizeof(vec<T_>) バイトに，それぞれalignされた領域を返す．
   \param T	メモリ領域の要素の型
 */
 template <class T>
@@ -56,10 +54,6 @@ class allocator
 		    if (n == 0)
 			return nullptr;
 
-		  // overrunを防ぐように要素数を再調整
-		    const auto	m = align<T>::value/sizeof(T);
-		    n = ((n - 1)/m + 1)*m;
-		    
 		    void*	p;
 		    if (posix_memalign(&p, align<T>::value, n*sizeof(T)))
 			throw std::bad_alloc();

@@ -520,7 +520,7 @@ namespace detail
 //! 指定された範囲の内積の値を返す
 /*!
   N != 0 の場合，Nで指定した要素数の範囲の内積を求め，argは無視．
-  N = 0 の場合，ARG = INなら範囲の末尾の次を，ARG = size_tなら要素数をargで指定，
+  N = 0 の場合，ARG = ITER0なら範囲の末尾の次を，ARG = size_tなら要素数をargで指定，
   \param begin0	適用範囲の第1変数の先頭を指す反復子
   \param arg	適用範囲の第1変数の末尾の次を指す反復子または要素数
   \param begin1	適用範囲の第2変数の先頭を指す反復子
@@ -584,7 +584,7 @@ namespace detail
 //! 指定された範囲にある要素の2乗和を返す
 /*!
   N != 0 の場合，Nで指定した要素数の範囲の2乗和を求め，argは無視．
-  N = 0 の場合，ARG = INなら範囲の末尾の次を，ARG = size_tなら要素数をargで指定，
+  N = 0 の場合，ARG = ITERなら範囲の末尾の次を，ARG = size_tなら要素数をargで指定，
   \param begin	適用範囲の先頭を指す反復子
   \param arg	適用範囲の末尾の次を指す反復子または要素数
   \return	2乗和の値
