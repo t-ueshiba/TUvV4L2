@@ -59,7 +59,8 @@ EXTHDRS		= ../../TU/Array++.h \
 		../../TU/iterator.h \
 		../../TU/pair.h \
 		../../TU/range.h \
-		../../TU/simd/BufTraits.h \
+		../../TU/simd/Array++.h \
+		../../TU/simd/algorithm.h \
 		../../TU/simd/allocator.h \
 		../../TU/simd/arithmetic.h \
 		../../TU/simd/arm/arch.h \
@@ -138,7 +139,7 @@ main.o: ../../TU/io.h ../../TU/Rectify.h ../../TU/Warp.h \
 	../../TU/simd/arm/type_traits.h ../../TU/simd/x86/vec.h \
 	../../TU/simd/x86/arch.h ../../TU/simd/arm/vec.h \
 	../../TU/simd/arm/arch.h ../../TU/simd/allocator.h \
-	../../TU/simd/load_store.h ../../TU/pair.h ../../TU/simd/pack.h \
+	../../TU/simd/load_store.h ../../TU/simd/pack.h ../../TU/pair.h \
 	../../TU/simd/cvt.h ../../TU/tuple.h ../../TU/simd/zero.h \
 	../../TU/simd/x86/zero.h ../../TU/simd/arm/zero.h \
 	../../TU/simd/cast.h ../../TU/simd/x86/cast.h \
@@ -163,9 +164,9 @@ main.o: ../../TU/io.h ../../TU/Rectify.h ../../TU/Warp.h \
 	../../TU/simd/lookup.h ../../TU/simd/x86/lookup.h \
 	../../TU/simd/arm/lookup.h ../../TU/simd/load_store_iterator.h \
 	../../TU/simd/cvtdown_iterator.h ../../TU/simd/cvtup_iterator.h \
-	../../TU/simd/shift_iterator.h ../../TU/simd/BufTraits.h \
-	../../TU/Array++.h ../../TU/range.h ../../TU/algorithm.h \
-	../../TU/Image++.h ../../TU/Vector++.h ../../TU/Camera++.h \
-	../../TU/Geometry++.h ../../TU/Minimize.h ../../TU/SADStereo.h \
-	../../TU/StereoBase.h ../../TU/Profiler.h ../../TU/BoxFilter.h \
-	../../TU/Filter2.h ../../TU/GFStereo.h
+	../../TU/simd/shift_iterator.h ../../TU/simd/algorithm.h \
+	../../TU/algorithm.h ../../TU/simd/Array++.h ../../TU/Array++.h \
+	../../TU/range.h ../../TU/Image++.h ../../TU/Vector++.h \
+	../../TU/Camera++.h ../../TU/Geometry++.h ../../TU/Minimize.h \
+	../../TU/SADStereo.h ../../TU/StereoBase.h ../../TU/Profiler.h \
+	../../TU/BoxFilter.h ../../TU/Filter2.h ../../TU/GFStereo.h

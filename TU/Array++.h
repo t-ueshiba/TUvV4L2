@@ -22,16 +22,24 @@ class BufTraits : public std::allocator_traits<ALLOC>
   private:
     using super			= std::allocator_traits<ALLOC>;
 
+    constexpr static size_t	align(size_t a)
+				{
+				    return (sizeof(T) > a ? align(2*a) : a);
+				}
+    
   public:
     using iterator		= typename super::pointer;
     using const_iterator	= typename super::const_pointer;
-    using element_type		= typename super::value_type;
-    
+
   protected:
     using			typename super::pointer;
 
+  // g++ には alignas(0) がエラーになるバグがある
+#if !defined(__GNUG__) || defined(__clang__) || defined(__INTEL_COMPILER)
     constexpr static size_t	Alignment = 0;
-
+#else
+    constexpr static size_t	Alignment = align(1);
+#endif
     static auto null()		{ return nullptr; }
     static auto ptr(pointer p)	{ return p; }
 };
@@ -211,10 +219,7 @@ class Buf : public BufTraits<T, ALLOC>
 		}
 
   private:
-#if !defined(__GNUG__)	// g++ には alignas(0) がエラーになるバグがある
-    alignas(super::Alignment)
-#endif
-    std::array<T, capacity()>	_a;
+    alignas(super::Alignment) std::array<T, capacity()>	_a;
 };
 
 //! 可変長多次元バッファクラス
@@ -902,32 +907,37 @@ namespace detail
   struct substance_t<E, PRED, true>
   {
     private:
-      template <class T_, size_t SIZE_>
+      template <class T_, class ITER_, size_t SIZE_>
       struct array_t
       {
-	//using traits_t = BufTraits<T_, std::allocator<T_> >;
-	//using type = array<typename traits_t::element_type,
-	//		     typename traits_t::allocator_type, SIZE_>;
 	  using type = array<T_, std::allocator<T_>, SIZE_>;
       };
-    //#if defined(SIMD)
-#if 0
-      template <class T_, size_t SIZE_>
-      struct array_t<simd::vec<T_>, SIZE_>
+#if defined(SIMD)
+      template <class T_, class ITER_, size_t SIZE_>
+      struct array_t<simd::vec<T_>, simd::iterator_wrapper<ITER_>, SIZE_>
       {
 	  using type = array<T_, simd::allocator<T_>, SIZE_>;
       };
+      template <class T_, size_t SIZE_>
+      struct array_t<std::remove_cv_t<T_>, simd::iterator_wrapper<T_*>, SIZE_>
+      {
+	  using type = array<std::remove_cv_t<T_>,
+			     simd::allocator<std::remove_cv_t<T_> >, SIZE_>;
+      };
 #endif
-      template <class T_, class ALLOC_, size_t SIZE_, size_t... SIZES_>
-      struct array_t<array<T_, ALLOC_, SIZES_...>, SIZE_>
+      template <class T_, class ITER_, class ALLOC_,
+		size_t SIZE_, size_t... SIZES_>
+      struct array_t<array<T_, ALLOC_, SIZES_...>, ITER_, SIZE_>
       {
 	  using type = array<T_, ALLOC_, SIZE_, SIZES_...>;
       };
 
-      using E1	 = typename substance_t<TU::value_t<E>, PRED>::type;
+      using ITER = iterator_t<E>;
+      using F	 = typename substance_t<iterator_value<ITER>, PRED>::type;
       
     public:
-      using type = typename array_t<E1, (size0<E1>() ? size0<E>() : 0)>::type;
+      using type = typename array_t<F, ITER,
+				    (size0<F>() ? size0<E>() : 0)>::type;
   };
   template <class... E, template <class> class PRED>
   struct substance_t<std::tuple<E...>, PRED, false>

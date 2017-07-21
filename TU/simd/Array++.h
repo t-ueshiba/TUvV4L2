@@ -23,7 +23,6 @@ class BufTraits<simd::vec<T>, ALLOC>
   public:
     using iterator		= simd::store_iterator<T, true>;
     using const_iterator	= simd::load_iterator<T, true>;
-    using element_type		= T;
     
   protected:
     using			typename super::pointer;
@@ -44,7 +43,6 @@ class BufTraits<T, simd::allocator<T> >
   public:
     using iterator		= simd::iterator_wrapper<T*>;
     using const_iterator	= simd::iterator_wrapper<const T*>;
-    using element_type		= typename super::value_type;
     
   protected:
     using			typename super::pointer;
@@ -61,7 +59,7 @@ namespace simd
 *  simd::Array<T> and simd::Array2<T> type aliases			*
 ************************************************************************/
 template <class T, size_t N=0>
-using Array = array<T, simd::allocator<T>,  N>;			//!< 1次元配列
+using Array  = array<T, simd::allocator<T>, N>;			//!< 1次元配列
 
 template <class T, size_t R=0, size_t C=0>
 using Array2 = array<T, simd::allocator<T>, R, C>;		//!< 2次元配列

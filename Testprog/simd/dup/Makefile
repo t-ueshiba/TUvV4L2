@@ -101,6 +101,6 @@ main.o: ../../../TU/simd/dup.h ../../../TU/simd/cvt.h ../../../TU/tuple.h \
 	../../../TU/simd/logical.h ../../../TU/simd/x86/logical.h \
 	../../../TU/simd/x86/logical_base.h ../../../TU/simd/arm/logical.h \
 	../../../TU/simd/x86/dup.h ../../../TU/simd/arm/dup.h \
-	../../../TU/simd/load_store.h ../../../TU/pair.h \
-	../../../TU/simd/pack.h ../../../TU/simd/x86/load_store.h \
+	../../../TU/simd/load_store.h ../../../TU/simd/pack.h \
+	../../../TU/pair.h ../../../TU/simd/x86/load_store.h \
 	../../../TU/simd/arm/load_store.h

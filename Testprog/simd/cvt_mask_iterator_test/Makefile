@@ -98,5 +98,5 @@ main.o: ../../../TU/simd/cvtdown_iterator.h ../../../TU/iterator.h \
 	../../../TU/simd/x86/unpack.h ../../../TU/simd/arm/cvt.h \
 	../../../TU/simd/cvtup_iterator.h \
 	../../../TU/simd/load_store_iterator.h ../../../TU/simd/load_store.h \
-	../../../TU/pair.h ../../../TU/simd/pack.h \
+	../../../TU/simd/pack.h ../../../TU/pair.h \
 	../../../TU/simd/x86/load_store.h ../../../TU/simd/arm/load_store.h

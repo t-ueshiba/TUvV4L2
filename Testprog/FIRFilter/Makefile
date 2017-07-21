@@ -61,6 +61,6 @@ OBJS		= main.o
 include $(PROJECT)/lib/common.mk
 ###
 main.o: ../../TU/Image++.h ../../TU/pair.h ../../TU/Vector++.h \
-	../../TU/Array++.h ../../TU/range.h ../../TU/algorithm.h \
-	../../TU/iterator.h ../../TU/tuple.h ../../TU/FIRGaussianConvolver.h \
+	../../TU/Array++.h ../../TU/range.h ../../TU/iterator.h \
+	../../TU/tuple.h ../../TU/algorithm.h ../../TU/FIRGaussianConvolver.h \
 	../../TU/FIRFilter.h ../../TU/SeparableFilter2.h ../../TU/Profiler.h
