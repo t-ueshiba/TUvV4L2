@@ -111,7 +111,7 @@ main.o: ../../../TU/simd/transform.h ../../../TU/iterator.h \
 	../../../TU/simd/arm/bit_shift.h ../../../TU/simd/x86/cvt.h \
 	../../../TU/simd/x86/unpack.h ../../../TU/simd/arm/cvt.h \
 	../../../TU/simd/load_store_iterator.h ../../../TU/simd/load_store.h \
-	../../../TU/pair.h ../../../TU/simd/pack.h \
+	../../../TU/simd/pack.h ../../../TU/pair.h \
 	../../../TU/simd/x86/load_store.h ../../../TU/simd/arm/load_store.h \
 	../../../TU/simd/arithmetic.h ../../../TU/simd/logical.h \
 	../../../TU/simd/x86/logical.h ../../../TU/simd/x86/logical_base.h \

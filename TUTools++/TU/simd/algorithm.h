@@ -70,7 +70,7 @@ inner_product(iterator_wrapper<ITER0> begin0, ARG arg,
 #ifdef TU_DEBUG
     std::cout << "(simd)inner_product<" << N << "> ["
 	      << print_sizes(range<iterator_wrapper<ITER0>, N>(begin0, arg))
-	      << ']' << std::endl;
+	      << "] ==> ";
 #endif
     constexpr auto	M = make_terminator<ITER0>(N);
     

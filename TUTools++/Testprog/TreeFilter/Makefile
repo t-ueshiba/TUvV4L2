@@ -59,6 +59,6 @@ OBJS		= main.o
 #include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
-main.o: ../../TU/Array++.h ../../TU/range.h ../../TU/algorithm.h \
-	../../TU/iterator.h ../../TU/tuple.h ../../TU/TreeFilter.h \
+main.o: ../../TU/Array++.h ../../TU/range.h ../../TU/iterator.h \
+	../../TU/tuple.h ../../TU/algorithm.h ../../TU/TreeFilter.h \
 	../../TU/Profiler.h
