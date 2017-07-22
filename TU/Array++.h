@@ -22,11 +22,6 @@ class BufTraits : public std::allocator_traits<ALLOC>
   private:
     using super			= std::allocator_traits<ALLOC>;
 
-    constexpr static size_t	align(size_t a)
-				{
-				    return (sizeof(T) > a ? align(2*a) : a);
-				}
-    
   public:
     using iterator		= typename super::pointer;
     using const_iterator	= typename super::const_pointer;
@@ -34,12 +29,7 @@ class BufTraits : public std::allocator_traits<ALLOC>
   protected:
     using			typename super::pointer;
 
-  // g++ には alignas(0) がエラーになるバグがある
-#if !defined(__GNUG__) || defined(__clang__) || defined(__INTEL_COMPILER)
     constexpr static size_t	Alignment = 0;
-#else
-    constexpr static size_t	Alignment = align(1);
-#endif
     static auto null()		{ return nullptr; }
     static auto ptr(pointer p)	{ return p; }
 };
@@ -219,7 +209,11 @@ class Buf : public BufTraits<T, ALLOC>
 		}
 
   private:
-    alignas(super::Alignment) std::array<T, capacity()>	_a;
+  // g++ には alignas(0) がエラーになるバグがある
+#if !defined(__GNUG__) || defined(__clang__) || defined(__INTEL_COMPILER)
+    alignas(super::Alignment)
+#endif
+    std::array<T, capacity()>	_a;
 };
 
 //! 可変長多次元バッファクラス
