@@ -22,6 +22,11 @@ class BufTraits : public std::allocator_traits<ALLOC>
   private:
     using super			= std::allocator_traits<ALLOC>;
 
+    constexpr static size_t	align(size_t a)
+				{
+				    return (a < sizeof(T) ? align(2*a) : a);
+				}
+    
   public:
     using iterator		= typename super::pointer;
     using const_iterator	= typename super::const_pointer;
@@ -29,7 +34,12 @@ class BufTraits : public std::allocator_traits<ALLOC>
   protected:
     using			typename super::pointer;
 
+  // g++ には alignas(0) がエラーになるバグがある
+#if !defined(__GNUG__) || defined(__clang__) || defined(__INTEL_COMPILER)
     constexpr static size_t	Alignment = 0;
+#else
+    constexpr static size_t	Alignment = align(1);
+#endif
     static auto null()		{ return nullptr; }
     static auto ptr(pointer p)	{ return p; }
 };
@@ -158,8 +168,9 @@ class Buf : public BufTraits<T, ALLOC>
     std::istream&
    		get(std::istream& in)
    		{
-   		    for (auto& val : _a)
-   			in >> val;
+		    for (size_t i = 0; i < capacity(); i += stride())
+			for (size_t j = 0; j < size<rank()-1>(); ++j)
+			    in >> _a[i + j];
    		    return in;
    		}
 
@@ -209,11 +220,7 @@ class Buf : public BufTraits<T, ALLOC>
 		}
 
   private:
-  // g++ には alignas(0) がエラーになるバグがある
-#if !defined(__GNUG__) || defined(__clang__) || defined(__INTEL_COMPILER)
-    alignas(super::Alignment)
-#endif
-    std::array<T, capacity()>	_a;
+    alignas(super::Alignment) std::array<T, capacity()>	_a;
 };
 
 //! 可変長多次元バッファクラス
@@ -480,7 +487,7 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 			    if (d == 0)		// 最上位軸の末尾ならば...
 			    {			// 領域を確保して
 				resize(sizes, super::Alignment);
-				iter = base_iterator(_p + _capacity);
+				iter = base_iterator(_p + span(is_1d()));
 				break;		// その末端をiterにセットして返す
 			    }
 		
