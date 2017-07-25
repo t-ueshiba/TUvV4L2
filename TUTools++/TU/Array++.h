@@ -1089,19 +1089,18 @@ namespace detail
 				*std::cbegin(std::declval<L>()) *
 				*std::cbegin(std::declval<R>())),
 				is_range_or_opnode>::type;
-	  
+      
     public:
 		lincomb_opnode(const L& l, const R& r)
 		    :_val(TU::size<1>(r))
 		{
 		    assert(std::size(l) == std::size(r));
 
-		    for_each<size0()>(std::cbegin(l), std::size(l),
-				      std::cbegin(r),
-				      [this](const auto& x, const auto& y)
-				      { _val += x * y; });
+		    for_each<TU::size0<L>()>(
+			std::cbegin(l), std::size(l), std::cbegin(r),
+			[this](const auto& x, const auto& y){ _val += x * y; });
 		}
-
+      
       constexpr static auto
 		size0()
 		{

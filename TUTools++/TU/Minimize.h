@@ -557,9 +557,9 @@ minimizeSquareSparseDebug(const F& f, const G& g, ATA& a, IB bbegin, IB bend,
 		sqr_new	   += square(fval_new[j]);
 	    }
 #ifdef TU_MINIMIZE_DEBUG
-	    cerr << "val^2 = " << sqr << ", gval = " << gval
-		 << "  (update: val^2 = " << sqr_new
-		 << ", lambda = " << lambda << ")" << endl;
+	    std::cerr << "val^2 = " << sqr << ", gval = " << gval
+		      << "  (update: val^2 = " << sqr_new
+		      << ", lambda = " << lambda << ")" << std::endl;
 #endif
 	    if (std::abs(sqr_new - sqr) <=
 		tol * (std::abs(sqr_new) + std::abs(sqr) + 1.0e-10))
