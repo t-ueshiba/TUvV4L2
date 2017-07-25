@@ -1080,6 +1080,54 @@ namespace detail
 		    return std::forward<X_>(x) ^ std::forward<Y_>(y);
 		}
   };
+
+  template <class L, class R>
+  class lincomb_opnode : public opnode
+  {
+    private:
+      using	cache_t = typename substance_t<decltype(
+				*std::cbegin(std::declval<L>()) *
+				*std::cbegin(std::declval<R>())),
+				is_range_or_opnode>::type;
+	  
+    public:
+		lincomb_opnode(const L& l, const R& r)
+		    :_val(TU::size<1>(r))
+		{
+		    assert(std::size(l) == std::size(r));
+
+		    for_each<size0()>(std::cbegin(l), std::size(l),
+				      std::cbegin(r),
+				      [this](const auto& x, const auto& y)
+				      { _val += x * y; });
+		}
+
+      constexpr static auto
+		size0()
+		{
+		    return cache_t::size0();
+		}
+      auto	begin()	const
+		{
+		    return _val.begin();
+		}
+      auto	end() const
+		{
+		    return _val.end();
+		}
+      auto	size() const
+		{
+		    return _val.size();
+		}
+      decltype(auto)
+		operator [](size_t i) const
+		{
+		    return _val[i];
+		}
+
+    private:
+      cache_t	_val;
+  };
 }	// namespace detail
 
 //! 2つの1次元配列式の内積をとる.
@@ -1132,17 +1180,9 @@ operator *(L&& l, R&& r)
 template <class L, class R,
 	  std::enable_if_t<rank<L>() == 1 && rank<R>() == 2>* = nullptr>
 inline auto
-operator *(L&& l, R&& r)
+operator *(const L& l, const R& r)
 {
-    constexpr auto
-		S   = detail::max<detail::max<size0<L>(), size0<R>()>::value,
-				  1>::value - 1;
-    auto	a   = std::cbegin(l);
-    auto	b   = std::cbegin(r);
-    auto	val = evaluate(*a * *b);
-    for_each<S>(++a, std::size(l) - 1, ++b,
-		[&val](const auto& x, const auto& y){ val += x * y; });
-    return val;
+    return detail::lincomb_opnode<L, R>(l, r);
 }
 
 //! 1次元配列式と2次元配列式の積をとる.
