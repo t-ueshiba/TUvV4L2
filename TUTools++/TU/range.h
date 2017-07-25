@@ -1059,8 +1059,17 @@ namespace detail
   /**********************************************************************
   *  type aliases							*
   **********************************************************************/
-  template <size_t I, size_t J>
-  using max = std::integral_constant<size_t, (I > J ? I : J)>;
+  template <size_t I, size_t... J>
+  struct max
+  {
+      constexpr static size_t	value = (I > max<J...>::value ?
+					 I : max<J...>::value);
+  };
+  template <size_t I>
+  struct max<I>
+  {
+      constexpr static size_t	value = I;
+  };
 
   template <class ITER, size_t SIZE>
   std::true_type	check_range(range<ITER, SIZE>)			;
@@ -1325,8 +1334,10 @@ template <class L, class R>
 inline std::enable_if_t<rank<L>() != 0 && rank<L>() == rank<R>(), L&>
 operator +=(L&& l, const R& r)
 {
-    for_each<size0<L>()>(std::begin(l), std::size(l), std::begin(r),
-			 [](auto&& x, const auto& y){ x += y; });
+    constexpr size_t	N = detail::max<size0<L>(), size0<R>()>::value;
+    
+    for_each<N>(std::begin(l), std::size(l), std::begin(r),
+		[](auto&& x, const auto& y){ x += y; });
     return l;
 }
 
@@ -1340,8 +1351,10 @@ template <class L, class R>
 inline std::enable_if_t<rank<L>() != 0 && rank<L>() == rank<R>(), L&>
 operator -=(L&& l, R&& r)
 {
-    for_each<size0<L>()>(std::begin(l), std::size(l), std::begin(r),
-			 [](auto&& x, const auto& y){ x -= y; });
+    constexpr size_t	N = detail::max<size0<L>(), size0<R>()>::value;
+    
+    for_each<N>(std::begin(l), std::size(l), std::begin(r),
+		[](auto&& x, const auto& y){ x -= y; });
     return l;
 }
 
