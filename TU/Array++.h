@@ -1072,15 +1072,6 @@ namespace detail
 				      std::forward<R>(r), op);
   }
 
-  struct bit_xor
-  {
-      template <class X_, class Y_>
-      auto	operator ()(X_&& x, Y_&& y) const
-		{
-		    return std::forward<X_>(x) ^ std::forward<Y_>(y);
-		}
-  };
-
   template <class L, class R>
   class lincomb_opnode : public opnode
   {
@@ -1149,7 +1140,26 @@ namespace detail
       mutable bool	_valid;		// _cache の有効性
       mutable cache_t	_cache;		// _l * _r の計算結果
   };
+
+  struct bit_xor
+  {
+      template <class X_, class Y_>
+      auto	operator ()(X_&& x, Y_&& y) const
+		{
+		    return std::forward<X_>(x) ^ std::forward<Y_>(y);
+		}
+  };
+
+  template <class ROW, size_t NROWS, size_t NCOLS>
+  std::true_type	check_transposed(
+			    range<column_iterator<ROW, NROWS>, NCOLS>)	;
+  std::false_type	check_transposed(...)				;
+
 }	// namespace detail
+
+//! 2次元配列式が他の2次元配列式を転置したものであるか判定する．
+template <class E>
+using is_transposed = decltype(detail::check_transposed(std::declval<E>()));
 
 //! 2つの1次元配列式の内積をとる.
 /*!
@@ -1177,9 +1187,11 @@ operator *(const L& l, const R& r)
   \param r	右辺の1または2次元配列式
   \return	積を表す演算子ノード
 */
-template <class L, class R, std::enable_if_t<rank<L>() == 2 &&
-					     rank<R>() >= 1 &&
-					     rank<R>() <= 2>* = nullptr>
+template <class L, class R,
+	  std::enable_if_t<rank<L>() == 2 &&
+			   (rank<R>() == 2 ||
+			    (rank<R>() == 1 && !is_transposed<L>::value))>*
+	  = nullptr>
 inline auto
 operator *(L&& l, R&& r)
 {
@@ -1190,16 +1202,31 @@ operator *(L&& l, R&& r)
 		       * std::forward<decltype(y)>(y); });
 }
 
+//! 転置された2次元配列式と1次元配列式の積をとる.
+/*!
+  \param l	転置された2次元配列式
+  \param r	1次元配列式
+  \return	積を表す演算子ノード
+*/
+template <class L, class R, std::enable_if_t<rank<L>() == 2 &&
+					     is_transposed<L>::value &&
+					     rank<R>() == 1>* = nullptr>
+inline auto
+operator *(L&& l, R&& r)
+{
+    return std::forward<R>(r) * transpose(l);
+}
+
 //! 1次元配列式と2次元配列式の積をとる.
 /*!
-  右辺の2次元配列式 r がrow major order. l の各要素を係数とした r の各行の
-  線型結合を計算する．
-  \param l	左辺の1次元配列式
-  \param r	右辺の2次元配列式
+  l の各要素を係数とした r の各行の線型結合を計算する．
+  \param l	1次元配列式
+  \param r	2次元配列式
   \return	積を表す演算子ノード
 */
 template <class L, class R,
-	  std::enable_if_t<rank<L>() == 1 && rank<R>() == 2>* = nullptr>
+	  std::enable_if_t<rank<L>() == 1 && rank<R>() == 2 &&
+			   !is_transposed<R>::value>* = nullptr>
 inline auto
 operator *(L&& l, R&& r)
 {
@@ -1207,17 +1234,18 @@ operator *(L&& l, R&& r)
 					std::forward<R>(r));
 }
 
-//! 1次元配列式と2次元配列式の積をとる.
+//! 1次元配列式と転置された2次元配列式の積をとる.
 /*!
-  右辺の2次元配列式 r がcolumn major order. l と r の各列の内積を計算する．
-  \param l	左辺の1次元配列式
-  \param r	右辺の2次元配列式
+  l と r の各列の内積を計算する．
+  \param l	1次元配列式
+  \param r	転置された2次元配列式
   \return	積を表す演算子ノード
 */
-template <class L, class ROW, size_t NROWS, size_t NCOLS,
-	  std::enable_if_t<rank<L>() == 1>* = nullptr>
+template <class L, class R,
+	  std::enable_if_t<rank<L>() == 1 && rank<R>() == 2 &&
+			   is_transposed<R>::value>* = nullptr>
 inline auto
-operator *(L&& l, const range<column_iterator<ROW, NROWS>, NCOLS>& r)
+operator *(L&& l, R&& r)
 {
     return transpose(r) * std::forward<L>(l);
 }
