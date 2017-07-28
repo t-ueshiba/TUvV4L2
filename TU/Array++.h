@@ -1042,13 +1042,13 @@ namespace detail
 		  // transform_iterator への第1テンプレートパラメータを，
 		  // binder2nd そのものではなく，それへの定数参照とする
 		  // ことにより，キャッシュのコピーを防ぐ
-		    return make_transform_iterator1(std::cbegin(_l),
-						    std::cref(_binder));
+		    return TU::make_transform_iterator(std::cref(_binder),
+						       std::cbegin(_l));
 		}
       auto	end() const
 		{
-		    return make_transform_iterator1(std::cend(_l),
-						    std::cref(_binder));
+		    return TU::make_transform_iterator(std::cref(_binder),
+						       std::cend(_l));
 		}
       auto	size() const
 		{

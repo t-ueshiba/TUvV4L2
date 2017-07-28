@@ -2,7 +2,6 @@
  *  $Id$
  */
 #include <boost/iterator_adaptors.hpp>
-#include <boost/iterator/transform_iterator.hpp>
 #include "TU/DP.h"
 
 namespace TU
@@ -119,8 +118,8 @@ main()
 		      domain_iterator(&domain + f.nrow(), domain));
 
 	domain_type	x(f.nrow());
-	value_type	val = dp(make_transform_iterator1(f.begin(),
-							  generator_type(g)),
+	value_type	val = dp(make_transform_iterator(generator_type(g),
+							 f.begin()),
 				 x.rbegin());
 	dp.put(cout);
 	

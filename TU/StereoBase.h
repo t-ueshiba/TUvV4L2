@@ -15,8 +15,8 @@
 #  include <tbb/scalable_allocator.h>
 #endif
 
-#include "TU/simd/simd.h"
-#include "TU/Image++.h"		// Use RGBA
+#include "TU/simd/Array++.h"
+#include "TU/iterator.h"
 #include "TU/Profiler.h"
 
 #if defined(PROFILE) && !defined(USE_TBB)

@@ -130,23 +130,23 @@ OBJS		= main.o
 include $(PROJECT)/lib/common.mk
 ###
 main.o: ../../../TU/algorithm.h ../../../TU/io.h ../../../TU/Rectify.h \
-	../../../TU/Warp.h ../../../TU/simd/simd.h ../../../TU/simd/config.h \
-	../../../TU/simd/vec.h ../../../TU/simd/type_traits.h \
-	../../../TU/simd/x86/type_traits.h ../../../TU/simd/arm/type_traits.h \
-	../../../TU/simd/x86/vec.h ../../../TU/simd/x86/arch.h \
-	../../../TU/simd/arm/vec.h ../../../TU/simd/arm/arch.h \
-	../../../TU/simd/allocator.h ../../../TU/simd/load_store.h \
-	../../../TU/simd/pack.h ../../../TU/pair.h ../../../TU/simd/cvt.h \
-	../../../TU/tuple.h ../../../TU/simd/zero.h \
-	../../../TU/simd/x86/zero.h ../../../TU/simd/arm/zero.h \
-	../../../TU/simd/cast.h ../../../TU/simd/x86/cast.h \
-	../../../TU/simd/arm/cast.h ../../../TU/simd/shift.h \
-	../../../TU/simd/x86/shift.h ../../../TU/simd/arm/shift.h \
-	../../../TU/simd/bit_shift.h ../../../TU/simd/x86/bit_shift.h \
-	../../../TU/simd/arm/bit_shift.h ../../../TU/simd/x86/cvt.h \
-	../../../TU/simd/x86/unpack.h ../../../TU/simd/arm/cvt.h \
-	../../../TU/simd/x86/load_store.h ../../../TU/simd/arm/load_store.h \
-	../../../TU/simd/insert_extract.h \
+	../../../TU/Warp.h ../../../TU/simd/Array++.h ../../../TU/simd/simd.h \
+	../../../TU/simd/config.h ../../../TU/simd/vec.h \
+	../../../TU/simd/type_traits.h ../../../TU/simd/x86/type_traits.h \
+	../../../TU/simd/arm/type_traits.h ../../../TU/simd/x86/vec.h \
+	../../../TU/simd/x86/arch.h ../../../TU/simd/arm/vec.h \
+	../../../TU/simd/arm/arch.h ../../../TU/simd/allocator.h \
+	../../../TU/simd/load_store.h ../../../TU/simd/pack.h \
+	../../../TU/pair.h ../../../TU/simd/cvt.h ../../../TU/tuple.h \
+	../../../TU/simd/zero.h ../../../TU/simd/x86/zero.h \
+	../../../TU/simd/arm/zero.h ../../../TU/simd/cast.h \
+	../../../TU/simd/x86/cast.h ../../../TU/simd/arm/cast.h \
+	../../../TU/simd/shift.h ../../../TU/simd/x86/shift.h \
+	../../../TU/simd/arm/shift.h ../../../TU/simd/bit_shift.h \
+	../../../TU/simd/x86/bit_shift.h ../../../TU/simd/arm/bit_shift.h \
+	../../../TU/simd/x86/cvt.h ../../../TU/simd/x86/unpack.h \
+	../../../TU/simd/arm/cvt.h ../../../TU/simd/x86/load_store.h \
+	../../../TU/simd/arm/load_store.h ../../../TU/simd/insert_extract.h \
 	../../../TU/simd/x86/insert_extract.h \
 	../../../TU/simd/arm/insert_extract.h ../../../TU/simd/dup.h \
 	../../../TU/simd/logical.h ../../../TU/simd/x86/logical.h \
@@ -164,8 +164,8 @@ main.o: ../../../TU/algorithm.h ../../../TU/io.h ../../../TU/Rectify.h \
 	../../../TU/simd/load_store_iterator.h \
 	../../../TU/simd/cvtdown_iterator.h ../../../TU/simd/cvtup_iterator.h \
 	../../../TU/simd/shift_iterator.h ../../../TU/simd/algorithm.h \
-	../../../TU/simd/Array++.h ../../../TU/Array++.h ../../../TU/range.h \
-	../../../TU/Image++.h ../../../TU/Vector++.h ../../../TU/Camera++.h \
+	../../../TU/Array++.h ../../../TU/range.h ../../../TU/Image++.h \
+	../../../TU/Vector++.h ../../../TU/Camera++.h \
 	../../../TU/Geometry++.h ../../../TU/Minimize.h \
 	../../../TU/GuidedFilter.h ../../../TU/BoxFilter.h \
 	../../../TU/Filter2.h ../../../TU/TreeFilter.h ../../../TU/Profiler.h \

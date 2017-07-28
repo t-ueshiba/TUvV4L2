@@ -8,7 +8,7 @@
 
 #include <iterator>
 #include <functional>			// for std::function
-#include <boost/iterator/transform_iterator.hpp>
+#include <boost/iterator/iterator_adaptor.hpp>
 #include "TU/tuple.h"
 
 namespace std
@@ -331,14 +331,59 @@ size(const std::tuple<T...>& t)
 }
 
 /************************************************************************
-*  make_transform_iterator1<FUNC, ITER>					*
+*  transform_iterator<FUNC, ITER...>					*
 ************************************************************************/
-template <class FUNC, class ITER> inline boost::transform_iterator<FUNC, ITER>
-make_transform_iterator1(const ITER& iter, FUNC func)
+template <class FUNC, class... ITER>
+class transform_iterator
+    : public boost::iterator_adaptor<
+	transform_iterator<FUNC, ITER...>,
+	zip_iterator<std::tuple<ITER...> >,
+	std::decay_t<std::result_of_t<FUNC(iterator_reference<ITER>...)> >,
+	boost::use_default,
+	std::result_of_t<FUNC(iterator_reference<ITER>...)> >
 {
-    return {iter, func};
-}
+  private:
+    using ref	= std::result_of_t<FUNC(iterator_reference<ITER>...)>;
+    using super	= boost::iterator_adaptor<transform_iterator,
+					  zip_iterator<std::tuple<ITER...> >,
+					  std::decay_t<ref>,
+					  boost::use_default,
+					  ref>;
+    friend	class boost::iterator_core_access;
 
+  public:
+    using	typename super::difference_type;
+    using	typename super::reference;
+	
+  public:
+		transform_iterator(FUNC func, const ITER&... iter)
+		    :super(std::tuple<ITER...>(iter...)), _func(func)
+		{
+		}
+	
+  private:
+    reference	dereference() const
+		{
+		    return dereference(
+				std::make_index_sequence<sizeof...(ITER)>());
+		}
+    template <size_t... IDX_>
+    reference	dereference(std::index_sequence<IDX_...>) const
+		{
+		    return _func(std::get<IDX_>(*super::base())...);
+		}
+	
+  private:
+    FUNC	_func;	//!< 演算子
+};
+
+template <class FUNC, class... ITER>
+inline transform_iterator<FUNC, ITER...>
+make_transform_iterator(FUNC func, const ITER&... iter)
+{
+    return {func, iter...};
+}
+    
 /************************************************************************
 *  make_mbr_iterator<ITER, T>						*
 ************************************************************************/
@@ -350,13 +395,13 @@ make_transform_iterator1(const ITER& iter, FUNC func)
 template <class ITER, class T> inline auto
 make_mbr_iterator(const ITER& iter, T iterator_value<ITER>::* mbr)
 {
-    return make_transform_iterator1(
-	       iter,
+    return make_transform_iterator(
 	       std::function<std::conditional_t<
 				 std::is_same<iterator_pointer<ITER>,
 					      iterator_value<ITER>*>::value,
 				 T&, const T&>(iterator_reference<ITER>)>(
-				     std::mem_fn(mbr)));
+				     std::mem_fn(mbr)),
+	       iter);
 }
 
 //! std::pairへの反復子からその第1要素に直接アクセスする反復子を作る．
@@ -377,74 +422,6 @@ template <class ITER> inline auto
 make_second_iterator(const ITER& iter)
 {
     return make_mbr_iterator(iter, &iterator_value<ITER>::second);
-}
-    
-/************************************************************************
-*  transform_iterator2<FUNC, ITER0, ITER1>				*
-************************************************************************/
-template <class FUNC, class ITER0, class ITER1>
-class transform_iterator2
-    : public boost::iterator_adaptor<
-		 transform_iterator2<FUNC, ITER0, ITER1>,
-		 ITER0,
-		 std::result_of_t<FUNC(iterator_reference<ITER0>,
-				       iterator_reference<ITER1>)>,
-		 boost::use_default,
-		 std::result_of_t<FUNC(iterator_reference<ITER0>,
-				       iterator_reference<ITER1>)> >
-{
-  private:
-    using ref	= std::result_of_t<FUNC(iterator_reference<ITER0>,
-					iterator_reference<ITER1>)>;
-    using super	= boost::iterator_adaptor<transform_iterator2,
-					  ITER0,
-					  ref,
-					  boost::use_default,
-					  ref>;
-    friend	class boost::iterator_core_access;
-
-  public:
-    using	typename super::difference_type;
-    using	typename super::reference;
-	
-  public:
-		transform_iterator2(const ITER0& iter0,
-				    const ITER1& iter1, FUNC func)
-		    :super(iter0), _iter(iter1), _func(func)
-		{
-		}
-	
-  private:
-    reference	dereference() const
-		{
-		    return _func(*super::base(), *_iter);
-		}
-    void	advance(difference_type n)
-		{
-		    super::base_reference() += n;
-		    _iter += n;
-		}
-    void	increment()
-		{
-		    ++super::base_reference();
-		    ++_iter;
-		}
-    void	decrement()
-		{
-		    --super::base_reference();
-		    --_iter;
-		}
-	
-  private:
-    ITER1	_iter;	//!< 第2引数となる式の実体を指す反復子
-    FUNC	_func;	//!< 2項演算子
-};
-
-template <class FUNC, class ITER0, class ITER1>
-inline transform_iterator2<FUNC, ITER0, ITER1>
-make_transform_iterator2(const ITER0& iter0, const ITER1& iter1, FUNC func)
-{
-    return {iter0, iter1, func};
 }
     
 /************************************************************************
@@ -611,12 +588,12 @@ class row2col
 *  alias vertical_iterator<ROW>						*
 ************************************************************************/
 template <class ROW>
-using vertical_iterator = boost::transform_iterator<row2col<ROW>, ROW>;
+using vertical_iterator = transform_iterator<row2col<ROW>, ROW>;
 
 template <class ROW> inline vertical_iterator<ROW>
 make_vertical_iterator(const ROW& row, size_t col)
 {
-    return {row, {col}};
+    return {{col}, row};
 }
 
 /************************************************************************

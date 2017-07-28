@@ -23,13 +23,9 @@ class GuidedFilter : public BoxFilter
     struct init_params
     {
 	template <class IN_, class GUIDE_>
-	auto	operator ()(const std::tuple<IN_, GUIDE_>& t) const
+	auto	operator ()(const IN_& p, const GUIDE_& g) const
 		{
-		    using	std::get;
-
-		    return std::make_tuple(get<0>(t), get<1>(t),
-					   evaluate(get<0>(t)*get<1>(t)),
-					   get<1>(t)*get<1>(t));
+		    return std::make_tuple(p, g, evaluate(p*g), g*g);
 		}
 
       // 引数型をuniversal reference(IN_&&)にすると上記関数とオーバーロード
@@ -132,12 +128,8 @@ GuidedFilter<T>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out) const
     
   // guided filterの2次元係数ベクトルを計算する．
     Array<coeffs_t>	c(super::outLength(std::distance(ib, ie)));
-    super::convolve<T>(make_transform_iterator1(
-			   make_zip_iterator(std::make_tuple(ib, gb)),
-			   init_params()),
-		       make_transform_iterator1(
-			   make_zip_iterator(std::make_tuple(ie, ge)),
-			   init_params()),
+    super::convolve<T>(make_transform_iterator(init_params(), ib, gb),
+		       make_transform_iterator(init_params(), ie, ge),
 		       make_assignment_iterator(c.begin(),
 						init_coeffs(winSize(), _e)));
     
@@ -166,8 +158,8 @@ GuidedFilter<T>::convolve(IN ib, IN ie, OUT out) const
     
   // guided filterの2次元係数ベクトルを計算する．
     Array<coeffs_t>	c(super::outLength(std::distance(ib, ie)));
-    super::convolve<T>(make_transform_iterator1(ib, init_params()),
-		       make_transform_iterator1(ie, init_params()),
+    super::convolve<T>(make_transform_iterator(init_params(), ib),
+		       make_transform_iterator(init_params(), ie),
 		       make_assignment_iterator(c.begin(),
 						init_coeffs(winSize(), _e)));
 
@@ -236,6 +228,7 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out) const
 				    iterator_t<
 					decayed_iterator_value<IN> > >, T>;
     using coeffs_t	= std::tuple<coeff_t, coeff_t>;
+    using		std::cbegin;
     using		std::size;
 
     if (ib == ie)
@@ -248,14 +241,12 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out) const
     
   // guided filterの2次元係数ベクトルを計算する．
     super::convolve<T>(make_range_iterator(
-			   make_transform_iterator1(
-			       cbegin(std::make_tuple(*ib, *gb)),
-			       init_params()),
+			   make_transform_iterator(init_params(),
+						   cbegin(*ib), cbegin(*gb)),
 			   std::make_tuple(stride(ib), stride(gb)), size(*ib)),
 		       make_range_iterator(
-			   make_transform_iterator1(
-			       cbegin(std::make_tuple(*ie, *ge)),
-			       init_params()),
+			   make_transform_iterator(init_params(),
+						   cbegin(*ie), cbegin(*ge)),
 			   std::make_tuple(stride(ie), stride(ge)), size(*ie)),
 		       make_range_iterator(
 			   make_assignment_iterator(c.begin()->begin(),
@@ -304,12 +295,10 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, OUT out) const
 
   // guided filterの2次元係数ベクトルを計算する．
     super::convolve<T>(make_range_iterator(
-			   make_transform_iterator1(cbegin(*ib),
-						    init_params()),
+			   make_transform_iterator(init_params(), cbegin(*ib)),
 			   stride(ib), size(*ib)),
 		       make_range_iterator(
-			   make_transform_iterator1(cbegin(*ie),
-						    init_params()),
+			   make_transform_iterator(init_params(), cbegin(*ie)),
 			   stride(ie), size(*ie)),
 		       make_range_iterator(
 			   make_assignment_iterator(c.begin()->begin(),

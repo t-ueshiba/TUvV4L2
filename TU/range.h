@@ -518,8 +518,10 @@ make_range(ITER iter, size_t size)
 template <class ITER, size_t SIZE> std::ostream&
 operator <<(std::ostream& out, const range<ITER, SIZE>& r)
 {
-    for (const auto& val : r)
-	out << ' ' << val;
+  //for (const auto& val : r)
+  //	out << ' ' << val;
+    for (auto iter = r.begin(); iter != r.end(); ++iter)
+	out << ' ' << *iter;
     return out << std::endl;
 }
     
@@ -1003,7 +1005,7 @@ class column_iterator
   private:
     reference	dereference() const
 		{
-		    return {{_row, super::base()}, _nrows};
+		    return {{{super::base()}, _row}, _nrows};
 		}
     
   private:
@@ -1114,11 +1116,11 @@ namespace detail
 		}
       auto	begin()	const
 		{
-		    return make_transform_iterator1(std::cbegin(_expr), _op);
+		    return TU::make_transform_iterator(_op, std::cbegin(_expr));
 		}
       auto	end() const
 		{
-		    return make_transform_iterator1(std::cend(_expr), _op);
+		    return TU::make_transform_iterator(_op, std::cend(_expr));
 		}
       auto	size() const
 		{
@@ -1173,13 +1175,13 @@ namespace detail
 		}
       auto	begin()	const
 		{
-		    return make_transform_iterator2(std::cbegin(_l),
-						    std::cbegin(_r), _op);
+		    return TU::make_transform_iterator(
+				_op, std::cbegin(_l), std::cbegin(_r));
 		}
       auto	end() const
 		{
-		    return make_transform_iterator2(std::cend(_l),
-						    std::cend(_r), _op);
+		    return TU::make_transform_iterator(
+				_op, std::cend(_l), std::cend(_r));
 		}
       auto	size()	const	{ return std::size(_l); }
       decltype(auto)
@@ -1361,6 +1363,17 @@ operator -=(L&& l, R&& r)
 /************************************************************************
 *  generic algorithms for ranges					*
 ************************************************************************/
+//! 与えられたスカラもしくは1次元配列式をそのまま返す
+/*
+  \param expr	スカラまたは1次元配列式
+  \return	expr への定数参照
+ */ 
+template <class E> inline std::enable_if_t<(rank<E>() < 2), const E&>
+transpose(const E& expr)
+{
+    return expr;
+}
+
 //! 与えられた2次元配列式の転置を返す
 /*
   \param expr	2次元配列式
@@ -1381,7 +1394,9 @@ transpose(const E& expr)
 template <class ROW, size_t NROWS, size_t NCOLS> inline auto
 transpose(const range<column_iterator<ROW, NROWS>, NCOLS>& r)
 {
-    return make_range<NROWS>(r.begin()->begin().base(), size<1>(r));
+    return make_range<NROWS>(
+		std::get<0>(r.begin()->begin().base().get_iterator_tuple()),
+		size<1>(r));
 }
 
 //! 与えられた式の各要素の自乗和を求める.

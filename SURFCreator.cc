@@ -4,7 +4,6 @@
   \brief	クラス TU::SURFCreator の実装
 */
 #include "TU/SURFCreator.h"
-#include <algorithm>
 
 namespace TU
 {

@@ -6,9 +6,10 @@
 #if !defined(TU_SIMD_ARRAYPP_H)
 #define TU_SIMD_ARRAYPP_H
 
-#include "TU/simd/allocator.h"
-#include "TU/simd/load_store_iterator.h"
-#include "TU/Array++.h"
+#include "TU/simd/simd.h"	// import before TU/Array++.h
+#if defined(SIMD)
+#  include "TU/simd/algorithm.h"
+#  include "TU/Array++.h"
 
 namespace TU
 {
@@ -69,4 +70,7 @@ using Array3 = array<T, simd::allocator<T>, Z, Y, X>;		//!< 3次元配列
     
 }	// namespace simd
 }	// namespace TU
+#else
+#  include "TU/Array++.h"
+#endif	// defined(SIMD)
 #endif	// !TU_SIMD_ARRAYPP_H
