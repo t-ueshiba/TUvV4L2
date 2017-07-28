@@ -6,7 +6,7 @@
 #ifndef	TU_WARP_H
 #define	TU_WARP_H
 
-#include "TU/simd/simd.h"
+#include "TU/simd/Array++.h"
 #include "TU/Image++.h"
 #include "TU/Camera++.h"
 #if defined(USE_TBB)
@@ -31,13 +31,13 @@ class Warp
 	size_t		width()			const	{return us.size();}
 	void		resize(size_t d)		;
 #if defined(SIMD)
-	Array<short,  0, simd::allocator<short > >	us, vs;
-	Array<u_char, 0, simd::allocator<u_char> >	du, dv;
+	simd::Array<short>	us, vs;
+	simd::Array<u_char>	du, dv;
 #else
-	Array<short>					us, vs;
-	Array<u_char>					du, dv;
+	Array<short>		us, vs;
+	Array<u_char>		du, dv;
 #endif
-	size_t						lmost;
+	size_t			lmost;
     };
     
     template <class IN>

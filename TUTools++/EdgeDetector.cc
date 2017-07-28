@@ -3,7 +3,7 @@
   \author	Toshio UESHIBA
   \brief	クラス TU::EdgeDetector の実装
 */
-#include "TU/simd/simd.h"
+#include "TU/simd/Array++.h"
 #include "TU/EdgeDetector.h"
 #include "TU/Geometry++.h"
 

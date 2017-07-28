@@ -7,7 +7,6 @@
 #define TU_STEREOUTILITY_H
 
 #include <limits>
-#include "TU/algorithm.h"	// for TU::diff()
 #include "TU/Image++.h"
 #include "TU/StereoBase.h"
 
@@ -108,20 +107,20 @@ template <class COL, class COL_RV, class T=iterator_value<COL> >
 class diff_iterator
     : public boost::iterator_adaptor<diff_iterator<COL, COL_RV, T>,
 				     zip_iterator<std::tuple<COL, COL_RV> >,
-				     range<boost::transform_iterator<
+				     range<transform_iterator<
 					       Diff<T>, COL_RV> >,
 				     boost::use_default,
-				     range<boost::transform_iterator<
+				     range<transform_iterator<
 					       Diff<T>, COL_RV> > >
 {
   private:
     using super	= boost::iterator_adaptor<diff_iterator,
 					  zip_iterator<
 					      std::tuple<COL, COL_RV> >,
-					  range<boost::transform_iterator<
+					  range<transform_iterator<
 						    Diff<T>, COL_RV> >,
 					  boost::use_default,
-					  range<boost::transform_iterator<
+					  range<transform_iterator<
 						    Diff<T>, COL_RV> > >;
     friend	class boost::iterator_core_access;
 
@@ -140,10 +139,10 @@ class diff_iterator
 		{
 		    const auto&	iter_tuple = super::base().get_iterator_tuple();
 
-		    return make_range(make_transform_iterator1(
-					  std::get<1>(iter_tuple),
+		    return make_range(make_transform_iterator(
 					  Diff<T>(*std::get<0>(iter_tuple),
-						  _thresh)),
+						  _thresh),
+					  std::get<1>(iter_tuple)),
 				      _dsw);
 		}
     

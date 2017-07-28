@@ -8,6 +8,7 @@
 
 #include <vector>
 #include "TU/simd/simd.h"
+#include "TU/simd/Array++.h"
 #include "TU/Feature.h"
 #include "TU/IntegralImage.h"
 #if defined(USE_TBB)
