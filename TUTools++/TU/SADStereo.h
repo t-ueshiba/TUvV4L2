@@ -383,14 +383,14 @@ SADStereo<SCORE, DISP>::initializeDissimilarities(COL colL, COL colLe,
 
 	    auto	P = make_zip_iterator(
 				std::make_tuple(
-				    make_transform_iterator(
+				    TU::make_transform_iterator(
 					diff_t(*colL,
 					       _params.intensityDiffMax),
 					make_col_accessor(colRV)),
-				    make_transform_iterator(
+				    TU::make_transform_iterator(
 					ddiff_t(*(colL + 1) - *(colL - 1),
 						_params.derivativeDiffMax),
-					make_transform_iterator(
+					TU::make_transform_iterator(
 					    Minus(),
 					    make_col_accessor(colRV) + 1,
 					    make_col_accessor(colRV) - 1))));
@@ -460,25 +460,25 @@ SADStereo<SCORE, DISP>::updateDissimilarities(COL colL,  COL colLe,
 	    const Minus	minus{};
 	    auto	P = make_zip_iterator(
 				std::make_tuple(
-				    make_transform_iterator(
+				    TU::make_transform_iterator(
 					diff_t(*colL,
 					       _params.intensityDiffMax),
 					make_col_accessor(colRV)),
-				    make_transform_iterator(
+				    TU::make_transform_iterator(
 					ddiff_t(*(colL + 1) - *(colL - 1),
 						_params.derivativeDiffMax),
-					make_transform_iterator(
+					TU::make_transform_iterator(
 					    Minus(),
 					    make_col_accessor(colRV) + 1,
 					    make_col_accessor(colRV) - 1)),
-				    make_transform_iterator(
+				    TU::make_transform_iterator(
 					diff_t(*colLp,
 					       _params.intensityDiffMax),
 					make_col_accessor(colRVp)),
-				    make_transform_iterator(
+				    TU::make_transform_iterator(
 					ddiff_t(*(colLp + 1) - *(colLp - 1),
 						_params.derivativeDiffMax),
-					make_transform_iterator(
+					TU::make_transform_iterator(
 					    Minus(),
 					    make_col_accessor(colRVp) + 1,
 					    make_col_accessor(colRVp) - 1))));

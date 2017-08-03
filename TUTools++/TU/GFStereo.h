@@ -548,14 +548,14 @@ GFStereo<SCORE, DISP>::initializeFilterParameters(COL colL, COL colLe,
 	    const auto	pixL = *colL;
 	    auto	P = make_zip_iterator(
 				std::make_tuple(
-				    make_transform_iterator(
+				    TU::make_transform_iterator(
 					diff_t(pixL,
 					       _params.intensityDiffMax),
 					make_col_accessor(colRV)),
-				    make_transform_iterator(
+				    TU::make_transform_iterator(
 					ddiff_t(*(colL + 1) - *(colL - 1),
 						_params.derivativeDiffMax),
-					make_transform_iterator(
+					TU::make_transform_iterator(
 					    Minus(),
 					    make_col_accessor(colRV) + 1,
 					    make_col_accessor(colRV) - 1))));
@@ -642,25 +642,25 @@ GFStereo<SCORE, DISP>::updateFilterParameters(COL colL, COL colLe, COL_RV colRV,
 	    const auto	pixL  = *colL;
 	    auto	P = make_zip_iterator(
 				std::make_tuple(
-				    make_transform_iterator(
+				    TU::make_transform_iterator(
 					diff_t(*colL,
 					       _params.intensityDiffMax),
 					make_col_accessor(colRV)),
-				    make_transform_iterator(
+				    TU::make_transform_iterator(
 					ddiff_t(*(colL + 1) - *(colL - 1),
 						_params.derivativeDiffMax),
-					make_transform_iterator(
+					TU::make_transform_iterator(
 					    Minus(),
 					    make_col_accessor(colRV) + 1,
 					    make_col_accessor(colRV) - 1)),
-				    make_transform_iterator(
+				    TU::make_transform_iterator(
 					diff_t(*colLp,
 					       _params.intensityDiffMax),
 					make_col_accessor(colRVp)),
-				    make_transform_iterator(
+				    TU::make_transform_iterator(
 					ddiff_t(*(colLp + 1) - *(colLp - 1),
 						_params.derivativeDiffMax),
-					make_transform_iterator(
+					TU::make_transform_iterator(
 					    Minus(),
 					    make_col_accessor(colRVp) + 1,
 					    make_col_accessor(colRVp) - 1))));
