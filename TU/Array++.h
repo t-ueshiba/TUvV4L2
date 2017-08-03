@@ -1024,12 +1024,14 @@ namespace detail
 				typename substance_t<E_, is_opnode>::type>;
 
 	public:
-	  template <std::enable_if_t<!is_transposed<R>::value>* = nullptr>
-		binder2nd(OP op, R&& r)
-		    :_r(std::forward<R>(r)), _op(op)			{}
-	  template <std::enable_if_t<is_transposed<R>::value>* = nullptr>
-		binder2nd(OP op, R&& r)
-		    :_r(transpose(std::forward<R>(r))), _op(op)		{}
+	  template <class R_,
+		    std::enable_if_t<!is_transposed<R_>::value>* = nullptr>
+		binder2nd(OP op, R_&& r)
+		    :_r(std::forward<R_>(r)), _op(op)			{}
+	  template <class R_,
+		    std::enable_if_t<is_transposed<R_>::value>* = nullptr>
+		binder2nd(OP op, R_&& r)
+		    :_r(transpose(std::forward<R_>(r))), _op(op)	{}
 
 	  template <class T_>
 	  auto	operator ()(T_&& arg) const
