@@ -120,17 +120,17 @@ class Buf : public BufTraits<T, ALLOC>
     
   // 各軸のサイズと最終軸のストライドを指定したコンストラクタとリサイズ関数
     explicit	Buf(const sizes_type& sizes, size_t=0)
-   		{
-   		    if (!check_sizes(sizes, axis<rank()>()))
-   			throw std::logic_error("Buf<T, ALLOC, SIZE, SIZES...>::Buf(): mismatched size!");
-   		    init(typename std::is_arithmetic<value_type>::type());
-   		}
+		{
+		    if (!check_sizes(sizes, axis<rank()>()))
+			throw std::logic_error("Buf<T, ALLOC, SIZE, SIZES...>::Buf(): mismatched size!");
+		    init(typename std::is_arithmetic<value_type>::type());
+		}
     bool	resize(const sizes_type& sizes, size_t=0)
-   		{
-   		    if (!check_sizes(sizes, axis<rank()>()))
-   			throw std::logic_error("Buf<T, ALLOC, SIZE, SIZES...>::resize(): mismatched size!");
-   		    return false;
-   		}
+		{
+		    if (!check_sizes(sizes, axis<rank()>()))
+			throw std::logic_error("Buf<T, ALLOC, SIZE, SIZES...>::resize(): mismatched size!");
+		    return false;
+		}
 
     template <size_t I_=0>
     constexpr static auto	size()		{ return siz<I_>::value; }
@@ -899,6 +899,11 @@ namespace simd
     
 namespace detail
 {
+  template <class T>
+  using	is_range_or_opnode	= std::integral_constant<bool,
+							 is_range<T>::value ||
+							 is_opnode<T>::value>;
+
   template <class E, template <class> class PRED, bool=PRED<E>::value>
   struct substance_t
   {
@@ -934,7 +939,8 @@ namespace detail
       };
 
       using ITER = iterator_t<E>;
-      using F	 = typename substance_t<iterator_value<ITER>, PRED>::type;
+      using F	 = typename substance_t<iterator_value<ITER>,
+					is_range_or_opnode>::type;
       
     public:
       using type = typename array_t<F, ITER,
@@ -945,11 +951,6 @@ namespace detail
   {
       using type = std::tuple<typename substance_t<E, PRED>::type...>;
   };
-
-  template <class T>
-  using	is_range_or_opnode	= std::integral_constant<bool,
-							 is_range<T>::value ||
-							 is_opnode<T>::value>;
 }	// namespace detail
 
 //! 反復子が指す型. ただし，それがrangeまたはopnodeならば，それが表現する配列型
@@ -987,7 +988,9 @@ template <class E>
 inline std::enable_if_t<detail::is_opnode<E>::value, std::ostream&>
 operator <<(std::ostream& out, const E& expr)
 {
-    return out << evaluate(expr);
+    for (auto iter = std::begin(expr); iter != std::end(expr); ++iter)
+	out << ' ' << *iter;
+    return out << std::endl;
 }
     
 /************************************************************************
@@ -1007,8 +1010,27 @@ namespace detail
     private:
       class binder2nd
       {
+	// R が tranpose_opnode であれば中身の評価結果の転置．
+	// そうでない opnode に変換可能（参照型も可）であれば，その評価結果の型，
+	// opnode に変換できなければ R そのもの．
+	  template <class E_>
+	  using cache_t	= std::conditional_t<
+				is_transposed<E_>::value,
+				transpose_opnode<
+				    typename substance_t<
+					decltype(
+					    transpose(std::declval<E_>())),
+					is_opnode>::type>,
+				typename substance_t<E_, is_opnode>::type>;
+
 	public:
-	  binder2nd(OP op, R&& r) :_r(std::forward<R>(r)), _op(op)	{}
+	  template <class R_,
+		    std::enable_if_t<!is_transposed<R_>::value>* = nullptr>
+		binder2nd(OP op, R_&& r)
+		    :_r(std::forward<R_>(r)), _op(op)			{}
+	  template <class E_>
+		binder2nd(OP op, const transpose_opnode<E_>& r)
+		    :_r(transpose(r)), _op(op)				{}
 
 	  template <class T_>
 	  auto	operator ()(T_&& arg) const
@@ -1017,14 +1039,9 @@ namespace detail
 		}
 
 	private:
-	// R が opnode に変換可能（参照型も可）であれば，その評価結果の型
-	// opnode に変換できなければ R そのもの
-	  using	cache_t = typename substance_t<R, is_opnode>::type;
-	  
-	  const cache_t	_r;	// 第2引数を評価してキャッシュに保存
-	  const OP	_op;
+	  const cache_t<R>	_r;	// 第2引数を評価してキャッシュに保存
+	  const OP		_op;
       };
-
 
     public:
 		product_opnode(L&& l, R&& r, OP op)
@@ -1149,17 +1166,7 @@ namespace detail
 		    return std::forward<X_>(x) ^ std::forward<Y_>(y);
 		}
   };
-
-  template <class ROW, size_t NROWS, size_t NCOLS>
-  std::true_type	check_transposed(
-			    range<column_iterator<ROW, NROWS>, NCOLS>)	;
-  std::false_type	check_transposed(...)				;
-
 }	// namespace detail
-
-//! 2次元配列式が他の2次元配列式を転置したものであるか判定する．
-template <class E>
-using is_transposed = decltype(detail::check_transposed(std::declval<E>()));
 
 //! 2つの1次元配列式の内積をとる.
 /*!
@@ -1181,48 +1188,12 @@ operator *(const L& l, const R& r)
 			    value_type(0));
 }
 
-//! 2次元配列式と1または2次元配列式の積をとる.
-/*!
-  \param l	左辺の2次元配列式
-  \param r	右辺の1または2次元配列式
-  \return	積を表す演算子ノード
-*/
-template <class L, class R,
-	  std::enable_if_t<rank<L>() == 2 &&
-			   (rank<R>() == 2 ||
-			    (rank<R>() == 1 && !is_transposed<L>::value))>*
-	  = nullptr>
-inline auto
-operator *(L&& l, R&& r)
-{
-    return detail::make_product_opnode(
-		std::forward<L>(l), std::forward<R>(r),
-		[](auto&& x, auto&& y)
-		{ return std::forward<decltype(x)>(x)
-		       * std::forward<decltype(y)>(y); });
-}
-
-//! 転置された2次元配列式と1次元配列式の積をとる.
-/*!
-  \param l	転置された2次元配列式
-  \param r	1次元配列式
-  \return	積を表す演算子ノード
-*/
-template <class L, class R, std::enable_if_t<rank<L>() == 2 &&
-					     is_transposed<L>::value &&
-					     rank<R>() == 1>* = nullptr>
-inline auto
-operator *(L&& l, R&& r)
-{
-    return std::forward<R>(r) * transpose(l);
-}
-
-//! 1次元配列式と2次元配列式の積をとる.
+//! 1次元配列式と転置されていない2次元配列式の積をとる.
 /*!
   l の各要素を係数とした r の各行の線型結合を計算する．
   \param l	1次元配列式
-  \param r	2次元配列式
-  \return	積を表す演算子ノード
+  \param r	転置されていない2次元配列式
+  \return	線型結合を表す演算子ノード
 */
 template <class L, class R,
 	  std::enable_if_t<rank<L>() == 1 && rank<R>() == 2 &&
@@ -1234,20 +1205,49 @@ operator *(L&& l, R&& r)
 					std::forward<R>(r));
 }
 
-//! 1次元配列式と転置された2次元配列式の積をとる.
+//! 2次元配列式と1または2次元配列式の積をとる.
 /*!
-  l と r の各列の内積を計算する．
-  \param l	1次元配列式
-  \param r	転置された2次元配列式
+  以下の場合に l の各行と r の積を計算する．
+  (1) 左辺：転置されていない2次元配列式, 右辺：1次元または2次元配列式
+  (2) 左辺：転置された2次元配列式，右辺：転置されていない2次元配列式
+  \param l	左辺の2次元配列式
+  \param r	右辺の1または2次元配列式
   \return	積を表す演算子ノード
 */
 template <class L, class R,
-	  std::enable_if_t<rank<L>() == 1 && rank<R>() == 2 &&
-			   is_transposed<R>::value>* = nullptr>
+	  std::enable_if_t<((!is_transposed<L>::value && rank<L>() == 2) &&
+			    (rank<R>() == 1 || rank<R>() == 2)) ||
+			   (is_transposed<L>::value &&
+			    (!is_transposed<R>::value && rank<R>() == 2))>*
+	  = nullptr>
 inline auto
 operator *(L&& l, R&& r)
 {
-    return transpose(r) * std::forward<L>(l);
+    return detail::make_product_opnode(
+		std::forward<L>(l), std::forward<R>(r),
+		[](auto&& x, auto&& y)
+		{ return std::forward<decltype(x)>(x)
+		       * std::forward<decltype(y)>(y); });
+}
+
+//! 1次元配列式と転置された2次元配列式の積をとる.
+/*!
+  (1) 左辺：転置された2次元配列式, 右辺：1次元または転置された2次元配列式
+  (2) 左辺：1次元配列式，右辺：転置された2次元配列式
+  \param l	転置された2次元配列式または1次元配列式
+  \param r	1次元配列式または転置された2次元配列式
+  \return	転置された演算子ノード
+*/
+template <class L, class R,
+	  std::enable_if_t<(is_transposed<L>::value &&
+			    (is_transposed<R>::value || rank<R>() == 1)) ||
+			   (rank<L>() == 1 && is_transposed<R>::value)>*
+	  = nullptr>
+inline auto
+operator *(L&& l, R&& r)
+{
+    return transpose(transpose(std::forward<R>(r)) *
+		     transpose(std::forward<L>(l)));
 }
     
 //! 2つの1次元配列式の外積をとる.
@@ -1270,10 +1270,10 @@ operator %(L&& l, R&& r)
 
 //! 2つの1次元配列式のベクトル積をとる.
 /*!
-  演算子ノードではなく，評価結果の3次元配列が返される.
+  演算子ノードではなく，評価結果の1次元配列が返される.
   \param l	左辺の1次元配列式
   \param r	右辺の1次元配列式
-  \return	ベクトル積
+  \return	ベクトル積の評価結果を表す1次元配列
 */
 template <class L, class R>
 inline std::enable_if_t<rank<L>() == 1 && rank<R>() == 1,

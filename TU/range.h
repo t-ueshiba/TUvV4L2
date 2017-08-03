@@ -1205,6 +1205,7 @@ namespace detail
       return binary_opnode<OP, L, R>(std::forward<L>(l),
 				     std::forward<R>(r), op);
   }
+
 }	// namespace detail
 
 //! 与えられた式の各要素の符号を反転する.
@@ -1361,17 +1362,73 @@ operator -=(L&& l, R&& r)
 }
 
 /************************************************************************
-*  generic algorithms for ranges					*
+*  transposition of 2D expressions					*
 ************************************************************************/
+namespace detail
+{
+  /**********************************************************************
+  *  class transpose_opnode<E>						*
+  **********************************************************************/
+  template <class E>
+  class transpose_opnode : public opnode
+  {
+    public:
+		transpose_opnode(E&& expr)
+		    :_expr(std::forward<E>(expr))
+		{
+		}
+
+      constexpr static auto
+		size0()
+		{
+		    return TU::size0<value_t<E> >();
+		}
+      auto	begin()	const
+		{
+		    return column_begin(_expr);
+		}
+      auto	end() const
+		{
+		    return column_end(_expr);
+		}
+      auto	size() const
+		{
+		    return TU::size<1>(_expr);
+		}
+      decltype(auto)
+		operator [](size_t i) const
+		{
+		    assert(i < size());
+		    return *(begin() + i);
+		}
+      E		transpose() const 
+		{
+		    return std::forward<E>(const_cast<transpose_opnode*>(this)
+					   ->_expr);
+		}
+
+    private:
+      E		_expr;
+  };
+
+  template <class E>
+  std::true_type	check_transposed(const transpose_opnode<E>&)	;
+  std::false_type	check_transposed(...)				;
+}
+    
+//! 2次元配列式が他の2次元配列式を転置したものであるか判定する．
+template <class E>
+using is_transposed = decltype(detail::check_transposed(std::declval<E>()));
+
 //! 与えられたスカラもしくは1次元配列式をそのまま返す
 /*
   \param expr	スカラまたは1次元配列式
   \return	expr への定数参照
- */ 
-template <class E> inline std::enable_if_t<(rank<E>() < 2), const E&>
-transpose(const E& expr)
+ */
+template <class E> inline std::enable_if_t<(rank<E>() < 2), E&&>
+transpose(E&& expr)
 {
-    return expr;
+    return std::forward<E>(expr);
 }
 
 //! 与えられた2次元配列式の転置を返す
@@ -1379,11 +1436,12 @@ transpose(const E& expr)
   \param expr	2次元配列式
   \return	expr を転置した2次元配列式
  */ 
-template <class E, std::enable_if_t<rank<E>() == 2>* = nullptr> inline auto
-transpose(const E& expr)
+template <class E,
+	  std::enable_if_t<rank<E>() == 2 &&
+			   !is_transposed<E>::value>* = nullptr> inline auto
+transpose(E&& expr)
 {
-    constexpr size_t	SIZE = size0<value_t<E> >();
-    return make_range<SIZE>(column_begin(expr), size<1>(expr));
+    return detail::transpose_opnode<E>(std::forward<E>(expr));
 }
 
 //! 転置された2次元配列式をさらに転置して元に戻す
@@ -1391,14 +1449,15 @@ transpose(const E& expr)
   \param r	転置された2次元配列式を表すレンジ
   \return	r をさらに転置した2次元配列式
  */ 
-template <class ROW, size_t NROWS, size_t NCOLS> inline auto
-transpose(const range<column_iterator<ROW, NROWS>, NCOLS>& r)
+template <class E> inline decltype(auto)
+transpose(const detail::transpose_opnode<E>& expr)
 {
-    return make_range<NROWS>(
-		std::get<0>(r.begin()->begin().base().get_iterator_tuple()),
-		size<1>(r));
+    return expr.transpose();
 }
 
+/************************************************************************
+*  generic algorithms for ranges					*
+************************************************************************/
 //! 与えられた式の各要素の自乗和を求める.
 /*!
   \param x	式
