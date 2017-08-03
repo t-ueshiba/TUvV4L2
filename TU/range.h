@@ -328,7 +328,7 @@ class range
 		range(const range&)				= default;
     range&	operator =(const range& r)
 		{
-		    copy<SIZE>(r.begin(), size(), begin());
+		    copy<SIZE>(r.begin(), SIZE, _begin);
 		    return *this;
 		}
 		range(range&&)					= default;
@@ -1401,10 +1401,13 @@ namespace detail
 		    assert(i < size());
 		    return *(begin() + i);
 		}
-      E		transpose() const 
+      E		transpose()
 		{
-		    return std::forward<E>(const_cast<transpose_opnode*>(this)
-					   ->_expr);
+		    return std::forward<E>(_expr);
+		}
+      E		transpose() const
+		{
+		    return _expr;
 		}
 
     private:
@@ -1436,9 +1439,9 @@ transpose(E&& expr)
   \param expr	2次元配列式
   \return	expr を転置した2次元配列式
  */ 
-template <class E,
-	  std::enable_if_t<rank<E>() == 2 &&
-			   !is_transposed<E>::value>* = nullptr> inline auto
+template <class E, std::enable_if_t<rank<E>() == 2 &&
+				    !is_transposed<E>::value>* = nullptr>
+inline auto
 transpose(E&& expr)
 {
     return detail::transpose_opnode<E>(std::forward<E>(expr));
@@ -1449,8 +1452,10 @@ transpose(E&& expr)
   \param r	転置された2次元配列式を表すレンジ
   \return	r をさらに転置した2次元配列式
  */ 
-template <class E> inline decltype(auto)
-transpose(const detail::transpose_opnode<E>& expr)
+template <class E, std::enable_if_t<rank<E>() == 2 &&
+				    is_transposed<E>::value>* = nullptr>
+inline decltype(auto)
+transpose(E&& expr)
 {
     return expr.transpose();
 }
