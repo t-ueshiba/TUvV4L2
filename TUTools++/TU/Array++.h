@@ -1024,13 +1024,12 @@ namespace detail
 				typename substance_t<E_, is_opnode>::type>;
 
 	public:
-	  template <class R_,
-		    std::enable_if_t<!is_transposed<R_>::value>* = nullptr>
-		binder2nd(OP op, R_&& r)
-		    :_r(std::forward<R_>(r)), _op(op)			{}
-	  template <class E_>
-		binder2nd(OP op, const transpose_opnode<E_>& r)
-		    :_r(transpose(r)), _op(op)				{}
+	  template <std::enable_if_t<!is_transposed<R>::value>* = nullptr>
+		binder2nd(OP op, R&& r)
+		    :_r(std::forward<R>(r)), _op(op)			{}
+	  template <std::enable_if_t<is_transposed<R>::value>* = nullptr>
+		binder2nd(OP op, R&& r)
+		    :_r(transpose(std::forward<R>(r))), _op(op)		{}
 
 	  template <class T_>
 	  auto	operator ()(T_&& arg) const
@@ -1184,7 +1183,7 @@ operator *(const L& l, const R& r)
 
     assert(size<0>(l) == size<0>(r));
     constexpr size_t	S = detail::max<size0<L>(), size0<R>()>::value;
-    return inner_product<S>(std::begin(l), std::size(l), std::begin(r),
+    return inner_product<S>(std::cbegin(l), std::size(l), std::cbegin(r),
 			    value_type(0));
 }
 
