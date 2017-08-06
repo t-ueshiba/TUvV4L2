@@ -160,7 +160,6 @@ HDRS		= TU/Array++.h \
 		TU/simd/x86/vec.h \
 		TU/simd/x86/zero.h \
 		TU/simd/zero.h \
-		TU/tmp.h \
 		TU/tuple.h
 SRCS		= ColorConverter.cc \
 		EdgeDetector.cc \
