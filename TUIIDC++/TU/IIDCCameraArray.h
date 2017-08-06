@@ -168,7 +168,7 @@ setFeature(CAMERAS&& cameras, u_int id, u_int val, float fval)
       case IIDCCamera::ZOOM:
       case IIDCCamera::PAN:
       case IIDCCamera::TILT:
-	if (std::size(cameras) > 0)
+	if (TU::size(cameras) > 0)
 	{
 	    const auto	feature = IIDCCamera::uintToFeature(id);
 
@@ -202,7 +202,7 @@ setFeature(CAMERAS&& cameras, u_int id, u_int val, float fval)
 
       case IIDCCamera::WHITE_BALANCE:
       case IIDCCamera::WHITE_BALANCE + IIDCCAMERA_OFFSET_VR:
-	if (std::size(cameras) > 0)
+	if (TU::size(cameras) > 0)
 	{
 	    if (std::begin(cameras)->isAbsControl(IIDCCamera::WHITE_BALANCE))
 		for (auto& camera : cameras)

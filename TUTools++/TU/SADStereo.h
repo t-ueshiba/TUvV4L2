@@ -183,15 +183,11 @@ SADStereo<SCORE, DISP>::getOverlap() const
 template <class SCORE, class DISP> template <class ROW, class ROW_D> void
 SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowR, ROW_D rowD)
 {
-    using	std::cbegin;
-    using	std::cend;
-    using	std::begin;
-    
     start(0);
     const size_t	N = _params.windowSize,
 			D = _params.disparitySearchWidth,
 			H = std::distance(rowL, rowLe),
-			W = (H != 0 ? std::size(*rowL) : 0);
+			W = (H != 0 ? TU::size(*rowL) : 0);
     if (H < N || W < N)				// 充分な行数／列数があるか確認
 	return;
 
@@ -208,13 +204,14 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowR, ROW_D rowD)
 	start(1);
 	if (rowL <= rowL0)
 	{
-	    initializeDissimilarities(cbegin(*rowL), cend(*rowL), cbegin(*rowR),
-				      buffers->Q.begin());
+	    initializeDissimilarities(TU::cbegin(*rowL), TU::cend(*rowL),
+				      TU::cbegin(*rowR), buffers->Q.begin());
 	}
 	else
 	{
-	    updateDissimilarities(cbegin(*rowL), cend(*rowL), cbegin(*rowR),
-				  cbegin(*rowLp), cbegin(*rowRp),
+	    updateDissimilarities(TU::cbegin(*rowL), TU::cend(*rowL),
+				  TU::cbegin(*rowR),
+				  TU::cbegin(*rowLp), TU::cbegin(*rowRp),
 				  buffers->Q.begin());
 	    ++rowLp;
 	    ++rowRp;
@@ -232,7 +229,7 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowR, ROW_D rowD)
 	    start(3);
 	    selectDisparities(buffers->dminL.cbegin(), buffers->dminL.cend(),
 			      buffers->dminR.cbegin(), buffers->delta.cbegin(),
-			      begin(*rowD) + N/2);
+			      TU::begin(*rowD) + N/2);
 	    ++rowD;
 	}
 
@@ -247,15 +244,11 @@ template <class SCORE, class DISP> template <class ROW, class ROW_D> void
 SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 			      ROW rowR, ROW rowV, ROW_D rowD)
 {
-    using	std::cbegin;
-    using	std::cend;
-    using	std::begin;
-    
     start(0);
     const size_t	N = _params.windowSize,
 			D = _params.disparitySearchWidth,
 			H = std::distance(rowL, rowLe),
-			W = (H != 0 ? std::size(*rowL) : 0);
+			W = (H != 0 ? TU::size(*rowL) : 0);
     if (H < N || W < N)				// 充分な行数／列数があるか確認
 	return;
 
@@ -279,24 +272,24 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 	
 	start(1);
 	if (rowL <= rowL0)
-	    initializeDissimilarities(cbegin(*rowL), cend(*rowL),
+	    initializeDissimilarities(TU::cbegin(*rowL), TU::cend(*rowL),
 				      make_zip_iterator(
 					  std::make_tuple(
-					      cbegin(*rowR),
+					      TU::cbegin(*rowR),
 					      make_vertical_iterator(rowV,
 								     cV))),
 				      buffers->Q.begin());
 	else
 	{
-	    updateDissimilarities(cbegin(*rowL), cend(*rowL),
+	    updateDissimilarities(TU::cbegin(*rowL), TU::cend(*rowL),
 				  make_zip_iterator(
 				      std::make_tuple(
-					  cbegin(*rowR),
+					  TU::cbegin(*rowR),
 					  make_vertical_iterator(rowV, cV))),
-				  cbegin(*rowLp),
+				  TU::cbegin(*rowLp),
 				  make_zip_iterator(
 				      std::make_tuple(
-					  cbegin(*rowRp),
+					  TU::cbegin(*rowRp),
 					  make_vertical_iterator(rowV,
 								 --cVp))),
 				  buffers->Q.begin());
@@ -323,7 +316,7 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 	    start(3);
 	    selectDisparities(buffers->dminL.cbegin(), buffers->dminL.cend(),
 			      buffers->dminR.cbegin(), buffers->delta.cbegin(),
-			      begin(*rowD) + N/2);
+			      TU::begin(*rowD) + N/2);
 
 	    ++rowD;
 	}
@@ -342,7 +335,7 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 	{
 	    pruneDisparities(make_vertical_iterator(buffers->dminV.cbegin(), v),
 			     make_vertical_iterator(buffers->dminV.cend(),   v),
-			     std::begin(*rowD) + N/2);
+			     TU::begin(*rowD) + N/2);
 	    ++rowD;
 	}
     }
@@ -524,8 +517,6 @@ SADStereo<SCORE, DISP>::computeDisparities(const_reverse_col_siterator colQ,
 					   DMIN_RV dminRV,
 					   RMIN_RV RminRV) const
 {
-    using	std::begin;
-    
   // 評価値を横方向に積算し，最小値を与える視差を双方向に探索する．
     for (const_reverse_col_sbox boxR(colQ, _params.windowSize), boxRe(colQe);
 	 boxR != boxRe; ++boxR)
@@ -552,13 +543,13 @@ SADStereo<SCORE, DISP>::computeDisparities(const_reverse_col_siterator colQ,
 	auto			dminRVt = make_col_accessor(--dminRV);
 #if defined(SIMD) && defined(WITHOUT_CVTDOWN)
 	miterator	maskRV(make_mask_iterator(boxR->cbegin(),
-						  begin(*RminRV)));
+						  TU::begin(*RminRV)));
 	for (miterator maskRVe(make_mask_iterator(boxR->cend(),
-						  begin(*RminRV)));
+						  TU::begin(*RminRV)));
 	     maskRV != maskRVe; ++maskRV)
 #else
-	miterator	maskRV(boxR->cbegin(), begin(*RminRV));
-	for (miterator maskRVe(boxR->cend(),   begin(*RminRV));
+	    miterator	maskRV(boxR->cbegin(), TU::begin(*RminRV));
+	for (miterator maskRVe(boxR->cend(),   TU::begin(*RminRV));
 	     maskRV != maskRVe; ++maskRV)
 #endif
 	{

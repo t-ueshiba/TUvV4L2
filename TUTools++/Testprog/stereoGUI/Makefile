@@ -65,7 +65,6 @@ EXTHDRS		= ../../TU/Array++.h \
 		../../TU/pair.h \
 		../../TU/range.h \
 		../../TU/simd/Array++.h \
-		../../TU/simd/algorithm.h \
 		../../TU/simd/allocator.h \
 		../../TU/simd/arithmetic.h \
 		../../TU/simd/arm/arch.h \
@@ -209,10 +208,10 @@ DrawThreeD.o: DrawThreeD.h ../../TU/Warp.h ../../TU/simd/Array++.h \
 	../../TU/simd/lookup.h ../../TU/simd/x86/lookup.h \
 	../../TU/simd/arm/lookup.h ../../TU/simd/load_store_iterator.h \
 	../../TU/simd/cvtdown_iterator.h ../../TU/simd/cvtup_iterator.h \
-	../../TU/simd/shift_iterator.h ../../TU/simd/algorithm.h \
-	../../TU/algorithm.h ../../TU/Array++.h ../../TU/range.h \
-	../../TU/Image++.h ../../TU/Vector++.h ../../TU/Camera++.h \
-	../../TU/Geometry++.h ../../TU/Minimize.h
+	../../TU/simd/shift_iterator.h ../../TU/algorithm.h \
+	../../TU/Array++.h ../../TU/range.h ../../TU/Image++.h \
+	../../TU/Vector++.h ../../TU/Camera++.h ../../TU/Geometry++.h \
+	../../TU/Minimize.h
 MyCanvasPane.o: MyCanvasPane.h /usr/local/include/TU/v/CanvasPane.h \
 	/usr/local/include/TU/v/TUv++.h ../../TU/List.h ../../TU/Geometry++.h \
 	../../TU/Minimize.h ../../TU/Vector++.h ../../TU/Array++.h \
@@ -263,8 +262,8 @@ MyCmdWindow.o: /usr/local/include/TU/v/FileSelection.h \
 	../../TU/simd/x86/lookup.h ../../TU/simd/arm/lookup.h \
 	../../TU/simd/load_store_iterator.h ../../TU/simd/cvtdown_iterator.h \
 	../../TU/simd/cvtup_iterator.h ../../TU/simd/shift_iterator.h \
-	../../TU/simd/algorithm.h ../../TU/Profiler.h ../../TU/BoxFilter.h \
-	../../TU/Filter2.h ../../TU/GFStereo.h stereoGUI.h MyCmdWindow.h \
+	../../TU/Profiler.h ../../TU/BoxFilter.h ../../TU/Filter2.h \
+	../../TU/GFStereo.h stereoGUI.h MyCmdWindow.h \
 	/usr/local/include/TU/v/App.h /usr/local/include/TU/v/Timer.h \
 	../../TU/Rectify.h ../../TU/Warp.h ../../TU/Camera++.h MyCanvasPane.h \
 	/usr/local/include/TU/v/CanvasPane.h \
@@ -316,7 +315,7 @@ MyOglCanvasPane.o: MyOglCanvasPane.h /usr/local/include/TU/v/CanvasPane.h \
 	../../TU/simd/x86/lookup.h ../../TU/simd/arm/lookup.h \
 	../../TU/simd/load_store_iterator.h ../../TU/simd/cvtdown_iterator.h \
 	../../TU/simd/cvtup_iterator.h ../../TU/simd/shift_iterator.h \
-	../../TU/simd/algorithm.h ../../TU/Camera++.h
+	../../TU/Camera++.h
 createMenuCmds.o: /usr/local/include/TU/v/TUv++.h ../../TU/List.h \
 	../../TU/Geometry++.h ../../TU/Minimize.h ../../TU/Vector++.h \
 	../../TU/Array++.h ../../TU/range.h ../../TU/iterator.h \
@@ -354,12 +353,12 @@ main.o: ../../TU/io.h ../../TU/SADStereo.h ../../TU/StereoBase.h \
 	../../TU/simd/x86/lookup.h ../../TU/simd/arm/lookup.h \
 	../../TU/simd/load_store_iterator.h ../../TU/simd/cvtdown_iterator.h \
 	../../TU/simd/cvtup_iterator.h ../../TU/simd/shift_iterator.h \
-	../../TU/simd/algorithm.h ../../TU/algorithm.h ../../TU/Array++.h \
-	../../TU/range.h ../../TU/Profiler.h ../../TU/BoxFilter.h \
-	../../TU/Filter2.h ../../TU/GFStereo.h MyCmdWindow.h \
-	/usr/local/include/TU/v/App.h /usr/local/include/TU/v/TUv++.h \
-	../../TU/List.h ../../TU/Geometry++.h ../../TU/Minimize.h \
-	../../TU/Vector++.h /usr/local/include/TU/v/Widget-Xaw.h \
+	../../TU/algorithm.h ../../TU/Array++.h ../../TU/range.h \
+	../../TU/Profiler.h ../../TU/BoxFilter.h ../../TU/Filter2.h \
+	../../TU/GFStereo.h MyCmdWindow.h /usr/local/include/TU/v/App.h \
+	/usr/local/include/TU/v/TUv++.h ../../TU/List.h ../../TU/Geometry++.h \
+	../../TU/Minimize.h ../../TU/Vector++.h \
+	/usr/local/include/TU/v/Widget-Xaw.h \
 	/usr/local/include/TU/v/Colormap.h ../../TU/Image++.h \
 	/usr/local/include/TU/v/CmdWindow.h /usr/local/include/TU/v/CmdPane.h \
 	/usr/local/include/TU/v/Timer.h ../../TU/Rectify.h ../../TU/Warp.h \

@@ -35,7 +35,7 @@ setFormat(CAMERAS&& cameras, CmdId id, CmdVal val, Window& window)
 {
     if (id == V4L2Camera::UNKNOWN_PIXEL_FORMAT)
     {
-	if (std::size(cameras))
+	if (TU::size(cameras))
 	{
 	    size_t	u0, v0, width, height;
 	    selectROI(*std::begin(cameras), id, u0, v0, width, height, window);
@@ -64,7 +64,7 @@ refreshFeatureCmds(const CAMERAS& cameras, CmdPane& cmdPane)
 {
     auto	camera = std::begin(cameras);
     
-    switch (std::size(cameras))
+    switch (TU::size(cameras))
     {
       case 0:
 	return;
@@ -94,7 +94,7 @@ setFeature(CAMERAS&& cameras, CmdId id, CmdVal val, CmdPane& cmdPane)
 	return true;
     }
 
-    if (std::size(cameras) > 1 &&		// カメラが複数かつ
+    if (TU::size(cameras) > 1 &&		// カメラが複数かつ
 	!cmdPane.getValue(V4L2CAMERA_ALL))	// 全カメラ操作モードでなければ...
     {
 	auto	camera = std::begin(cameras);

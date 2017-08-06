@@ -272,15 +272,13 @@ class BoxFilter2 : public Filter2<BoxFilter2>
 template <class T, class IN, class OUT> void
 BoxFilter2::convolveRows(IN ib, IN ie, OUT out) const
 {
-    using	std::begin;
-    using	std::end;
-    
     if (std::distance(ib, ie) < rowWinSize())
 	throw std::runtime_error("BoxFilter2::convolveRows(): not enough rows!");
     
     for (box_filter_iterator<IN, T> row(ib, _rowWinSize), rowe(ie);
 	 row != rowe; ++row, ++out)
-	_colFilter.convolve<T>(begin(*row), end(*row), begin(*out));
+	_colFilter.convolve<T>(TU::cbegin(*row), TU::cend(*row),
+			       TU::begin(*out));
 }
 
 }

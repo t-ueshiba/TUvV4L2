@@ -954,27 +954,27 @@ bayerDecodeRGGB(IN in, IN ie, OUT out)
 
     auto	ic = in;
     ++in;
-    detail::bayerDecodeBorderRowXGGY(std::cbegin(*ic), std::cend(*ic),
-				     std::cbegin(*in), std::begin(*out),
+    detail::bayerDecodeBorderRowXGGY(TU::cbegin(*ic), TU::cend(*ic),
+				     TU::cbegin(*in), TU::begin(*out),
 				     &COLOR::r, &COLOR::b);
     ++out;
     auto	ip = ic;
     for (++ic; ++in != ie; ++ip, ++ic)
     {
-	detail::bayerDecodeRowXGGY(std::cbegin(*ic), std::cend(*ic),
-				   std::cbegin(*ip), std::cbegin(*in),
-				   std::begin(*out), &COLOR::r, &COLOR::b);
+	detail::bayerDecodeRowXGGY(TU::cbegin(*ic), TU::cend(*ic),
+				   TU::cbegin(*ip), TU::cbegin(*in),
+				   TU::begin(*out), &COLOR::r, &COLOR::b);
 	++out;
 	++ip;
 	++ic;
 	++in;
-	detail::bayerDecodeRowGXYG(std::cbegin(*ic), std::cend(*ic),
-				   std::cbegin(*ip), std::cbegin(*in),
-				   std::begin(*out), &COLOR::b, &COLOR::r);
+	detail::bayerDecodeRowGXYG(TU::cbegin(*ic), TU::cend(*ic),
+				   TU::cbegin(*ip), TU::cbegin(*in),
+				   TU::begin(*out), &COLOR::b, &COLOR::r);
 	++out;
     }
-    detail::bayerDecodeBorderRowGXYG(std::cbegin(*ic), std::cend(*ic),
-				     std::cbegin(*ip), std::begin(*out),
+    detail::bayerDecodeBorderRowGXYG(TU::cbegin(*ic), TU::cend(*ic),
+				     TU::cbegin(*ip), TU::begin(*out),
 				     &COLOR::b, &COLOR::r);
 
     return ++out;
@@ -990,27 +990,27 @@ bayerDecodeBGGR(IN in, IN ie, OUT out)
 
     auto	ic = in;
     ++in;
-    detail::bayerDecodeBorderRowXGGY(std::cbegin(*ic), std::cend(*ic),
-				     std::cbegin(*in), std::begin(*out),
+    detail::bayerDecodeBorderRowXGGY(TU::cbegin(*ic), TU::cend(*ic),
+				     TU::cbegin(*in), TU::begin(*out),
 				     &COLOR::b, &COLOR::r);
     ++out;
     auto	ip = ic;
     for (++ic; ++in != ie; ++ip, ++ic)
     {
-	detail::bayerDecodeRowXGGY(std::cbegin(*ic), std::cend(*ic),
-				   std::cbegin(*ip), std::cbegin(*in),
-				   std::begin(*out), &COLOR::b, &COLOR::r);
+	detail::bayerDecodeRowXGGY(TU::cbegin(*ic), TU::cend(*ic),
+				   TU::cbegin(*ip), TU::cbegin(*in),
+				   TU::begin(*out), &COLOR::b, &COLOR::r);
 	++out;
 	++ip;
 	++ic;
 	++in;
-	detail::bayerDecodeRowGXYG(std::cbegin(*ic), std::cend(*ic),
-				   std::cbegin(*ip), std::cbegin(*in),
-				   std::begin(*out), &COLOR::r, &COLOR::b);
+	detail::bayerDecodeRowGXYG(TU::cbegin(*ic), TU::cend(*ic),
+				   TU::cbegin(*ip), TU::cbegin(*in),
+				   TU::begin(*out), &COLOR::r, &COLOR::b);
 	++out;
     }
-    detail::bayerDecodeBorderRowGXYG(std::cbegin(*ic), std::cend(*ic),
-				     std::cbegin(*ip), std::begin(*out),
+    detail::bayerDecodeBorderRowGXYG(TU::cbegin(*ic), TU::cend(*ic),
+				     TU::cbegin(*ip), TU::begin(*out),
 				     &COLOR::r, &COLOR::b);
 
     return ++out;
@@ -1026,27 +1026,27 @@ bayerDecodeGRBG(IN in, IN ie, OUT out)
 
     auto	ic = in;
     ++in;
-    detail::bayerDecodeBorderRowGXYG(std::cbegin(*ic), std::cend(*ic),
-				     std::cbegin(*in), std::begin(*out),
+    detail::bayerDecodeBorderRowGXYG(TU::cbegin(*ic), TU::cend(*ic),
+				     TU::cbegin(*in), TU::begin(*out),
 				     &COLOR::r, &COLOR::b);
     ++out;
     auto	ip = ic;
     for (++ic; ++in != ie; ++ip, ++ic)
     {
-	detail::bayerDecodeRowGXYG(std::cbegin(*ic), std::cend(*ic),
-				   std::cbegin(*ip), std::cbegin(*in),
-				   std::begin(*out), &COLOR::r, &COLOR::b);
+	detail::bayerDecodeRowGXYG(TU::cbegin(*ic), TU::cend(*ic),
+				   TU::cbegin(*ip), TU::cbegin(*in),
+				   TU::begin(*out), &COLOR::r, &COLOR::b);
 	++out;
 	++ip;
 	++ic;
 	++in;
-	detail::bayerDecodeRowXGGY(std::cbegin(*ic), std::cend(*ic),
-				   std::cbegin(*ip), std::cbegin(*in),
-				   std::begin(*out), &COLOR::b, &COLOR::r);
+	detail::bayerDecodeRowXGGY(TU::cbegin(*ic), TU::cend(*ic),
+				   TU::cbegin(*ip), TU::cbegin(*in),
+				   TU::begin(*out), &COLOR::b, &COLOR::r);
 	++out;
     }
-    detail::bayerDecodeBorderRowXGGY(std::cbegin(*ic), std::cend(*ic),
-				     std::cbegin(*ip), std::begin(*out),
+    detail::bayerDecodeBorderRowXGGY(TU::cbegin(*ic), TU::cend(*ic),
+				     TU::cbegin(*ip), TU::begin(*out),
 				     &COLOR::b, &COLOR::r);
 
     return ++out;
@@ -1062,27 +1062,27 @@ bayerDecodeGBRG(IN in, IN ie, OUT out)
 
     auto	ic = in;
     ++in;
-    detail::bayerDecodeBorderRowGXYG(std::cbegin(*ic), std::cend(*ic),
-				     std::cbegin(*in), std::begin(*out),
+    detail::bayerDecodeBorderRowGXYG(TU::cbegin(*ic), TU::cend(*ic),
+				     TU::cbegin(*in), begin(*out),
 				     &COLOR::b, &COLOR::r);
     ++out;
     auto	ip = ic;
     for (++ic; ++in != ie; ++ip, ++ic)
     {
-	detail::bayerDecodeRowGXYG(std::cbegin(*ic), std::cend(*ic),
-				   std::cbegin(*ip), std::cbegin(*in),
-				   std::begin(*out), &COLOR::b, &COLOR::r);
+	detail::bayerDecodeRowGXYG(TU::cbegin(*ic), TU::cend(*ic),
+				   TU::cbegin(*ip), TU::cbegin(*in),
+				   TU::begin(*out), &COLOR::b, &COLOR::r);
 	++out;
 	++ip;
 	++ic;
 	++in;
-	detail::bayerDecodeRowXGGY(std::cbegin(*ic), std::cend(*ic),
-				   std::cbegin(*ip), std::cbegin(*in),
-				   std::begin(*out), &COLOR::r, &COLOR::b);
+	detail::bayerDecodeRowXGGY(TU::cbegin(*ic), TU::cend(*ic),
+				   TU::cbegin(*ip), TU::cbegin(*in),
+				   TU::begin(*out), &COLOR::r, &COLOR::b);
 	++out;
     }
-    detail::bayerDecodeBorderRowXGGY(std::cbegin(*ic), std::cend(*ic),
-				     std::cbegin(*ip), std::begin(*out),
+    detail::bayerDecodeBorderRowXGGY(TU::cbegin(*ic), TU::cend(*ic),
+				     TU::cbegin(*ip), TU::begin(*out),
 				     &COLOR::r, &COLOR::b);
 
     return ++out;
@@ -1491,24 +1491,24 @@ Image<T, ALLOC>::restoreRows(std::istream& in, const TypeInfo& typeInfo)
     Array<S>		buf(width());
     if (typeInfo.bottomToTop)
     {
-	for (auto row = rbegin(); row != rend(); ++row)
+	for (auto iter = rbegin(); iter != rend(); ++iter)
 	{
 	    if (!buf.restore(in) || !in.ignore(npads))
 		break;
 	    std::copy(make_pixel_iterator(buf.cbegin()),
 		      make_pixel_iterator(buf.cend()),
-		      make_pixel_iterator(std::begin(*row)));
+		      make_pixel_iterator(TU::begin(*iter)));
 	}
     }
     else
     {
-	for (auto row = begin(); row != end(); ++row)
+	for (auto&& row : *this)
 	{
 	    if (!buf.restore(in) || !in.ignore(npads))
 		break;
 	    std::copy(make_pixel_iterator(buf.cbegin()),
 		      make_pixel_iterator(buf.cend()),
-		      make_pixel_iterator(std::begin(*row)));
+		      make_pixel_iterator(row.begin()));
 	}
     }
 
@@ -1526,7 +1526,7 @@ Image<T, ALLOC>::restoreAndLookupRows(std::istream& in,
     Array<S>		buf(width());
     if (typeInfo.bottomToTop)
     {
-	for (auto row = rbegin(); row != rend(); ++row)    
+	for (auto iter = rbegin(); iter != rend(); ++iter)
 	{
 	    if (!buf.restore(in) || !in.ignore(npads))
 		break;
@@ -1534,12 +1534,12 @@ Image<T, ALLOC>::restoreAndLookupRows(std::istream& in,
 					      colormap, buf.cbegin())),
 		      make_pixel_iterator(TU::make_transform_iterator(
 					      colormap, buf.cend())),
-		      make_pixel_iterator(std::begin(*row)));
+		      make_pixel_iterator(TU::begin(*iter)));
 	}
     }
     else
     {
-	for (auto row = begin(); row != end(); ++row)
+	for (auto&& row : *this)
 	{
 	    if (!buf.restore(in) || !in.ignore(npads))
 		break;
@@ -1547,7 +1547,7 @@ Image<T, ALLOC>::restoreAndLookupRows(std::istream& in,
 					      colormap, buf.cbegin())),
 		      make_pixel_iterator(TU::make_transform_iterator(
 					      colormap, buf.cend())),
-		      make_pixel_iterator(std::begin(*row)));
+		      make_pixel_iterator(row.begin()));
 	}
     }
 
@@ -1570,8 +1570,8 @@ Image<T, ALLOC>::saveRows(std::ostream& out, Type type) const
     {
 	for (auto row = rbegin(); row != rend(); ++row)
 	{
-	    std::copy(make_pixel_iterator(std::begin(*row)),
-		      make_pixel_iterator(std::end(*row)),
+	    std::copy(make_pixel_iterator(TU::begin(*row)),
+		      make_pixel_iterator(TU::end(*row)),
 		      make_pixel_iterator(buf.begin()));
 	    if (!buf.save(out) || !pad.save(out))
 		break;
@@ -1581,8 +1581,8 @@ Image<T, ALLOC>::saveRows(std::ostream& out, Type type) const
     {
 	for (auto row = begin(); row != end(); ++row)
 	{
-	    std::copy(make_pixel_iterator(std::begin(*row)),
-		      make_pixel_iterator(std::end(*row)),
+	    std::copy(make_pixel_iterator(TU::begin(*row)),
+		      make_pixel_iterator(TU::end(*row)),
 		      make_pixel_iterator(buf.begin()));
 	    if (!buf.save(out) || !pad.save(out))
 		break;

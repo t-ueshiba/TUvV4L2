@@ -78,8 +78,8 @@ ICIA<MAP>::initialize(const IMAGE& src)
     Array2<value_type>		edgeH(size<0>(src), size<1>(src));
     Array2<value_type>		edgeV(size<0>(src), size<1>(src));
     DericheConvolver2<float>	convolver(_params.alpha);
-    convolver.diffH(std::begin(src), std::end(src), edgeH.begin());
-    convolver.diffV(std::begin(src), std::end(src), edgeV.begin());
+    convolver.diffH(TU::cbegin(src), TU::cend(src), edgeH.begin());
+    convolver.diffV(TU::cbegin(src), TU::cend(src), edgeV.begin());
 
     initialize(edgeH, edgeV);
 }
@@ -94,10 +94,10 @@ ICIA<MAP>::initialize(const IMAGE& edgeH, const IMAGE& edgeV)
   // 変換パラメータに関する原画像の輝度勾配とモーメント行列を求める．
     for (size_t v = 0; v < _grad.nrow(); ++v)
     {
-	auto	eH   = std::begin(edgeH[v]);
-	auto	eV   = std::begin(edgeV[v]);
-	auto	grad = std::begin(_grad[v]);
-	auto	M    = std::begin(_M[v]);
+	auto	eH   = TU::cbegin(edgeH[v]);
+	auto	eV   = TU::cbegin(edgeV[v]);
+	auto	grad = TU::begin(_grad[v]);
+	auto	M    = TU::begin(_M[v]);
 	
 	if (v == 0)
 	{
@@ -250,7 +250,7 @@ ICIA<MAP>::sqrerr(const IMAGE& src, const IMAGE& dst,
     size_t	npoints = 0;
     for (size_t v = v0; v < v0 + h; ++v)
     {
-	auto	sval = std::begin(src[v]) + u0;
+	auto	sval = TU::cbegin(src[v]) + u0;
 	auto	grad = _grad[v].cbegin() + u0;
 		
 	for (size_t u = u0; u < u0 + w; ++u)

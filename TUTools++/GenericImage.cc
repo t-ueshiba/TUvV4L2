@@ -25,14 +25,14 @@ GenericImage::restoreData(std::istream& in)
     if (_typeInfo.bottomToTop)
     {
 	for (auto line = _a.rbegin(); line != _a.rend(); ++line)
-	    if (!in.read(std::begin(*line), std::size(*line)) ||
+	    if (!in.read(TU::begin(*line), TU::size(*line)) ||
 		!in.ignore(npads))
 		break;
     }
     else
     {
 	for (auto line : _a)
-	    if (!in.read(std::begin(line), std::size(line)) ||
+	    if (!in.read(TU::begin(line), TU::size(line)) ||
 		!in.ignore(npads))
 		break;
     }
@@ -59,14 +59,14 @@ GenericImage::saveData(std::ostream& out) const
     if (_typeInfo.bottomToTop)
     {
 	for (auto line = _a.rbegin(); line != _a.rend(); ++line)
-	    if (!out.write(std::begin(*line), std::size(*line)) ||
+	    if (!out.write(TU::cbegin(*line), TU::size(*line)) ||
 		!pad.save(out))
 		break;
     }
     else
     {
-	for (auto line : _a)
-	    if (!out.write(std::begin(line), std::size(line)) ||
+	for (auto&& line : _a)
+	    if (!out.write(TU::cbegin(line), TU::size(line)) ||
 		!pad.save(out))
 		break;
     }

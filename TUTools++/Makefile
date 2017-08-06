@@ -96,7 +96,6 @@ HDRS		= TU/Array++.h \
 		TU/pair.h \
 		TU/range.h \
 		TU/simd/Array++.h \
-		TU/simd/algorithm.h \
 		TU/simd/allocator.h \
 		TU/simd/arithmetic.h \
 		TU/simd/arm/arch.h \
@@ -135,6 +134,7 @@ HDRS		= TU/Array++.h \
 		TU/simd/select.h \
 		TU/simd/shift.h \
 		TU/simd/shift_iterator.h \
+		TU/simd/shifted_iterator.h \
 		TU/simd/simd.h \
 		TU/simd/transform.h \
 		TU/simd/type_traits.h \
@@ -344,9 +344,9 @@ EdgeDetector.o: TU/simd/Array++.h TU/simd/simd.h TU/simd/config.h \
 	TU/simd/x86/svml.h TU/simd/transform.h TU/iterator.h TU/functional.h \
 	TU/simd/lookup.h TU/simd/x86/lookup.h TU/simd/arm/lookup.h \
 	TU/simd/load_store_iterator.h TU/simd/cvtdown_iterator.h \
-	TU/simd/cvtup_iterator.h TU/simd/shift_iterator.h TU/simd/algorithm.h \
-	TU/algorithm.h TU/Array++.h TU/range.h TU/EdgeDetector.h TU/Image++.h \
-	TU/Vector++.h TU/Geometry++.h TU/Minimize.h
+	TU/simd/cvtup_iterator.h TU/simd/shift_iterator.h TU/algorithm.h \
+	TU/Array++.h TU/range.h TU/EdgeDetector.h TU/Image++.h TU/Vector++.h \
+	TU/Geometry++.h TU/Minimize.h
 FIRGaussianCoefficients.o: TU/FIRGaussianConvolver.h TU/FIRFilter.h \
 	TU/SeparableFilter2.h TU/Array++.h TU/range.h TU/iterator.h \
 	TU/tuple.h TU/algorithm.h
@@ -381,9 +381,9 @@ Rectify.o: TU/Rectify.h TU/Warp.h TU/simd/Array++.h TU/simd/simd.h \
 	TU/simd/x86/svml.h TU/simd/transform.h TU/iterator.h TU/functional.h \
 	TU/simd/lookup.h TU/simd/x86/lookup.h TU/simd/arm/lookup.h \
 	TU/simd/load_store_iterator.h TU/simd/cvtdown_iterator.h \
-	TU/simd/cvtup_iterator.h TU/simd/shift_iterator.h TU/simd/algorithm.h \
-	TU/algorithm.h TU/Array++.h TU/range.h TU/Image++.h TU/Vector++.h \
-	TU/Camera++.h TU/Geometry++.h TU/Minimize.h
+	TU/simd/cvtup_iterator.h TU/simd/shift_iterator.h TU/algorithm.h \
+	TU/Array++.h TU/range.h TU/Image++.h TU/Vector++.h TU/Camera++.h \
+	TU/Geometry++.h TU/Minimize.h
 SHOT602.o: TU/SHOT602.h TU/Serial.h TU/fdstream.h TU/Manip.h
 SURFCreator.o: TU/SURFCreator.h TU/simd/simd.h TU/simd/config.h \
 	TU/simd/vec.h TU/simd/type_traits.h TU/simd/x86/type_traits.h \
@@ -407,9 +407,9 @@ SURFCreator.o: TU/SURFCreator.h TU/simd/simd.h TU/simd/config.h \
 	TU/simd/lookup.h TU/simd/x86/lookup.h TU/simd/arm/lookup.h \
 	TU/simd/load_store_iterator.h TU/simd/cvtdown_iterator.h \
 	TU/simd/cvtup_iterator.h TU/simd/shift_iterator.h TU/simd/Array++.h \
-	TU/simd/algorithm.h TU/algorithm.h TU/Array++.h TU/range.h \
-	TU/Feature.h TU/Geometry++.h TU/Minimize.h TU/Vector++.h TU/Manip.h \
-	TU/IntegralImage.h TU/Image++.h
+	TU/algorithm.h TU/Array++.h TU/range.h TU/Feature.h TU/Geometry++.h \
+	TU/Minimize.h TU/Vector++.h TU/Manip.h TU/IntegralImage.h \
+	TU/Image++.h
 Serial.o: TU/Serial.h TU/fdstream.h
 TriggerGenerator.o: TU/TriggerGenerator.h TU/Serial.h TU/fdstream.h \
 	TU/Manip.h

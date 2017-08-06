@@ -13,74 +13,7 @@
 
 namespace std
 {
-#if __cplusplus < 201700L
-/************************************************************************
-*  function std::size(T)						*
-************************************************************************/
-template <class T> inline size_t
-size(const T& x)
-{
-    return x.size();
-}
-template <class T, size_t N> inline constexpr size_t
-size(const T (&array)[N]) noexcept
-{
-    return N;
-}
-#endif
-
 #if __cplusplus < 201402L    
-/************************************************************************
-*  std::[rbegin|rend|cbegin|cend|crbegin|crend](T)			*
-************************************************************************/
-template <class T> inline auto
-rbegin(const T& x) -> decltype(x.rbegin())
-{
-    return x.rbegin();
-}
-    
-template <class T> inline auto
-rbegin(T& x) -> decltype(x.rbegin())
-{
-    return x.rbegin();
-}
-    
-template <class T> inline auto
-rend(const T& x) -> decltype(x.rend())
-{
-    return x.rend();
-}
-    
-template <class T> inline auto
-rend(T& x) -> decltype(x.rend())
-{
-    return x.rend();
-}
-    
-template <class T> inline auto
-cbegin(const T& x) -> decltype(std::begin(x))
-{
-    return std::begin(x);
-}
-    
-template <class T> inline auto
-cend(const T& x) -> decltype(std::end(x))
-{
-    return std::end(x);
-}
-
-template <class T> inline auto
-crbegin(const T& x) -> decltype(std::rbegin(x))
-{
-    return std::rbegin(x);
-}
-    
-template <class T> inline auto
-crend(const T& x) -> decltype(std::rend(x))
-{
-    return std::rend(x);
-}
-
 template <class ITER> inline auto
 make_reverse_iterator(ITER iter)
 {
@@ -243,46 +176,84 @@ using decayed_iterator_value = typename detail::decayed_iterator_value<ITER>
 					      ::type;
 
 /************************************************************************
-*  TU::[begin|end|rbegin|rend](std::tuple<T...>)			*
+*  TU::[begin|end|rbegin|rend](T&&), TU::size(const T&)			*
 ************************************************************************/
-namespace detail
+template <class T> inline auto
+begin(T&& x) -> decltype(x.begin())
 {
-  struct generic_begin
-  {
-      template <class T>
-      auto	operator ()(T&& x) const
-		{
-		    using	std::begin;
-		    return begin(std::forward<T>(x));
-		}
-  };
-  struct generic_end
-  {
-      template <class T>
-      auto	operator ()(T&& x) const
-		{
-		    using	std::end;
-		    return end(std::forward<T>(x));
-		}
-  };
+    return x.begin();
+}
+
+template <class T> inline auto
+end(T&& x) -> decltype(x.end())
+{
+    return x.end();
 }
     
+template <class T> inline auto
+rbegin(T&& x) -> decltype(x.rbegin())
+{
+    return x.rbegin();
+}
+    
+template <class T> inline auto
+rend(T&& x) -> decltype(x.rend())
+{
+    return x.rend();
+}
+
+template <class T> inline auto
+size(const T& x) -> decltype(x.size())
+{
+    return x.size();
+}
+
+template <class T, size_t N> constexpr T*
+begin(T (&array)[N]) noexcept
+{
+    return array;
+}
+
+template <class T, size_t N> constexpr T*
+end(T (&array)[N]) noexcept
+{
+    return array + N;
+}
+
+template <class T, size_t N> std::reverse_iterator<T*>
+rbegin(T (&array)[N])
+{
+    return {array + N};
+}
+
+template <class T, size_t N> std::reverse_iterator<T*>
+rend(T (&array)[N])
+{
+    return {array};
+}
+
+template <class T, size_t N> inline constexpr size_t
+size(const T (&array)[N]) noexcept
+{
+    return N;
+}
+
 template <class TUPLE,
 	  std::enable_if_t<is_tuple<TUPLE>::value>* = nullptr> inline auto
 begin(TUPLE&& t)
 {
-  // icpc-17.0.4 のバグ対策のため，lambdaを用いずに実装
-    return TU::make_zip_iterator(tuple_transform(detail::generic_begin(),
-						 std::forward<TUPLE>(t)));
+    return TU::make_zip_iterator(tuple_transform(
+  				     [](auto&& x){ return begin(x); },
+  				     std::forward<TUPLE>(t)));
 }
 
 template <class TUPLE,
 	  std::enable_if_t<is_tuple<TUPLE>::value>* = nullptr> inline auto
 end(TUPLE&& t)
 {
-  // icpc-17.0.4 のバグ対策のため，lambdaを用いずに実装
-    return TU::make_zip_iterator(tuple_transform(detail::generic_end(),
-						 std::forward<TUPLE>(t)));
+    return TU::make_zip_iterator(tuple_transform(
+  				     [](auto&& x){ return end(x); },
+				     std::forward<TUPLE>(t)));
 }
 
 template <class TUPLE,
@@ -300,36 +271,35 @@ rend(TUPLE&& t)
 }
 
 template <class... T> inline auto
-cbegin(const std::tuple<T...>& t)
-{
-    return begin(t);
-}
-
-template <class... T> inline auto
-cend(const std::tuple<T...>& t)
-{
-    return end(t);
-}
-
-template <class... T> inline auto
-crbegin(const std::tuple<T...>& t)
-{
-    return rbegin(t);
-}
-
-template <class... T> inline auto
-crend(const std::tuple<T...>& t)
-{
-    return rend(t);
-}
-
-template <class... T> inline auto
 size(const std::tuple<T...>& t)
 {
-    using std::size;
-    return size(std::get<0>(t));
+    return TU::size(std::get<0>(t));
 }
 
+template <class T> inline auto
+cbegin(const T& x) -> decltype(TU::begin(x))
+{
+    return TU::begin(x);
+}
+    
+template <class T> inline auto
+cend(const T& x) -> decltype(TU::end(x))
+{
+    return TU::end(x);
+}
+    
+template <class T> inline auto
+crbegin(const T& x) -> decltype(TU::rbegin(x))
+{
+    return TU::rbegin(x);
+}
+    
+template <class T> inline auto
+crend(const T& x) -> decltype(TU::rend(x))
+{
+    return TU::rend(x);
+}
+    
 /************************************************************************
 *  transform_iterator<FUNC, ITER...>					*
 ************************************************************************/
@@ -577,7 +547,7 @@ class row2col
     
     decltype(auto)	operator ()(argument_type row) const
 			{
-			    return *(std::begin(row) + _col);
+			    return *(TU::begin(row) + _col);
 			}
     
   private:
