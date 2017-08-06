@@ -604,7 +604,7 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 		{
 		    constexpr auto	S = detail::max<size0(),
 							TU::size0<E_>()>::value;
-		    copy<S>(std::cbegin(expr), size(), begin());
+		    copy<S>(TU::cbegin(expr), size(), begin());
 		}
     template <class E_>
     std::enable_if_t<TU::rank<E_>() == rank() + TU::rank<T>(), array&>
@@ -615,7 +615,7 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 				  super::Alignment);
 		    constexpr auto	S = detail::max<size0(),
 							TU::size0<E_>()>::value;
-		    copy<S>(std::cbegin(expr), size(), begin());
+		    copy<S>(TU::cbegin(expr), size(), begin());
 
 		    return *this;
 		}
@@ -894,6 +894,7 @@ namespace simd
 {
   template <class T>	class vec;
   template <class T>	class allocator;
+  template <class ITER>	class iterator_wrapper;
 }
 #endif
     
@@ -938,7 +939,7 @@ namespace detail
 	  using type = array<T_, ALLOC_, SIZE_, SIZES_...>;
       };
 
-      using ITER = iterator_t<E>;
+      using ITER = TU::iterator_t<E>;
       using F	 = typename substance_t<iterator_value<ITER>,
 					is_range_or_opnode>::type;
       
@@ -988,7 +989,7 @@ template <class E>
 inline std::enable_if_t<detail::is_opnode<E>::value, std::ostream&>
 operator <<(std::ostream& out, const E& expr)
 {
-    for (auto iter = std::begin(expr); iter != std::end(expr); ++iter)
+    for (auto iter = TU::cbegin(expr); iter != TU::cend(expr); ++iter)
 	out << ' ' << *iter;
     return out << std::endl;
 }
@@ -1061,16 +1062,16 @@ namespace detail
 		  // binder2nd そのものではなく，それへの定数参照とする
 		  // ことにより，キャッシュのコピーを防ぐ
 		    return TU::make_transform_iterator(std::cref(_binder),
-						       std::cbegin(_l));
+						       TU::cbegin(_l));
 		}
       auto	end() const
 		{
 		    return TU::make_transform_iterator(std::cref(_binder),
-						       std::cend(_l));
+						       TU::cend(_l));
 		}
       auto	size() const
 		{
-		    return std::size(_l);
+		    return TU::size(_l);
 		}
       decltype(auto)
 		operator [](size_t i) const
@@ -1096,8 +1097,8 @@ namespace detail
     private:
     // 未評価でもメンバ関数 size() を呼べるために遅延評価機構を導入
       using	cache_t = typename substance_t<
-				decltype(*std::cbegin(std::declval<L>()) *
-					 *std::cbegin(std::declval<R>())),
+				decltype(*TU::cbegin(std::declval<L>()) *
+					 *TU::cbegin(std::declval<R>())),
 				is_range_or_opnode>::type;
       
     public:
@@ -1105,7 +1106,7 @@ namespace detail
 		    :_l(std::forward<L>(l)), _r(std::forward<R>(r)),
 		     _valid(false), _cache()
 		{
-		    assert(std::size(l) == std::size(r));
+		    assert(TU::size(l) == TU::size(r));
 		}
       
       constexpr static auto
@@ -1140,10 +1141,10 @@ namespace detail
 			constexpr auto	N = max<TU::size0<L>(),
 						TU::size0<R>(), 1>::value - 1;
 			
-			auto	a = std::cbegin(_l);
-			auto	b = std::cbegin(_r);
+			auto	a = TU::cbegin(_l);
+			auto	b = TU::cbegin(_r);
 			_cache = *a * *b;
-			TU::for_each<N>(++a, std::size(_l) - 1, ++b,
+			TU::for_each<N>(++a, TU::size(_l) - 1, ++b,
 					[this](const auto& x, const auto& y)
 					{ _cache += x * y; });
 			_valid = true;
@@ -1185,7 +1186,7 @@ operator *(const L& l, const R& r)
 
     assert(size<0>(l) == size<0>(r));
     constexpr size_t	S = detail::max<size0<L>(), size0<R>()>::value;
-    return inner_product<S>(std::cbegin(l), std::size(l), std::cbegin(r),
+    return inner_product<S>(TU::cbegin(l), TU::size(l), TU::cbegin(r),
 			    value_type(0));
 }
 

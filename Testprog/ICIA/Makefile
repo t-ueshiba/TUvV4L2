@@ -55,7 +55,6 @@ EXTHDRS		= ../../TU/Array++.h \
 		../../TU/pair.h \
 		../../TU/range.h \
 		../../TU/simd/Array++.h \
-		../../TU/simd/algorithm.h \
 		../../TU/simd/allocator.h \
 		../../TU/simd/arithmetic.h \
 		../../TU/simd/arm/arch.h \
@@ -159,9 +158,8 @@ main.o: ../../TU/Warp.h ../../TU/simd/Array++.h ../../TU/simd/simd.h \
 	../../TU/simd/lookup.h ../../TU/simd/x86/lookup.h \
 	../../TU/simd/arm/lookup.h ../../TU/simd/load_store_iterator.h \
 	../../TU/simd/cvtdown_iterator.h ../../TU/simd/cvtup_iterator.h \
-	../../TU/simd/shift_iterator.h ../../TU/simd/algorithm.h \
-	../../TU/algorithm.h ../../TU/Array++.h ../../TU/range.h \
-	../../TU/Image++.h ../../TU/Vector++.h ../../TU/Camera++.h \
-	../../TU/Geometry++.h ../../TU/Minimize.h ../../TU/ICIA.h \
-	../../TU/DericheConvolver.h ../../TU/IIRFilter.h \
-	../../TU/SeparableFilter2.h ../../TU/Profiler.h
+	../../TU/simd/shift_iterator.h ../../TU/algorithm.h \
+	../../TU/Array++.h ../../TU/range.h ../../TU/Image++.h \
+	../../TU/Vector++.h ../../TU/Camera++.h ../../TU/Geometry++.h \
+	../../TU/Minimize.h ../../TU/ICIA.h ../../TU/DericheConvolver.h \
+	../../TU/IIRFilter.h ../../TU/SeparableFilter2.h ../../TU/Profiler.h

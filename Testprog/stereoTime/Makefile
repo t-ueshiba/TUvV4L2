@@ -65,7 +65,6 @@ EXTHDRS		= ../../TU/Array++.h \
 		../../TU/pair.h \
 		../../TU/range.h \
 		../../TU/simd/Array++.h \
-		../../TU/simd/algorithm.h \
 		../../TU/simd/allocator.h \
 		../../TU/simd/arithmetic.h \
 		../../TU/simd/arm/arch.h \
@@ -171,10 +170,10 @@ Rectify.o: ../../TU/Rectify.h ../../TU/Warp.h ../../TU/simd/Array++.h \
 	../../TU/simd/lookup.h ../../TU/simd/x86/lookup.h \
 	../../TU/simd/arm/lookup.h ../../TU/simd/load_store_iterator.h \
 	../../TU/simd/cvtdown_iterator.h ../../TU/simd/cvtup_iterator.h \
-	../../TU/simd/shift_iterator.h ../../TU/simd/algorithm.h \
-	../../TU/algorithm.h ../../TU/Array++.h ../../TU/range.h \
-	../../TU/Image++.h ../../TU/Vector++.h ../../TU/Camera++.h \
-	../../TU/Geometry++.h ../../TU/Minimize.h
+	../../TU/simd/shift_iterator.h ../../TU/algorithm.h \
+	../../TU/Array++.h ../../TU/range.h ../../TU/Image++.h \
+	../../TU/Vector++.h ../../TU/Camera++.h ../../TU/Geometry++.h \
+	../../TU/Minimize.h
 main.o: ../../TU/io.h ../../TU/Rectify.h ../../TU/Warp.h \
 	../../TU/simd/Array++.h ../../TU/simd/simd.h ../../TU/simd/config.h \
 	../../TU/simd/vec.h ../../TU/simd/type_traits.h \
@@ -207,8 +206,8 @@ main.o: ../../TU/io.h ../../TU/Rectify.h ../../TU/Warp.h \
 	../../TU/simd/x86/lookup.h ../../TU/simd/arm/lookup.h \
 	../../TU/simd/load_store_iterator.h ../../TU/simd/cvtdown_iterator.h \
 	../../TU/simd/cvtup_iterator.h ../../TU/simd/shift_iterator.h \
-	../../TU/simd/algorithm.h ../../TU/algorithm.h ../../TU/Array++.h \
-	../../TU/range.h ../../TU/Image++.h ../../TU/Vector++.h \
-	../../TU/Camera++.h ../../TU/Geometry++.h ../../TU/Minimize.h \
-	../../TU/SADStereo.h ../../TU/StereoBase.h ../../TU/Profiler.h \
-	../../TU/BoxFilter.h ../../TU/Filter2.h ../../TU/GFStereo.h
+	../../TU/algorithm.h ../../TU/Array++.h ../../TU/range.h \
+	../../TU/Image++.h ../../TU/Vector++.h ../../TU/Camera++.h \
+	../../TU/Geometry++.h ../../TU/Minimize.h ../../TU/SADStereo.h \
+	../../TU/StereoBase.h ../../TU/Profiler.h ../../TU/BoxFilter.h \
+	../../TU/Filter2.h ../../TU/GFStereo.h

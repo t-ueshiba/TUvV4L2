@@ -7,6 +7,7 @@
 #define TU_GUIDEDFILTER_H
 
 #include "TU/BoxFilter.h"
+#include <boost/core/demangle.hpp>
 
 namespace TU
 {
@@ -23,7 +24,7 @@ class GuidedFilter : public BoxFilter
     struct init_params
     {
 	template <class IN_, class GUIDE_>
-	auto	operator ()(const IN_& p, const GUIDE_& g) const
+	auto	operator ()(IN_&& p, GUIDE_&& g) const
 		{
 		    return std::make_tuple(p, g, evaluate(p*g), g*g);
 		}
@@ -31,7 +32,7 @@ class GuidedFilter : public BoxFilter
       // 引数型をuniversal reference(IN_&&)にすると上記関数とオーバーロード
       // できなくなるので，const IN_& とする．
 	template <class IN_>
-	auto	operator ()(const IN_& p) const
+	auto	operator ()(IN_&& p) const
 		{
 		    return std::make_tuple(p, p*p);
 		}
@@ -83,7 +84,7 @@ class GuidedFilter : public BoxFilter
 
 		    get<1>(t) = (get<0>(coeffs)*get<0>(t) + get<1>(coeffs))/_n;
 		}
-	
+
       private:
 	const size_t	_n;
     };
@@ -228,26 +229,26 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out) const
 				    iterator_t<
 					decayed_iterator_value<IN> > >, T>;
     using coeffs_t	= std::tuple<coeff_t, coeff_t>;
-    using		std::cbegin;
-    using		std::size;
 
     if (ib == ie)
 	return;
 
     const auto		n    = rowWinSize() * colWinSize();
     const auto		nrow = super::outRowLength(std::distance(ib, ie));
-    const auto		ncol = super::outColLength(size(*ib));
+    const auto		ncol = super::outColLength(TU::size(*ib));
     Array2<coeffs_t>	c(nrow, ncol);
     
   // guided filterの2次元係数ベクトルを計算する．
     super::convolve<T>(make_range_iterator(
 			   TU::make_transform_iterator(
 			       init_params(), cbegin(*ib), cbegin(*gb)),
-			   std::make_tuple(stride(ib), stride(gb)), size(*ib)),
+			   std::make_tuple(stride(ib), stride(gb)),
+			   TU::size(*ib)),
 		       make_range_iterator(
 			   TU::make_transform_iterator(
 			       init_params(), cbegin(*ie), cbegin(*ge)),
-			   std::make_tuple(stride(ie), stride(ge)), size(*ie)),
+			   std::make_tuple(stride(ie), stride(ge)),
+			   TU::size(*ie)),
 		       make_range_iterator(
 			   make_assignment_iterator(c.begin()->begin(),
 						    init_coeffs(n, _e)),
@@ -263,7 +264,7 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out) const
 			       += (colWinSize() - 1),
 			       trans_guides(n)),
 			   std::make_tuple(stride(gb), stride(out)),
-			   size(*out)));
+			   TU::size(*out)));
 }
 
 //! 2次元入力データにguided filterを適用する
@@ -282,26 +283,24 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, OUT out) const
 				    iterator_t<
 					decayed_iterator_value<IN> > >, T>;
     using coeffs_t	= std::tuple<coeff_t, coeff_t>;
-    using		std::cbegin;
-    using		std::size;
     
     if (ib == ie)
 	return;
 
     const auto		n    = rowWinSize() * colWinSize();
     const auto		nrow = super::outRowLength(std::distance(ib, ie));
-    const auto		ncol = super::outColLength(size(*ib));
+    const auto		ncol = super::outColLength(TU::size(*ib));
     Array2<coeffs_t>	c(nrow, ncol);
 
   // guided filterの2次元係数ベクトルを計算する．
     super::convolve<T>(make_range_iterator(
 			   TU::make_transform_iterator(
 			       init_params(), cbegin(*ib)),
-			   stride(ib), size(*ib)),
+			   stride(ib), TU::size(*ib)),
 		       make_range_iterator(
 			   TU::make_transform_iterator(
 			       init_params(), cbegin(*ie)),
-			   stride(ie), size(*ie)),
+			   stride(ie), TU::size(*ie)),
 		       make_range_iterator(
 			   make_assignment_iterator(c.begin()->begin(),
 						    init_coeffs(n, _e)),
@@ -317,7 +316,7 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, OUT out) const
 			       + colWinSize() - 1,
 			       trans_guides(n)),
 			   std::make_tuple(stride(ib), stride(out)),
-			   size(*out)));
+			   TU::size(*out)));
 }
 
 }

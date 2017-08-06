@@ -89,12 +89,12 @@ class MinIdx
     template <class SCORES_>
     size_t	operator ()(const SCORES_& R) const
 		{
-		    auto	RminL = std::cbegin(R);
-		    for (auto iter = std::cbegin(R); iter != std::cend(R);
+		    auto	RminL = TU::cbegin(R);
+		    for (auto iter = TU::cbegin(R); iter != TU::cend(R);
 			 ++iter)
 			if (*iter < *RminL)
 			    RminL = iter;
-		    return _disparityMax - (RminL - std::cbegin(R));
+		    return _disparityMax - (RminL - TU::cbegin(R));
 		}
   private:
     const size_t	_disparityMax;

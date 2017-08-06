@@ -63,11 +63,11 @@ doJob(const Image<T>& imageL, const Image<T>& imageR,
   // ステレオマッチングを行う．
     Image<disparity_type>	disparityMap(rectify.width(0),
 					     rectify.height(0));
-    const auto			rowL  = std::cbegin(rectifiedImageL);
-    const auto			rowR  = std::cbegin(rectifiedImageR);
-    const auto			rowLe = std::cend(rectifiedImageL);
-    const auto			rowRe = std::cend(rectifiedImageR);
-    const auto			rowD  = std::begin(disparityMap);
+    const auto			rowL  = TU::cbegin(rectifiedImageL);
+    const auto			rowR  = TU::cbegin(rectifiedImageR);
+    const auto			rowLe = TU::cend(rectifiedImageL);
+    const auto			rowRe = TU::cend(rectifiedImageR);
+    const auto			rowD  = TU::begin(disparityMap);
 #ifdef SCORE_ARRAY2
     Array2<Array<S> >		scores(disparityMap.height(),
 				       disparityMap.width());
@@ -80,31 +80,31 @@ doJob(const Image<T>& imageL, const Image<T>& imageR,
 	BoxFilter2	filter(params.windowSize, params.windowSize);
 
 	filter.convolve(make_range_iterator(
-			    make_diff_iterator<S>(std::cbegin(*rowL),
-						  std::cbegin(*rowR),
+			    make_diff_iterator<S>(TU::cbegin(*rowL),
+						  TU::cbegin(*rowR),
 						  params.disparitySearchWidth,
 						  params.intensityDiffMax),
 			    std::make_tuple(stride(rowL), stride(rowR)),
-			    std::size(*rowL)),
+			    TU::size(*rowL)),
 			make_range_iterator(
-			    make_diff_iterator<S>(std::cbegin(*rowLe),
-						  std::cbegin(*rowRe),
+			    make_diff_iterator<S>(TU::cbegin(*rowLe),
+						  TU::cbegin(*rowRe),
 						  params.disparitySearchWidth,
 						  params.intensityDiffMax),
 			    std::make_tuple(stride(rowLe), stride(rowRe)),
-			    std::size(*rowLe)),
+			    TU::size(*rowLe)),
 #ifdef SCORE_ARRAY2
 			scores.begin());
 #else
 			make_range_iterator(
 			    make_matching_iterator<S>(
-				std::begin(*(rowD + params.windowSize/2))
+				TU::begin(*(rowD + params.windowSize/2))
 				+ params.windowSize/2,
 				params.disparitySearchWidth,
 				params.disparityMax,
 				params.disparityInconsistency,
 				params.doHorizontalBackMatch),
-				stride(rowD), std::size(*rowD)));
+				stride(rowD), TU::size(*rowD)));
 #endif
       }
 	break;
@@ -115,31 +115,31 @@ doJob(const Image<T>& imageL, const Image<T>& imageR,
 		filter(params.windowSize, params.windowSize, params.sigma);
 	
 	filter.convolve(make_range_iterator(
-			    make_diff_iterator<S>(std::cbegin(*rowL),
-						  std::cbegin(*rowR),
+			    make_diff_iterator<S>(TU::cbegin(*rowL),
+						  TU::cbegin(*rowR),
 						  params.disparitySearchWidth,
 						  params.intensityDiffMax),
 			    std::make_tuple(stride(rowL), stride(rowR)),
-			    std::size(*rowL)),
+			    TU::size(*rowL)),
 			make_range_iterator(
-			    make_diff_iterator<S>(std::cbegin(*rowLe),
-						  std::cbegin(*rowRe),
+			    make_diff_iterator<S>(TU::cbegin(*rowLe),
+						  TU::cbegin(*rowRe),
 						  params.disparitySearchWidth,
 						  params.intensityDiffMax),
 			    std::make_tuple(stride(rowLe), stride(rowRe)),
-			    std::size(*rowLe)),
+			    TU::size(*rowLe)),
 			rowL, rowLe,
 #ifdef SCORE_ARRAY2
 			scores.begin());
 #else
 			make_range_iterator(
 			    make_matching_iterator<S>(
-				std::begin(*rowD),
+				TU::begin(*rowD),
 				params.disparitySearchWidth,
 				params.disparityMax,
 				params.disparityInconsistency,
 				params.doHorizontalBackMatch),
-			    stride(rowD), std::size(*rowD)));
+			    stride(rowD), TU::size(*rowD)));
 #endif
       }
 	break;
@@ -152,31 +152,31 @@ doJob(const Image<T>& imageL, const Image<T>& imageR,
 						       params.sigma);
 	
 	filter.convolve(make_range_iterator(
-			    make_diff_iterator<S>(std::cbegin(*rowL),
-						  std::cbegin(*rowR),
+			    make_diff_iterator<S>(TU::cbegin(*rowL),
+						  TU::cbegin(*rowR),
 						  params.disparitySearchWidth,
 						  params.intensityDiffMax),
 			    std::make_tuple(stride(rowL), stride(rowR)),
-			    std::size(*rowL)),
+			    TU::size(*rowL)),
 			make_range_iterator(
-			    make_diff_iterator<S>(std::cbegin(*rowLe),
-						  std::cbegin(*rowRe),
+			    make_diff_iterator<S>(TU::cbegin(*rowLe),
+						  TU::cbegin(*rowRe),
 						  params.disparitySearchWidth,
 						  params.intensityDiffMax),
 			    std::make_tuple(stride(rowLe), stride(rowRe)),
-			    std::size(*rowLe)),
+			    TU::size(*rowLe)),
 			rowL, rowLe,
 #ifdef SCORE_ARRAY2
 			scores.begin(),
 #else
 			make_range_iterator(
 			    make_matching_iterator<S>(
-				std::begin(*rowD),
+				TU::begin(*rowD),
 				params.disparitySearchWidth,
 				params.disparityMax,
 				params.disparityInconsistency,
 				params.doHorizontalBackMatch),
-			    stride(rowD), std::size(*rowD)),
+			    stride(rowD), TU::size(*rowD)),
 #endif
 			true);
       }
@@ -189,12 +189,12 @@ doJob(const Image<T>& imageL, const Image<T>& imageR,
 #ifdef SCORE_ARRAY2
     std::copy(scores.cbegin(), scores.cend(),
 	      make_range_iterator(make_matching_iterator<S>(
-				      std::begin(*rowD),
+				      TU::begin(*rowD),
 				      params.disparitySearchWidth,
 				      params.disparityMax,
 				      params.disparityInconsistency,
 				      params.doHorizontalBackMatch),
-				  stride(rowD), std::size(*rowD)));
+				  stride(rowD), TU::size(*rowD)));
 #endif
     disparityMap.save(std::cout);
 }
