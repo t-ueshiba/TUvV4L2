@@ -7,7 +7,6 @@
 #define TU_GUIDEDFILTER_H
 
 #include "TU/BoxFilter.h"
-#include <boost/core/demangle.hpp>
 
 namespace TU
 {
