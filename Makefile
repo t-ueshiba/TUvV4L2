@@ -134,7 +134,6 @@ HDRS		= TU/Array++.h \
 		TU/simd/select.h \
 		TU/simd/shift.h \
 		TU/simd/shift_iterator.h \
-		TU/simd/shifted_iterator.h \
 		TU/simd/simd.h \
 		TU/simd/transform.h \
 		TU/simd/type_traits.h \
@@ -161,6 +160,7 @@ HDRS		= TU/Array++.h \
 		TU/simd/x86/vec.h \
 		TU/simd/x86/zero.h \
 		TU/simd/zero.h \
+		TU/tmp.h \
 		TU/tuple.h
 SRCS		= ColorConverter.cc \
 		EdgeDetector.cc \
