@@ -1141,7 +1141,7 @@ namespace detail
 		}
       auto	end() const
 		{
-		    return TU::make_transform_iterator(_op, std::cend(_expr));
+		    return TU::make_transform_iterator(_op, TU::cend(_expr));
 		}
       auto	size() const
 		{
@@ -1202,7 +1202,7 @@ namespace detail
       auto	end() const
 		{
 		    return TU::make_transform_iterator(
-				_op, std::cend(_l), std::cend(_r));
+				_op, TU::cend(_l), TU::cend(_r));
 		}
       auto	size()	const	{ return TU::size(_l); }
       decltype(auto)
