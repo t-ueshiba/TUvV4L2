@@ -60,10 +60,24 @@ namespace detail
 
 // float <-> double
 #if defined(SSE2)
+  template <> inline dvec_t
+  cast_base(dvec_t x)
+  {
+      return x;
+  }
+
   SIMD_SPECIALIZED_FUNC(dvec_t cast_base<dvec_t>(fvec_t x),
 			cast, (x), fvec_t, dvec_t, SIMD_BASE)
   SIMD_SPECIALIZED_FUNC(fvec_t cast_base<fvec_t>(dvec_t x),
 			cast, (x), dvec_t, fvec_t, SIMD_BASE)
+#endif
+
+#if defined(SSE)
+  template <> inline fvec_t
+  cast_base(fvec_t x)
+  {
+      return x;
+  }
 #endif
 }	// namespace detail
       

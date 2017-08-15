@@ -69,7 +69,7 @@ inhomogeneous(const E& expr)
 					     Array<element_type, N-1> >;
 
     const auto	n = TU::size(expr) - 1;
-    return result_type(slice(expr, 0, n) / *(TU::cbegin(expr) + n));
+    return result_type(slice(expr, 0, n) / *(std::cbegin(expr) + n));
 }
 
 /************************************************************************

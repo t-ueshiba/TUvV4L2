@@ -309,15 +309,15 @@ GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowR, ROW_D rowD)
       // フィルタパラメータ(= 縦横両方向に積算された相違度(コスト)の総和
       // および画素毎のコストとガイド画素の積和)を初期化
 	if (rowL <= rowL0)
-	    initializeFilterParameters(TU::cbegin(*rowL), TU::cend(*rowL),
-				       TU::cbegin(*rowR),
+	    initializeFilterParameters(std::cbegin(*rowL), std::cend(*rowL),
+				       std::cbegin(*rowR),
 				       TU::begin(buffers->Q),
 				       TU::begin(buffers->F));
 	else
 	{
-	    updateFilterParameters(TU::cbegin(*rowL), TU::cend(*rowL),
-				   TU::cbegin(*rowR),
-				   TU::cbegin(*rowLp), TU::cbegin(*rowRp),
+	    updateFilterParameters(std::cbegin(*rowL), std::cend(*rowL),
+				   std::cbegin(*rowR),
+				   std::cbegin(*rowLp), std::cbegin(*rowRp),
 				   TU::begin(buffers->Q),
 				   TU::begin(buffers->F));
 	    ++rowLp;
@@ -331,7 +331,7 @@ GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowR, ROW_D rowD)
 	  // それを用いてフィルタ係数を初期化
 	    initializeFilterCoefficients(TU::cbegin(buffers->Q),
 					 TU::cend(buffers->Q),
-					 TU::cbegin(buffers->F),
+					 std::cbegin(buffers->F),
 					 TU::begin(*rowA));
 	    ++rowA;
 
@@ -348,7 +348,7 @@ GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowR, ROW_D rowD)
 	      // 用いてそれぞれ左/右/上画像を基準とした最適視差を計算
 	  	buffers->RminR = std::numeric_limits<Score>::max();
 		computeDisparities(TU::crbegin(B), TU::crend(B),
-				   TU::crbegin(*rowG) + N - 1,
+				   std::crbegin(*rowG) + N - 1,
 				   buffers->dminL.rbegin(),
 				   buffers->delta.rbegin(),
 				   buffers->dminR.end() - D + 1,
@@ -413,25 +413,25 @@ GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
       // フィルタパラメータ(= 縦横両方向に積算された相違度(コスト)の総和
       // および画素毎のコストとガイド画素の積和)を初期化
 	if (rowL <= rowL0)
-	    initializeFilterParameters(TU::cbegin(*rowL), TU::cend(*rowL),
+	    initializeFilterParameters(std::cbegin(*rowL), std::cend(*rowL),
 				       make_zip_iterator(
 					   std::make_tuple(
-					       TU::cbegin(*rowR),
+					       std::cbegin(*rowR),
 					       make_vertical_iterator(rowV,
 								      cV))),
 				       TU::begin(buffers->Q),
 				       TU::begin(buffers->F));
 	else
 	{
-	    updateFilterParameters(TU::cbegin(*rowL), TU::cend(*rowL),
+	    updateFilterParameters(std::cbegin(*rowL), std::cend(*rowL),
 				   make_zip_iterator(
 				       std::make_tuple(
-					   TU::cbegin(*rowR),
+					   std::cbegin(*rowR),
 					   make_vertical_iterator(rowV, cV))),
-				   TU::cbegin(*rowLp),
+				   std::cbegin(*rowLp),
 				   make_zip_iterator(
 				       std::make_tuple(
-					   TU::cbegin(*rowRp),
+					   std::cbegin(*rowRp),
 					   make_vertical_iterator(rowV,
 								  --cVp))),
 				   TU::begin(buffers->Q),
@@ -447,7 +447,7 @@ GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 	  // それを用いてフィルタ係数を初期化
 	    initializeFilterCoefficients(TU::cbegin(buffers->Q),
 					 TU::cend(buffers->Q),
-					 TU::cbegin(buffers->F),
+					 std::cbegin(buffers->F),
 					 TU::begin(*rowA));
 	    ++rowA;
 
@@ -465,7 +465,7 @@ GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 	      // 用いてそれぞれ左/右/上画像を基準とした最適視差を計算
 		buffers->RminR = std::numeric_limits<Score>::max();
 		computeDisparities(TU::crbegin(B), TU::crend(B),
-				   TU::crbegin(*rowG) + N - 1,
+				   std::crbegin(*rowG) + N - 1,
 				   buffers->dminL.rbegin(),
 				   buffers->delta.rbegin(),
 				   make_zip_iterator(
@@ -549,14 +549,14 @@ GFStereo<SCORE, DISP>::initializeFilterParameters(COL colL, COL colLe,
 	    const auto	pixL = *colL;
 	    auto	P = make_zip_iterator(
 				std::make_tuple(
-				    TU::make_transform_iterator(
+				    make_map_iterator(
 					diff_t(pixL,
 					       _params.intensityDiffMax),
 					make_col_accessor(colRV)),
-				    TU::make_transform_iterator(
+				    make_map_iterator(
 					ddiff_t(*(colL + 1) - *(colL - 1),
 						_params.derivativeDiffMax),
-					TU::make_transform_iterator(
+					make_map_iterator(
 					    Minus(),
 					    make_col_accessor(colRV) + 1,
 					    make_col_accessor(colRV) - 1))));
@@ -643,25 +643,25 @@ GFStereo<SCORE, DISP>::updateFilterParameters(COL colL, COL colLe, COL_RV colRV,
 	    const auto	pixL  = *colL;
 	    auto	P = make_zip_iterator(
 				std::make_tuple(
-				    TU::make_transform_iterator(
+				    make_map_iterator(
 					diff_t(*colL,
 					       _params.intensityDiffMax),
 					make_col_accessor(colRV)),
-				    TU::make_transform_iterator(
+				    make_map_iterator(
 					ddiff_t(*(colL + 1) - *(colL - 1),
 						_params.derivativeDiffMax),
-					TU::make_transform_iterator(
+					make_map_iterator(
 					    Minus(),
 					    make_col_accessor(colRV) + 1,
 					    make_col_accessor(colRV) - 1)),
-				    TU::make_transform_iterator(
+				    make_map_iterator(
 					diff_t(*colLp,
 					       _params.intensityDiffMax),
 					make_col_accessor(colRVp)),
-				    TU::make_transform_iterator(
+				    make_map_iterator(
 					ddiff_t(*(colLp + 1) - *(colLp - 1),
 						_params.derivativeDiffMax),
-					TU::make_transform_iterator(
+					make_map_iterator(
 					    Minus(),
 					    make_col_accessor(colRVp) + 1,
 					    make_col_accessor(colRVp) - 1))));

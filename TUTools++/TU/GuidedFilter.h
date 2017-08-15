@@ -128,8 +128,8 @@ GuidedFilter<T>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out) const
     
   // guided filterの2次元係数ベクトルを計算する．
     Array<coeffs_t>	c(super::outLength(std::distance(ib, ie)));
-    super::convolve<T>(TU::make_transform_iterator(init_params(), ib, gb),
-		       TU::make_transform_iterator(init_params(), ie, ge),
+    super::convolve<T>(make_map_iterator(init_params(), ib, gb),
+		       make_map_iterator(init_params(), ie, ge),
 		       make_assignment_iterator(c.begin(),
 						init_coeffs(winSize(), _e)));
     
@@ -158,8 +158,8 @@ GuidedFilter<T>::convolve(IN ib, IN ie, OUT out) const
     
   // guided filterの2次元係数ベクトルを計算する．
     Array<coeffs_t>	c(super::outLength(std::distance(ib, ie)));
-    super::convolve<T>(TU::make_transform_iterator(init_params(), ib),
-		       TU::make_transform_iterator(init_params(), ie),
+    super::convolve<T>(make_map_iterator(init_params(), ib),
+		       make_map_iterator(init_params(), ie),
 		       make_assignment_iterator(c.begin(),
 						init_coeffs(winSize(), _e)));
 
@@ -213,7 +213,6 @@ class GuidedFilter2 : private BoxFilter2
 
 //! 2次元入力データと2次元ガイドデータにguided filterを適用する
 /*!
-  入力データとガイドデータおよび出力先のストライドは同一でなければならない．
   \param ib	2次元入力データの先頭の行を示す反復子
   \param ie	2次元入力データの末尾の次の行を示す反復子
   \param gb	2次元ガイドデータの先頭の行を示す反復子
@@ -239,13 +238,15 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out) const
     
   // guided filterの2次元係数ベクトルを計算する．
     super::convolve<T>(make_range_iterator(
-			   TU::make_transform_iterator(
-			       init_params(), cbegin(*ib), cbegin(*gb)),
+			   make_map_iterator(init_params(),
+					     std::cbegin(*ib),
+					     std::cbegin(*gb)),
 			   std::make_tuple(stride(ib), stride(gb)),
 			   TU::size(*ib)),
 		       make_range_iterator(
-			   TU::make_transform_iterator(
-			       init_params(), cbegin(*ie), cbegin(*ge)),
+			   make_map_iterator(init_params(),
+					     std::cbegin(*ie),
+					     std::cbegin(*ge)),
 			   std::make_tuple(stride(ie), stride(ge)),
 			   TU::size(*ie)),
 		       make_range_iterator(
@@ -259,7 +260,7 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out) const
     super::convolve<T>(c.cbegin(), c.cend(),
 		       make_range_iterator(
 			   make_assignment_iterator(
-			       begin(std::make_tuple(*gb, *out))
+			       TU::begin(std::make_tuple(*gb, *out))
 			       += (colWinSize() - 1),
 			       trans_guides(n)),
 			   std::make_tuple(stride(gb), stride(out)),
@@ -269,7 +270,6 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out) const
 //! 2次元入力データにguided filterを適用する
 /*!
   ガイドデータは与えられた2次元入力データに同一とする．
-  入力データと出力先のストライドは同一でなければならない．
   \param ib	2次元入力データの先頭の行を示す反復子
   \param ie	2次元入力データの末尾の次の行を示す反復子
   \param out	guided filterを適用したデータの出力先の先頭行を示す反復子
@@ -293,12 +293,10 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, OUT out) const
 
   // guided filterの2次元係数ベクトルを計算する．
     super::convolve<T>(make_range_iterator(
-			   TU::make_transform_iterator(
-			       init_params(), cbegin(*ib)),
+			   make_map_iterator(init_params(), std::cbegin(*ib)),
 			   stride(ib), TU::size(*ib)),
 		       make_range_iterator(
-			   TU::make_transform_iterator(
-			       init_params(), cbegin(*ie)),
+			   make_map_iterator(init_params(), std::cbegin(*ie)),
 			   stride(ie), TU::size(*ie)),
 		       make_range_iterator(
 			   make_assignment_iterator(c.begin()->begin(),
@@ -311,7 +309,7 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, OUT out) const
     super::convolve<T>(c.cbegin(), c.cend(),
 		       make_range_iterator(
 			   make_assignment_iterator(
-			       begin(std::make_tuple(*ib, *out))
+			       TU::begin(std::make_tuple(*ib, *out))
 			       + colWinSize() - 1,
 			       trans_guides(n)),
 			   std::make_tuple(stride(ib), stride(out)),

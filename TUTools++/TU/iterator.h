@@ -322,42 +322,42 @@ rend(TUPLE&& t)
 }
 
 template <class... T> inline auto
+cbegin(const std::tuple<T...>& t)
+{
+    return begin(t);
+}
+
+template <class... T> inline auto
+cend(const std::tuple<T...>& t)
+{
+    return end(t);
+}
+
+template <class... T> inline auto
+crbegin(const std::tuple<T...>& t)
+{
+    return rbegin(t);
+}
+
+template <class... T> inline auto
+crend(const std::tuple<T...>& t)
+{
+    return rend(t);
+}
+
+template <class... T> inline auto
 size(const std::tuple<T...>& t)
 {
     return TU::size(std::get<0>(t));
 }
 
-template <class T> inline auto
-cbegin(const T& x) -> decltype(TU::begin(x))
-{
-    return TU::begin(x);
-}
-    
-template <class T> inline auto
-cend(const T& x) -> decltype(TU::end(x))
-{
-    return TU::end(x);
-}
-    
-template <class T> inline auto
-crbegin(const T& x) -> decltype(TU::rbegin(x))
-{
-    return TU::rbegin(x);
-}
-    
-template <class T> inline auto
-crend(const T& x) -> decltype(TU::rend(x))
-{
-    return TU::rend(x);
-}
-    
 /************************************************************************
-*  transform_iterator<FUNC, ITER...>					*
+*  map_iterator<FUNC, ITER...>						*
 ************************************************************************/
 template <class FUNC, class... ITER>
-class transform_iterator
+class map_iterator
     : public boost::iterator_adaptor<
-	transform_iterator<FUNC, ITER...>,
+	map_iterator<FUNC, ITER...>,
 	zip_iterator<std::tuple<ITER...> >,
 	std::decay_t<std::result_of_t<FUNC(iterator_reference<ITER>...)> >,
 	boost::use_default,
@@ -365,7 +365,7 @@ class transform_iterator
 {
   private:
     using ref	= std::result_of_t<FUNC(iterator_reference<ITER>...)>;
-    using super	= boost::iterator_adaptor<transform_iterator,
+    using super	= boost::iterator_adaptor<map_iterator,
 					  zip_iterator<std::tuple<ITER...> >,
 					  std::decay_t<ref>,
 					  boost::use_default,
@@ -377,7 +377,7 @@ class transform_iterator
     using	typename super::reference;
 	
   public:
-		transform_iterator(FUNC func, const ITER&... iter)
+		map_iterator(FUNC func, const ITER&... iter)
 		    :super(std::tuple<ITER...>(iter...)), _func(func)
 		{
 		}
@@ -399,8 +399,8 @@ class transform_iterator
 };
 
 template <class FUNC, class... ITER>
-inline transform_iterator<FUNC, ITER...>
-make_transform_iterator(FUNC func, const ITER&... iter)
+inline map_iterator<FUNC, ITER...>
+make_map_iterator(FUNC func, const ITER&... iter)
 {
     return {func, iter...};
 }
@@ -416,7 +416,7 @@ make_transform_iterator(FUNC func, const ITER&... iter)
 template <class ITER, class T> inline auto
 make_mbr_iterator(const ITER& iter, T iterator_value<ITER>::* mbr)
 {
-    return make_transform_iterator(
+    return make_map_iterator(
 	       std::function<std::conditional_t<
 				 std::is_same<iterator_pointer<ITER>,
 					      iterator_value<ITER>*>::value,
@@ -609,7 +609,7 @@ class row2col
 *  alias vertical_iterator<ROW>						*
 ************************************************************************/
 template <class ROW>
-using vertical_iterator = transform_iterator<row2col<ROW>, ROW>;
+using vertical_iterator = map_iterator<row2col<ROW>, ROW>;
 
 template <class ROW> inline vertical_iterator<ROW>
 make_vertical_iterator(const ROW& row, size_t col)

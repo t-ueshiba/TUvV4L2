@@ -89,47 +89,95 @@ class MinIdx
     template <class SCORES_>
     size_t	operator ()(const SCORES_& R) const
 		{
-		    auto	RminL = TU::cbegin(R);
-		    for (auto iter = TU::cbegin(R); iter != TU::cend(R);
+		    auto	RminL = std::cbegin(R);
+		    for (auto iter = std::cbegin(R); iter != std::cend(R);
 			 ++iter)
 			if (*iter < *RminL)
 			    RminL = iter;
-		    return _disparityMax - (RminL - TU::cbegin(R));
+		    return _disparityMax - (RminL - std::cbegin(R));
 		}
   private:
     const size_t	_disparityMax;
 };
 
 /************************************************************************
-*  class diff_iterator<COL, COL_RV, T>					*
+*  struct Diff2<T>							*
 ************************************************************************/
-template <class COL, class COL_RV, class T=iterator_value<COL> >
-class diff_iterator
-    : public boost::iterator_adaptor<diff_iterator<COL, COL_RV, T>,
-				     zip_iterator<std::tuple<COL, COL_RV> >,
-				     range<transform_iterator<
-					       Diff<T>, COL_RV> >,
-				     boost::use_default,
-				     range<transform_iterator<
-					       Diff<T>, COL_RV> > >
+template <class T>
+struct Diff2
+{
+    Diff2(T x, T thresh)	:_x(x), _thresh(thresh)		{}
+
+#if defined(SIMD)
+    auto	operator ()(simd::vec<T> y) const
+		{
+		    using signed_type
+			= typename std::conditional_t<
+				std::is_integral<T>::value,
+				std::make_signed<T>,
+				detail::identity<T> >::type;
+		    using namespace	simd;
+
+		    return cast<signed_type>(min(diff(simd::vec<T>(_x), y),
+						 simd::vec<T>(_thresh)));
+		}
+#endif
+    auto	operator ()(T y) const
+		{
+		    using signed_type
+			= typename std::conditional_t<
+				std::is_integral<T>::value,
+				std::make_signed<T>,
+				detail::identity<T> >::type;
+
+		    return static_cast<signed_type>(std::min(diff(_x, y),
+							     _thresh));
+		}
+
+    auto	operator ()(T y, T z) const
+		{
+		    return (*this)(y) + (*this)(z);
+		}
+    
+  private:
+    const T	_x;
+    const T	_thresh;
+};
+
+/************************************************************************
+*  class diff_iterator<T, COL, COL_RV...>				*
+************************************************************************/
+template <class T, class COL, class... COL_RV>
+class diff_iterator : public boost::iterator_adaptor<
+			diff_iterator<T, COL, COL_RV...>,
+			zip_iterator<std::tuple<COL, COL_RV...> >,
+			range<decltype(make_map_iterator(
+					   std::declval<Diff2<T> >(),
+					   std::declval<COL_RV>()...))>,
+			boost::use_default,
+			range<decltype(make_map_iterator(
+					   std::declval<Diff2<T> >(),
+					   std::declval<COL_RV>()...))> >
 {
   private:
-    using super	= boost::iterator_adaptor<diff_iterator,
-					  zip_iterator<
-					      std::tuple<COL, COL_RV> >,
-					  range<transform_iterator<
-						    Diff<T>, COL_RV> >,
-					  boost::use_default,
-					  range<transform_iterator<
-						    Diff<T>, COL_RV> > >;
+    using super	= boost::iterator_adaptor<
+			diff_iterator,
+			zip_iterator<std::tuple<COL, COL_RV...> >,
+			range<decltype(make_map_iterator(
+					   std::declval<Diff2<T> >(),
+					   std::declval<COL_RV>()...))>,
+			boost::use_default,
+			range<decltype(make_map_iterator(
+					   std::declval<Diff2<T> >(),
+					   std::declval<COL_RV>()...))> >;
     friend	class boost::iterator_core_access;
 
   public:
     using	typename super::reference;
     
   public:
-		diff_iterator(COL colL, COL_RV colRV, size_t dsw, T thresh)
-		    :super(std::make_tuple(colL, colRV)),
+		diff_iterator(size_t dsw, T thresh, COL colL, COL_RV... colRV)
+		    :super(std::make_tuple(colL, colRV...)),
 		     _dsw(dsw), _thresh(thresh)
 		{
 		}
@@ -137,13 +185,18 @@ class diff_iterator
   private:
     reference	dereference() const
 		{
+		    return dereference(
+				std::make_index_sequence<sizeof...(COL_RV)>());
+		}
+    template <size_t... IDX_>
+    reference	dereference(std::index_sequence<IDX_...>) const
+		{
 		    const auto&	iter_tuple = super::base().get_iterator_tuple();
-
-		    return make_range(make_transform_iterator(
-					  Diff<T>(*std::get<0>(iter_tuple),
-						  _thresh),
-					  std::get<1>(iter_tuple)),
-				      _dsw);
+		    
+		    return {make_map_iterator(
+			        Diff2<T>(*std::get<0>(iter_tuple), _thresh),
+				std::get<1 + IDX_>(iter_tuple)...),
+			    _dsw};
 		}
     
   private:
@@ -151,11 +204,11 @@ class diff_iterator
     T		_thresh;
 };
 
-template <class T, class COL, class COL_RV>
-inline diff_iterator<COL, COL_RV, T>
-make_diff_iterator(COL colL, COL_RV colRV, size_t dsw, T thresh)
+template <class T, class COL, class... COL_RV>
+inline diff_iterator<T, COL, COL_RV...>
+make_diff_iterator(size_t dsw, T thresh, COL colL, COL_RV... colRV)
 {
-    return {colL, colRV, dsw, thresh};
+    return {dsw, thresh, colL, colRV...};
 }
 
 /************************************************************************

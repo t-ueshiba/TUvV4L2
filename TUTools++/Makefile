@@ -235,7 +235,6 @@ OTHER_HDRS	= TU/Array++.h \
 		TU/pair.h \
 		TU/range.h \
 		TU/simd/Array++.h \
-		TU/simd/algorithm.h \
 		TU/simd/allocator.h \
 		TU/simd/arithmetic.h \
 		TU/simd/arm/arch.h \

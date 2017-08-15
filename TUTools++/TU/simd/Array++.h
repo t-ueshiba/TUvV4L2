@@ -19,47 +19,11 @@ namespace TU
 {
 namespace simd
 {
-/************************************************************************
-*  iterator_wrapper<ITER>						*
-************************************************************************/
-//! 反復子をラップして名前空間 TU::simd に取り込むためのクラス
-/*!
-  本クラスの目的は，以下の2つである．
-    (1)	iterator_value<ITER> がSIMDベクトル型となるあらゆる反復子を
-	その機能を保持したまま名前を変更することにより，TU/algorithm.h にある
-	関数のオーバーロード版(本ファイルで定義)を呼び出せるようにすること．
-    (2)	ITER が const T* 型または T* 型のとき，それぞれ load_iterator<T, true>
-	store_iterator<T, true> を生成できるようにすること．本クラスでラップ
-	されたポインタが指すアドレスは sizeof(vec<T>) にalignされているものと
-	みなされる．
-	
-  \param ITER	ラップする反復子の型
-*/ 
-template <class ITER>
-class iterator_wrapper
-    : public boost::iterator_adaptor<iterator_wrapper<ITER>, ITER>
-{
-  private:
-    using	super = boost::iterator_adaptor<iterator_wrapper, ITER>;
-
-  public:
-		iterator_wrapper(ITER iter)	:super(iter)	{}
-      template <class ITER_,
-		std::enable_if_t<std::is_convertible<ITER_, ITER>::value>*
-		= nullptr>
-		iterator_wrapper(ITER_ iter)	:super(iter)	{}
-      template <class ITER_,
-		std::enable_if_t<std::is_convertible<ITER_, ITER>::value>*
-		= nullptr>
-		iterator_wrapper(iterator_wrapper<ITER_> iter)
-		    :super(iter.base())				{}
-};
-
 //! 反復子をラップして名前空間 TU::simd に取り込む
 /*!
   \param iter	ラップする反復子
 */
-template <class ITER> inline iterator_wrapper<ITER>
+template <bool ALIGNED=true, class ITER> inline iterator_wrapper<ITER, ALIGNED>
 wrap_iterator(ITER iter)
 {
     return {iter};
@@ -70,8 +34,8 @@ wrap_iterator(ITER iter)
   \param iter	ラップされた反復子
   \return	もとの反復子
 */
-template <class ITER> inline ITER
-make_accessor(iterator_wrapper<ITER> iter)
+template <class ITER, bool ALIGNED> inline ITER
+make_accessor(iterator_wrapper<ITER, ALIGNED> iter)
 {
     return iter.base();
 }
@@ -82,8 +46,8 @@ make_accessor(iterator_wrapper<ITER> iter)
   \param p	ラップされた定数ポインタ
   \return	SIMDベクトルを読み込む反復子
 */
-template <class T> inline load_iterator<T, true>
-make_accessor(iterator_wrapper<const T*> p)
+template <class T, bool ALIGNED> inline load_iterator<T, ALIGNED>
+make_accessor(iterator_wrapper<const T*, ALIGNED> p)
 {
     return {p.base()};
 }
@@ -94,8 +58,8 @@ make_accessor(iterator_wrapper<const T*> p)
   \param p	ラップされたポインタ
   \return	SIMDベクトルを書き込む反復子
 */
-template <class T> inline store_iterator<T, true>
-make_accessor(iterator_wrapper<T*> p)
+template <class T, bool ALIGNED> inline store_iterator<T, ALIGNED>
+make_accessor(iterator_wrapper<T*, ALIGNED> p)
 {
     return {p.base()};
 }
@@ -133,15 +97,15 @@ make_terminator(size_t n)
 namespace detail
 {
   template <class ITER>	struct const_iterator_t;
-  template <class T>
-  struct const_iterator_t<simd::iterator_wrapper<T*> >
+  template <class T, bool ALIGNED>
+  struct const_iterator_t<simd::iterator_wrapper<T*, ALIGNED> >
   {
-      using type = simd::iterator_wrapper<const T*>;
+      using type = simd::iterator_wrapper<const T*, ALIGNED>;
   };
 }	// namespace detail
     
 /************************************************************************
-*  algorithms overloaded for simd::iterator_wrapper<ITER>		*
+*  algorithms overloaded for simd::iterator_wrapper<ITER, ALIGNED>	*
 ************************************************************************/
 //! 指定された範囲の各要素に関数を適用する
 /*!
@@ -151,8 +115,8 @@ namespace detail
   \param arg	適用範囲の末尾の次を指す反復子または適用要素数
   \param func	適用する関数
 */
-template <size_t N, class ITER, class ARG, class FUNC> inline FUNC
-for_each(simd::iterator_wrapper<ITER> begin, ARG arg, FUNC func)
+template <size_t N, class ITER, bool ALIGNED, class ARG, class FUNC> inline FUNC
+for_each(simd::iterator_wrapper<ITER, ALIGNED> begin, ARG arg, FUNC func)
 {
     constexpr auto	M = simd::make_terminator<ITER>(N);
     
@@ -169,9 +133,10 @@ for_each(simd::iterator_wrapper<ITER> begin, ARG arg, FUNC func)
   \param begin1	第2の適用範囲の先頭を指す反復子
   \param func	適用する関数
 */
-template <size_t N, class ITER0, class ARG, class ITER1, class FUNC> inline FUNC
-for_each(simd::iterator_wrapper<ITER0> begin0, ARG arg,
-	 simd::iterator_wrapper<ITER1> begin1, FUNC func)
+template <size_t N,  class ITER0, bool ALIGNED0,
+	  class ARG, class ITER1, bool ALIGNED1, class FUNC> inline FUNC
+for_each(simd::iterator_wrapper<ITER0, ALIGNED0> begin0, ARG arg,
+	 simd::iterator_wrapper<ITER1, ALIGNED1> begin1, FUNC func)
 {
     constexpr auto	M = simd::make_terminator<ITER0>(N);
 
@@ -190,14 +155,15 @@ for_each(simd::iterator_wrapper<ITER0> begin0, ARG arg,
   \param init	初期値
   \return	内積の値
 */
-template <size_t N, class ITER0, class ARG, class ITER1, class T> inline T
-inner_product(simd::iterator_wrapper<ITER0> begin0, ARG arg,
-	      simd::iterator_wrapper<ITER1> begin1, T init)
+template <size_t N,  class ITER0, bool ALIGNED0,
+	  class ARG, class ITER1, bool ALIGNED1, class T> inline T
+inner_product(simd::iterator_wrapper<ITER0, ALIGNED0> begin0, ARG arg,
+	      simd::iterator_wrapper<ITER1, ALIGNED1> begin1, T init)
 {
 #ifdef TU_DEBUG
     std::cout << "(simd)inner_product<" << N << "> ["
-	      << print_sizes(range<simd::iterator_wrapper<ITER0>, N>(begin0,
-								     arg))
+	      << print_sizes(range<simd::iterator_wrapper<ITER0, ALIGNED0>, N>(
+				 begin0, arg))
 	      << "] ==> ";
 #endif
     constexpr auto	M = simd::make_terminator<ITER0>(N);
@@ -216,8 +182,8 @@ inner_product(simd::iterator_wrapper<ITER0> begin0, ARG arg,
   \param arg	適用範囲の末尾の次を指す反復子または要素数
   \return	2乗和の値
 */
-template <size_t N, class ITER, class ARG> inline auto
-square(simd::iterator_wrapper<ITER> iter, ARG arg)
+template <size_t N, class ITER, bool ALIGNED, class ARG> inline auto
+square(simd::iterator_wrapper<ITER, ALIGNED> iter, ARG arg)
 {
     constexpr auto	M = simd::make_terminator<ITER>(N);
     
@@ -242,15 +208,14 @@ namespace detail
 }	// namespace detail
 #endif
     
-template <class FUNC, class... ITER> inline auto
-make_transform_iterator(FUNC func, simd::iterator_wrapper<ITER>... iter)
+template <class FUNC, class... ITER, bool... ALIGNED> inline auto
+make_map_iterator(FUNC func, simd::iterator_wrapper<ITER, ALIGNED>... iter)
 {
 #ifdef TU_DEBUG
-    std::cout << "(simd)transform_iterator:\n";
+    std::cout << "(simd)map_iterator:\n";
     detail::print_types<ITER...>(std::cout);
 #endif		  
-    return wrap_iterator(make_transform_iterator(func,
-						 simd::make_accessor(iter)...));
+    return wrap_iterator(make_map_iterator(func, simd::make_accessor(iter)...));
 }
 
 /************************************************************************
@@ -273,49 +238,12 @@ class BufTraits<simd::vec<T>, ALLOC>
   protected:
     using			typename super::pointer;
 
-    constexpr static size_t	Alignment = sizeof(simd::vec<T>);
+    constexpr static size_t	Alignment = super::allocator_type::Alignment;
     
-    static auto null()		{ return nullptr; }
-    static auto ptr(pointer p)	{ return p; }
+    static pointer	null()		{ return nullptr; }
+    static auto		ptr(pointer p)	{ return p.base(); }
 };
 
-template <class T>
-class BufTraits<T, simd::allocator<T> >
-    : public std::allocator_traits<simd::allocator<T> >
-{
-  private:
-    using super			= std::allocator_traits<simd::allocator<T> >;
-
-  public:
-    using iterator		= simd::iterator_wrapper<T*>;
-    using const_iterator	= simd::iterator_wrapper<const T*>;
-    
-  protected:
-    using			typename super::pointer;
-
-    constexpr static size_t	Alignment = sizeof(simd::vec<T>);
-    
-    static auto null()		{ return nullptr; }
-    static auto ptr(pointer p)	{ return p; }
-};
-
-template <class T, class ALLOC, size_t SIZE, size_t... SIZES>	class array;
-
-namespace simd
-{
-/************************************************************************
-*  simd::Array<T> and simd::Array2<T> type aliases			*
-************************************************************************/
-template <class T, size_t N=0>
-using Array  = array<T, simd::allocator<T>, N>;			//!< 1次元配列
-
-template <class T, size_t R=0, size_t C=0>
-using Array2 = array<T, simd::allocator<T>, R, C>;		//!< 2次元配列
-
-template <class T, size_t Z=0, size_t Y=0, size_t X=0>
-using Array3 = array<T, simd::allocator<T>, Z, Y, X>;		//!< 3次元配列
-    
-}	// namespace simd
 }	// namespace TU
 #endif	// defined(SIMD)
 

@@ -39,7 +39,7 @@ class SeparableFilter2
 		    auto	ie = _in;
 		    std::advance(ie, r.end());
 		    for (auto col = r.begin(); in != ie; ++in, ++col)
-			_filter.convolve(TU::cbegin(*in), TU::cend(*in),
+			_filter.convolve(std::cbegin(*in), std::cend(*in),
 					 make_vertical_iterator(_out, col));
 		}
 
@@ -59,10 +59,10 @@ class SeparableFilter2
 	void	operator ()(const tbb::blocked_range<size_t>& r) const
 		{
 		    _filterV.convolve(make_range_iterator(
-					  TU::cbegin(*_ib) + r.begin(),
+					  std::cbegin(*_ib) + r.begin(),
 					  stride(_ib), r.size()),
 				      make_range_iterator(
-					  TU::cbegin(*_ie) + r.begin(),
+					  std::cbegin(*_ie) + r.begin(),
 					  stride(_ie), r.size()),
 				      make_range_iterator(
 					  TU::begin(*_out) + r.begin(),
@@ -92,7 +92,7 @@ class SeparableFilter2
 		    auto	out = _out;
 		    std::advance(out, r.begin());
 		    for (; in != ie; ++in, ++out)
-			_filterH.convolve(TU::cbegin(*in), TU::cend(*in),
+			_filterH.convolve(std::cbegin(*in), std::cend(*in),
 					  TU::begin(*out));
 		}
 
@@ -172,7 +172,7 @@ SeparableFilter2<F>::convolve(IN_ ib, IN_ ie, OUT_ out) const
 #  else
     size_t	col = 0;
     for (; ib != ie; ++ib)
-	_filterH.convolve(TU::cbegin(*ib), TU::cend(*ib),
+	_filterH.convolve(std::cbegin(*ib), std::cend(*ib),
 			  make_vertical_iterator(buf.begin(), col++));
     col = 0;
     for (const auto& row : buf)

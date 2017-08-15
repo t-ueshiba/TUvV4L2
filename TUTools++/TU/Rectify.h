@@ -130,18 +130,18 @@ class Rectify
 				   size_t& disparitySearchWidth,
 				   size_t& disparityMax)		;
 
-    template <class T>
-    void	operator ()(const Image<T>& inL,
-			    const Image<T>& inR,
-			    Image<T>& outL,
-			    Image<T>& outR)			const	;
-    template <class T>
-    void	operator ()(const Image<T>& inL,
-			    const Image<T>& inR,
-			    const Image<T>& inV,
-			    Image<T>& outL,
-			    Image<T>& outR,
-			    Image<T>& outV)			const	;
+    template <class T, class ALLOC, class ALLOC2>
+    void	operator ()(const Image<T, ALLOC>& inL,
+			    const Image<T, ALLOC>& inR,
+			    Image<T, ALLOC2>& outL,
+			    Image<T, ALLOC2>& outR)		const	;
+    template <class T, class ALLOC, class ALLOC2>
+    void	operator ()(const Image<T, ALLOC>& inL,
+			    const Image<T, ALLOC>& inR,
+			    const Image<T, ALLOC>& inV,
+			    Image<T, ALLOC2>& outL,
+			    Image<T, ALLOC2>& outR,
+			    Image<T, ALLOC2>& outV)		const	;
     
     const homography_type&
 		H(int i)		const	{return _H[i];}
@@ -348,9 +348,9 @@ Rectify::initialize(const ImageBase& imageL,
 		      disparitySearchWidth, disparityMax);
 }
     
-template <class T> inline void
-Rectify::operator ()(const Image<T>& inL, const Image<T>& inR,
-		     Image<T>& outL, Image<T>& outR) const
+template <class T, class ALLOC, class ALLOC2> inline void
+Rectify::operator ()(const Image<T, ALLOC>& inL, const Image<T, ALLOC>& inR,
+		     Image<T, ALLOC2>& outL, Image<T, ALLOC2>& outR) const
 {
     outL.resize(_warp[0].height(), _warp[0].width());
     outR.resize(_warp[1].height(), _warp[1].width());
@@ -359,13 +359,13 @@ Rectify::operator ()(const Image<T>& inL, const Image<T>& inR,
     _warp[1](inR.cbegin(), outR.begin());
 }
 
-template <class T> inline void
-Rectify::operator ()(const Image<T>& inL,
-		     const Image<T>& inR,
-		     const Image<T>& inV,
-		     Image<T>& outL,
-		     Image<T>& outR,
-		     Image<T>& outV) const
+template <class T, class ALLOC, class ALLOC2> inline void
+Rectify::operator ()(const Image<T, ALLOC>& inL,
+		     const Image<T, ALLOC>& inR,
+		     const Image<T, ALLOC>& inV,
+		     Image<T, ALLOC2>& outL,
+		     Image<T, ALLOC2>& outR,
+		     Image<T, ALLOC2>& outV) const
 {
     outL.resize(_warp[0].height(), _warp[0].width());
     outR.resize(_warp[1].height(), _warp[1].width());

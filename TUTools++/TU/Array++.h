@@ -22,26 +22,31 @@ class BufTraits : public std::allocator_traits<ALLOC>
   private:
     using super			= std::allocator_traits<ALLOC>;
 
-    constexpr static size_t	align(size_t a)
+    template <class ALLOC_>
+    constexpr static auto	align(void*) -> decltype(ALLOC_::Alignment)
 				{
-				    return (a < sizeof(T) ? align(2*a) : a);
+				    return ALLOC_::Alignment;
 				}
-    
+    template <class ALLOC_>
+    constexpr static size_t	align(...)
+				{
+				  // g++ には alignas(0) がエラーになるバグが
+				  // あるので，0を返せない．
+				    return alignof(T);
+				}
+
   public:
     using iterator		= typename super::pointer;
     using const_iterator	= typename super::const_pointer;
 
   protected:
     using			typename super::pointer;
+    using			typename super::allocator_type;
+    
+    constexpr static size_t	Alignment = align<allocator_type>(nullptr);
 
-  // g++ には alignas(0) がエラーになるバグがある
-#if !defined(__GNUG__) || defined(__clang__) || defined(__INTEL_COMPILER)
-    constexpr static size_t	Alignment = 0;
-#else
-    constexpr static size_t	Alignment = align(1);
-#endif
-    static auto null()		{ return nullptr; }
-    static auto ptr(pointer p)	{ return p; }
+    static pointer	null()		{ return static_cast<T*>(nullptr); }
+    static T*		ptr(pointer p)	{ return p; }
 };
 
 /************************************************************************
@@ -430,7 +435,7 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 		}
     void	free(pointer p, size_t siz)
 		{
-		    if (!_ext && p != super::null())
+		    if (!_ext && !super::ptr(p))
 		    {
 			for (pointer q = p, qe = q + siz; q != qe; ++q)
 			    super::destroy(_allocator, super::ptr(q));
@@ -604,7 +609,7 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 		{
 		    constexpr auto	S = detail::max<size0(),
 							TU::size0<E_>()>::value;
-		    copy<S>(TU::cbegin(expr), size(), begin());
+		    copy<S>(std::cbegin(expr), size(), begin());
 		}
     template <class E_>
     std::enable_if_t<TU::rank<E_>() == rank() + TU::rank<T>(), array&>
@@ -615,7 +620,7 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 				  super::Alignment);
 		    constexpr auto	S = detail::max<size0(),
 							TU::size0<E_>()>::value;
-		    copy<S>(TU::cbegin(expr), size(), begin());
+		    copy<S>(std::cbegin(expr), size(), begin());
 
 		    return *this;
 		}
@@ -892,9 +897,9 @@ namespace detail
 #if defined(SIMD)
 namespace simd
 {
-  template <class T>	class vec;
-  template <class T>	class allocator;
-  template <class ITER>	class iterator_wrapper;
+  template <class T>			class vec;
+  template <class T, bool ALIGNED>	class allocator;
+  template <class ITER, bool ALIGNED>	class iterator_wrapper;
 }
 #endif
     
@@ -919,25 +924,28 @@ namespace detail
       {
 	  using type = array<T_, std::allocator<T_>, SIZE_>;
       };
-#if defined(SIMD)
-      template <class T_, class ITER_, size_t SIZE_>
-      struct array_t<simd::vec<T_>, simd::iterator_wrapper<ITER_>, SIZE_>
-      {
-	  using type = array<T_, simd::allocator<T_>, SIZE_>;
-      };
-      template <class T_, size_t SIZE_>
-      struct array_t<std::remove_cv_t<T_>, simd::iterator_wrapper<T_*>, SIZE_>
-      {
-	  using type = array<std::remove_cv_t<T_>,
-			     simd::allocator<std::remove_cv_t<T_> >, SIZE_>;
-      };
-#endif
       template <class T_, class ITER_, class ALLOC_,
 		size_t SIZE_, size_t... SIZES_>
       struct array_t<array<T_, ALLOC_, SIZES_...>, ITER_, SIZE_>
       {
 	  using type = array<T_, ALLOC_, SIZE_, SIZES_...>;
       };
+#if defined(SIMD)
+      template <class T_, class ITER_, bool ALIGNED_, size_t SIZE_>
+      struct array_t<simd::vec<T_>,
+		     simd::iterator_wrapper<ITER_, ALIGNED_>, SIZE_>
+      {
+	  using type = array<T_, simd::allocator<T_, ALIGNED_>, SIZE_>;
+      };
+      template <class T_, bool ALIGNED_, size_t SIZE_>
+      struct array_t<std::remove_cv_t<T_>,
+		     simd::iterator_wrapper<T_*, ALIGNED_>, SIZE_>
+      {
+	  using type = array<std::remove_cv_t<T_>,
+			     simd::allocator<std::remove_cv_t<T_>, ALIGNED_>,
+			     SIZE_>;
+      };
+#endif
 
       using ITER = TU::iterator_t<E>;
       using F	 = typename substance_t<iterator_value<ITER>,
@@ -989,7 +997,7 @@ template <class E>
 inline std::enable_if_t<detail::is_opnode<E>::value, std::ostream&>
 operator <<(std::ostream& out, const E& expr)
 {
-    for (auto iter = TU::cbegin(expr); iter != TU::cend(expr); ++iter)
+    for (auto iter = std::cbegin(expr); iter != std::cend(expr); ++iter)
 	out << ' ' << *iter;
     return out << std::endl;
 }
@@ -1058,16 +1066,15 @@ namespace detail
 		}
       auto	begin()	const
 		{
-		  // transform_iterator への第1テンプレートパラメータを，
+		  // map_iterator への第1テンプレートパラメータを，
 		  // binder2nd そのものではなく，それへの定数参照とする
 		  // ことにより，キャッシュのコピーを防ぐ
-		    return TU::make_transform_iterator(std::cref(_binder),
-						       TU::cbegin(_l));
+		    return make_map_iterator(std::cref(_binder),
+					     std::cbegin(_l));
 		}
       auto	end() const
 		{
-		    return TU::make_transform_iterator(std::cref(_binder),
-						       TU::cend(_l));
+		    return make_map_iterator(std::cref(_binder), std::cend(_l));
 		}
       auto	size() const
 		{
@@ -1097,8 +1104,8 @@ namespace detail
     private:
     // 未評価でもメンバ関数 size() を呼べるために遅延評価機構を導入
       using	cache_t = typename substance_t<
-				decltype(*TU::cbegin(std::declval<L>()) *
-					 *TU::cbegin(std::declval<R>())),
+				decltype(*std::cbegin(std::declval<L>()) *
+					 *std::cbegin(std::declval<R>())),
 				is_range_or_opnode>::type;
       
     public:
@@ -1141,8 +1148,8 @@ namespace detail
 			constexpr auto	N = max<TU::size0<L>(),
 						TU::size0<R>(), 1>::value - 1;
 			
-			auto	a = TU::cbegin(_l);
-			auto	b = TU::cbegin(_r);
+			auto	a = std::cbegin(_l);
+			auto	b = std::cbegin(_r);
 			_cache = *a * *b;
 			TU::for_each<N>(++a, TU::size(_l) - 1, ++b,
 					[this](const auto& x, const auto& y)
@@ -1186,7 +1193,7 @@ operator *(const L& l, const R& r)
 
     assert(size<0>(l) == size<0>(r));
     constexpr size_t	S = detail::max<size0<L>(), size0<R>()>::value;
-    return inner_product<S>(TU::cbegin(l), TU::size(l), TU::cbegin(r),
+    return inner_product<S>(std::cbegin(l), TU::size(l), std::cbegin(r),
 			    value_type(0));
 }
 
