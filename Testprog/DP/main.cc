@@ -118,8 +118,8 @@ main()
 		      domain_iterator(&domain + f.nrow(), domain));
 
 	domain_type	x(f.nrow());
-	value_type	val = dp(TU::make_transform_iterator(generator_type(g),
-							     f.begin()),
+	value_type	val = dp(make_map_iterator(generator_type(g),
+						   f.begin()),
 				 x.rbegin());
 	dp.put(cout);
 	

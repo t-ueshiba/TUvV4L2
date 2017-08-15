@@ -277,7 +277,7 @@ BoxFilter2::convolveRows(IN ib, IN ie, OUT out) const
     
     for (box_filter_iterator<IN, T> row(ib, _rowWinSize), rowe(ie);
 	 row != rowe; ++row, ++out)
-	_colFilter.convolve<T>(TU::cbegin(*row), TU::cend(*row),
+	_colFilter.convolve<T>(std::cbegin(*row), std::cend(*row),
 			       TU::begin(*out));
 }
 

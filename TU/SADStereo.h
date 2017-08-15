@@ -204,14 +204,14 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowR, ROW_D rowD)
 	start(1);
 	if (rowL <= rowL0)
 	{
-	    initializeDissimilarities(TU::cbegin(*rowL), TU::cend(*rowL),
-				      TU::cbegin(*rowR), buffers->Q.begin());
+	    initializeDissimilarities(std::cbegin(*rowL), std::cend(*rowL),
+				      std::cbegin(*rowR), buffers->Q.begin());
 	}
 	else
 	{
-	    updateDissimilarities(TU::cbegin(*rowL), TU::cend(*rowL),
-				  TU::cbegin(*rowR),
-				  TU::cbegin(*rowLp), TU::cbegin(*rowRp),
+	    updateDissimilarities(std::cbegin(*rowL), std::cend(*rowL),
+				  std::cbegin(*rowR),
+				  std::cbegin(*rowLp), std::cbegin(*rowRp),
 				  buffers->Q.begin());
 	    ++rowLp;
 	    ++rowRp;
@@ -272,24 +272,24 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 	
 	start(1);
 	if (rowL <= rowL0)
-	    initializeDissimilarities(TU::cbegin(*rowL), TU::cend(*rowL),
+	    initializeDissimilarities(std::cbegin(*rowL), std::cend(*rowL),
 				      make_zip_iterator(
 					  std::make_tuple(
-					      TU::cbegin(*rowR),
+					      std::cbegin(*rowR),
 					      make_vertical_iterator(rowV,
 								     cV))),
 				      buffers->Q.begin());
 	else
 	{
-	    updateDissimilarities(TU::cbegin(*rowL), TU::cend(*rowL),
+	    updateDissimilarities(std::cbegin(*rowL), std::cend(*rowL),
 				  make_zip_iterator(
 				      std::make_tuple(
-					  TU::cbegin(*rowR),
+					  std::cbegin(*rowR),
 					  make_vertical_iterator(rowV, cV))),
-				  TU::cbegin(*rowLp),
+				  std::cbegin(*rowLp),
 				  make_zip_iterator(
 				      std::make_tuple(
-					  TU::cbegin(*rowRp),
+					  std::cbegin(*rowRp),
 					  make_vertical_iterator(rowV,
 								 --cVp))),
 				  buffers->Q.begin());
@@ -376,14 +376,14 @@ SADStereo<SCORE, DISP>::initializeDissimilarities(COL colL, COL colLe,
 
 	    auto	P = make_zip_iterator(
 				std::make_tuple(
-				    TU::make_transform_iterator(
+				    make_map_iterator(
 					diff_t(*colL,
 					       _params.intensityDiffMax),
 					make_col_accessor(colRV)),
-				    TU::make_transform_iterator(
+				    make_map_iterator(
 					ddiff_t(*(colL + 1) - *(colL - 1),
 						_params.derivativeDiffMax),
-					TU::make_transform_iterator(
+					make_map_iterator(
 					    Minus(),
 					    make_col_accessor(colRV) + 1,
 					    make_col_accessor(colRV) - 1))));
@@ -453,25 +453,25 @@ SADStereo<SCORE, DISP>::updateDissimilarities(COL colL,  COL colLe,
 	    const Minus	minus{};
 	    auto	P = make_zip_iterator(
 				std::make_tuple(
-				    TU::make_transform_iterator(
+				    make_map_iterator(
 					diff_t(*colL,
 					       _params.intensityDiffMax),
 					make_col_accessor(colRV)),
-				    TU::make_transform_iterator(
+				    make_map_iterator(
 					ddiff_t(*(colL + 1) - *(colL - 1),
 						_params.derivativeDiffMax),
-					TU::make_transform_iterator(
+					make_map_iterator(
 					    Minus(),
 					    make_col_accessor(colRV) + 1,
 					    make_col_accessor(colRV) - 1)),
-				    TU::make_transform_iterator(
+				    make_map_iterator(
 					diff_t(*colLp,
 					       _params.intensityDiffMax),
 					make_col_accessor(colRVp)),
-				    TU::make_transform_iterator(
+				    make_map_iterator(
 					ddiff_t(*(colLp + 1) - *(colLp - 1),
 						_params.derivativeDiffMax),
-					TU::make_transform_iterator(
+					make_map_iterator(
 					    Minus(),
 					    make_col_accessor(colRVp) + 1,
 					    make_col_accessor(colRVp) - 1))));

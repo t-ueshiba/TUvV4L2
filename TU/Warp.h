@@ -23,6 +23,18 @@ namespace TU
 class Warp
 {
   private:
+#if defined(SIMD)
+    template <class T, class S>
+    static T	ptr(S* p)
+		{
+		    return reinterpret_cast<T>(p);
+		}
+    template <class T, class S, bool ALIGNED>
+    static T	ptr(simd::iterator_wrapper<S*, ALIGNED> p)
+		{
+		    return reinterpret_cast<T>(p.base());
+		}
+#endif    
     struct FracArray
     {
 	FracArray(size_t d=0)
@@ -31,13 +43,15 @@ class Warp
 	size_t		width()			const	{return us.size();}
 	void		resize(size_t d)		;
 #if defined(SIMD)
-	simd::Array<short>	us, vs;
-	simd::Array<u_char>	du, dv;
+	template <class T>
+	using allocator	= simd::allocator<T>;
 #else
-	Array<short>		us, vs;
-	Array<u_char>		du, dv;
+	template <class T>
+	using allocator	= std::allocator<T>;
 #endif
-	size_t			lmost;
+	Array<short,  0, allocator<short> >	us, vs;
+	Array<u_char, 0, allocator<u_char> >	du, dv;
+	size_t					lmost;
     };
     
     template <class IN>
@@ -98,7 +112,7 @@ class Warp
 	std::enable_if_t<std::is_integral<V>::value, simd::vec<T> >
 			lookup(simd::vec<T> u, simd::vec<T> v) const
 			{
-			    return simd::lookup(TU::begin(*_in),
+			    return simd::lookup(std::cbegin(*_in),
 						v, u, _in.stride());
 			}
 	template <class V=value_type>
@@ -106,9 +120,9 @@ class Warp
 			lookup(simd::Is32vec u, simd::Is32vec v) const
 			{
 			    return simd::lookup(
-				       reinterpret_cast<const int32_t*>(
-					   TU::begin(*_in)),
-				       v, u, _in.stride());
+					Warp::ptr<const int32_t*>(
+					    std::cbegin(*_in)),
+					v, u, _in.stride());
 			}
 	template <class V=value_type>
 	static std::enable_if_t<!std::is_integral<V>::value, simd::Is32vec>
@@ -386,11 +400,11 @@ Warp::warpLine(IN in, OUT out, const FracArray& frac) const
 {
     Interpolate<IN>	interpolate(in);
     
-    auto	u  = TU::cbegin(frac.us);
-    auto	ue = TU::cend(  frac.us);
-    auto	v  = TU::cbegin(frac.vs);
-    auto	du = TU::cbegin(frac.du);
-    auto	dv = TU::cbegin(frac.dv);
+    auto	u  = std::cbegin(frac.us);
+    auto	ue = std::cend(  frac.us);
+    auto	v  = std::cbegin(frac.vs);
+    auto	du = std::cbegin(frac.du);
+    auto	dv = std::cbegin(frac.dv);
     out += frac.lmost;
 #if defined(SIMD)
     using	value_type = typename Interpolate<IN>::value_type;
@@ -402,7 +416,7 @@ Warp::warpLine(IN in, OUT out, const FracArray& frac) const
     const auto	n = simd::vec<u_char>::floor(std::distance(u, ue));
 
     simd::transform<T>(interpolate,
-		       simd::make_accessor(reinterpret_cast<O>(out)),
+		       simd::make_accessor(ptr<O>(out)),
 		       simd::make_accessor(u),
 		       simd::make_accessor(u + n),
 		       simd::make_accessor(v),

@@ -18,6 +18,12 @@
 
 namespace TU
 {
+#if defined(SIMD)
+template <class T>	using allocator	= simd::allocator<T, false>;
+#else
+template <class T>	using allocator	= std::allocator<T>;
+#endif
+
 enum Algorithm	{SAD, GF, WMF, TF};
     
 /************************************************************************
@@ -45,8 +51,8 @@ doJob(const Image<T>& imageL, const Image<T>& imageR,
     using	disparity_type	= float;
     
   // 画像を平行化する．
-    Rectify		rectify;
-    Image<T>		rectifiedImageL, rectifiedImageR;
+    Rectify	rectify;
+    Image<T, allocator<T> >	rectifiedImageL, rectifiedImageR;
     rectify.initialize(imageL, imageR, scale,
 		       params.disparitySearchWidth, params.disparityMax);
     rectify(imageL, imageR, rectifiedImageL, rectifiedImageR);
@@ -61,13 +67,14 @@ doJob(const Image<T>& imageL, const Image<T>& imageR,
 	      << std::endl;
     
   // ステレオマッチングを行う．
-    Image<disparity_type>	disparityMap(rectify.width(0),
+    Image<disparity_type, allocator<disparity_type> >
+				disparityMap(rectify.width(0),
 					     rectify.height(0));
-    const auto			rowL  = TU::cbegin(rectifiedImageL);
-    const auto			rowR  = TU::cbegin(rectifiedImageR);
-    const auto			rowLe = TU::cend(rectifiedImageL);
-    const auto			rowRe = TU::cend(rectifiedImageR);
-    const auto			rowD  = TU::begin(disparityMap);
+    const auto			rowL  = std::cbegin(rectifiedImageL);
+    const auto			rowR  = std::cbegin(rectifiedImageR);
+    const auto			rowLe = std::cend(rectifiedImageL);
+    const auto			rowRe = std::cend(rectifiedImageR);
+    const auto			rowD  = std::begin(disparityMap);
 #ifdef SCORE_ARRAY2
     Array2<Array<S> >		scores(disparityMap.height(),
 				       disparityMap.width());
@@ -80,17 +87,17 @@ doJob(const Image<T>& imageL, const Image<T>& imageR,
 	BoxFilter2	filter(params.windowSize, params.windowSize);
 
 	filter.convolve(make_range_iterator(
-			    make_diff_iterator<S>(TU::cbegin(*rowL),
-						  TU::cbegin(*rowR),
-						  params.disparitySearchWidth,
-						  params.intensityDiffMax),
+			    make_diff_iterator<S>(params.disparitySearchWidth,
+						  params.intensityDiffMax,
+						  std::cbegin(*rowL),
+						  std::cbegin(*rowR)),
 			    std::make_tuple(stride(rowL), stride(rowR)),
 			    TU::size(*rowL)),
 			make_range_iterator(
-			    make_diff_iterator<S>(TU::cbegin(*rowLe),
-						  TU::cbegin(*rowRe),
-						  params.disparitySearchWidth,
-						  params.intensityDiffMax),
+			    make_diff_iterator<S>(params.disparitySearchWidth,
+						  params.intensityDiffMax,
+						  std::cbegin(*rowLe),
+						  std::cbegin(*rowRe)),
 			    std::make_tuple(stride(rowLe), stride(rowRe)),
 			    TU::size(*rowLe)),
 #ifdef SCORE_ARRAY2
@@ -115,17 +122,17 @@ doJob(const Image<T>& imageL, const Image<T>& imageR,
 		filter(params.windowSize, params.windowSize, params.sigma);
 	
 	filter.convolve(make_range_iterator(
-			    make_diff_iterator<S>(TU::cbegin(*rowL),
-						  TU::cbegin(*rowR),
-						  params.disparitySearchWidth,
-						  params.intensityDiffMax),
+			    make_diff_iterator<S>(params.disparitySearchWidth,
+						  params.intensityDiffMax,
+						  std::cbegin(*rowL),
+						  std::cbegin(*rowR)),
 			    std::make_tuple(stride(rowL), stride(rowR)),
 			    TU::size(*rowL)),
 			make_range_iterator(
-			    make_diff_iterator<S>(TU::cbegin(*rowLe),
-						  TU::cbegin(*rowRe),
-						  params.disparitySearchWidth,
-						  params.intensityDiffMax),
+			    make_diff_iterator<S>(params.disparitySearchWidth,
+						  params.intensityDiffMax,
+						  std::cbegin(*rowLe),
+						  std::cbegin(*rowRe)),
 			    std::make_tuple(stride(rowLe), stride(rowRe)),
 			    TU::size(*rowLe)),
 			rowL, rowLe,
@@ -143,7 +150,7 @@ doJob(const Image<T>& imageL, const Image<T>& imageR,
 #endif
       }
 	break;
-
+  /*
       case TF:
       {
 	using wfunc_type	= MyDiff<T, float>;
@@ -152,17 +159,17 @@ doJob(const Image<T>& imageL, const Image<T>& imageR,
 						       params.sigma);
 	
 	filter.convolve(make_range_iterator(
-			    make_diff_iterator<S>(TU::cbegin(*rowL),
-						  TU::cbegin(*rowR),
-						  params.disparitySearchWidth,
-						  params.intensityDiffMax),
+			    make_diff_iterator<S>(params.disparitySearchWidth,
+						  params.intensityDiffMax,
+						  std::cbegin(*rowL),
+						  std::cbegin(*rowR)),
 			    std::make_tuple(stride(rowL), stride(rowR)),
 			    TU::size(*rowL)),
 			make_range_iterator(
-			    make_diff_iterator<S>(TU::cbegin(*rowLe),
-						  TU::cbegin(*rowRe),
-						  params.disparitySearchWidth,
-						  params.intensityDiffMax),
+			    make_diff_iterator<S>(params.disparitySearchWidth,
+						  params.intensityDiffMax,
+						  std::cbegin(*rowLe),
+						  std::cbegin(*rowRe)),
 			    std::make_tuple(stride(rowLe), stride(rowRe)),
 			    TU::size(*rowLe)),
 			rowL, rowLe,
@@ -181,7 +188,7 @@ doJob(const Image<T>& imageL, const Image<T>& imageR,
 			true);
       }
 	break;
-
+      */
       default:
 	break;
     }
@@ -208,8 +215,8 @@ main(int argc, char* argv[])
 {
     using namespace	TU;
 
-    typedef u_char	pixel_type;
-    typedef float	score_type;
+    using pixel_type	= float;
+    using score_type	= float;
     
     Algorithm	algo			= SAD;
     std::string	paramFile		= DEFAULT_PARAM_FILE;

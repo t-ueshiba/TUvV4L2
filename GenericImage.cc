@@ -59,14 +59,14 @@ GenericImage::saveData(std::ostream& out) const
     if (_typeInfo.bottomToTop)
     {
 	for (auto line = _a.rbegin(); line != _a.rend(); ++line)
-	    if (!out.write(TU::cbegin(*line), TU::size(*line)) ||
+	    if (!out.write(std::cbegin(*line), TU::size(*line)) ||
 		!pad.save(out))
 		break;
     }
     else
     {
 	for (auto&& line : _a)
-	    if (!out.write(TU::cbegin(line), TU::size(line)) ||
+	    if (!out.write(std::cbegin(line), TU::size(line)) ||
 		!pad.save(out))
 		break;
     }

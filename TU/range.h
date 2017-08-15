@@ -197,7 +197,7 @@ namespace detail
   template <size_t I, class E> inline auto
   size(const E& expr, std::integral_constant<size_t, I>)
   {
-      return size(*TU::cbegin(expr), std::integral_constant<size_t, I-1>());
+      return size(*std::cbegin(expr), std::integral_constant<size_t, I-1>());
   }
 }	// namespace detail
 
@@ -261,8 +261,8 @@ class sizes_holder
 			{
 			    const auto&	val = *iter;
 			    return print_size(print_x(out << TU::size(val),
-						      TU::cbegin(val)),
-					      TU::cbegin(val));
+						      std::cbegin(val)),
+					      std::cbegin(val));
 			}
 
   protected:
@@ -282,7 +282,7 @@ class sizes_and_strides_holder : public sizes_holder<E>
     std::ostream&	operator ()(std::ostream& out) const
 			{
 			    return print_stride(super::operator ()(out) << ':',
-						TU::cbegin(super::_expr));
+						std::cbegin(super::_expr));
 			}
     
   private:
@@ -299,8 +299,8 @@ class sizes_and_strides_holder : public sizes_holder<E>
 			    const auto&	val = *iter;
 			    return print_stride(super::print_x(
 						    out << iter.stride(),
-						    TU::cbegin(val)),
-						TU::cbegin(val));
+						    std::cbegin(val)),
+						std::cbegin(val));
 			}
 };
 
@@ -369,7 +369,7 @@ class range
 		operator =(const E_& expr)
 		{
 		    assert(TU::size(expr) == SIZE);
-		    copy<SIZE>(TU::cbegin(expr), SIZE, _begin);
+		    copy<SIZE>(std::cbegin(expr), SIZE, _begin);
 		    return *this;
 		}
 
@@ -459,7 +459,7 @@ class range<ITER, 0>
 		operator =(const E_& expr)
 		{
 		    assert(TU::size(expr) == _size);
-		    copy<TU::size0<E_>()>(TU::cbegin(expr), _size, _begin);
+		    copy<TU::size0<E_>()>(std::cbegin(expr), _size, _begin);
 		    return *this;
 		}
 		
@@ -1137,11 +1137,11 @@ namespace detail
 		}
       auto	begin()	const
 		{
-		    return TU::make_transform_iterator(_op, TU::cbegin(_expr));
+		    return make_map_iterator(_op, std::cbegin(_expr));
 		}
       auto	end() const
 		{
-		    return TU::make_transform_iterator(_op, TU::cend(_expr));
+		    return make_map_iterator(_op, std::cend(_expr));
 		}
       auto	size() const
 		{
@@ -1196,13 +1196,12 @@ namespace detail
 		}
       auto	begin()	const
 		{
-		    return TU::make_transform_iterator(
-				_op, TU::cbegin(_l), TU::cbegin(_r));
+		    return make_map_iterator(_op,
+					     std::cbegin(_l), std::cbegin(_r));
 		}
       auto	end() const
 		{
-		    return TU::make_transform_iterator(
-				_op, TU::cend(_l), TU::cend(_r));
+		    return make_map_iterator(_op, std::cend(_l), std::cend(_r));
 		}
       auto	size()	const	{ return TU::size(_l); }
       decltype(auto)
@@ -1360,7 +1359,7 @@ operator +=(L&& l, const R& r)
 {
     constexpr size_t	N = detail::max<size0<L>(), size0<R>()>::value;
     
-    for_each<N>(TU::begin(l), TU::size(l), TU::cbegin(r),
+    for_each<N>(TU::begin(l), TU::size(l), std::cbegin(r),
 		[](auto&& x, const auto& y){ x += y; });
     return l;
 }
@@ -1377,7 +1376,7 @@ operator -=(L&& l, const R& r)
 {
     constexpr size_t	N = detail::max<size0<L>(), size0<R>()>::value;
     
-    for_each<N>(TU::begin(l), TU::size(l), TU::cbegin(r),
+    for_each<N>(TU::begin(l), TU::size(l), std::cbegin(r),
 		[](auto&& x, const auto& y){ x -= y; });
     return l;
 }
@@ -1492,7 +1491,7 @@ transpose(E&& expr)
 template <class E, std::enable_if_t<(rank<E>() != 0)>* = nullptr> inline auto
 square(const E& expr)
 {
-    return square<size0<E>()>(TU::cbegin(expr), TU::size(expr));
+    return square<size0<E>()>(std::cbegin(expr), TU::size(expr));
 }
 
 //! 与えられた式の各要素の自乗和の平方根を求める.
