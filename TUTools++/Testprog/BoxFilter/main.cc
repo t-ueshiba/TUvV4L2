@@ -2,29 +2,35 @@
  *  $Id: main.cc,v 1.17 2012-07-28 09:10:17 ueshiba Exp $
  */
 #include <stdlib.h>
+#include "TU/simd/Array++.h"
 #include "TU/Image++.h"
 #include "TU/BoxFilter.h"
 #include "TU/Profiler.h"
 
 namespace TU
 {
+#if defined(SIMD)
+template <class T>
+using allocator = simd::allocator<T>;
+#else
+template <class T>
+using allocator = std::allocator<T>;
+#endif
+    
 /************************************************************************
 *  static fucntions							*
 ************************************************************************/
-template <class T> void
+template <class S, class T> void
 doJob(size_t winSize, size_t grainSize, int niter)
 {
     using namespace	std;
 
-    typedef T		pixel_type;
-    typedef float	value_type;
-    
-    Image<pixel_type>	in;
+    Image<S, allocator<S> >	in;
     in.restore(cin);
     
-    Image<value_type>		out(in.width(), in.height());
+    Image<T, allocator<T> >	out(in.width(), in.height());
     Profiler<>			profiler(1);
-    BoxFilter2<value_type>	box(winSize, winSize);
+    BoxFilter2<T>		box(winSize, winSize);
     box.setGrainSize(grainSize);
     
     for (int i = 0; i < 5; ++i)
@@ -39,24 +45,21 @@ doJob(size_t winSize, size_t grainSize, int niter)
 	profiler.print(cerr);
     }
 
-    out *= value_type(1)/(value_type(winSize)*value_type(winSize));
+    out *= T(1)/(T(winSize)*T(winSize));
     out.save(cout);
 }
  
-template <class T> void
+template <class S, class T> void
 doJob1(size_t winSize, int niter)
 {
     using namespace	std;
 
-    typedef T		pixel_type;
-    typedef float	value_type;
-    
-    Image<pixel_type>		in;
+    Image<S, allocator<S> >	in;
     in.restore(cin);
     
-    Array<value_type>		out(in.width());
+    Array<T, 0, allocator<T> >	out(in.width());
     Profiler<>			profiler(1);
-    BoxFilter<value_type>	box(winSize);
+    BoxFilter<T>		box(winSize);
 
     for (int i = 0; i < 5; ++i)
     {
@@ -82,7 +85,8 @@ main(int argc, char* argv[])
     using namespace	std;
     using namespace	TU;
 
-    typedef u_char	pixel_type;
+    using pixel_type	= short;
+    using value_type	= float;
     
     size_t		winSize = 3;
     size_t		grainSize = 100;
@@ -104,9 +108,9 @@ main(int argc, char* argv[])
 
     try
     {
-      //doJob1<pixel_type>(winSize, niter);
+      //doJob1<pixel_type, value_type>(winSize, niter);
 	cerr << endl;
-	doJob<pixel_type>(winSize, grainSize, niter);
+	doJob<pixel_type, value_type>(winSize, grainSize, niter);
     }
     catch (exception& err)
     {

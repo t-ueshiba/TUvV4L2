@@ -170,12 +170,10 @@ doJob(const Image<T>& imageL, const Image<T>& imageR,
       default:
 	break;
     }
-
 #ifdef SCORE_ARRAY3
     std::copy(scores.cbegin(), scores.cend(), rowD);
 #endif
     disparityMap.save(std::cout);
-
 }
 
 }

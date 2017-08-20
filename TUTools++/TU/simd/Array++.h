@@ -84,9 +84,9 @@ make_converter(iterator_wrapper<ITER, ALIGNED> iter)
 namespace detail
 {
   template <class ITER>
-  struct vsize		// iterator_value<ITER> が vec<T> 型
+  struct vsize		// ITER::value_type が vec<T> 型
   {
-      constexpr static size_t	value = iterator_value<ITER>::size;
+      constexpr static size_t	value = ITER::value_type::size;
   };
   template <class T>
   struct vsize<T*>
@@ -177,12 +177,15 @@ for_each(simd::iterator_wrapper<ITER0, ALIGNED0> begin0, ARG arg,
 #endif
     using T0	= typename detail::vec_element_t<iterator_value<ITER0> >::type;
     using T1	= typename detail::vec_element_t<iterator_value<ITER1> >::type;
-    using CVTR0	= decltype(simd::make_converter<T1>(begin0));
-
-    constexpr auto	M = simd::make_terminator<CVTR0>(N);
-
+    using CVTR  = std::conditional_t<
+			(simd::vec<T0>::size > simd::vec<T1>::size),
+			decltype(simd::make_converter<T1>(begin0)),
+			decltype(simd::make_converter<T0>(begin1))>;
+    
+    constexpr auto	M = simd::make_terminator<CVTR>(N);
+    
     return for_each<M>(simd::make_converter<T1>(begin0),
-		       simd::make_terminator<CVTR0>(arg),
+		       simd::make_terminator<CVTR>(arg),
 		       simd::make_converter<T0>(begin1),
 		       func);
 }
