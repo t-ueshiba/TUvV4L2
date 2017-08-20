@@ -119,9 +119,10 @@ make_box_filter_iterator(const ITER& iter, size_t w=0)
 }
 
 /************************************************************************
-*  class BoxFilter							*
+*  class BoxFilter<T>							*
 ************************************************************************/
 //! 1次元入力データ列にbox filterを適用するクラス
+template <class T>
 class BoxFilter
 {
   public:
@@ -144,7 +145,7 @@ class BoxFilter
    */
     size_t	winSize()		const	{return _winSize;}
 
-    template <class T=void, class IN, class OUT>
+    template <class IN, class OUT>
     void	convolve(IN ib, IN ie, OUT out)	const	;
 
   //! 与えられた長さの入力データ列に対する出力データ列の長さを返す
@@ -165,8 +166,8 @@ class BoxFilter
   \param out	box filterを適用した出力データ列の先頭を示す反復子
   \return	出力データ列の末尾の次を示す反復子
 */
-template <class T, class IN, class OUT> void
-BoxFilter::convolve(IN ib, IN ie, OUT out) const
+template <class T> template <class IN, class OUT> void
+BoxFilter<T>::convolve(IN ib, IN ie, OUT out) const
 {
     std::copy(make_box_filter_iterator<T>(ib, _winSize),
 	      make_box_filter_iterator<T>(ie), out);
@@ -176,10 +177,11 @@ BoxFilter::convolve(IN ib, IN ie, OUT out) const
 *  class BoxFilter2							*
 ************************************************************************/
 //! 2次元入力データ列にbox filterを適用するクラス
-class BoxFilter2 : public Filter2<BoxFilter2>
+template <class T>
+class BoxFilter2 : public Filter2<BoxFilter2<T> >
 {
   private:
-    using super	= Filter2<BoxFilter2>;
+    using super	= Filter2<BoxFilter2<T> >;
     
   public:
     using	super::grainSize;
@@ -255,12 +257,12 @@ class BoxFilter2 : public Filter2<BoxFilter2>
 
     size_t	overlap()	const	{ return rowWinSize() - 1; }
 
-    template <class T=void, class IN, class OUT>
+    template <class IN, class OUT>
     void	convolveRows(IN ib, IN ie, OUT out)	const	;
     
   private:
-    size_t	_rowWinSize;
-    BoxFilter	_colFilter;
+    size_t		_rowWinSize;
+    BoxFilter<T>	_colFilter;
 };
 
 //! 与えられた2次元配列とこのフィルタの畳み込みを行う
@@ -269,16 +271,16 @@ class BoxFilter2 : public Filter2<BoxFilter2>
   \param ie	入力2次元データ配列の末尾の次の行を指す反復子
   \param out	出力2次元データ配列の先頭行を指す反復子
 */
-template <class T, class IN, class OUT> void
-BoxFilter2::convolveRows(IN ib, IN ie, OUT out) const
+template <class T> template <class IN, class OUT> void
+BoxFilter2<T>::convolveRows(IN ib, IN ie, OUT out) const
 {
     if (std::distance(ib, ie) < rowWinSize())
 	throw std::runtime_error("BoxFilter2::convolveRows(): not enough rows!");
     
     for (box_filter_iterator<IN, T> row(ib, _rowWinSize), rowe(ie);
 	 row != rowe; ++row, ++out)
-	_colFilter.convolve<T>(std::cbegin(*row), std::cend(*row),
-			       TU::begin(*out));
+	_colFilter.convolve(std::cbegin(*row), std::cend(*row),
+			    TU::begin(*out));
 }
 
 }

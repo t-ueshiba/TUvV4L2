@@ -471,10 +471,10 @@ template <size_t N, class IN, class ARG, class OUT> inline void
 copy(IN in, ARG arg, OUT out)
 {
 #ifdef TU_DEBUG
-    std::cout << "copy<" << N << "> ["
-	      << print_sizes(range<IN, N>(in, arg)) << ']' << std::endl;
+  //std::cout << "copy<" << N << "> ["
+  //	      << print_sizes(range<IN, N>(in, arg)) << ']' << std::endl;
 #endif
-    for_each<N>(in, arg, out, [](const auto& src, auto&& dst){ dst = src; });
+    for_each<N>(in, arg, out, [](const auto& x, auto&& y){ y = x; });
 }
 
 /************************************************************************
@@ -531,8 +531,8 @@ template <size_t N, class ITER0, class ARG, class ITER1, class T> inline T
 inner_product(ITER0 begin0, ARG arg, ITER1 begin1, T init)
 {
 #ifdef TU_DEBUG
-    std::cout << "inner_product<" << N << "> ["
-	      << print_sizes(range<ITER0, N>(begin0, arg)) << ']' << std::endl;
+  //std::cout << "inner_product<" << N << "> ["
+  //	      << print_sizes(range<ITER0, N>(begin0, arg)) << ']' << std::endl;
 #endif
     return detail::inner_product(begin0, arg, begin1, init,
 				 std::integral_constant<size_t, N>());
