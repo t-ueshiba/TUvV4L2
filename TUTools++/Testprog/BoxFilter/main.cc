@@ -22,9 +22,9 @@ doJob(size_t winSize, size_t grainSize, int niter)
     Image<pixel_type>	in;
     in.restore(cin);
     
-    Image<value_type>	out(in.width(), in.height());
-    Profiler<>		profiler(1);
-    BoxFilter2		box(winSize, winSize);
+    Image<value_type>		out(in.width(), in.height());
+    Profiler<>			profiler(1);
+    BoxFilter2<value_type>	box(winSize, winSize);
     box.setGrainSize(grainSize);
     
     for (int i = 0; i < 5; ++i)
@@ -54,9 +54,9 @@ doJob1(size_t winSize, int niter)
     Image<pixel_type>		in;
     in.restore(cin);
     
-    Array<value_type>	out(in.width());
-    Profiler<>		profiler(1);
-    BoxFilter		box(winSize);
+    Array<value_type>		out(in.width());
+    Profiler<>			profiler(1);
+    BoxFilter<value_type>	box(winSize);
 
     for (int i = 0; i < 5; ++i)
     {
@@ -82,7 +82,7 @@ main(int argc, char* argv[])
     using namespace	std;
     using namespace	TU;
 
-    typedef int		pixel_type;
+    typedef u_char	pixel_type;
     
     size_t		winSize = 3;
     size_t		grainSize = 100;

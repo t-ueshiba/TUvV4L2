@@ -118,10 +118,10 @@ struct Diff2
 				detail::identity<T> >::type;
 		    using namespace	simd;
 
-		    return cast<signed_type>(min(diff(simd::vec<T>(_x), y),
-						 simd::vec<T>(_thresh)));
+		    return cast<signed_type>(min(diff(_x, y), _thresh));
+		  //return min(diff(_x, y), _thresh);
 		}
-#endif
+#else
     auto	operator ()(T y) const
 		{
 		    using signed_type
@@ -133,15 +133,21 @@ struct Diff2
 		    return static_cast<signed_type>(std::min(diff(_x, y),
 							     _thresh));
 		}
-
-    auto	operator ()(T y, T z) const
+#endif
+    template <class T_>
+    auto	operator ()(T_ y, T_ z) const
 		{
 		    return (*this)(y) + (*this)(z);
 		}
     
   private:
-    const T	_x;
-    const T	_thresh;
+#if defined(SIMD)
+    const simd::vec<T>	_x;
+    const simd::vec<T>	_thresh;
+#else
+    const T		_x;
+    const T		_thresh;
+#endif
 };
 
 /************************************************************************

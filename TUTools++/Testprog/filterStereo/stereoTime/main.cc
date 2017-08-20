@@ -15,18 +15,23 @@
 #define DEFAULT_SCALE		1.0
 #define DEFAULT_GRAINSIZE	50
 
-//#define SCORE_ARRAY2
+#define SCORE_ARRAY3
 
 namespace TU
 {
+#if defined(SIMD)
+template <class T>	using allocator	= simd::allocator<T, false>;
+#else
+template <class T>	using allocator	= std::allocator<T>;
+#endif
+
 enum Algorithm	{SAD, GF, WMF, TF};
     
 /************************************************************************
-*  class Diff<S, T>							*
+*  class MyDiff<S, T>							*
 ************************************************************************/
-  /*
 template <class S, class T>
-struct Diff
+struct MyDiff
 {
     typedef S	argument_type;
     typedef T	result_type;
@@ -36,7 +41,6 @@ struct Diff
 		    return std::abs(x - y);
 		}
 };
-  */
 
 /************************************************************************
 *  static functions							*
@@ -46,34 +50,61 @@ doJob(const Image<T>& imageL, const Image<T>& imageR,
       const StereoParameters& params, double scale, Algorithm algo,
       size_t ntrials)
 {
-    using	disparity_type	= float;
+    using disparity_type	= float;
     
   // 画像を平行化する．
-    Rectify		rectify;
-    Image<T>		rectifiedImageL, rectifiedImageR;
+    Rectify			rectify;
+    Image<T, allocator<T> >	rectifiedImageL, rectifiedImageR;
     rectify.initialize(imageL, imageR, scale,
 		       params.disparitySearchWidth, params.disparityMax);
     rectify(imageL, imageR, rectifiedImageL, rectifiedImageR);
 
-  // ステレオマッチングを行う．
-    Image<disparity_type>	disparityMap(rectify.width(0),
-					     rectify.height(0));
-    const auto			rowL  = std::cbegin(rectifiedImageL);
-    const auto			rowR  = std::cbegin(rectifiedImageR);
-    const auto			rowLe = std::cend(rectifiedImageL);
-    const auto			rowRe = std::cend(rectifiedImageR);
-    const auto			rowD  = std::begin(disparityMap);
-#ifdef SCORE_ARRAY2
-    Array2<Array<S> >		scores(disparityMap.height(),
-				       disparityMap.width());
+  // フィルタの入出力行を指す反復子を作る．
+    const auto	rowL  = std::cbegin(rectifiedImageL);
+    const auto	rowR  = std::cbegin(rectifiedImageR);
+    const auto	rowLe = std::cend(rectifiedImageL);
+    const auto	rowRe = std::cend(rectifiedImageR);
+    const auto	rowI  = make_range_iterator(
+			    make_diff_iterator<S>(params.disparitySearchWidth,
+						  params.intensityDiffMax,
+						  std::cbegin(*rowL),
+						  std::cbegin(*rowR)),
+			    std::make_tuple(stride(rowL), stride(rowR)),
+			    TU::size(*rowL));
+    const auto	rowIe = make_range_iterator(
+			    make_diff_iterator<S>(params.disparitySearchWidth,
+						  params.intensityDiffMax,
+						  std::cbegin(*rowLe),
+						  std::cbegin(*rowRe)),
+			    std::make_tuple(stride(rowLe), stride(rowRe)),
+			    TU::size(*rowLe));
+
+    Image<S, allocator<S> >
+		disparityMap(rectify.width(0), rectify.height(0));
+    const auto	rowD  = make_range_iterator(
+			    make_matching_iterator<S>(
+				disparityMap.begin()->begin(),
+				params.disparitySearchWidth,
+				params.disparityMax,
+				params.disparityInconsistency,
+				params.doHorizontalBackMatch),
+			    stride(disparityMap.begin()),
+			    disparityMap.width());
+#ifdef SCORE_ARRAY3
+    Array3<S, 0, 0, 0, allocator<S> >
+		scores(disparityMap.height(), disparityMap.width(),
+		       params.disparitySearchWidth);
+    const auto	rowO  = std::begin(scores);
+#else
+    const auto	rowO  = rowD;
 #endif
-    Profiler<>			profiler(2);
-    
+  // ステレオマッチングを行う．
+    Profiler<>		profiler(2);
     switch (algo)
     {
       case SAD:
       {
-	BoxFilter2	filter(params.windowSize, params.windowSize);
+	BoxFilter2<S>	filter(params.windowSize, params.windowSize);
 
 	for (size_t i = 0; i < ntrials; ++i)
 	{
@@ -82,34 +113,7 @@ doJob(const Image<T>& imageL, const Image<T>& imageR,
 		profiler.start(0);
 		rectify(imageL, imageR, rectifiedImageL, rectifiedImageR);
 		profiler.start(1);
-		filter.convolve(
-		    make_range_iterator(
-			make_diff_iterator<S>(params.disparitySearchWidth,
-					      params.intensityDiffMax,
-					      std::cbegin(*rowL),
-					      std::cbegin(*rowR)),
-			std::make_tuple(stride(rowL), stride(rowR)),
-			TU::size(*rowL)),
-		    make_range_iterator(
-			make_diff_iterator<S>(params.disparitySearchWidth,
-					      params.intensityDiffMax,
-					      std::cbegin(*rowLe),
-					      std::cbegin(*rowRe)),
-			std::make_tuple(stride(rowLe), stride(rowRe)),
-			TU::size(*rowLe)),
-#ifdef SCORE_ARRAY2
-		    scores.begin());
-#else
-		make_range_iterator(
-		    make_matching_iterator<S>(
-			TU::begin(*(rowD + params.windowSize/2))
-			+ params.windowSize/2,
-			params.disparitySearchWidth,
-			params.disparityMax,
-			params.disparityInconsistency,
-			params.doHorizontalBackMatch),
-		    stride(rowD), TU::size(*rowD)));
-#endif
+		filter.convolve(rowI, rowIe, rowO);
 	        profiler.nextFrame();
 	    }
 	    std::cerr << "-------------------------------------------" << std::endl;
@@ -130,34 +134,7 @@ doJob(const Image<T>& imageL, const Image<T>& imageR,
 		profiler.start(0);
 		rectify(imageL, imageR, rectifiedImageL, rectifiedImageR);
 		profiler.start(1);
-		filter.convolve(
-		    make_range_iterator(
-			make_diff_iterator<S>(params.disparitySearchWidth,
-					      params.intensityDiffMax,
-					      std::cbegin(*rowL),
-					      std::cbegin(*rowR)),
-			std::make_tuple(stride(rowL), stride(rowR)),
-			TU::size(*rowL)),
-		    make_range_iterator(
-			make_diff_iterator<S>(params.disparitySearchWidth,
-					      params.intensityDiffMax,
-					      std::cbegin(*rowLe),
-					      std::cbegin(*rowRe)),
-			std::make_tuple(stride(rowLe), stride(rowRe)),
-			TU::size(*rowLe)),
-		    rowL, rowLe,
-#ifdef SCORE_ARRAY2
-		    scores.begin());
-#else
-		make_range_iterator(
-		    make_matching_iterator<S>(
-			TU::begin(*rowD),
-			params.disparitySearchWidth,
-			params.disparityMax,
-			params.disparityInconsistency,
-			params.doHorizontalBackMatch),
-		    stride(rowD), TU::size(*rowD)));
-#endif
+		filter.convolve(rowI, rowIe, rowL, rowLe, rowO);
 		profiler.nextFrame();
 	    }
 	    std::cerr << "-------------------------------------------" << std::endl;
@@ -165,14 +142,14 @@ doJob(const Image<T>& imageL, const Image<T>& imageR,
 	}
       }
 	break;
-  /*
+
       case TF:
       {
-	typedef Diff<T, float>	wfunc_type;
+	using wfunc_type	= MyDiff<T, float>;
 
-	boost::TreeFilter<ScoreArray, wfunc_type>	filter(wfunc_type(),
-							       params.sigma);
-	
+	boost::TreeFilter<Array<S>, wfunc_type>	filter(wfunc_type(),
+						       params.sigma);
+
 	for (size_t i = 0; i < ntrials; ++i)
 	{
 	    for (size_t j = 0; j < 10; ++j)
@@ -180,32 +157,7 @@ doJob(const Image<T>& imageL, const Image<T>& imageR,
 		profiler.start(0);
 		rectify(imageL, imageR, rectifiedImageL, rectifiedImageR);
 		profiler.start(1);
-		filter.convolve(
-		    make_row_iterator<in_iterator>(
-			make_fast_zip_iterator(
-			    boost::make_tuple(rectifiedImageL.cbegin(),
-					      rectifiedImageR.cbegin())),
-			params.disparitySearchWidth,
-			params.intensityDiffMax),
-		    make_row_iterator<in_iterator>(
-			make_fast_zip_iterator(
-			    boost::make_tuple(rectifiedImageL.cend(),
-					      rectifiedImageR.cend())),
-			params.disparitySearchWidth,
-			params.intensityDiffMax),
-		    rectifiedImageL.cbegin(),
-		    rectifiedImageL.cend(),
-		    make_row_iterator<out_iterator>(
-			disparityMap.begin(),
-#ifdef NO_BACKMATCH
-			MinIdx<ScoreArray>(params.disparityMax)
-#else
-			params.disparitySearchWidth,
-			params.disparityMax,
-			params.disparityInconsistency
-#endif
-			),
-		    true);
+		filter.convolve(rowI, rowIe, rowL, rowLe, rowO, true);
 		profiler.nextFrame();
 	    }
 	    std::cerr << "-------------------------------------------" << std::endl;
@@ -214,22 +166,16 @@ doJob(const Image<T>& imageL, const Image<T>& imageR,
 	}
       }
 	break;
-  */      
+
       default:
 	break;
     }
 
-#ifdef SCORE_ARRAY2
-    std::copy(scores.cbegin(), scores.cend(),
-	      make_range_iterator(make_matching_iterator<S>(
-				      TU::begin(*rowD),
-				      params.disparitySearchWidth,
-				      params.disparityMax,
-				      params.disparityInconsistency,
-				      params.doHorizontalBackMatch),
-				  stride(rowD), TU::size(*rowD)));
+#ifdef SCORE_ARRAY3
+    std::copy(scores.cbegin(), scores.cend(), rowD);
 #endif
     disparityMap.save(std::cout);
+
 }
 
 }
@@ -241,8 +187,8 @@ main(int argc, char* argv[])
 {
     using namespace	TU;
 
-    typedef u_char	pixel_type;
-    typedef float	score_type;
+    using pixel_type	= u_char;
+    using score_type	= float;
     
     Algorithm	algo			= SAD;
     std::string	paramFile		= DEFAULT_PARAM_FILE;

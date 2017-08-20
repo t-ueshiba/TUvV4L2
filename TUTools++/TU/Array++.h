@@ -889,6 +889,19 @@ namespace detail
     public:
       using type = array<U, ALLOC<U>, SIZE, SIZES...>;
   };
+#if defined(SIMD)
+  template <class S, bool ALIGNED,
+	    size_t SIZE, size_t... SIZES, class T>
+  struct replace_element<array<S, simd::allocator<S, ALIGNED>, SIZE, SIZES...>,
+			 T>
+  {
+    private:
+      using U	 = typename replace_element<S, T>::type;
+
+    public:
+      using type = array<U, simd::allocator<U, ALIGNED>, SIZE, SIZES...>;
+  };
+#endif
 }	// namespace detail
     
 /************************************************************************
@@ -1151,9 +1164,9 @@ namespace detail
 			auto	a = std::cbegin(_l);
 			auto	b = std::cbegin(_r);
 			_cache = *a * *b;
-			TU::for_each<N>(++a, TU::size(_l) - 1, ++b,
-					[this](const auto& x, const auto& y)
-					{ _cache += x * y; });
+			for_each<N>(++a, TU::size(_l) - 1, ++b,
+				    [this](const auto& x, const auto& y)
+				    { _cache += x * y; });
 			_valid = true;
 		    }
 
@@ -1286,8 +1299,7 @@ operator %(L&& l, R&& r)
 */
 template <class L, class R>
 inline std::enable_if_t<rank<L>() == 1 && rank<R>() == 1,
-			Array<std::common_type_t<element_t<L>, element_t<R> >,
-			      3> >
+			Array<std::common_type_t<value_t<L>, value_t<R> >, 3> >
 operator ^(const L& l, const R& r)
 {
 #ifdef TU_DEBUG

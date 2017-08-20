@@ -24,15 +24,15 @@ class Warp
 {
   private:
 #if defined(SIMD)
-    template <class T, class S>
-    static T	ptr(S* p)
+    template <class P, class T>
+    static P	ptr(T* p)
 		{
-		    return reinterpret_cast<T>(p);
+		    return reinterpret_cast<P>(p);
 		}
-    template <class T, class S, bool ALIGNED>
-    static T	ptr(simd::iterator_wrapper<S*, ALIGNED> p)
+    template <class P, class T, bool ALIGNED>
+    static P	ptr(simd::iterator_wrapper<T*, ALIGNED> p)
 		{
-		    return reinterpret_cast<T>(p.base());
+		    return reinterpret_cast<P>(p.base());
 		}
 #endif    
     struct FracArray
@@ -411,12 +411,12 @@ Warp::warpLine(IN in, OUT out, const FracArray& frac) const
     using	T = std::conditional_t<(sizeof(value_type) > sizeof(int16_t)),
 				       int32_t, int16_t>;
     using	O = std::conditional_t<(sizeof(value_type) > sizeof(int16_t)),
-				       int32_t*, OUT>;
+				       int32_t, iterator_value<OUT> >;
 	
     const auto	n = simd::vec<u_char>::floor(std::distance(u, ue));
 
     simd::transform<T>(interpolate,
-		       simd::make_accessor(ptr<O>(out)),
+		       simd::make_accessor(ptr<O*>(out)),
 		       simd::make_accessor(u),
 		       simd::make_accessor(u + n),
 		       simd::make_accessor(v),

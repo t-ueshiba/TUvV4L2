@@ -15,7 +15,7 @@ namespace TU
 ************************************************************************/
 //! 1次元guided filterを表すクラス
 template <class T>
-class GuidedFilter : public BoxFilter
+class GuidedFilter : public BoxFilter<T>
 {
   public:
     using element_type	= T;
@@ -89,11 +89,13 @@ class GuidedFilter : public BoxFilter
     };
     
   private:
-    using super	= BoxFilter;
+    using super	= BoxFilter<T>;
 
   public:
     GuidedFilter(size_t w, T e) :super(w), _e(e)			{}
 
+    using	super::winSize;
+    
     auto	epsilon()		const	{ return _e; }
     auto&	setEpsilon(T e)			{ _e = e; return *this; }
     
@@ -128,17 +130,17 @@ GuidedFilter<T>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out) const
     
   // guided filterの2次元係数ベクトルを計算する．
     Array<coeffs_t>	c(super::outLength(std::distance(ib, ie)));
-    super::convolve<T>(make_map_iterator(init_params(), ib, gb),
-		       make_map_iterator(init_params(), ie, ge),
-		       make_assignment_iterator(c.begin(),
-						init_coeffs(winSize(), _e)));
+    super::convolve(make_map_iterator(init_params(), ib, gb),
+		    make_map_iterator(init_params(), ie, ge),
+		    make_assignment_iterator(c.begin(),
+					     init_coeffs(winSize(), _e)));
     
   // 係数ベクトルの平均値を求め，それによってガイドデータ列を線型変換する．
     std::advance(gb, winSize() - 1);
-    super::convolve<T>(c.cbegin(), c.cend(),
-		       make_assignment_iterator(
-			   make_zip_iterator(std::make_tuple(gb, out)),
-			   trans_guides(winSize())));
+    super::convolve(c.cbegin(), c.cend(),
+		    make_assignment_iterator(
+			make_zip_iterator(std::make_tuple(gb, out)),
+			trans_guides(winSize())));
 }
 
 //! 1次元入力データ列にguided filterを適用する
@@ -158,17 +160,17 @@ GuidedFilter<T>::convolve(IN ib, IN ie, OUT out) const
     
   // guided filterの2次元係数ベクトルを計算する．
     Array<coeffs_t>	c(super::outLength(std::distance(ib, ie)));
-    super::convolve<T>(make_map_iterator(init_params(), ib),
-		       make_map_iterator(init_params(), ie),
-		       make_assignment_iterator(c.begin(),
-						init_coeffs(winSize(), _e)));
+    super::convolve(make_map_iterator(init_params(), ib),
+		    make_map_iterator(init_params(), ie),
+		    make_assignment_iterator(c.begin(),
+					     init_coeffs(winSize(), _e)));
 
   // 係数ベクトルの平均値を求め，それによって入力データ列を線型変換する．
     std::advance(ib, winSize() - 1);
-    super::convolve<T>(c.cbegin(), c.cend(),
-		       make_assignment_iterator(
-			   make_zip_iterator(std::make_tuple(ib, out)),
-			   trans_guides(winSize())));
+    super::convolve(c.cbegin(), c.cend(),
+		    make_assignment_iterator(
+			make_zip_iterator(std::make_tuple(ib, out)),
+			trans_guides(winSize())));
 }
 
 /************************************************************************
@@ -176,7 +178,7 @@ GuidedFilter<T>::convolve(IN ib, IN ie, OUT out) const
 ************************************************************************/
 //! 2次元guided filterを表すクラス
 template <class T>
-class GuidedFilter2 : private BoxFilter2
+class GuidedFilter2 : private BoxFilter2<T>
 {
   public:
     using element_type	= T;
@@ -185,7 +187,7 @@ class GuidedFilter2 : private BoxFilter2
     using init_params	= typename GuidedFilter<T>::init_params;
     using init_coeffs	= typename GuidedFilter<T>::init_coeffs;
     using trans_guides	= typename GuidedFilter<T>::trans_guides;
-    using super		= BoxFilter2;
+    using super		= BoxFilter2<T>;
     
   public:
     GuidedFilter2(size_t wrow, size_t wcol, T e)
@@ -237,34 +239,34 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out) const
     Array2<coeffs_t>	c(nrow, ncol);
     
   // guided filterの2次元係数ベクトルを計算する．
-    super::convolve<T>(make_range_iterator(
-			   make_map_iterator(init_params(),
-					     std::cbegin(*ib),
-					     std::cbegin(*gb)),
-			   std::make_tuple(stride(ib), stride(gb)),
-			   TU::size(*ib)),
-		       make_range_iterator(
-			   make_map_iterator(init_params(),
-					     std::cbegin(*ie),
-					     std::cbegin(*ge)),
-			   std::make_tuple(stride(ie), stride(ge)),
-			   TU::size(*ie)),
-		       make_range_iterator(
-			   make_assignment_iterator(c.begin()->begin(),
-						    init_coeffs(n, _e)),
-			   stride(c.begin()), c.ncol()));
+    super::convolve(make_range_iterator(
+			make_map_iterator(init_params(),
+					  std::cbegin(*ib),
+					  std::cbegin(*gb)),
+			std::make_tuple(stride(ib), stride(gb)),
+			TU::size(*ib)),
+		    make_range_iterator(
+			make_map_iterator(init_params(),
+					  std::cbegin(*ie),
+					  std::cbegin(*ge)),
+			std::make_tuple(stride(ie), stride(ge)),
+			TU::size(*ie)),
+		    make_range_iterator(
+			make_assignment_iterator(c.begin()->begin(),
+						 init_coeffs(n, _e)),
+			stride(c.begin()), c.ncol()));
 
   // 係数ベクトルの平均値を求め，それによってガイドデータ列を線型変換する．
     gb  += (rowWinSize() - 1);
     out += (rowWinSize() - 1);
-    super::convolve<T>(c.cbegin(), c.cend(),
-		       make_range_iterator(
-			   make_assignment_iterator(
-			       TU::begin(std::make_tuple(*gb, *out))
-			       += (colWinSize() - 1),
-			       trans_guides(n)),
-			   std::make_tuple(stride(gb), stride(out)),
-			   TU::size(*out)));
+    super::convolve(c.cbegin(), c.cend(),
+		    make_range_iterator(
+			make_assignment_iterator(
+			    TU::begin(std::make_tuple(*gb, *out))
+			    += (colWinSize() - 1),
+			    trans_guides(n)),
+			std::make_tuple(stride(gb), stride(out)),
+			TU::size(*out)));
 }
 
 //! 2次元入力データにguided filterを適用する
@@ -292,28 +294,28 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, OUT out) const
     Array2<coeffs_t>	c(nrow, ncol);
 
   // guided filterの2次元係数ベクトルを計算する．
-    super::convolve<T>(make_range_iterator(
-			   make_map_iterator(init_params(), std::cbegin(*ib)),
-			   stride(ib), TU::size(*ib)),
-		       make_range_iterator(
-			   make_map_iterator(init_params(), std::cbegin(*ie)),
-			   stride(ie), TU::size(*ie)),
-		       make_range_iterator(
-			   make_assignment_iterator(c.begin()->begin(),
-						    init_coeffs(n, _e)),
-			   stride(c.begin()), c.ncol()));
+    super::convolve(make_range_iterator(
+			make_map_iterator(init_params(), std::cbegin(*ib)),
+			stride(ib), TU::size(*ib)),
+		    make_range_iterator(
+			make_map_iterator(init_params(), std::cbegin(*ie)),
+			stride(ie), TU::size(*ie)),
+		    make_range_iterator(
+			make_assignment_iterator(c.begin()->begin(),
+						 init_coeffs(n, _e)),
+			stride(c.begin()), c.ncol()));
 
   // 係数ベクトルの平均値を求め，それによって入力データ列を線型変換する．
     std::advance(ib,  rowWinSize() - 1);
     std::advance(out, rowWinSize() - 1);
-    super::convolve<T>(c.cbegin(), c.cend(),
-		       make_range_iterator(
-			   make_assignment_iterator(
-			       TU::begin(std::make_tuple(*ib, *out))
-			       + colWinSize() - 1,
-			       trans_guides(n)),
-			   std::make_tuple(stride(ib), stride(out)),
-			   TU::size(*out)));
+    super::convolve(c.cbegin(), c.cend(),
+		    make_range_iterator(
+			make_assignment_iterator(
+			    TU::begin(std::make_tuple(*ib, *out))
+			    + colWinSize() - 1,
+			    trans_guides(n)),
+			std::make_tuple(stride(ib), stride(out)),
+			TU::size(*out)));
 }
 
 }

@@ -63,6 +63,23 @@ make_accessor(iterator_wrapper<T*, ALIGNED> p)
 {
     return {p.base()};
 }
+
+template <class T, class ITER, bool ALIGNED> inline auto
+make_converter(iterator_wrapper<ITER, ALIGNED> iter)
+{
+    using accessor	= decltype(make_accessor(iter));
+    using element_type	= typename iterator_value<accessor>::element_type;
+    using converter	= std::conditional_t<
+				is_vec<iterator_reference<accessor> >::value,
+				std::conditional_t<
+				    (vec<T>::size >= vec<element_type>::size),
+				    cvtdown_iterator<T, accessor>, accessor>,
+				std::conditional_t<
+				    (vec<element_type>::size > vec<T>::size),
+				    accessor, cvtup_iterator<accessor> > >;
+
+    return converter(make_accessor(iter));
+}
     
 namespace detail
 {
@@ -107,6 +124,20 @@ namespace detail
 /************************************************************************
 *  algorithms overloaded for simd::iterator_wrapper<ITER, ALIGNED>	*
 ************************************************************************/
+namespace detail
+{
+  template <class T>
+  struct vec_element_t
+  {
+      using type	= T;
+  };
+  template <class T>
+  struct vec_element_t<simd::vec<T> >
+  {
+      using type	= T;
+  };
+}	// namespace detail
+    
 //! 指定された範囲の各要素に関数を適用する
 /*!
   N != 0 の場合，Nで指定した要素数だけ適用し，argは無視．
@@ -138,11 +169,22 @@ template <size_t N,  class ITER0, bool ALIGNED0,
 for_each(simd::iterator_wrapper<ITER0, ALIGNED0> begin0, ARG arg,
 	 simd::iterator_wrapper<ITER1, ALIGNED1> begin1, FUNC func)
 {
-    constexpr auto	M = simd::make_terminator<ITER0>(N);
+#ifdef TU_DEBUG
+    std::cout << "(simd)for_each<" << N << "> ["
+	      << print_sizes(range<simd::iterator_wrapper<ITER0, ALIGNED0>, N>(
+				 begin0, arg))
+	      << ']' << std::endl;
+#endif
+    using T0	= typename detail::vec_element_t<iterator_value<ITER0> >::type;
+    using T1	= typename detail::vec_element_t<iterator_value<ITER1> >::type;
+    using CVTR0	= decltype(simd::make_converter<T1>(begin0));
 
-    return for_each<M>(simd::make_accessor(begin0),
-		       simd::make_terminator<ITER0>(arg),
-		       simd::make_accessor(begin1), func);
+    constexpr auto	M = simd::make_terminator<CVTR0>(N);
+
+    return for_each<M>(simd::make_converter<T1>(begin0),
+		       simd::make_terminator<CVTR0>(arg),
+		       simd::make_converter<T0>(begin1),
+		       func);
 }
     
 //! 指定された範囲の内積の値を返す
@@ -164,7 +206,7 @@ inner_product(simd::iterator_wrapper<ITER0, ALIGNED0> begin0, ARG arg,
     std::cout << "(simd)inner_product<" << N << "> ["
 	      << print_sizes(range<simd::iterator_wrapper<ITER0, ALIGNED0>, N>(
 				 begin0, arg))
-	      << "] ==> ";
+	      << "]" << std::endl;
 #endif
     constexpr auto	M = simd::make_terminator<ITER0>(N);
     
@@ -212,7 +254,7 @@ template <class FUNC, class... ITER, bool... ALIGNED> inline auto
 make_map_iterator(FUNC func, simd::iterator_wrapper<ITER, ALIGNED>... iter)
 {
 #ifdef TU_DEBUG
-    std::cout << "(simd)map_iterator:\n";
+    std::cout << "(simd)make_map_iterator:\n";
     detail::print_types<ITER...>(std::cout);
 #endif		  
     return wrap_iterator(make_map_iterator(func, simd::make_accessor(iter)...));
