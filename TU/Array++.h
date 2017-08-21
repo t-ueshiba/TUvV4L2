@@ -1202,12 +1202,12 @@ template <class L, class R,
 inline auto
 operator *(const L& l, const R& r)
 {
-    using value_type = std::common_type_t<value_t<L>, value_t<R> >;
+    using element_type = std::common_type_t<element_t<L>, element_t<R> >;
 
     assert(size<0>(l) == size<0>(r));
     constexpr size_t	S = detail::max<size0<L>(), size0<R>()>::value;
     return inner_product<S>(std::cbegin(l), TU::size(l), std::cbegin(r),
-			    value_type(0));
+			    element_type(0));
 }
 
 //! 1次元配列式と転置されていない2次元配列式の積をとる.
@@ -1299,7 +1299,8 @@ operator %(L&& l, R&& r)
 */
 template <class L, class R>
 inline std::enable_if_t<rank<L>() == 1 && rank<R>() == 1,
-			Array<std::common_type_t<value_t<L>, value_t<R> >, 3> >
+			Array<std::common_type_t<element_t<L>,
+						 element_t<R> >, 3> >
 operator ^(const L& l, const R& r)
 {
 #ifdef TU_DEBUG
