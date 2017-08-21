@@ -677,7 +677,7 @@ class range_iterator
     friend class	boost::iterator_core_access;
 	  
   public:
-		range_iterator(ITER iter=ITER(),
+		range_iterator(ITER iter,
 			       iterator_stride<ITER> stride=STRIDE,
 			       size_t size=SIZE)
 		    :super(iter), ss(stride, size)			{}

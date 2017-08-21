@@ -39,14 +39,13 @@ struct Diff
     Diff(T x, T thresh)	:_x(x), _thresh(thresh)		{}
 
 #if defined(SIMD)
-    auto	operator ()(T y) const
+    auto	operator ()(simd::vec<T> y) const
 		{
-		    using element_type = typename T::element_type;
 		    using signed_type
 			= typename std::conditional_t<
-				std::is_integral<element_type>::value,
-				std::make_signed<element_type>,
-				detail::identity<element_type> >::type;
+				std::is_integral<T>::value,
+				std::make_signed<T>,
+				detail::identity<T> >::type;
 		    using namespace	simd;
 
 		    return cast<signed_type>(min(diff(_x, y), _thresh));
@@ -54,24 +53,28 @@ struct Diff
 #else
     auto	operator ()(T y) const
 		{
-		    using signed_type
-			= typename std::conditional_t<
-				std::is_integral<T>::value,
-				std::make_signed<T>,
-				detail::identity<T> >::type;
-
-		    return static_cast<signed_type>(std::min(diff(_x, y),
-							     _thresh));
+		    return std::min(diff(_x, y), _thresh);
 		}
 #endif
-    auto	operator ()(std::tuple<T, T> y) const
+    template <class T_>
+    auto	operator ()(T_ y, T_ z) const
+		{
+		    return (*this)(y) + (*this)(z);
+		}
+    template <class T_>
+    auto	operator ()(std::tuple<T_, T_> y) const
 		{
 		    return (*this)(std::get<0>(y)) + (*this)(std::get<1>(y));
 		}
     
   private:
-    const T	_x;
-    const T	_thresh;
+#if defined(SIMD)
+    const simd::vec<T>	_x;
+    const simd::vec<T>	_thresh;
+#else
+    const T		_x;
+    const T		_thresh;
+#endif
 };
 
 /************************************************************************
