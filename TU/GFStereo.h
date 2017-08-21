@@ -522,23 +522,19 @@ GFStereo<SCORE, DISP>::initializeFilterParameters(COL colL, COL colLe,
 						  col_giterator colF) const
 {
     using pixel_t	= iterator_value<COL>;
-#if defined(SIMD)
-    using diff_t	= Diff<simd::vec<pixel_t> >;
-#else
     using diff_t	= Diff<pixel_t>;
-#endif
+
     if (_params.blend > 0)
     {
 	using blend_t	= Blend<ScoreVec>;
+	using ddiff_t	= Diff<std::make_signed_t<pixel_t> >;
 #if defined(SIMD)
 	using qiterator	= simd::cvtup_iterator<
 			      assignment_iterator<
 				  init_params2, subiterator<col_siterator> > >;
-	using ddiff_t	= Diff<simd::vec<std::make_signed_t<pixel_t> > >;
 #else
 	using qiterator	= assignment_iterator<init_params2,
 					      subiterator<col_siterator> >;
-	using ddiff_t	= Diff<std::make_signed_t<pixel_t> >;
 #endif
 	while (++colL != colLe - 1)
 	{
@@ -613,23 +609,19 @@ GFStereo<SCORE, DISP>::updateFilterParameters(COL colL, COL colLe, COL_RV colRV,
 					      col_giterator colF) const
 {
     using pixel_t	= iterator_value<COL>;
-#if defined(SIMD)
-    using diff_t	= Diff<simd::vec<pixel_t> >;
-#else
     using diff_t	= Diff<pixel_t>;
-#endif
+
     if (_params.blend > 0)
     {
+	using ddiff_t	= Diff<std::make_signed_t<pixel_t> >;
 #if defined(SIMD)
 	using qiterator	= simd::cvtup_iterator<
 			      assignment_iterator<
 				  update_params2,
 				  subiterator<col_siterator> > >;
-	using ddiff_t	= Diff<simd::vec<std::make_signed_t<pixel_t> > >;
 #else
 	using qiterator	= assignment_iterator<update_params2,
 					      subiterator<col_siterator> >;
-	using ddiff_t	= Diff<std::make_signed_t<pixel_t> >;
 #endif
 	while (++colL != colLe - 1)
 	{

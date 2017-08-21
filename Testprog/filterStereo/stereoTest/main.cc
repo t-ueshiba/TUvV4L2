@@ -14,8 +14,6 @@
 #define DEFAULT_SCALE		1.0
 #define DEFAULT_GRAINSIZE	50
 
-//#define SCORE_ARRAY3
-
 namespace TU
 {
 #if defined(SIMD)
@@ -32,9 +30,9 @@ enum Algorithm	{SAD, GF, WMF, TF};
 template <class S, class T>
 struct MyDiff
 {
-    typedef S	argument_type;
-    typedef T	result_type;
-
+    using argument_type	= S;
+    using result_type	= T;
+    
     result_type	operator ()(argument_type x, argument_type y) const
 		{
 		    return std::abs(x - y);
@@ -125,7 +123,7 @@ doJob(const Image<T>& imageL, const Image<T>& imageR,
 	
       case TF:
       {
-	using wfunc_type = MyDiff<T, float>;
+	using wfunc_type = MyDiff<T, S>;
 
 	boost::TreeFilter<Array<S>, wfunc_type>	filter(wfunc_type(),
 						       params.sigma);

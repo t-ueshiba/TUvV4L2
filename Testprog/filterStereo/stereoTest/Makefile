@@ -13,8 +13,8 @@ IDLS		=
 MOCHDRS		=
 
 INCDIRS		= -I../../..
-CPPFLAGS	= -DNDEBUG #-DTU_DEBUG #-DUSE_TBB #-DSCORE_ARRAY2
-CFLAGS		= -g -O #-O3
+CPPFLAGS	= -DNDEBUG #-DSCORE_ARRAY3 #-DTU_DEBUG #-DUSE_TBB
+CFLAGS		= -g -O3
 NVCCFLAGS	= -g
 ifeq ($(shell arch), armv7l)
   CPPFLAGS     += -DNEON
@@ -24,7 +24,7 @@ else
 #  CPPFLAGS     += -DSSE4
 #  CFLAGS       += -msse4
 #  CPPFLAGS     += -DAVX2
-#  CFLAGS       += -mavx2
+  CFLAGS       += -mavx2
 endif
 CCFLAGS		= $(CFLAGS) #-ftemplate-backtrace-limit=0
 
