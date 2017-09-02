@@ -49,8 +49,8 @@ cvt(const std::tuple<S...>& t)
     return tuple_transform([](auto x){ return cvt<T, HI, MASK>(x); }, t);
 }
     
-template <class T, bool MASK=false, class... S1, class... S2> inline auto
-cvt(const std::tuple<S1...>& l, const std::tuple<S2...>& r)
+template <class T, bool MASK=false, class... S> inline auto
+cvt(const std::tuple<S...>& l, const std::tuple<S...>& r)
 {
     return tuple_transform([](auto x, auto y){ return cvt<T, MASK>(x, y); },
 			   l, r);

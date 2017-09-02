@@ -22,22 +22,22 @@ namespace detail
   class cvtup_proxy
   {
     public:
-      typedef iterator_value<ITER>				value_type;
-      typedef cvtup_proxy					self;
+      using value_type	= iterator_value<ITER>;
+      using self	= cvtup_proxy;
 
     private:
-      typedef typename tuple_head<value_type>::element_type	T;
+      using T		= typename tuple_head<value_type>::element_type;
 
     private:
       template <class VEC_, class OP_>
-      typename std::enable_if<(vec<T>::size == tuple_head<VEC_>::size)>::type
+      std::enable_if_t<(vec<T>::size == tuple_head<VEC_>::size)>
 		cvtup(const VEC_& x, OP_ op)
 		{
 		    op(*_iter, cvt<T, false, MASK>(x));
 		    ++_iter;
 		}
       template <class VEC_, class OP_>
-      typename std::enable_if<(vec<T>::size < tuple_head<VEC_>::size)>::type
+      std::enable_if_t<(vec<T>::size < tuple_head<VEC_>::size)>
 		cvtup(const VEC_& x, OP_ op)
 		{
 		    using U = cvt_upper_type<
@@ -125,19 +125,19 @@ class cvtup_iterator
 		 detail::cvtup_proxy<ITER, MASK> >
 {
   private:
-    typedef boost::iterator_adaptor<
-		cvtup_iterator,
-		ITER,
-		typename detail::cvtup_proxy<ITER, MASK>::value_type,
-		boost::single_pass_traversal_tag,
-		detail::cvtup_proxy<ITER, MASK> >	super;
+    using super	= boost::iterator_adaptor<
+			cvtup_iterator,
+			ITER,
+			typename detail::cvtup_proxy<ITER, MASK>::value_type,
+			boost::single_pass_traversal_tag,
+			detail::cvtup_proxy<ITER, MASK> >;
 
   public:
-    typedef typename super::difference_type	difference_type;
-    typedef typename super::value_type		value_type;
-    typedef typename super::reference		reference;
+    using typename super::difference_type;
+    using typename super::value_type;
+    using typename super::reference;
 
-    friend class	boost::iterator_core_access;
+    friend class boost::iterator_core_access;
 
   public:
     cvtup_iterator(const ITER& iter)	:super(iter)			{}
