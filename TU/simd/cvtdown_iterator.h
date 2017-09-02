@@ -32,28 +32,29 @@ class cvtdown_iterator
 		 replace_element<iterator_value<ITER>, vec<T> > >
 {
   private:
-    typedef iterator_value<ITER>			src_type;
-    typedef typename tuple_head<src_type>::element_type	S;
-    typedef boost::iterator_adaptor<
-		cvtdown_iterator,
-		ITER,
-		replace_element<src_type, vec<T> >,
-		boost::single_pass_traversal_tag,
-		replace_element<src_type, vec<T> > >	super;
+    using src_type	= iterator_value<ITER>;
+    
+    using S		= typename tuple_head<src_type>::element_type;
+    using super		= boost::iterator_adaptor<
+				cvtdown_iterator,
+				ITER,
+				replace_element<src_type, vec<T> >,
+				boost::single_pass_traversal_tag,
+				replace_element<src_type, vec<T> > >;
 
   public:
-    typedef typename super::difference_type		difference_type;
-    typedef typename super::reference			reference;
+    using	typename super::difference_type;
+    using	typename super::reference;
 
-    friend class	boost::iterator_core_access;
+    friend	class boost::iterator_core_access;
 
   public:
 		cvtdown_iterator(const ITER& iter)	:super(iter)	{}
 
   private:
     template <class T_>
-    typename std::enable_if<(vec<T_>::size == vec<S>::size),
-			    replace_element<src_type, vec<T_> > >::type
+    std::enable_if_t<(vec<T_>::size == vec<S>::size),
+		     replace_element<src_type, vec<T_> > >
 		cvtdown()
 		{
 		    auto	x = *super::base();
@@ -61,8 +62,8 @@ class cvtdown_iterator
 		    return cvt<T_, false, MASK>(x);
 		}
     template <class T_>
-    typename std::enable_if<(vec<T_>::size > vec<S>::size),
-			    replace_element<src_type, vec<T_> > >::type
+    std::enable_if_t<(vec<T_>::size > vec<S>::size),
+		     replace_element<src_type, vec<T_> > >
 		cvtdown()
 		{
 		    using A = cvt_above_type<T_, S, MASK>;

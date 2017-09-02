@@ -18,7 +18,7 @@ namespace simd
 ************************************************************************/
 //! SIMDベクトルを出力する反復子を介して1つまたは複数のSIMDベクトルを読み込み，指定された成分を持つSIMDベクトルに変換する反復子
 /*!
-  \param S	変換先のSIMDベクトルの成分の型
+  \param T	変換先のSIMDベクトルの成分の型
   \param ITER	SIMDベクトルを出力する反復子
 */
 template <class T, class ITER, bool MASK=false>
