@@ -15,7 +15,7 @@ IDLS		= ForwardKinematicsService.idl ReachingService.idl \
 MOCHDRS		=
 
 INCDIRS		= -I. -I$(PREFIX)/include
-CPPFLAGS	= -DNDEBUG -DHRP2KAI
+CPPFLAGS	= -DNDEBUG -DHRP2YH
 CFLAGS		= -O3
 NVCCFLAGS	= -O
 ifeq ($(shell arch), armv7l)
@@ -73,8 +73,8 @@ include $(PROJECT)/lib/common.mk
 ###
 HRP2.o: TU/HRP2++.h WalkGeneratorService.hh \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/range.h /usr/local/include/TU/algorithm.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
+	/usr/local/include/TU/range.h /usr/local/include/TU/iterator.h \
+	/usr/local/include/TU/tuple.h /usr/local/include/TU/algorithm.h \
 	bodyinfo_HRP3.h misc.h /usr/include/math.h bodyinfo_HRP2toHRP3.h \
 	bodyinfo_HRP2YH.h bodyinfo_HRP2SH.h bodyinfo_HRP2KAI.h \
 	bodyinfo_HRP2DOF7.h

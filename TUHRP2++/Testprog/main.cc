@@ -64,10 +64,10 @@ doJob(HRP2& hrp2, const std::string& configDirs, const std::string& cameraName)
     hrp2.go_clothinit();
 
   // 各校正点について…
-    for (int n = 0; n < poseList.dim(); ++n)
+    for (int n = 0; n < poseList.size(); ++n)
     {
       // ロボットに次の把持中心（校正点）の姿勢を与える．
-	cout << "--- Target-" << n << '/' << poseList.dim() - 1 << " ---\n"
+	cout << "--- Target-" << n << '/' << poseList.size() - 1 << " ---\n"
 	     << poseList[n];
 	double	duration = 10.0;
 
@@ -95,12 +95,12 @@ doJob(HRP2& hrp2, const std::string& configDirs, const std::string& cameraName)
 	else
 	{
 	  // 第６軸の真の姿勢が求まったら、それを把持中心の姿勢に変換する。
-	    Matrix44d	D6g = Matrix44d::I(4);
+	    Matrix44d	D6g = diag<4>(1.0);
 	    D6g[0][3] = X6[0];
 	    D6g[1][3] = X6[1];
 	    D6g[2][3] = X6[2];
 	    Matrix44d	Dwg = Dw6 * D6g;
-	    cout << "--- Real-" << n << '/' << poseList.dim() - 1 << " ---\n"
+	    cout << "--- Real-" << n << '/' << poseList.size() - 1 << " ---\n"
 		 << Dwg;
 	}
 

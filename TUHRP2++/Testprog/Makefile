@@ -12,7 +12,7 @@ VPATH		=
 IDLS		=
 MOCHDRS		=
 
-INCDIRS		= -I. -I$(PREFIX)/include
+INCDIRS		= -I.. -I$(PREFIX)/include
 CPPFLAGS	= -DNDEBUG
 CFLAGS		= -g
 NVCCFLAGS	= -g
@@ -43,11 +43,10 @@ EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/HRP2++.h \
 		/usr/local/include/TU/Manip.h \
 		/usr/local/include/TU/Vector++.h \
-		/usr/local/include/TU/functional.h \
+		/usr/local/include/TU/algorithm.h \
 		/usr/local/include/TU/iterator.h \
-		/usr/local/include/TU/mmInstructions.h \
-		/usr/local/include/TU/tuple.h \
-		/usr/local/include/TU/types.h
+		/usr/local/include/TU/range.h \
+		/usr/local/include/TU/tuple.h
 HDRS		=
 SRCS		= main.cc
 OBJS		= main.o
@@ -58,8 +57,7 @@ include $(PROJECT)/lib/rtc.mk		# IDLHDRS, IDLSRCS, CPPFLAGS, OBJS, LIBS
 #include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
-main.o: /usr/local/include/TU/Manip.h /usr/local/include/TU/types.h \
-	/usr/local/include/TU/HRP2++.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
-	/usr/local/include/TU/functional.h \
-	/usr/local/include/TU/mmInstructions.h /usr/local/include/TU/tuple.h
+main.o: /usr/local/include/TU/Manip.h /usr/local/include/TU/HRP2++.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/range.h /usr/local/include/TU/iterator.h \
+	/usr/local/include/TU/tuple.h /usr/local/include/TU/algorithm.h
