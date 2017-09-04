@@ -52,12 +52,12 @@ MyCmdWindow<CAMERAS, PIXEL>::MyCmdWindow(App& parentApp,
     :CmdWindow(parentApp, "Camera controller", Colormap::RGBColor, 16, 0, 0),
      _cameras(cameras),
      _maxSkew(maxSkew),
-     _movie(std::size(_cameras)),
+     _movie(TU::size(_cameras)),
      _canvases(0),
      _menuCmd(*this, createMenuCmds(*std::begin(_cameras))),
      _captureCmd(*this, createCaptureCmds()),
      _featureCmd(*this, createFeatureCmds(*std::begin(_cameras),
-					  std::size(cameras))),
+					  TU::size(cameras))),
      _timer(*this, 0)
 {
     _menuCmd.place(0, 0, 2, 1);
@@ -187,7 +187,7 @@ MyCmdWindow<CAMERAS, PIXEL>::tick()
 	else
 	    for (auto& camera : _cameras)
 		camera.snap();
-	for (size_t i = 0; i < std::size(_cameras); ++i)
+	for (size_t i = 0; i < TU::size(_cameras); ++i)
 	    _cameras[i] >> _movie.image(i);
     }
 
@@ -199,7 +199,7 @@ MyCmdWindow<CAMERAS, PIXEL>::tick()
 template <class CAMERAS, class PIXEL> void
 MyCmdWindow<CAMERAS, PIXEL>::initializeMovie()
 {
-    Array<typename Movie<PIXEL>::Size>	sizes(std::size(_cameras));
+    Array<typename Movie<PIXEL>::Size>	sizes(TU::size(_cameras));
     auto				camera = std::cbegin(_cameras);
     for (auto& size : sizes)
     {
