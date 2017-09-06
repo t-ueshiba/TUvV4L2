@@ -61,9 +61,7 @@ namespace detail
 			   vec<T_> >
 			operator ()(ITER_& iter) const
 			{
-			    const auto	x = *iter;
-			    ++iter;
-			    return cvt<T_, false, MASK>(x);
+			    return cvt<T_, false, MASK>(*iter++);
 			}
 	  template <class T_=I, class ITER_>
 	  std::enable_if_t<(iterator_value<ITER_>::size < vec<T_>::size),
@@ -95,9 +93,7 @@ namespace detail
 			   iterator_value<ITER_> >
 	  		operator ()(ITER_& iter) const
 			{
-			    const auto	x = *iter;
-			    ++iter;
-			    return x;
+			    return *iter++;
 			}
 	  template <class ITER_>
 	  std::enable_if_t<iterator_value<ITER_>::size != N_, ITER_&>
@@ -119,21 +115,21 @@ namespace detail
       template <class ITER_>
       struct max_size
       {
-	  static constexpr size_t	value = iterator_value<ITER_>::size;
+	  constexpr static auto	value = iterator_value<ITER_>::size;
       };
       template <class ITER_>
       struct max_size<std::tuple<ITER_> >
       {
-	  static constexpr size_t	value = max_size<ITER_>::value;
+	  constexpr static auto	value = max_size<ITER_>::value;
       };
       template <class ITER_, class... TAIL_>
       struct max_size<std::tuple<ITER_, TAIL_...> >
       {
-	  static constexpr size_t	head_max = max_size<ITER_>::value;
-	  static constexpr size_t	tail_max = max_size<
-						   std::tuple<TAIL_...> >::value;
-	  static constexpr size_t	value	 = (head_max > tail_max ?
-						    head_max : tail_max);
+	  constexpr static auto	head_max = max_size<ITER_>::value;
+	  constexpr static auto	tail_max = max_size<
+						std::tuple<TAIL_...> >::value;
+	  constexpr static auto	value	 = (head_max > tail_max ?
+					    head_max : tail_max);
       };
 
     private:
@@ -230,7 +226,7 @@ namespace detail
 		{
 		    while (std::get<0>(_t) != _end)
 		    {
-			constexpr size_t
+			constexpr auto
 			    N = (max_size<ITER_TUPLE>::value > vec<O>::size ?
 				 max_size<ITER_TUPLE>::value : vec<O>::size);
 
