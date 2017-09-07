@@ -16,19 +16,17 @@ INCDIRS		= -I.. -I$(PREFIX)/include
 CPPFLAGS	= -DNDEBUG
 CFLAGS		= -g
 NVCCFLAGS	= -g
-ifneq ($(findstring icpc,$(CXX)),)
-  CFLAGS	= -O3
-  NVCCFLAGS	= -O			# must < -O2
-  CPPFLAGS     += -DSSE3
+ifeq ($(shell arch), armv7l)
+  CPPFLAGS     += -DNEON
+else ifeq ($(shell arch), aarch64)
+  CPPFLAGS     += -DNEON
+else
+  CPPFLAGS     += -DSSE4
+  CFLAGS       += -msse4
 endif
 CCFLAGS		= $(CFLAGS)
 
 LIBS		= -lTUHRP2++ -lTUTools++
-ifneq ($(findstring darwin,$(OSTYPE)),)
-  LIBS	       += -framework IOKit -framework CoreFoundation \
-		  -framework CoreServices
-endif
-
 LINKER		= $(CXX)
 
 BINDIR		= $(PREFIX)/bin
@@ -39,8 +37,12 @@ INCDIR		= $(PREFIX)/include
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC .cpp:sC .cu:sC
-EXTHDRS		= /usr/local/include/TU/Array++.h \
-		/usr/local/include/TU/HRP2++.h \
+EXTHDRS		= ../ForwardKinematicsService.hh \
+		../ReachingService.hh \
+		../SequencePlayerService.hh \
+		../TU/HRP2++.h \
+		../WalkGeneratorService.hh \
+		/usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/Manip.h \
 		/usr/local/include/TU/Vector++.h \
 		/usr/local/include/TU/algorithm.h \
@@ -57,7 +59,9 @@ include $(PROJECT)/lib/rtc.mk		# IDLHDRS, IDLSRCS, CPPFLAGS, OBJS, LIBS
 #include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
-main.o: /usr/local/include/TU/Manip.h /usr/local/include/TU/HRP2++.h \
-	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/range.h /usr/local/include/TU/iterator.h \
-	/usr/local/include/TU/tuple.h /usr/local/include/TU/algorithm.h
+main.o: /usr/local/include/TU/Manip.h ../TU/HRP2++.h ../ReachingService.hh \
+	../SequencePlayerService.hh ../ForwardKinematicsService.hh \
+	../WalkGeneratorService.hh /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/range.h \
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
+	/usr/local/include/TU/algorithm.h

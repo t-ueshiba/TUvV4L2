@@ -3,7 +3,7 @@
  *  and SequencePlayerRTC) service provider and Vision program.
  *    by nkita 100808
  *
- *  Revised to support coninuous monitoring hand poses and integrated into
+ *  Revised to support continuous monitoring hand poses and integrated into
  *  new library libTUHRP2++.
  *    by t.ueshiba 130301.
  *    
@@ -112,11 +112,13 @@ HRP2::setup(bool isLeftHand, bool isLaterMode)
   // 使用する自由度を設定
     bool	usedDofs[] =
 		{
+		  // 6 + 6 + 2 + 2 = 16 DOFs
 		    true, true, true, true, true, true,		// right leg
 		    true, true, true, true, true, true,		// left leg
 		    true, false,				// waist
 		    false, false,				// neck
-#if defined(HRP2SH)
+#if defined(HRP2SH) || defined(HRP2KAI)
+		  // 7 + 1 + 7 + 1 + 5 + 5 = 26 DOFs
 		    true, true, true, true, true, true,	true,	// right arm
 		    false,					// right hand
 		    false, false, false, false, false, false, false, // left arm
@@ -124,11 +126,13 @@ HRP2::setup(bool isLeftHand, bool isLaterMode)
 		    false, false, false, false, false,	// right hand joint
 		    false, false, false, false, false,	// left hand joint
 #else
+		  // 7 + 1 + 7 + 1 = 16 DOFs
 		    true, true, true, true, true, true, true,	// right arm
 		    false,					// right hand
 		    false, false, false, false, false, false, false, // left arm
 		    false,					// left hand
 #endif
+		  // 6 DOFs
 		    true, true, false, false, false, false	// base
 		};
     if (!SelectUsedDofs(usedDofs))

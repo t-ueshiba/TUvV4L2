@@ -12,8 +12,8 @@ VPATH		=
 IDLS		=
 MOCHDRS		=
 
-INCDIRS		= -I.. -I$(PREFIX)/include
-CPPFLAGS	= -DNDEBUG #-DUSE_TBB
+INCDIRS		= -I../../..
+CPPFLAGS	= -DNDEBUG -DUSE_TBB
 CFLAGS		= -g -O3
 NVCCFLAGS	= -g
 ifneq ($(findstring icpc,$(CXX)),)
@@ -23,7 +23,7 @@ ifneq ($(findstring icpc,$(CXX)),)
 endif
 CCFLAGS		= $(CFLAGS)
 
-LIBS		= -lTUTools++ -ltbb
+LIBS		= -ltbb
 ifneq ($(findstring darwin,$(OSTYPE)),)
   LIBS	       += -framework IOKit -framework CoreFoundation \
 		  -framework CoreServices
@@ -39,23 +39,30 @@ INCDIR		= $(PREFIX)/include
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC .cpp:sC .cu:sC
-EXTHDRS		= /usr/local/include/TU/Array++.h \
-		/usr/local/include/TU/Geometry++.h \
-		/usr/local/include/TU/Image++.h \
-		/usr/local/include/TU/Minimize.h \
-		/usr/local/include/TU/Profiler.h \
-		/usr/local/include/TU/Quantizer.h \
-		/usr/local/include/TU/Vector++.h \
-		/usr/local/include/TU/WeightedMedianFilter.h \
-		/usr/local/include/TU/algorithm.h \
-		/usr/local/include/TU/functional.h \
-		/usr/local/include/TU/iterator.h \
-		/usr/local/include/TU/pair.h \
-		/usr/local/include/TU/tuple.h \
-		/usr/local/include/TU/types.h
+EXTHDRS		= ../../../TU/Array++.h \
+		../../../TU/Camera++.h \
+		../../../TU/Geometry++.h \
+		../../../TU/Image++.h \
+		../../../TU/Manip.h \
+		../../../TU/Minimize.h \
+		../../../TU/Profiler.h \
+		../../../TU/Quantizer.h \
+		../../../TU/Vector++.h \
+		../../../TU/WeightedMedianFilter.h \
+		../../../TU/algorithm.h \
+		../../../TU/functional.h \
+		../../../TU/iterator.h \
+		../../../TU/pair.h \
+		../../../TU/range.h \
+		../../../TU/tuple.h \
+		../../../TU/types.h
 HDRS		=
-SRCS		= main.cc
-OBJS		= main.o
+SRCS		= ImageBase.cc \
+		main.cc \
+		manipulators.cc
+OBJS		= ImageBase.o \
+		main.o \
+		manipulators.o
 
 #include $(PROJECT)/lib/rtc.mk		# IDLHDRS, IDLSRCS, CPPFLAGS, OBJS, LIBS
 #include $(PROJECT)/lib/qt.mk		# MOCSRCS, OBJS
@@ -63,11 +70,15 @@ OBJS		= main.o
 #include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
-main.o: /usr/local/include/TU/Image++.h /usr/local/include/TU/types.h \
-	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/iterator.h \
-	/usr/local/include/TU/tuple.h /usr/local/include/TU/functional.h \
-	/usr/local/include/TU/pair.h /usr/local/include/TU/Minimize.h \
-	/usr/local/include/TU/WeightedMedianFilter.h \
-	/usr/local/include/TU/Quantizer.h /usr/local/include/TU/algorithm.h \
-	/usr/local/include/TU/Profiler.h
+ImageBase.o: ../../../TU/Image++.h ../../../TU/types.h \
+	../../../TU/Geometry++.h ../../../TU/Vector++.h ../../../TU/Array++.h \
+	../../../TU/iterator.h ../../../TU/tuple.h ../../../TU/functional.h \
+	../../../TU/range.h ../../../TU/pair.h ../../../TU/Minimize.h \
+	../../../TU/Camera++.h ../../../TU/Manip.h
+main.o: ../../../TU/Image++.h ../../../TU/types.h ../../../TU/Geometry++.h \
+	../../../TU/Vector++.h ../../../TU/Array++.h ../../../TU/iterator.h \
+	../../../TU/tuple.h ../../../TU/functional.h ../../../TU/range.h \
+	../../../TU/pair.h ../../../TU/Minimize.h \
+	../../../TU/WeightedMedianFilter.h ../../../TU/Quantizer.h \
+	../../../TU/algorithm.h ../../../TU/Profiler.h
+manipulators.o: ../../../TU/Manip.h ../../../TU/types.h

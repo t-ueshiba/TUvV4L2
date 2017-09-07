@@ -75,8 +75,8 @@ TUXv++.sa.o: TU/v/XvDC.h /usr/local/include/TU/v/ShmDC.h \
 	/usr/local/include/TU/v/DC.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/Vector++.h \
 	/usr/local/include/TU/Array++.h /usr/local/include/TU/range.h \
-	/usr/local/include/TU/algorithm.h /usr/local/include/TU/iterator.h \
-	/usr/local/include/TU/tuple.h /usr/local/include/TU/Image++.h \
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
+	/usr/local/include/TU/algorithm.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/pair.h /usr/local/include/TU/Manip.h \
 	/usr/local/include/TU/v/Colormap.h \
 	/usr/local/include/TU/v/CanvasPane.h /usr/local/include/TU/v/TUv++.h \
@@ -87,8 +87,8 @@ XvDC.o: TU/v/XvDC.h /usr/local/include/TU/v/ShmDC.h \
 	/usr/local/include/TU/v/DC.h /usr/local/include/TU/Geometry++.h \
 	/usr/local/include/TU/Minimize.h /usr/local/include/TU/Vector++.h \
 	/usr/local/include/TU/Array++.h /usr/local/include/TU/range.h \
-	/usr/local/include/TU/algorithm.h /usr/local/include/TU/iterator.h \
-	/usr/local/include/TU/tuple.h /usr/local/include/TU/Image++.h \
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
+	/usr/local/include/TU/algorithm.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/pair.h /usr/local/include/TU/Manip.h \
 	/usr/local/include/TU/v/Colormap.h \
 	/usr/local/include/TU/v/CanvasPane.h /usr/local/include/TU/v/TUv++.h \
