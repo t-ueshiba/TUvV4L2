@@ -40,25 +40,22 @@ struct all<PRED, std::tuple<HEAD, TAIL...> >
 ************************************************************************/
 namespace detail
 {
-  template <class T>
-  struct check_tuple : std::false_type					{};
   template <class... T>
-  struct check_tuple<std::tuple<T...> > : std::true_type		{};
+  std::true_type	check_tuple(std::tuple<T...>)			;
+  std::false_type	check_tuple(...)				;
 }	// namespace detail
 
-//! 与えられた型が std::tuple 又はそれへの参照であるか判定する
+//! 与えられた型が std::tuple 又はそれに変換可能であるか判定する
 /*!
-  T が std::tuple に変換可能でも，std::tuple そのもの，又はそれへの参照で
-  なければ false
   \param T	判定対象となる型
 */ 
 template <class T>
-using is_tuple		= detail::check_tuple<std::decay_t<T> >;
+using is_tuple = decltype(detail::check_tuple(std::declval<T>()));
 
 /************************************************************************
 *  predicate: any_tuple<ARGS...>					*
 ************************************************************************/
-//! 少なくとも1つのテンプレート引数が std::tuple 又はそれへの参照であるか判定する
+//! 少なくとも1つのテンプレート引数が std::tuple 又はそれに変換可能であるか判定する
 /*!
   \param ARGS...	判定対象となる型の並び
 */
@@ -74,16 +71,10 @@ struct any_tuple<ARG, ARGS...>
 ************************************************************************/
 namespace detail
 {
+  template <class HEAD, class... TAIL>
+  HEAD	tuple_head(std::tuple<HEAD, TAIL...>)				;
   template <class T>
-  struct tuple_head
-  {
-      using type = T;
-  };
-  template <class... T>
-  struct tuple_head<std::tuple<T...> >
-  {
-      using type = std::tuple_element_t<0, std::tuple<T...> >;
-  };
+  T	tuple_head(T)							;
 }	// namespace detail
     
 //! 与えられた型がtupleならばその先頭要素の型を，そうでなければ元の型を返す．
@@ -91,7 +82,7 @@ namespace detail
   \param T	その先頭要素の型を調べるべき型
 */
 template <class T>
-using tuple_head = typename detail::tuple_head<T>::type;
+using tuple_head = decltype(detail::tuple_head(std::declval<T>()));
 
 /************************************************************************
 *  type alias: replace_element<S, T>					*

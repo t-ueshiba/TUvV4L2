@@ -179,7 +179,7 @@ namespace detail
       };
 
     private:
-    // _funcの適用結果を vec<O> (のtuple)にconvert upしてstoreする
+    // _funcの適用結果を vec<O> にconvert upしてstoreする
       template <class TUPLE_>
       std::enable_if_t<(vec<O>::size == tuple_head<TUPLE_>::size)>
 		upResult_store(const TUPLE_& x)
@@ -199,8 +199,8 @@ namespace detail
 		    upResult_store(cvt<U, true,  MASK>(x));
 		}
 	  
-    // 既に vec<O> と同位に到達している入力をさらに vec<I> (のtuple)までconvert up
-    // して_funcを適用し，その結果を vec<O> (のtuple)までconvert downして返す
+    // 既に vec<O> と同位に到達している入力をさらに vec<I> にconvert upして
+    // _funcを適用し，その結果を vec<O> までconvert downして返す
       template <class TUPLE_,
 		std::enable_if_t<(max_size<TUPLE_>::value == vec<I>::size)>*
 		= nullptr>
@@ -242,8 +242,8 @@ namespace detail
 		    upResult_store(_func(cvtdown()(x)));
 		}
 
-    // vec<O> と同位に達した入力をさらに vec<I> にconvert upして _funcを適用し，
-    // その結果を vec<O> にconvert downしてstoreする．
+    // vec<O> と同位に到達した入力をさらに vec<I> にconvert upして _func を
+    // 適用し，その結果を vec<O> にconvert downしてstoreする．
       template <class TUPLE_>
       std::enable_if_t<(max_size<TUPLE_>::value == vec<O>::size)>
 		exec(TUPLE_&& x)
@@ -252,7 +252,7 @@ namespace detail
 		    ++_out;
 		}
 
-    // 入力を vec<I> または vec<O> と同位になるまでconvert upする．
+    // x の中に vec<O> より下位のベクトルがあれば読み込んでconvert upする．
       template <class TUPLE_>
       std::enable_if_t<(max_size<TUPLE_>::value > vec<I>::size &&
 			max_size<TUPLE_>::value > vec<O>::size)>
