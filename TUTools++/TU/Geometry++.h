@@ -444,6 +444,10 @@ class HyperPlane : public std::conditional_t<D==0, Array<T>, Array<T, D+1> >
     template <class ITER_>
     HyperPlane(ITER_ begin, ITER_ end)			{ fit(begin, end); }
 
+    template <class E_,
+	      std::enable_if_t<TU::rank<E_>() == base_type::rank()>* = nullptr>
+    HyperPlane(const E_& expr)	:base_type(expr)	{}
+    
   //! 超平面を表す同次座標ベクトルを指定する．
   /*!
     \param expr	(d+1)次元ベクトル(dは空間の次元)
@@ -454,7 +458,6 @@ class HyperPlane : public std::conditional_t<D==0, Array<T>, Array<T, D+1> >
 			    base_type::operator =(expr);
 			}
 
-    using		base_type::base_type;
     using		base_type::operator =;
     using		base_type::size;
 
@@ -602,6 +605,9 @@ class Projectivity : public std::conditional_t<(DO==0 || DI==0),
     template <class ITER_>
     Projectivity(ITER_ begin, ITER_ end, bool refine=false)		;
     
+    template <class E_, std::enable_if_t<rank<E_>() == 2>* = nullptr>
+    Projectivity(const E_& expr)	:base_type(expr)		{}
+    
   //! 変換行列を指定する．
   /*!
     \param expr	(m+1)x(n+1)行列(m, nは入力／出力空間の次元)
@@ -609,7 +615,6 @@ class Projectivity : public std::conditional_t<(DO==0 || DI==0),
     template <class E_, std::enable_if_t<rank<E_>() == 2>* = nullptr>
     void		set(const E_& expr)	{base_type::operator =(expr);}
 
-    using		base_type::base_type;
     using		base_type::operator =;
     using		base_type::nrow;
     using		base_type::ncol;
@@ -1121,7 +1126,6 @@ class Affinity : public Projectivity<T, DO, DI>
 			    (*this)[outDim()][inDim()] = 1;
 			}
     
-    using		base_type::base_type;
     using		base_type::operator =;
     using		base_type::inDim;
     using		base_type::outDim;
