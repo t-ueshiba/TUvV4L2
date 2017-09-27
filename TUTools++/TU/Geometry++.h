@@ -444,21 +444,21 @@ class HyperPlane : public std::conditional_t<D==0, Array<T>, Array<T, D+1> >
     template <class ITER_>
     HyperPlane(ITER_ begin, ITER_ end)			{ fit(begin, end); }
 
-    template <class E_,
-	      std::enable_if_t<TU::rank<E_>() == base_type::rank()>* = nullptr>
+    template <class E_, std::enable_if_t<TU::rank<E_>() == 1>* = nullptr>
     HyperPlane(const E_& expr)	:base_type(expr)	{}
-    
+
   //! 超平面を表す同次座標ベクトルを指定する．
   /*!
     \param expr	(d+1)次元ベクトル(dは空間の次元)
   */
-    template <class E_, std::enable_if_t<rank<E_>() == 1>* = nullptr>
-    void		set(const E_& expr)
+    template <class E_>
+    std::enable_if_t<rank<E_>() == 1, HyperPlane&>
+			operator =(const E_& expr)
 			{
 			    base_type::operator =(expr);
+			    return *this;
 			}
 
-    using		base_type::operator =;
     using		base_type::size;
 
     template <class ITER_>
@@ -612,10 +612,14 @@ class Projectivity : public std::conditional_t<(DO==0 || DI==0),
   /*!
     \param expr	(m+1)x(n+1)行列(m, nは入力／出力空間の次元)
   */
-    template <class E_, std::enable_if_t<rank<E_>() == 2>* = nullptr>
-    void		set(const E_& expr)	{base_type::operator =(expr);}
+    template <class E_>
+    std::enable_if_t<rank<E_>() == 2, Projectivity&>
+			operator =(const E_& expr)
+			{
+			    base_type::operator =(expr);
+			    return *this;
+			}
 
-    using		base_type::operator =;
     using		base_type::nrow;
     using		base_type::ncol;
     
@@ -767,9 +771,9 @@ Projectivity<T, DO, DI>::fit(ITER_ begin, ITER_ end, bool refine)
   // 正規化をキャンセルする．
     Vector<element_type, DI1*DO1>	eval;
     const auto	Ut = eigen(A, eval);
-    base_type::operator =(yNormalize.Tinv() *
-			  make_dense_range(Ut[Ut.nrow()-1].begin(),
-					   ydim + 1, xdim1) * xNormalize.T());
+    operator =(yNormalize.Tinv() *
+	       make_dense_range(Ut[Ut.nrow()-1].begin(),
+				ydim + 1, xdim1) * xNormalize.T());
 
   // 変換行列が正方ならば，その行列式が１になるように正規化する．
     if (nrow() == ncol())
@@ -1118,15 +1122,16 @@ class Affinity : public Projectivity<T, DO, DI>
     変換行列の下端行は強制的に 0,0,...,0,1 に設定される．
     \param T	(m+1) x (n+1) 行列(m, nは入力／出力空間の次元)
   */
-    template <class E_, std::enable_if_t<rank<E_>() == 2>* = nullptr>
-    void		set(const E_& expr)
+    template <class E_>
+    std::enable_if_t<rank<E_>() == 2, Affinity&>
+			operator =(const E_& expr)
 			{
-			    base_type::set(expr);
+			    base_type::operator =(expr);
 			    (*this)[outDim()] = 0;
 			    (*this)[outDim()][inDim()] = 1;
+			    return *this;
 			}
     
-    using		base_type::operator =;
     using		base_type::inDim;
     using		base_type::outDim;
     using		base_type::operator ();
