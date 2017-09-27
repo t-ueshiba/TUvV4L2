@@ -176,10 +176,6 @@ class Buf : public BufTraits<T, ALLOC>
 		    for (size_t i = 0; i < capacity(); i += stride())
 			for (size_t j = 0; j < size<rank()-1>(); ++j)
 			    in >> _a[i + j];
-		    for (size_t i = 0; i < rank(); ++i)
-			for (char c; in.get(c); )
-			    if (c == '\n')
-				break;
    		    return in;
    		}
 
