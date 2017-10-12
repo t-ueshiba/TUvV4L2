@@ -898,9 +898,9 @@ MyCmdWindow<STEREO, CAMERAS, PIXEL, DISP>::initializeRectification()
     _b = (Pl[0]*tR) / length(slice(Pl[2], 0, 3)) / 1000;
 
     float	range[3];
-    range[0] = 100 * _b / _stereo.getParameters().disparityMax;
-    range[1] = 100 * _b / _stereo.getParameters().disparityMin() - range[0];
-    range[2] = 100;
+    range[0] = _b / _stereo.getParameters().disparityMax;
+    range[1] = _b / _stereo.getParameters().disparityMin();
+    range[2] = 0;
     _menuCmd.setProp(c_GazeDistance, range);
 
     std::ostringstream	s;
