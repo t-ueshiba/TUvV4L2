@@ -24,7 +24,7 @@ else
 #  CPPFLAGS     += -DSSE4
 #  CFLAGS       += -msse4
 #  CPPFLAGS     += -DAVX2
-  CFLAGS       += -mavx2
+#  CFLAGS       += -mavx2
 endif
 CCFLAGS		= $(CFLAGS) #-ftemplate-backtrace-limit=0
 
