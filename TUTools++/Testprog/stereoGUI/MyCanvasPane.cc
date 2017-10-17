@@ -96,9 +96,9 @@ void
 MyCanvasPaneBase::drawPoint(int u, int v)
 {
 #if defined(USE_OVERLAY)
-    _dc << overlay << foreground(1) << Point2<int>(u, v) << underlay;
+    _dc << overlay << foreground(1) << Point2<int>({u, v}) << underlay;
 #else
-    _dc << foreground(BGR(0, 255, 0)) << Point2<int>(u, v);
+    _dc << foreground(BGR(0, 255, 0)) << Point2<int>({u, v});
 #endif
 }
 
@@ -106,9 +106,9 @@ void
 MyCanvasPaneBase::erasePoint(int u, int v)
 {
 #if defined(USE_OVERLAY)
-    _dc << overlay << foreground(0) << Point2<int>(u, v) << underlay;
+    _dc << overlay << foreground(0) << Point2<int>({u, v}) << underlay;
 #else
-    _dc << foreground(BGR(0, 0, 0)) << Point2<int>(u, v);
+    _dc << foreground(BGR(0, 0, 0)) << Point2<int>({u, v});
 #endif
 }
 
