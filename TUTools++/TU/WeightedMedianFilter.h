@@ -27,12 +27,20 @@ namespace TU
 /************************************************************************
 *  class ExpDiff<S, T>							*
 ************************************************************************/
+//! exp(-abs(x - y)/sigma) を返す関数オブジェクト
+/*!
+  引数が算術型でない場合はRGBカラーとみなし，abs(x - y)の代わりに3次元ベクトル
+	(x.r - y.r, x.g - y.g, x.b - y.b)
+  の長さを用いる．
+  \param S	引数の型
+  \param T	結果の型
+*/
 template <class S, class T>
 class ExpDiff
 {
   public:
-    using argument_type	= S;
-    using result_type	= T;
+    using argument_type	= S;	//!< 引数の型
+    using result_type	= T;	//!< 結果の型
 
   public:
 		ExpDiff(T sigma=1) :_nsigma(-sigma)	{}
@@ -64,15 +72,20 @@ namespace detail
 /************************************************************************
 *  class WeightedMedianFilterBase<W>					*
 ************************************************************************/
+//! 重み付けメディアンフィルタの実装のベースとなるクラス
+/*!
+  \param W	重み付け関数オブジェクトの型
+*/
 template <class W>
 class WeightedMedianFilterBase
 {
   public:
-    using weight_type	= typename W::result_type;
+    using weight_type	= typename W::result_type;	//!< 重みの型
     using warray2_type	= Array2<weight_type>;
     using warray_type	= decltype(*std::declval<warray2_type>().cbegin());
 
   protected:
+  //! ガイド信号の各量子化レベルに対して，cut point前後の入力信号量子化レベルの頻度の差
     class BalanceCountingBox : public boost::intrusive::list_base_hook<>
     {
       public:
@@ -102,6 +115,7 @@ class WeightedMedianFilterBase
 	size_t		_n    = 0;	// この box 中の点の数
     };
 
+  //! 入力信号の各量子化レベルに対して，対応するガイド信号の各量子化レベル毎の頻度
     class Histogram : public Array<size_t>
     {
       public:
@@ -187,14 +201,19 @@ class WeightedMedianFilterBase
 		    for (const auto& box : _nonzero_boxes)
 			balance += box * weights[idx(box)];
 
-		    if (balance >= 0)		// balance >= 0 ならば...
-			do			// balance < 0 となるまで
-			{			// cut point を左にシフト
+		    if (balance >= 0)	// balance >= 0 ならば...
+		    {			// balance < 0 となるまで
+			do		// cut point を左にシフト
+			{
+			  // 空でないヒストグラムに遭遇するまで
+			  // cut point を左にシフト
 			    while (_histograms[--_median].npoints() == 0)
 				;
-			    
+
+			  // 最右の空でないヒストグラム
 			    const auto&	hist = _histograms[_median];
 
+			  // 新たな cut point における balance を再計算
 			    balance = 0;
 			    for (auto& box : _nonzero_boxes)
 			    {
@@ -203,15 +222,23 @@ class WeightedMedianFilterBase
 				balance += box * weights[idxG];
 			    }
 			} while (balance >= 0);
-		    else			// balance < 0 ならば...
-			do			// balance >= 0 となるまで
-			{			// cut point を右にシフト
+
+			return _median;
+		    }
+		    else		// balance < 0 ならば...
+		    {			// balance >= 0 となるまで
+			do		// cut point を右にシフト
+			{
+			  // 空でないヒストグラムに遭遇するまで
+			  // cut point を右にシフト
 			    while (_histograms[_median].npoints() == 0)
 				++_median;
 
+			  // 最左の空でないヒストグラム
 			    const auto&	hist = _histograms[_median];
 			    ++_median;
 			    
+			  // 新たな cut point における balance を再計算
 			    balance = 0;
 			    for (auto& box : _nonzero_boxes)
 			    {
@@ -221,7 +248,8 @@ class WeightedMedianFilterBase
 			    }
 			} while (balance < 0);
 
-		    return (balance < 0 ? _median + 1 : _median);
+			return _median - 1;
+		    }
 		}
 	
       private:
