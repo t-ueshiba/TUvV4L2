@@ -8,6 +8,7 @@
 
 #include <boost/intrusive/list.hpp>
 #include <boost/iterator/counting_iterator.hpp>
+#include <boost/iterator/reverse_iterator.hpp>
 #include "TU/Quantizer.h"
 #include "TU/algorithm.h"	// diff(const T&, const T&)
 #if defined(USE_TBB)
@@ -85,6 +86,24 @@ class WeightedMedianFilterBase
     using warray_type	= decltype(*std::declval<warray2_type>().cbegin());
 
   protected:
+  //! 入力信号の各量子化レベルに対して，対応するガイド信号の各量子化レベル毎の頻度
+    class Histogram : public Array<size_t>
+    {
+      public:
+	void	resize(size_t nbinsG)
+		{
+		    Array<size_t>::resize(nbinsG);
+		    Array<size_t>::operator =(0);
+		    _n = 0;
+		}
+	void	add(size_t idxG)		{ ++(*this)[idxG]; ++_n; }
+	void	remove(size_t idxG)		{ --(*this)[idxG]; --_n; }
+	auto	npoints()		const	{ return _n; }
+	    
+      private:
+	size_t	_n = 0;		// ヒストグラムに登録されている点の総数
+    };
+
   //! ガイド信号の各量子化レベルに対して，cut point前後の入力信号量子化レベルの頻度の差
     class BalanceCountingBox : public boost::intrusive::list_base_hook<>
     {
@@ -115,24 +134,7 @@ class WeightedMedianFilterBase
 	size_t		_n    = 0;	// この box 中の点の数
     };
 
-  //! 入力信号の各量子化レベルに対して，対応するガイド信号の各量子化レベル毎の頻度
-    class Histogram : public Array<size_t>
-    {
-      public:
-	void	resize(size_t nbinsG)
-		{
-		    Array<size_t>::resize(nbinsG);
-		    Array<size_t>::operator =(0);
-		    _n = 0;
-		}
-	void	add(size_t idxG)		{ ++(*this)[idxG]; ++_n; }
-	void	remove(size_t idxG)		{ --(*this)[idxG]; --_n; }
-	auto	npoints()		const	{ return _n; }
-	    
-      private:
-	size_t	_n = 0;		// ヒストグラムに登録されている点の総数
-    };
-
+  //! 重み付けメディアン値を与えるcut pointの探索器
     class MedianTracker
     {
       private:
@@ -320,6 +322,11 @@ WeightedMedianFilterBase<W>::setWeights(const QuantizerBase<T>& quantizer)
 /************************************************************************
 *  class WeightedMedianFilter<T, W>					*
 ************************************************************************/
+//! 1次元重み付けメディアンフィルタを表すクラス
+/*!
+  \param T	出力信号の要素型
+  \param W	重み付け関数オブジェクトの型
+*/
 template <class T, class W>
 class WeightedMedianFilter : public detail::WeightedMedianFilterBase<W>
 {
@@ -388,6 +395,11 @@ WeightedMedianFilter<T, W>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out)
 /************************************************************************
 *  class WeightedMedianFilter2<T, W>					*
 ************************************************************************/
+//! 2次元重み付けメディアンフィルタを表すクラス
+/*!
+  \param T	出力信号の要素型
+  \param W	重み付け関数オブジェクトの型
+*/
 template <class T, class W>
 class WeightedMedianFilter2 : public detail::WeightedMedianFilterBase<W>,
 			      public Profiler<ENABLE_PROFILER>
