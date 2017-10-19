@@ -8,7 +8,6 @@
 
 #include <boost/intrusive/list.hpp>
 #include <boost/iterator/counting_iterator.hpp>
-#include <boost/iterator/reverse_iterator.hpp>
 #include "TU/Quantizer.h"
 #include "TU/algorithm.h"	// diff(const T&, const T&)
 #if defined(USE_TBB)
