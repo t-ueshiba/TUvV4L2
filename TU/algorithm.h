@@ -606,5 +606,118 @@ square(T val)
     return detail::square(val);
 }
     
+/************************************************************************
+*  op3x3(ROW row, ROW rowe, OP op)					*
+************************************************************************/
+//! 2次元データに対して3x3ウィンドウを走査してin-place近傍演算を行う．
+/*!
+  \param row	最初の行を示す反復子
+  \param rowe	最後の行の次を示す反復子
+  \param op	3x3ウィンドウを定義域とする演算子
+*/
+template <class ROW, class OP> void
+op3x3(ROW row, ROW rowe, OP op)
+{
+    --rowe;
+    for (const auto row0 = row++; row != rowe; )
+    {
+	auto	p   = row0->begin();	// 最初の行を一つ前の行のバッファとして使用
+	auto	q   = row->begin();
+	auto	val = *q;
+	auto	re  = (++row)->end();
+	--re;
+	--re;
+	for (auto r = row->begin(); r != re; ++r)
+	{
+	    auto tmp = op(p, q, r);
+	    *p = *q;			// 次行の左上画素 = 左画素をバッファに退避
+	    *q = val;			// 左画素における結果を書き込む
+	    val = tmp;			// 次ウィンドウの左画素における結果を保存
+	    ++p;
+	    ++q;
+	}
+	*p = *q;			// 次行の左上画素 = 左画素をバッファに退避
+	*q = val;
+	++p;
+	++q;
+	*p = *q;			// 次行の上画素 = 注目画素をバッファに退避
+    }
+}
+
+/************************************************************************
+*  morphological operations						*
+************************************************************************/
+//! 3x3ウィンドウ内の最大値を返す．
+/*!
+  \param p	注目点の左上点を指す反復子
+  \param q	注目点の左の点を指す反復子
+  \param r	注目点の左下点を指す反復子
+  \return	3x3ウィンドウ内の最大値
+*/
+template <class COL> inline typename std::iterator_traits<COL>::value_type
+max3x3(COL p, COL q, COL r)
+{
+    using namespace	std;
+	    
+    return max({max({*p, *(p + 1), *(p + 2)}),
+		max({*q, *(q + 1), *(q + 2)}),
+		max({*r, *(r + 1), *(r + 2)})});
+}
+    
+//! 3x3ウィンドウ内の最小値を返す．
+/*!
+  \param p	注目点の左上点を指す反復子
+  \param q	注目点の左の点を指す反復子
+  \param r	注目点の左下点を指す反復子
+  \return	3x3ウィンドウ内の最小値
+*/
+template <class COL> inline typename std::iterator_traits<COL>::value_type
+min3x3(COL p, COL q, COL r)
+{
+    using namespace	std;
+	    
+    return min({min({*p, *(p + 1), *(p + 2)}),
+		min({*q, *(q + 1), *(q + 2)}),
+		min({*r, *(r + 1), *(r + 2)})});
+}
+
+//! morphological open演算をin-placeで行う．
+/*
+  指定された回数だけ収縮(erosion)を行った後，同じ回数だけ膨張(dilation)を行う．
+  \param row	最初の行を示す反復子
+  \param rowe	最後の行の次を示す反復子
+  \param niter	収縮と膨張の回数
+*/
+template <class ROW> void
+mopOpen(ROW row, ROW rowe, size_t niter=1)
+{
+    using col_iterator
+	= typename std::iterator_traits<ROW>::value_type::iterator;
+
+    for (size_t n = 0; n < niter; ++n)
+	op3x3(row, rowe, min3x3<col_iterator>);	// 収縮(erosion)
+    for (size_t n = 0; n < niter; ++n)
+	op3x3(row, rowe, max3x3<col_iterator>);	// 膨張(dilation)
+}
+
+//! morphological close演算をin-placeで行う．
+/*
+  指定された回数だけ膨張(dilation)を行った後，同じ回数だけ収縮(erosion)を行う．
+  \param row	最初の行を示す反復子
+  \param rowe	最後の行の次を示す反復子
+  \param niter	収縮と膨張の回数
+*/
+template <class ROW> void
+mopClose(ROW row, ROW rowe, size_t niter=1)
+{
+    using col_iterator
+	= typename std::iterator_traits<ROW>::value_type::iterator;
+    
+    for (size_t n = 0; n < niter; ++n)
+	op3x3(row, rowe, max3x3<col_iterator>);	// 膨張(dilation)
+    for (size_t n = 0; n < niter; ++n)
+	op3x3(row, rowe, min3x3<col_iterator>);	// 収縮(erosion)
+}
+    
 }	// namespace TU
 #endif	// !TU_ALGORITHM_H

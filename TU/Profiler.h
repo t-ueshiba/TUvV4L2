@@ -6,6 +6,7 @@
 #ifndef TU_PROFILER_H
 #define TU_PROFILER_H
 
+#include <iomanip>
 #include <chrono>
 #include <string>
 #include <vector>
