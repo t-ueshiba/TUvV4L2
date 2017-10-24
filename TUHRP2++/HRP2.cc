@@ -1058,7 +1058,7 @@ HRP2::GetRealPoseThread::mainLoop()
 	    break;			// 脱出
 
 	TimedPose	D;
-	if (_hrp2.GetRealPose(const_cast<char*>(_linkName.c_str()), D))
+	if (_hrp2.GetRealPose(_linkName.c_str(), D))
 	{					// ポーズ入力成功？
 	    if (_poses.empty() || (D.t != _poses.back().t))
 	    {
