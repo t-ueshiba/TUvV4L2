@@ -143,8 +143,8 @@ ICIA<MAP>::operator ()(const IMAGE& src, const IMAGE& dst, MAP& f,
 {
 #ifdef ICIA_DEBUG
     std::cout << 'M' << 2 << std::endl;
-    src.saveHeader(std::cout, ImageBase::RGB_24);
-    src.saveHeader(std::cout, ImageBase::U_CHAR);
+    src.saveHeader(std::cout, ImageFormat::RGB_24);
+    src.saveHeader(std::cout, ImageFormat::U_CHAR);
 #endif
     start(2);
 
@@ -291,8 +291,8 @@ ICIA<MAP>::sqrerr(const IMAGE& src, const IMAGE& dst,
 	}
     }
 #ifdef ICIA_DEBUG
-    rgbImage.saveData(std::cout, ImageBase::RGB_24);
-    composedImage.saveData(std::cout, ImageBase::U_CHAR);
+    rgbImage.saveData(std::cout, ImageFormat::RGB_24);
+    composedImage.saveData(std::cout, ImageFormat::U_CHAR);
 #endif
     if (npoints < MAP::DOF)
 	throw std::runtime_error("ICIA::sqrerr(): not enough points!");
