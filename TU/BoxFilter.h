@@ -174,7 +174,7 @@ BoxFilter<T>::convolve(IN ib, IN ie, OUT out) const
 }
 
 /************************************************************************
-*  class BoxFilter2							*
+*  class BoxFilter2<T>							*
 ************************************************************************/
 //! 2次元入力データ列にbox filterを適用するクラス
 template <class T>

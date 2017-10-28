@@ -85,7 +85,7 @@ main(int argc, char* argv[])
     using namespace	std;
     using namespace	TU;
 
-    using pixel_type	= short;
+    using pixel_type	= u_char;
     using value_type	= float;
     
     size_t		winSize = 3;

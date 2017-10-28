@@ -76,6 +76,7 @@ HDRS		= TU/Array++.h \
 		TU/Ransac.h \
 		TU/Rectify.h \
 		TU/SADStereo.h \
+		TU/SADStereo2.h \
 		TU/SHOT602.h \
 		TU/SURFCreator.h \
 		TU/SeparableFilter2.h \
@@ -115,6 +116,7 @@ HDRS		= TU/Array++.h \
 		TU/simd/arm/type_traits.h \
 		TU/simd/arm/vec.h \
 		TU/simd/arm/zero.h \
+		TU/simd/assignment_iterator.h \
 		TU/simd/bit_shift.h \
 		TU/simd/cast.h \
 		TU/simd/compare.h \
@@ -166,7 +168,6 @@ SRCS		= ColorConverter.cc \
 		FIRGaussianCoefficients.cc \
 		GaussianCoefficients.cc \
 		GenericImage.cc \
-		ImageBase.cc \
 		PM16C_04.cc \
 		Rectify.cc \
 		SHOT602.cc \
@@ -181,7 +182,6 @@ OBJS		= ColorConverter.o \
 		FIRGaussianCoefficients.o \
 		GaussianCoefficients.o \
 		GenericImage.o \
-		ImageBase.o \
 		PM16C_04.o \
 		Rectify.o \
 		SHOT602.o \
@@ -319,8 +319,9 @@ include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 include $(PROJECT)/lib/other.mk
 ###
-ColorConverter.o: TU/Image++.h TU/pair.h TU/Vector++.h TU/Array++.h \
-	TU/range.h TU/iterator.h TU/tuple.h TU/algorithm.h
+ColorConverter.o: TU/Image++.h TU/pair.h TU/Manip.h TU/Camera++.h \
+	TU/Geometry++.h TU/Minimize.h TU/Vector++.h TU/Array++.h TU/range.h \
+	TU/iterator.h TU/tuple.h TU/algorithm.h
 EdgeDetector.o: TU/simd/Array++.h TU/simd/simd.h TU/simd/config.h \
 	TU/simd/vec.h TU/simd/type_traits.h TU/simd/x86/type_traits.h \
 	TU/simd/arm/type_traits.h TU/simd/x86/vec.h TU/simd/x86/arch.h \
@@ -343,19 +344,17 @@ EdgeDetector.o: TU/simd/Array++.h TU/simd/simd.h TU/simd/config.h \
 	TU/simd/lookup.h TU/simd/x86/lookup.h TU/simd/arm/lookup.h \
 	TU/simd/load_store_iterator.h TU/simd/cvtdown_iterator.h \
 	TU/simd/cvtup_iterator.h TU/simd/shift_iterator.h TU/algorithm.h \
-	TU/Array++.h TU/range.h TU/EdgeDetector.h TU/Image++.h TU/Vector++.h \
-	TU/Geometry++.h TU/Minimize.h
+	TU/Array++.h TU/range.h TU/EdgeDetector.h TU/Image++.h TU/Manip.h \
+	TU/Camera++.h TU/Geometry++.h TU/Minimize.h TU/Vector++.h
 FIRGaussianCoefficients.o: TU/FIRGaussianConvolver.h TU/FIRFilter.h \
 	TU/SeparableFilter2.h TU/Array++.h TU/range.h TU/iterator.h \
 	TU/tuple.h TU/algorithm.h
 GaussianCoefficients.o: TU/GaussianConvolver.h TU/Vector++.h TU/Array++.h \
 	TU/range.h TU/iterator.h TU/tuple.h TU/algorithm.h TU/IIRFilter.h \
 	TU/SeparableFilter2.h TU/Minimize.h
-GenericImage.o: TU/Image++.h TU/pair.h TU/Vector++.h TU/Array++.h \
-	TU/range.h TU/iterator.h TU/tuple.h TU/algorithm.h
-ImageBase.o: TU/Image++.h TU/pair.h TU/Vector++.h TU/Array++.h TU/range.h \
-	TU/iterator.h TU/tuple.h TU/algorithm.h TU/Camera++.h TU/Geometry++.h \
-	TU/Minimize.h TU/Manip.h
+GenericImage.o: TU/Image++.h TU/pair.h TU/Manip.h TU/Camera++.h \
+	TU/Geometry++.h TU/Minimize.h TU/Vector++.h TU/Array++.h TU/range.h \
+	TU/iterator.h TU/tuple.h TU/algorithm.h
 PM16C_04.o: TU/PM16C_04.h TU/Serial.h TU/fdstream.h TU/Manip.h
 Rectify.o: TU/Rectify.h TU/Warp.h TU/simd/Array++.h TU/simd/simd.h \
 	TU/simd/config.h TU/simd/vec.h TU/simd/type_traits.h \
@@ -380,8 +379,8 @@ Rectify.o: TU/Rectify.h TU/Warp.h TU/simd/Array++.h TU/simd/simd.h \
 	TU/simd/lookup.h TU/simd/x86/lookup.h TU/simd/arm/lookup.h \
 	TU/simd/load_store_iterator.h TU/simd/cvtdown_iterator.h \
 	TU/simd/cvtup_iterator.h TU/simd/shift_iterator.h TU/algorithm.h \
-	TU/Array++.h TU/range.h TU/Image++.h TU/Vector++.h TU/Camera++.h \
-	TU/Geometry++.h TU/Minimize.h
+	TU/Array++.h TU/range.h TU/Image++.h TU/Manip.h TU/Camera++.h \
+	TU/Geometry++.h TU/Minimize.h TU/Vector++.h
 SHOT602.o: TU/SHOT602.h TU/Serial.h TU/fdstream.h TU/Manip.h
 SURFCreator.o: TU/SURFCreator.h TU/simd/simd.h TU/simd/config.h \
 	TU/simd/vec.h TU/simd/type_traits.h TU/simd/x86/type_traits.h \
@@ -407,7 +406,7 @@ SURFCreator.o: TU/SURFCreator.h TU/simd/simd.h TU/simd/config.h \
 	TU/simd/cvtup_iterator.h TU/simd/shift_iterator.h TU/simd/Array++.h \
 	TU/algorithm.h TU/Array++.h TU/range.h TU/Feature.h TU/Geometry++.h \
 	TU/Minimize.h TU/Vector++.h TU/Manip.h TU/IntegralImage.h \
-	TU/Image++.h
+	TU/Image++.h TU/Camera++.h
 Serial.o: TU/Serial.h TU/fdstream.h
 TriggerGenerator.o: TU/TriggerGenerator.h TU/Serial.h TU/fdstream.h \
 	TU/Manip.h

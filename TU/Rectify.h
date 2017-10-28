@@ -34,9 +34,10 @@ class Rectify
 	initialize(cameraL, cameraR, widthL, heightL, widthR, heightR,
 		   scale, disparitySearchWidth, disparityMax);
     }
-    
-    Rectify(const ImageBase& imageL,
-	    const ImageBase& imageR,
+
+    template <class IMAGE>
+    Rectify(const ImageBase<IMAGE>& imageL,
+	    const ImageBase<IMAGE>& imageR,
 	    element_type scale=1.0,
 	    int disparitySearchWidth=0, int disparityMax=0)
     {
@@ -57,9 +58,10 @@ class Rectify
 		   scale, disparitySearchWidth, disparityMax);
     }
 
-    Rectify(const ImageBase& imageL,
-	    const ImageBase& imageR,
-	    const ImageBase& imageV,
+    template <class IMAGE>
+    Rectify(const ImageBase<IMAGE>& imageL,
+	    const ImageBase<IMAGE>& imageR,
+	    const ImageBase<IMAGE>& imageV,
 	    element_type scale=1.0,
 	    int disparitySearchWidth=0, int disparityMax=0)
     {
@@ -83,13 +85,15 @@ class Rectify
 				   element_type depthMax,
 				   size_t& disparitySearchWidth,
 				   size_t& disparityMax)		;
-    element_type	initialize(const ImageBase& imageL,
-				   const ImageBase& imageR,
+    template <class IMAGE>
+    element_type	initialize(const ImageBase<IMAGE>& imageL,
+				   const ImageBase<IMAGE>& imageR,
 				   element_type scale=1.0,
 				   size_t disparitySearchWidth=0,
 				   size_t disparityMax=0)		;
-    element_type	initialize(const ImageBase& imageL,
-				   const ImageBase& imageR,
+    template <class IMAGE>
+    element_type	initialize(const ImageBase<IMAGE>& imageL,
+				   const ImageBase<IMAGE>& imageR,
 				   element_type scale,
 				   element_type detphMin,
 				   element_type depthMax,
@@ -115,15 +119,17 @@ class Rectify
 				   element_type depthMax,
 				   size_t& disparitySearchWidth,
 				   size_t& disparityMax)		;
-    element_type	initialize(const ImageBase& imageL,
-				   const ImageBase& imageR,
-				   const ImageBase& imageV,
+    template <class IMAGE>
+    element_type	initialize(const ImageBase<IMAGE>& imageL,
+				   const ImageBase<IMAGE>& imageR,
+				   const ImageBase<IMAGE>& imageV,
 				   element_type scale=1.0,
 				   size_t disparitySearchWidth=0,
 				   size_t disparityMax=0)		;
-    element_type	initialize(const ImageBase& imageL,
-				   const ImageBase& imageR,
-				   const ImageBase& imageV,
+    template <class IMAGE>
+    element_type	initialize(const ImageBase<IMAGE>& imageL,
+				   const ImageBase<IMAGE>& imageR,
+				   const ImageBase<IMAGE>& imageV,
 				   element_type scale,
 				   element_type detphMin,
 				   element_type depthMax,
@@ -131,17 +137,17 @@ class Rectify
 				   size_t& disparityMax)		;
 
     template <class T, class ALLOC, class ALLOC2>
-    void	operator ()(const Image<T, ALLOC>& inL,
-			    const Image<T, ALLOC>& inR,
-			    Image<T, ALLOC2>& outL,
-			    Image<T, ALLOC2>& outR)		const	;
+    void		operator ()(const Image<T, ALLOC>& inL,
+				    const Image<T, ALLOC>& inR,
+				    Image<T, ALLOC2>& outL,
+				    Image<T, ALLOC2>& outR)	const	;
     template <class T, class ALLOC, class ALLOC2>
-    void	operator ()(const Image<T, ALLOC>& inL,
-			    const Image<T, ALLOC>& inR,
-			    const Image<T, ALLOC>& inV,
-			    Image<T, ALLOC2>& outL,
-			    Image<T, ALLOC2>& outR,
-			    Image<T, ALLOC2>& outV)		const	;
+    void		operator ()(const Image<T, ALLOC>& inL,
+				    const Image<T, ALLOC>& inR,
+				    const Image<T, ALLOC>& inV,
+				    Image<T, ALLOC2>& outL,
+				    Image<T, ALLOC2>& outR,
+				    Image<T, ALLOC2>& outV)	const	;
     
     const homography_type&
 		H(int i)		const	{return _H[i];}
@@ -226,9 +232,9 @@ Rectify::initialize(const camera_type& cameraL,
 				 disparitySearchWidth, disparityMax);
 }
 
-inline Rectify::element_type
-Rectify::initialize(const ImageBase& imageL,
-		    const ImageBase& imageR,
+template <class IMAGE> inline Rectify::element_type
+Rectify::initialize(const ImageBase<IMAGE>& imageL,
+		    const ImageBase<IMAGE>& imageR,
 		    element_type scale,
 		    size_t disparitySearchWidth, size_t disparityMax)
 {
@@ -242,9 +248,9 @@ Rectify::initialize(const ImageBase& imageL,
 		      scale, disparitySearchWidth, disparityMax);
 }
 
-inline Rectify::element_type
-Rectify::initialize(const ImageBase& imageL,
-		    const ImageBase& imageR,
+template <class IMAGE> inline Rectify::element_type
+Rectify::initialize(const ImageBase<IMAGE>& imageL,
+		    const ImageBase<IMAGE>& imageR,
 		    element_type scale,
 		    element_type depthMin, element_type depthMax,
 		    size_t& disparitySearchWidth, size_t& disparityMax)
@@ -308,10 +314,10 @@ Rectify::initialize(const camera_type& cameraL,
 				 disparitySearchWidth, disparityMax);
 }
 
-inline Rectify::element_type
-Rectify::initialize(const ImageBase& imageL,
-		    const ImageBase& imageR,
-		    const ImageBase& imageV,
+template <class IMAGE> inline Rectify::element_type
+Rectify::initialize(const ImageBase<IMAGE>& imageL,
+		    const ImageBase<IMAGE>& imageR,
+		    const ImageBase<IMAGE>& imageV,
 		    element_type scale,
 		    size_t disparitySearchWidth, size_t disparityMax)
 {
@@ -327,10 +333,10 @@ Rectify::initialize(const ImageBase& imageL,
 		      scale, disparitySearchWidth, disparityMax);
 }
     
-inline Rectify::element_type
-Rectify::initialize(const ImageBase& imageL,
-		    const ImageBase& imageR,
-		    const ImageBase& imageV,
+template <class IMAGE> inline Rectify::element_type
+Rectify::initialize(const ImageBase<IMAGE>& imageL,
+		    const ImageBase<IMAGE>& imageR,
+		    const ImageBase<IMAGE>& imageV,
 		    element_type scale,
 		    element_type depthMin, element_type depthMax,
 		    size_t& disparitySearchWidth, size_t& disparityMax)

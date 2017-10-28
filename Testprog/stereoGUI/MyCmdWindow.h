@@ -47,7 +47,6 @@ class MyCmdWindow : public CmdWindow
     const double				_scale;
     Rectify					_rectify;
     stereo_type					_stereo;
-    ImageBase::TypeInfo				_typeInfo;
     u_int					_nimages;
     Image<pixel_type>				_images[3];
     Image<pixel_type>				_rectifiedImages[3];

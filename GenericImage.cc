@@ -18,21 +18,21 @@ namespace TU
 std::istream&
 GenericImage::restoreData(std::istream& in)
 {
-    _colormap.resize(_typeInfo.ncolors);
+    _colormap.resize(_format.ncolors());
     _colormap.restore(in);
 
-    size_t	npads = type2nbytes(_typeInfo.type, true);
-    if (_typeInfo.bottomToTop)
+    const auto	npads = _format.nbytesForPadding(width());
+    if (_format.bottomToTop())
     {
-	for (auto line = _a.rbegin(); line != _a.rend(); ++line)
-	    if (!in.read(TU::begin(*line), TU::size(*line)) ||
+	for (auto row = _a.rbegin(); row != _a.rend(); ++row)
+	    if (!in.read(TU::begin(*row), TU::size(*row)) ||
 		!in.ignore(npads))
 		break;
     }
     else
     {
-	for (auto line : _a)
-	    if (!in.read(TU::begin(line), TU::size(line)) ||
+	for (auto&& row : _a)
+	    if (!in.read(TU::begin(row), TU::size(row)) ||
 		!in.ignore(npads))
 		break;
     }
@@ -55,49 +55,23 @@ GenericImage::saveData(std::ostream& out) const
 	    out.put(0).put(0).put(0).put(0);
     }
     
-    Array<u_char>	pad(type2nbytes(_typeInfo.type, true));
-    if (_typeInfo.bottomToTop)
+    Array<u_char>	pads(_format.nbytesForPadding(width()));
+    if (_format.bottomToTop())
     {
-	for (auto line = _a.rbegin(); line != _a.rend(); ++line)
-	    if (!out.write(std::cbegin(*line), TU::size(*line)) ||
-		!pad.save(out))
+	for (auto row = _a.rbegin(); row != _a.rend(); ++row)
+	    if (!out.write(std::cbegin(*row), TU::size(*row)) ||
+		!pads.save(out))
 		break;
     }
     else
     {
-	for (auto&& line : _a)
-	    if (!out.write(std::cbegin(line), TU::size(line)) ||
-		!pad.save(out))
+	for (const auto& row : _a)
+	    if (!out.write(std::cbegin(row), TU::size(row)) ||
+		!pads.save(out))
 		break;
     }
     
     return out;
-}
-
-size_t
-GenericImage::_width() const
-{
-    return (_a.ncol()*8) / type2depth(_typeInfo.type);
-}
-
-size_t
-GenericImage::_height() const
-{
-    return _a.nrow();
-}
-
-ImageBase::Type
-GenericImage::_defaultType() const
-{
-    return _typeInfo.type;
-}
-
-void
-GenericImage::_resize(size_t h, size_t w, const TypeInfo& typeInfo)
-{
-    _typeInfo = typeInfo;
-    w = (type2depth(_typeInfo.type)*w + 7) / 8;
-    _a.resize(h, w);
 }
 
 }
