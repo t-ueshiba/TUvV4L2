@@ -1307,36 +1307,6 @@ class ImageBase
 			    u_short	val = 0x0001;
 			    return ((*(u_char*)&val) != 0x01);
 			}
-    static short	get16(std::istream& in)
-			{
-			    const u_int	c0 = in.get(), c1 = in.get();
-			    return c0 + (c1 << 8);
-			}
-    static int		get32(std::istream& in)
-			{
-			    const u_int	c0 = in.get(), c1 = in.get(),
-					c2 = in.get(), c3 = in.get();
-			    return c0 + (c1 << 8) + (c2 << 16) + (c3 << 24);
-			}
-    static void		put16(std::ostream& out, int val)
-			{
-			    const char	c0 = u_int(val) & 0xff,
-					c1 = (u_int(val) >> 8) & 0xff;
-			    out.put(c0);
-			    out.put(c1);
-			}
-    static void		put32(std::ostream& out, int val)
-			{
-			    const char	c0 = u_int(val) & 0xff,
-					c1 = (u_int(val) >>  8) & 0xff,
-					c2 = (u_int(val) >> 16) & 0xff,
-					c3 = (u_int(val) >> 24) & 0xff;
-			    out.put(c0);
-			    out.put(c1);
-			    out.put(c2);
-			    out.put(c3);
-			}
-
     ImageFormat		restorePBMHeader(std::istream& in)		;
     ImageFormat		restoreBMPHeader(std::istream& in)		;
     ImageFormat::Type	savePBMHeader(std::ostream& out,
@@ -1576,20 +1546,31 @@ ImageBase<IMAGE>::restoreBMPHeader(std::istream& in)
 	throw std::runtime_error("TU::ImageBase::restoreBMPHeader: not a BMP file!!");
 
   // Read file header.
-    get32(in);					// Skip bfSize.
-    get16(in);					// Skip bfReserved1.
-    get16(in);					// Skip bfReserved2.
-    get32(in);					// Skip bfOffBits.
+    const auto	get16 =	[&in]()
+			{
+			    const int	c0 = in.get(), c1 = in.get();
+			    return c0 + (c1 << 8);
+			};
+    const auto	get32 =	[&in]()
+			{
+			    const int	c0 = in.get(), c1 = in.get(),
+					c2 = in.get(), c3 = in.get();
+			    return c0 + (c1 << 8) + (c2 << 16) + (c3 << 24);
+			};
+    get32();					// Skip bfSize.
+    get16();					// Skip bfReserved1.
+    get16();					// Skip bfReserved2.
+    get32();					// Skip bfOffBits.
 
   // Read information header.
     bool	bottomToTop = false;
     size_t	ncolors = 0;
     int		w = 0, h = 0, d = 0;
-    switch (c = get32(in))			// Read bcSize or biSize.
+    switch (c = get32())			// Read bcSize or biSize.
     {
       case 12:	// BMPCoreHeader:
-	w = get16(in);				// Read bcWidth.
-	h = get16(in);				// Read bcHeight.
+	w = get16();				// Read bcWidth.
+	h = get16();				// Read bcHeight.
 	if (h > 0)
 	    bottomToTop = true;
 	else
@@ -1597,8 +1578,8 @@ ImageBase<IMAGE>::restoreBMPHeader(std::istream& in)
 	    h = -h;
 	    bottomToTop = false;
 	}
-	get16(in);				// Skip bcPlanes.
-	switch (d = get16(in))			// Read bcBitCount.
+	get16();				// Skip bcPlanes.
+	switch (d = get16())			// Read bcBitCount.
 	{
 	  case 1:
 	  case 4:
@@ -1609,8 +1590,8 @@ ImageBase<IMAGE>::restoreBMPHeader(std::istream& in)
 	break;
 
       case 40:	// BMPInfoHeader:
-	w = get32(in);				// Read biWidth.
-	h = get32(in);				// Read biHeight.
+	w = get32();				// Read biWidth.
+	h = get32();				// Read biHeight.
 	if (h > 0)
 	    bottomToTop = true;
 	else
@@ -1618,14 +1599,14 @@ ImageBase<IMAGE>::restoreBMPHeader(std::istream& in)
 	    h = -h;
 	    bottomToTop = false;
 	}
-	get16(in);				// Skip biPlanes.
-	d = get16(in);				// Read biBitCount.
-	if (get32(in) != 0)			// Read biCompression.
+	get16();				// Skip biPlanes.
+	d = get16();				// Read biBitCount.
+	if (get32() != 0)			// Read biCompression.
 	    throw std::runtime_error("TUImageBase::restoreBMPHeader: compressed BMP file not supported!!");
-	get32(in);				// Skip biSizeImage.
-	get32(in);				// Skip biXPixPerMeter.
-	get32(in);				// Skip biYPixPerMeter.
-	if ((ncolors = get32(in)) == 0)		// Read biClrUsed.
+	get32();				// Skip biSizeImage.
+	get32();				// Skip biXPixPerMeter.
+	get32();				// Skip biYPixPerMeter.
+	if ((ncolors = get32()) == 0)		// Read biClrUsed.
 	    switch (d)
 	    {
 	      case 1:
@@ -1639,7 +1620,7 @@ ImageBase<IMAGE>::restoreBMPHeader(std::istream& in)
 		break;
 	    }
 	
-	get32(in);				// Read biClrImportant.
+	get32();				// Read biClrImportant.
 	break;
 
       default:	// Illegal information header size:
@@ -1769,25 +1750,43 @@ ImageBase<IMAGE>::saveBMPHeader(std::ostream& out,
     out << "BM";
 
   // Write file header.
+    const auto	put16 =	[&out](int val)
+			{
+			    const char	c0 = u_int(val) & 0xff,
+					c1 = (u_int(val) >> 8) & 0xff;
+			    out.put(c0);
+			    out.put(c1);
+			};
+    const auto	put32 =	[&out](int val)
+			{
+			    const char	c0 = u_int(val) & 0xff,
+					c1 = (u_int(val) >>  8) & 0xff,
+					c2 = (u_int(val) >> 16) & 0xff,
+					c3 = (u_int(val) >> 24) & 0xff;
+			    out.put(c0);
+			    out.put(c1);
+			    out.put(c2);
+			    out.put(c3);
+			};
     ImageFormat	format(type);
-    put32(out, 14 + 40 + 4*format.ncolors()
-	     + format.nbytesPerRow(width())*height());	// Write bfSize.
-    put16(out, 0);					// Write bfReserved1.
-    put16(out, 0);					// Write bfReserved2.
-    put32(out, 14 + 40 + 4*format.ncolors());		// Write bfOffBits.
+    put32(14 + 40 + 4*format.ncolors() +
+	  format.nbytesPerRow(width())*height());	// Write bfSize.
+    put16(0);						// Write bfReserved1.
+    put16(0);						// Write bfReserved2.
+    put32(14 + 40 + 4*format.ncolors());		// Write bfOffBits.
 
   // Write information header.
-    put32(out, 40);					// Write biSize.
-    put32(out, width());				// Write biWidth.
-    put32(out, height());				// Write biHeight.
-    put16(out, 1);					// Write biPlanes.
-    put16(out, format.depth());				// Write biBitCount.
-    put32(out, 0);					// Write biCompression.
-    put32(out, format.nbytesPerRow(width())*height());  // Write biSizeImage.
-    put32(out, 0);					// Write biXPixPerMeter.
-    put32(out, 0);					// Write biYPixPerMeter.
-    put32(out, format.ncolors());			// Write biClrUsed.
-    put32(out, 0);					// Write biClrImportant.
+    put32(40);						// Write biSize.
+    put32(width());					// Write biWidth.
+    put32(height());					// Write biHeight.
+    put16(1);						// Write biPlanes.
+    put16(format.depth());				// Write biBitCount.
+    put32(0);						// Write biCompression.
+    put32(format.nbytesPerRow(width())*height());	// Write biSizeImage.
+    put32(0);						// Write biXPixPerMeter.
+    put32(0);						// Write biYPixPerMeter.
+    put32(format.ncolors());				// Write biClrUsed.
+    put32(0);						// Write biClrImportant.
     
     return type;
 }
