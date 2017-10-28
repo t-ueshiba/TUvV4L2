@@ -185,7 +185,7 @@ main(int argc, char* argv[])
 	    ntrials = atoi(optarg);
 	    break;
 	}
-    
+
   // 本当のお仕事．
     try
     {
@@ -225,7 +225,7 @@ main(int argc, char* argv[])
 	    params.doVerticalBackMatch	 = doVerticalBackMatch;
 	    params.blend		 = blend;
 	    params.grainSize		 = grainSize;
-
+	    
 	    doJob<SADStereoType, u_char>(in, params, scale, binocular, ntrials);
 	}
     }

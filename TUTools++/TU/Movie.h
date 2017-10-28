@@ -83,19 +83,20 @@ template <class T> class Movie
   // Restore/Save movie.
     std::istream&	restore(std::istream& in)			;
     std::ostream&	save(std::ostream& out,
-			     ImageBase::Type type=ImageBase::DEFAULT)	;
-    ImageBase::Type	saveHeader(std::ostream& out,
-				   ImageBase::Type
-				       type=ImageBase::DEFAULT)	const	;
+			     ImageFormat::Type type
+				=ImageFormat::DEFAULT)			;
+    ImageFormat::Type	saveHeader(std::ostream& out,
+				   ImageFormat::Type
+				       type=ImageFormat::DEFAULT) const	;
     std::ostream&	saveFrame(std::ostream& out,
-				  ImageBase::Type
-				      type=ImageBase::DEFAULT)	const	;
+				  ImageFormat::Type
+				      type=ImageFormat::DEFAULT)  const	;
 
   private:
     Movie<T>&		setFrameToViews()				;
-    ImageBase::TypeInfo	restoreHeader(std::istream& in)			;
+    ImageFormat		restoreHeader(std::istream& in)			;
     std::istream&	restoreFrames(std::istream& in,
-				      ImageBase::TypeInfo typeInfo,
+				      const ImageFormat& format,
 				      size_t m)				;
     static size_t	npixels(size_t n)				;
     
@@ -494,12 +495,12 @@ Movie<T>::restore(std::istream& in)
 //! ムービーを指定した画素タイプで出力ストリームに書き出す．
 /*!
  \param out	出力ストリーム
- \param type	画素タイプ．ただし， #TU::ImageBase::DEFAULT を指定した場合は，
+ \param type	画素タイプ．ただし， #TU::ImageFormat::DEFAULT を指定した場合は，
 		このムービーの画素タイプで書き出される．   
  \return	outで指定した出力ストリーム
 */
 template <class T> std::ostream&
-Movie<T>::save(std::ostream& out, ImageBase::Type type)
+Movie<T>::save(std::ostream& out, ImageFormat::Type type)
 {
     saveHeader(out, type);
 
@@ -518,12 +519,12 @@ Movie<T>::save(std::ostream& out, ImageBase::Type type)
 //! ムービーのヘッダを指定した画素タイプで出力ストリームに書き出す．
 /*!
  \param out	出力ストリーム
- \param type	画素タイプ．ただし， #TU::ImageBase::DEFAULT を指定した場合は，
+ \param type	画素タイプ．ただし， #TU::ImageFormat::DEFAULT を指定した場合は，
 		このムービーの画素タイプで書き出される．   
  \return	実際に書き出す場合の画素タイプ
 */
-template <class T> ImageBase::Type
-Movie<T>::saveHeader(std::ostream& out, ImageBase::Type type) const
+template <class T> ImageFormat::Type
+Movie<T>::saveHeader(std::ostream& out, ImageFormat::Type type) const
 {
     using namespace	std;
     
@@ -536,12 +537,12 @@ Movie<T>::saveHeader(std::ostream& out, ImageBase::Type type) const
 //! 現在のフレームを指定した画素タイプで出力ストリームに書き出す．
 /*!
  \param out	出力ストリーム
- \param type	画素タイプ．ただし， #TU::ImageBase::DEFAULT を指定した場合は，
+ \param type	画素タイプ．ただし， #TU::ImageFormat::DEFAULT を指定した場合は，
 		このムービーの画素タイプで書き出される．   
  \return	outで指定した出力ストリーム
 */
 template <class T> std::ostream&
-Movie<T>::saveFrame(std::ostream& out, ImageBase::Type type) const
+Movie<T>::saveFrame(std::ostream& out, ImageFormat::Type type) const
 {
     for (size_t i = 0; i < nviews(); ++i)
 	_views[i].saveData(out, type);
@@ -564,7 +565,7 @@ Movie<T>::setFrameToViews()
     return *this;
 }
     
-template <class T> ImageBase::TypeInfo
+template <class T> ImageFormat
 Movie<T>::restoreHeader(std::istream& in)
 {
     using namespace	std;
@@ -572,7 +573,7 @@ Movie<T>::restoreHeader(std::istream& in)
   // ファイルの先頭文字が'M'であることを確認する．
     char	c;
     if (!in.get(c))
-	return ImageBase::TypeInfo(ImageBase::DEFAULT);
+	return ImageFormat::DEFAULT;
     if (c != 'M')
 	throw runtime_error("TU::Movie<T>::restoreHeader: not a movie file!!");
 
@@ -582,27 +583,26 @@ Movie<T>::restoreHeader(std::istream& in)
     _views.resize(nv);
 
   // 各ビューのヘッダを読み込み，その画像サイズをセットする．
-    ImageBase::TypeInfo	typeInfo(ImageBase::DEFAULT);
-    Array<Size>		sizes(nviews());
+    ImageFormat	format(ImageFormat::DEFAULT);
+    Array<Size>	sizes(nviews());
     for (size_t i = 0; i < nviews(); ++i)
     {
-	typeInfo = _views[i].restoreHeader(in);
+	format = _views[i].restoreHeader(in);
 	sizes[i] = make_pair(_views[i].width(), _views[i].height());
     }
     setSizes(sizes);
     
-    return typeInfo;
+    return format;
 }
 
 template <class T> std::istream&
-Movie<T>::restoreFrames(std::istream& in,
-			ImageBase::TypeInfo typeInfo, size_t m)
+Movie<T>::restoreFrames(std::istream& in, const ImageFormat& format, size_t m)
 {
     for (;;)
     {
       // とりあえずダミーフレームに読み込む．
 	for (size_t i = 0; i < nviews(); ++i)
-	    if (!_views[i].restoreData(in, typeInfo))
+	    if (!_views[i].restoreData(in, format))
 		goto finish;
 
       // コピーしてダミーフレームの直前に挿入

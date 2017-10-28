@@ -63,7 +63,6 @@ MyCmdWindow<STEREO, PIXEL, DISP>::MyCmdWindow(App&		 parentApp,
      _scale(scale),
      _rectify(),
      _stereo(params),
-     _typeInfo(ImageBase::DEFAULT),
      _nimages(0),
      _disparityMap(),
    // GUI stuffs.

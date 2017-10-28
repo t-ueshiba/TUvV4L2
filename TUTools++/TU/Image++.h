@@ -10,7 +10,8 @@
 #include <boost/operators.hpp>
 #include <sys/types.h>		// for u_int, u_char
 #include "TU/pair.h"
-#include "TU/Vector++.h"
+#include "TU/Manip.h"
+#include "TU/Camera++.h"
 
 using s_char	= signed char;	//!< 符号付き8bit整数
 
@@ -1089,65 +1090,169 @@ bayerDecodeGBRG(IN in, IN ie, OUT out)
 }
 
 /************************************************************************
-*  class ImageBase:	basic image class				*
+*  class ImageFormat							*
 ************************************************************************/
-//! 画素の2次元配列として定義されたあらゆる画像の基底となるクラス
-class ImageBase
+//! 外部記憶に読み書きする際の画素のタイプ
+class ImageFormat
 {
   public:
-    using matrix34_type	= Matrix<double, 3, 4>;
-    
-  //! 外部記憶に読み書きする際の画素のタイプ
     enum Type
     {
-	DEFAULT = 0,	//!< same as internal type
-	U_CHAR	= 5,	//!< unsigned mono	 8bit/pixel
-	RGB_24	= 6,	//!< RGB		24bit/pixel	
-	SHORT,		//!< signed mono	16bit/pixel
-	INT,		//!< signed mono	32bit/pixel	
-	FLOAT,		//!< float mono		32bit/pixel 
-	DOUBLE,		//!< double mono	64bit/pixel
-	YUV_444,	//!< YUV444		24bit/pixel
-	YUV_422,	//!< YUV422		16bit/pixel
-	YUYV_422,	//!< YUYV422		16bit/pixel
-	YUV_411,	//!< YUV411		12bit/pixel
-	BMP_8,		//!< BMP indexed color   8bit/pixel
-	BMP_24,		//!< BMP BGR		24bit/pixel
-	BMP_32		//!< BMP BGRA		32bit/pixel
+	DEFAULT = 0,			//!< same as internal type
+	U_CHAR  = 5,			//!< unsigned mono	 8bit/pixel
+	RGB_24  = 6,			//!< RGB		24bit/pixel	
+	SHORT,				//!< signed mono	16bit/pixel
+	INT,				//!< signed mono	32bit/pixel	
+	FLOAT,				//!< float mono		32bit/pixel 
+	DOUBLE,				//!< double mono	64bit/pixel
+	YUV_444,			//!< YUV444		24bit/pixel
+	YUV_422,			//!< YUV422		16bit/pixel
+	YUYV_422,			//!< YUYV422		16bit/pixel
+	YUV_411,			//!< YUV411		12bit/pixel
+	BMP_8,				//!< BMP indexed color   8bit/pixel
+	BMP_24,				//!< BMP BGR		24bit/pixel
+	BMP_32				//!< BMP BGRA		32bit/pixel
     };
 
-  //! 外部記憶に読み書きする際の付加情報
-    struct TypeInfo
-    {
-	TypeInfo(Type ty=DEFAULT)	;
-
-	Type	type;		//!< 画素の型
-	bool	bottomToTop;	//!< 行が下から上へ収められているならtrue
-	size_t	ncolors;	//!< カラーパレットの色数
-    };
-
-  protected:
     template <class _T, class _DUMMY=void>
-    struct type2type			{static constexpr Type value=RGB_24;};
+    struct defaultType
+    {
+	constexpr static auto	value = RGB_24;
+    };
     template <class _DUMMY>
-    struct type2type<u_char, _DUMMY>	{static constexpr Type value=U_CHAR;};
+    struct defaultType<u_char, _DUMMY>
+    {
+	constexpr static auto	value = U_CHAR;
+    };
     template <class _DUMMY>
-    struct type2type<short, _DUMMY>	{static constexpr Type value=SHORT;};
+    struct defaultType<short, _DUMMY>
+    {
+	constexpr static auto	value = SHORT;
+    };
     template <class _DUMMY>
-    struct type2type<int, _DUMMY>	{static constexpr Type value=INT;};
+    struct defaultType<int, _DUMMY>
+    {
+	constexpr static auto	value = INT;
+    };
     template <class _DUMMY>
-    struct type2type<float, _DUMMY>	{static constexpr Type value=FLOAT;};
+    struct defaultType<float, _DUMMY>
+    {
+	constexpr static auto	value = FLOAT;
+    };
     template <class _DUMMY>
-    struct type2type<double, _DUMMY>	{static constexpr Type value=DOUBLE;};
+    struct defaultType<double, _DUMMY>
+    {
+	constexpr static auto	value = DOUBLE;
+    };
     template <class _DUMMY>
-    struct type2type<YUV444, _DUMMY>	{static constexpr Type value=YUV_444;};
+    struct defaultType<YUV444, _DUMMY>
+    {
+	constexpr static auto	value = YUV_444;
+    };
     template <class _DUMMY>
-    struct type2type<YUV422, _DUMMY>	{static constexpr Type value=YUV_422;};
+    struct defaultType<YUV422, _DUMMY>
+    {
+	constexpr static auto	value = YUV_422;
+    };
     template <class _DUMMY>
-    struct type2type<YUYV422, _DUMMY>	{static constexpr Type value=YUYV_422;};
+    struct defaultType<YUYV422, _DUMMY>
+    {
+	constexpr static auto	value = YUYV_422;
+    };
     template <class _DUMMY>
-    struct type2type<YUV411, _DUMMY>	{static constexpr Type value=YUV_411;};
-    
+    struct defaultType<YUV411, _DUMMY>
+    {
+	constexpr static auto	value = YUV_411;
+    };
+
+  public:
+    ImageFormat(Type type, bool bottomToTop=false, size_t ncolors=0)
+	:_type(type), _bottomToTop(bottomToTop), _ncolors(ncolors)	{}
+
+    Type	type()				const	{ return _type; }
+    bool	bottomToTop()			const	{ return _bottomToTop; }
+    size_t	ncolors()			const	{ return _ncolors; }
+    size_t	depth()				const	;
+    size_t	nbytesPerRow(size_t width) const
+		{
+		    const size_t	nbytes = depth() * width / 8;
+		    switch (_type)
+		    {
+		      case BMP_8:
+		      case BMP_24:
+		      case BMP_32:
+			  return 4 * ((nbytes + 3) / 4);
+		      default:
+			break;
+		    }
+
+		    return nbytes;
+		}
+    size_t	nbytesForPadding(size_t width) const
+		{
+		    switch (_type)
+		    {
+		      case BMP_8:
+		      case BMP_24:
+		      case BMP_32:
+		      {
+			  const size_t	nbytes = depth() * width / 8;
+			  return 4 * ((nbytes + 3) / 4) - nbytes;
+		      }
+		      default:
+			break;
+		    }
+
+		    return 0;
+		}
+
+  private:
+    Type	_type;		//!< 画素の型
+    bool	_bottomToTop;	//!< 行が下から上へ収められているならtrue
+    size_t	_ncolors;	//!< カラーマップの色数
+};
+
+inline size_t
+ImageFormat::depth() const
+{
+    switch (_type)
+    {
+      case SHORT:
+	return 8*sizeof(short);
+      case INT:
+	return 8*sizeof(int);
+      case FLOAT:
+	return 8*sizeof(float);
+      case DOUBLE:
+	return 8*sizeof(double);
+      case RGB_24:
+	return 8*sizeof(RGB);
+      case YUV_444:
+	return 8*sizeof(YUV444);
+      case YUV_422:
+	return 8*sizeof(YUV422);
+      case YUYV_422:
+	return 8*sizeof(YUYV422);
+      case YUV_411:
+	return 12;
+      case BMP_24:
+	return 8*sizeof(BGR);
+      case BMP_32:
+	return 8*sizeof(BGRA);
+      default:
+	break;
+    }
+
+    return 8;
+}
+
+/************************************************************************
+*  class ImageBase<IMAGE>						*
+************************************************************************/
+//! 画素の2次元配列として定義されたあらゆる画像の基底となるクラス
+template <class IMAGE>
+class ImageBase
+{
   protected:
   //! 画像を生成し投影行列と放射歪曲係数を初期化する．
   /*!
@@ -1156,49 +1261,95 @@ class ImageBase
     2つの放射歪曲係数はいずれも0に初期化される．
   */
     ImageBase()
-	:P(), d1(0), d2(0)		{P[0][0] = P[1][1] = P[2][2] = 1.0;}
-    virtual ~ImageBase()		;
+	:P({{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}}), d1(0), d2(0)	{}
 
-    size_t		type2nbytes(Type type, bool padding)	const	;
-    static size_t	type2depth(Type type)				;
-    
   public:
-    TypeInfo		restoreHeader(std::istream& in)			;
-    Type		saveHeader(std::ostream& out,
-				   Type type=DEFAULT)		const	;
+    ImageFormat		restoreHeader(std::istream& in)			;
+    ImageFormat::Type	saveHeader(std::ostream& out,
+				   ImageFormat::Type type
+					=ImageFormat::DEFAULT)	const	;
 
   //! 画像の幅を返す．
   /*!
     \return	画像の幅
   */
-    size_t		width()			const	{return _width();}
+    size_t		width() const
+			{
+			    return static_cast<const IMAGE*>(this)->ncol();
+			}
 
   //! 画像の高さを返す．
   /*!
     \return	画像の高さ
   */
-    size_t		height()		const	{return _height();}
+    size_t		height() const
+			{
+			    return static_cast<const IMAGE*>(this)->nrow();
+			}
 
     size_t		npixelsToBorder(size_t u, size_t v,
-					size_t dir)	const	;
+					size_t dir)		const	;
+    void		resize(size_t h, size_t w,
+			       const ImageFormat& format)
+			{
+			    return static_cast<IMAGE*>(this)->resize(h, w,
+								     format);
+			}
+    ImageFormat::Type	defaultType() const
+			{
+			    return static_cast<const IMAGE*>(this)
+					->defaultType();
+			}
     
   private:
-    TypeInfo		restorePBMHeader(std::istream& in)	;
-    TypeInfo		restoreBMPHeader(std::istream& in)	;
-    Type		savePBMHeader(std::ostream& out,
-				      Type type)	const	;
-    Type		saveBMPHeader(std::ostream& out,
-				      Type type)	const	;
-    virtual size_t	_width()			const	= 0;
-    virtual size_t	_height()			const	= 0;
-    virtual Type	_defaultType()			const	= 0;
-    virtual void	_resize(size_t h, size_t w,
-				const TypeInfo& typeInfo)	= 0;
+    static bool		isBigEndian()
+			{
+			    u_short	val = 0x0001;
+			    return ((*(u_char*)&val) != 0x01);
+			}
+    static short	get16(std::istream& in)
+			{
+			    const u_int	c0 = in.get(), c1 = in.get();
+			    return c0 + (c1 << 8);
+			}
+    static int		get32(std::istream& in)
+			{
+			    const u_int	c0 = in.get(), c1 = in.get(),
+					c2 = in.get(), c3 = in.get();
+			    return c0 + (c1 << 8) + (c2 << 16) + (c3 << 24);
+			}
+    static void		put16(std::ostream& out, int val)
+			{
+			    const char	c0 = u_int(val) & 0xff,
+					c1 = (u_int(val) >> 8) & 0xff;
+			    out.put(c0);
+			    out.put(c1);
+			}
+    static void		put32(std::ostream& out, int val)
+			{
+			    const char	c0 = u_int(val) & 0xff,
+					c1 = (u_int(val) >>  8) & 0xff,
+					c2 = (u_int(val) >> 16) & 0xff,
+					c3 = (u_int(val) >> 24) & 0xff;
+			    out.put(c0);
+			    out.put(c1);
+			    out.put(c2);
+			    out.put(c3);
+			}
 
+    ImageFormat		restorePBMHeader(std::istream& in)		;
+    ImageFormat		restoreBMPHeader(std::istream& in)		;
+    ImageFormat::Type	savePBMHeader(std::ostream& out,
+				      ImageFormat::Type type)
+								const	;
+    ImageFormat::Type	saveBMPHeader(std::ostream& out,
+				      ImageFormat::Type type)
+								const	;
+    
   public:
-    matrix34_type	P;	//!< カメラの3x4投影行列
-    double		d1;	//!< 放射歪曲の第1係数
-    double		d2;	//!< 放射歪曲の第2係数
+    Matrix34d	P;	//!< カメラの3x4投影行列
+    double	d1;	//!< 放射歪曲の第1係数
+    double	d2;	//!< 放射歪曲の第2係数
 };
 
 //! 指定された向きに沿った与えられた点から画像境界までの画素数を返す．
@@ -1208,8 +1359,8 @@ class ImageBase
   \param dir	8隣接方向
   \return	画像境界までの画素数(始点を含む)
 */
-inline size_t
-ImageBase::npixelsToBorder(size_t u, size_t v, size_t dir) const
+template <class IMAGE> inline size_t
+ImageBase<IMAGE>::npixelsToBorder(size_t u, size_t v, size_t dir) const
 {
     switch (dir % 8)
     {
@@ -1232,6 +1383,415 @@ ImageBase::npixelsToBorder(size_t u, size_t v, size_t dir) const
     return std::min(width() - u, v + 1);
 }
 
+//! 入力ストリームから画像のヘッダを読み込む．
+/*!
+  \param in	入力ストリーム
+  \return	読み込まれた画像の画素のタイプ
+*/
+template <class IMAGE> ImageFormat
+ImageBase<IMAGE>::restoreHeader(std::istream& in)
+{
+  // Reset calibration parameters.
+    P = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 0, 1}};
+    d1 = d2 = 0.0;
+    
+  // Read the first magic character.
+    char	c;
+    if (!in.get(c))
+	return ImageFormat::DEFAULT;
+
+  // Read image header.
+    switch (c)
+    {
+      case 'P':
+	return restorePBMHeader(in);
+      case 'B':
+	return restoreBMPHeader(in);
+      default:
+	throw std::runtime_error("TU::ImageBase::restoreHeader: neighter PBM nor BMP file!!");
+	break;
+    }
+
+    return ImageFormat::DEFAULT;
+}
+
+//! 指定した画素タイプで出力ストリームに画像のヘッダを書き出す．
+/*!
+  \param out	出力ストリーム
+  \param type	画素タイプ．ただし，#DEFAULTを指定した場合は，
+		この画像オブジェクトの画素タイプで書き出される．
+  \return	実際に書き出す場合の画素タイプ．
+*/
+template <class IMAGE> ImageFormat::Type
+ImageBase<IMAGE>::saveHeader(std::ostream& out, ImageFormat::Type type) const
+{
+    if (type == ImageFormat::DEFAULT)
+	type = defaultType();
+
+    switch (type)
+    {
+      case ImageFormat::BMP_8:
+      case ImageFormat::BMP_24:
+      case ImageFormat::BMP_32:
+	return saveBMPHeader(out, type);
+      default:
+	return savePBMHeader(out, type);
+    }
+
+    return type;
+}
+
+template <class IMAGE> ImageFormat
+ImageBase<IMAGE>::restorePBMHeader(std::istream& in)
+{
+  // Read pbm type.
+    ImageFormat::Type	type;
+    int			c;
+    in >> c >> std::ws;		// Read pbm type and skip trailing white spaces.
+    switch (c)
+    {
+      case static_cast<int>(ImageFormat::U_CHAR):
+	type = ImageFormat::U_CHAR;
+	break;
+      case static_cast<int>(ImageFormat::RGB_24):
+	type = ImageFormat::RGB_24;
+	break;
+      default:
+	throw std::runtime_error("TU::ImageBase::restorePBMHeader: unknown pbm type!!");
+    }
+    
+  // Process comment lines.
+    bool	legacy = false;	// legacy style of dist. param. representation
+    for (; (c = in.get()) == '#'; in >> skipl)
+    {
+	char	key[256], val[256];
+	in >> key;
+	if (!strcmp(key, "DataType:"))		// pixel data type
+	{
+	    in >> val;
+	    if (!strcmp(val, "Short"))
+		type = ImageFormat::SHORT;
+	    else if (!strcmp(val, "Int"))
+		type = ImageFormat::INT;
+	    else if (!strcmp(val, "Float"))
+		type = ImageFormat::FLOAT;
+	    else if (!strcmp(val, "Double"))
+		type = ImageFormat::DOUBLE;
+	    else if (!strcmp(val, "YUV444"))
+		type = ImageFormat::YUV_444;
+	    else if (!strcmp(val, "YUV422"))
+		type = ImageFormat::YUV_422;
+	    else if (!strcmp(val, "YUYV422"))
+		type = ImageFormat::YUYV_422;
+	    else if (!strcmp(val, "YUV411"))
+		type = ImageFormat::YUV_411;
+	}
+	else if (!strcmp(key, "Endian:"))	// big- or little-endian
+	{
+	    in >> val;
+	    switch (type)
+	    {
+	      case ImageFormat::SHORT:
+	      case ImageFormat::INT:
+	      case ImageFormat::FLOAT:
+	      case ImageFormat::DOUBLE:
+		if (isBigEndian())
+		{
+		    if (!strcmp(val, "Little"))
+			throw std::runtime_error("TU::ImageBase::restore_epbm: big endian is not supported!!");
+		}
+		else
+		{
+		    if (!strcmp(val, "Big"))
+			throw std::runtime_error("TU::ImageBase::restore_epbm: little endian is not supported!!");
+		}
+		break;
+	      default:
+		break;
+	    }
+	}
+	else if (!strcmp(key, "PinHoleParameterH11:"))
+	    in >> P[0][0];
+	else if (!strcmp(key, "PinHoleParameterH12:"))
+	    in >> P[0][1];
+	else if (!strcmp(key, "PinHoleParameterH13:"))
+	    in >> P[0][2];
+	else if (!strcmp(key, "PinHoleParameterH14:"))
+	    in >> P[0][3];
+	else if (!strcmp(key, "PinHoleParameterH21:"))
+	    in >> P[1][0];
+	else if (!strcmp(key, "PinHoleParameterH22:"))
+	    in >> P[1][1];
+	else if (!strcmp(key, "PinHoleParameterH23:"))
+	    in >> P[1][2];
+	else if (!strcmp(key, "PinHoleParameterH24:"))
+	    in >> P[1][3];
+	else if (!strcmp(key, "PinHoleParameterH31:"))
+	    in >> P[2][0];
+	else if (!strcmp(key, "PinHoleParameterH32:"))
+	    in >> P[2][1];
+	else if (!strcmp(key, "PinHoleParameterH33:"))
+	    in >> P[2][2];
+	else if (!strcmp(key, "PinHoleParameterH34:"))
+	    in >> P[2][3];
+	else if (!strcmp(key, "DistortionParameterD1:"))
+	    in >> d1;
+	else if (!strcmp(key, "DistortionParameterD2:"))
+	    in >> d2;
+	else if (!strcmp(key, "DistortionParameterA:"))	// legacy dist. param.
+	{
+	    in >> d1;
+	    legacy = true;
+	}
+	else if (!strcmp(key, "DistortionParameterB:"))	// legacy dist. param.
+	{
+	    in >> d2;
+	    legacy = true;
+	}
+    }
+    in.putback(c);
+
+    if (legacy)
+    {
+	Camera<Intrinsic<double> >	camera(P);
+	double				k = camera.k();
+	d1 *= (k * k);
+	d2 *= (k * k * k * k);
+    }
+
+    size_t	w, h;
+    in >> w >> h;
+    resize(h, w, type);				// set width & height
+    in >> w >> skipl;				// skip MaxValue
+
+    return type;
+}
+
+template <class IMAGE> ImageFormat
+ImageBase<IMAGE>::restoreBMPHeader(std::istream& in)
+{
+  // Read pbm type.
+    int	c = in.get();				// Read second magic character.
+    if (c != 'M')
+	throw std::runtime_error("TU::ImageBase::restoreBMPHeader: not a BMP file!!");
+
+  // Read file header.
+    get32(in);					// Skip bfSize.
+    get16(in);					// Skip bfReserved1.
+    get16(in);					// Skip bfReserved2.
+    get32(in);					// Skip bfOffBits.
+
+  // Read information header.
+    bool	bottomToTop = false;
+    size_t	ncolors = 0;
+    int		w = 0, h = 0, d = 0;
+    switch (c = get32(in))			// Read bcSize or biSize.
+    {
+      case 12:	// BMPCoreHeader:
+	w = get16(in);				// Read bcWidth.
+	h = get16(in);				// Read bcHeight.
+	if (h > 0)
+	    bottomToTop = true;
+	else
+	{
+	    h = -h;
+	    bottomToTop = false;
+	}
+	get16(in);				// Skip bcPlanes.
+	switch (d = get16(in))			// Read bcBitCount.
+	{
+	  case 1:
+	  case 4:
+	  case 8:
+	    ncolors = (1 << d);
+	    break;
+	}
+	break;
+
+      case 40:	// BMPInfoHeader:
+	w = get32(in);				// Read biWidth.
+	h = get32(in);				// Read biHeight.
+	if (h > 0)
+	    bottomToTop = true;
+	else
+	{
+	    h = -h;
+	    bottomToTop = false;
+	}
+	get16(in);				// Skip biPlanes.
+	d = get16(in);				// Read biBitCount.
+	if (get32(in) != 0)			// Read biCompression.
+	    throw std::runtime_error("TUImageBase::restoreBMPHeader: compressed BMP file not supported!!");
+	get32(in);				// Skip biSizeImage.
+	get32(in);				// Skip biXPixPerMeter.
+	get32(in);				// Skip biYPixPerMeter.
+	if ((ncolors = get32(in)) == 0)		// Read biClrUsed.
+	    switch (d)
+	    {
+	      case 1:
+		ncolors = 2;
+		break;
+	      case 4:
+		ncolors = 16;
+		break;
+	      case 8:
+		ncolors = 256;
+		break;
+	    }
+	
+	get32(in);				// Read biClrImportant.
+	break;
+
+      default:	// Illegal information header size:
+	throw std::runtime_error("TU::ImageBase::restoreBMPHeader: information header corrupted!!");
+	break;
+    }
+
+  // Set type of the image.
+    ImageFormat::Type	type = ImageFormat::DEFAULT;
+    switch (d)
+    {
+      case 8:
+	type = ImageFormat::BMP_8;
+	break;
+      case 24:
+	type = ImageFormat::BMP_24;
+	break;
+      case 32:
+	type = ImageFormat::BMP_32;
+	break;
+      default:
+	throw std::runtime_error("TU::ImageBase::restoreBMPHeader: unsupported depth!!");
+	break;
+    }
+
+    ImageFormat	format(type, bottomToTop, ncolors);
+    resize(h, w, format);		// Allocate image area of w*h size.
+    
+    return format;
+}
+
+template <class IMAGE> ImageFormat::Type
+ImageBase<IMAGE>::savePBMHeader(std::ostream& out,
+				ImageFormat::Type type) const
+{
+    out << 'P';
+    switch (type)
+    {
+      case ImageFormat::RGB_24:
+	out << static_cast<int>(ImageFormat::RGB_24) << std::endl;
+	break;
+      default:
+	out << static_cast<int>(ImageFormat::U_CHAR) << std::endl;
+	break;
+    }
+
+    ImageFormat	format(type);
+    const auto	bitsToBytes = [](size_t n){ return (n + 7)/8; };
+    out << "# PixelLength: " << bitsToBytes(format.depth()) << std::endl;
+    out << "# DataType: ";
+    switch (type)
+    {
+      default:
+	out << "Char" << std::endl;
+	break;
+      case ImageFormat::RGB_24:
+	out << "RGB24" << std::endl;
+	break;
+      case ImageFormat::SHORT:
+	out << "Short" << std::endl;
+	break;
+      case ImageFormat::INT:
+	out << "Int" << std::endl;
+	break;
+      case ImageFormat::FLOAT:
+	out << "Float" << std::endl;
+	break;
+      case ImageFormat::DOUBLE:
+	out << "Double" << std::endl;
+	break;
+      case ImageFormat::YUV_444:
+	out << "YUV444" << std::endl;
+	break;
+      case ImageFormat::YUV_422:
+	out << "YUV422" << std::endl;
+	break;
+      case ImageFormat::YUYV_422:
+	out << "YUYV422" << std::endl;
+	break;
+      case ImageFormat::YUV_411:
+	out << "YUV411" << std::endl;
+	break;
+    }
+    out << "# Sign: ";
+    switch (type)
+    {
+      case ImageFormat::SHORT:
+      case ImageFormat::INT:
+      case ImageFormat::FLOAT:
+      case ImageFormat::DOUBLE:
+	out << "Signed" << std::endl;
+	break;
+      default:
+	out << "Unsigned" << std::endl;
+	break;
+    }
+    if (isBigEndian())
+	out << "# Endian: Big" << std::endl;
+    else
+	out << "# Endian: Little" << std::endl;
+    out << "# PinHoleParameterH11: " << P[0][0] << std::endl
+	<< "# PinHoleParameterH12: " << P[0][1] << std::endl
+	<< "# PinHoleParameterH13: " << P[0][2] << std::endl
+	<< "# PinHoleParameterH14: " << P[0][3] << std::endl
+	<< "# PinHoleParameterH21: " << P[1][0] << std::endl
+	<< "# PinHoleParameterH22: " << P[1][1] << std::endl
+	<< "# PinHoleParameterH23: " << P[1][2] << std::endl
+	<< "# PinHoleParameterH24: " << P[1][3] << std::endl
+	<< "# PinHoleParameterH31: " << P[2][0] << std::endl
+	<< "# PinHoleParameterH32: " << P[2][1] << std::endl
+	<< "# PinHoleParameterH33: " << P[2][2] << std::endl
+	<< "# PinHoleParameterH34: " << P[2][3] << std::endl;
+    if (d1 != 0.0 || d2 != 0.0)
+	out << "# DistortionParameterD1: " << d1 << std::endl
+	    << "# DistortionParameterD2: " << d2 << std::endl;
+    out << width() << ' ' << height() << '\n'
+	<< 255 << std::endl;
+    
+    return type;
+}
+
+template <class IMAGE> ImageFormat::Type
+ImageBase<IMAGE>::saveBMPHeader(std::ostream& out,
+				ImageFormat::Type type) const
+{
+  // Write BMP magic characters.
+    out << "BM";
+
+  // Write file header.
+    ImageFormat	format(type);
+    put32(out, 14 + 40 + 4*format.ncolors()
+	     + format.nbytesPerRow(width())*height());	// Write bfSize.
+    put16(out, 0);					// Write bfReserved1.
+    put16(out, 0);					// Write bfReserved2.
+    put32(out, 14 + 40 + 4*format.ncolors());		// Write bfOffBits.
+
+  // Write information header.
+    put32(out, 40);					// Write biSize.
+    put32(out, width());				// Write biWidth.
+    put32(out, height());				// Write biHeight.
+    put16(out, 1);					// Write biPlanes.
+    put16(out, format.depth());				// Write biBitCount.
+    put32(out, 0);					// Write biCompression.
+    put32(out, format.nbytesPerRow(width())*height());  // Write biSizeImage.
+    put32(out, 0);					// Write biXPixPerMeter.
+    put32(out, 0);					// Write biYPixPerMeter.
+    put32(out, format.ncolors());			// Write biClrUsed.
+    put32(out, 0);					// Write biClrImportant.
+    
+    return type;
+}
+
 /************************************************************************
 *  class Image<T, ALLOC>						*
 ************************************************************************/
@@ -1241,20 +1801,11 @@ ImageBase::npixelsToBorder(size_t u, size_t v, size_t dir) const
   \param ALLOC	アロケータの型
 */
 template <class T, class ALLOC=std::allocator<T> >
-class Image : public Array2<T, 0, 0, ALLOC>, public ImageBase
+class Image : public Array2<T, 0, 0, ALLOC>, public ImageBase<Image<T, ALLOC> >
 {
   private:
     using super	= Array2<T, 0, 0, ALLOC>;
-
-    template <class L>
-    struct Colormap : public Array<L>
-    {
-	using result_type = L;
-
-	Colormap(size_t d)	:Array<L>(d)		{}
-	
-	result_type	operator ()(size_t i)	const	{ return (*this)[i]; }
-    };
+    using base	= ImageBase<Image>;
     
   public:
     using	typename super::element_type;
@@ -1267,7 +1818,7 @@ class Image : public Array2<T, 0, 0, ALLOC>, public ImageBase
     \param h	画像の高さ
   */
     explicit Image(size_t w=0, size_t h=0)
-	:super(h, w), ImageBase()				{}
+	:super(h, w)						{}
 
   //! 幅と高さとpaddingを指定して画像を生成する．
   /*!
@@ -1276,7 +1827,7 @@ class Image : public Array2<T, 0, 0, ALLOC>, public ImageBase
     \param unit	1行あたりのバイト数がこの値の倍数になる
   */
     explicit Image(size_t w, size_t h, size_t unit)
-	:super(unit, h, w), ImageBase()				{}
+	:super(unit, h, w)					{}
 
   //! 他の配列と同一要素を持つ画像を作る（コピーコンストラクタの拡張）．
   /*!
@@ -1287,13 +1838,13 @@ class Image : public Array2<T, 0, 0, ALLOC>, public ImageBase
   */
     template <class E_, std::enable_if_t<rank<E_>() == 2>* = nullptr>
     Image(const E_& expr)
-	:super(expr), ImageBase()				{}
+	:super(expr)						{}
 
     Image(pointer p, size_t w, size_t h)
-	:super(p, h, w), ImageBase()				{}
+	:super(p, h, w)						{}
     
     Image(pointer p, size_t unit, size_t w, size_t h)
-	:super(p, unit, h, w), ImageBase()			{}
+	:super(p, unit, h, w)					{}
     
   //! 他の配列を自分に代入する（標準代入演算子の拡張）．
   /*!
@@ -1303,32 +1854,39 @@ class Image : public Array2<T, 0, 0, ALLOC>, public ImageBase
     \return		この配列
   */
     template <class E_> std::enable_if_t<rank<E_>() == 2, Image&>
-		operator =(const E_& expr)
-		{
-		    super::operator =(expr);
-		    return *this;
-		}
+    operator =(const E_& expr)
+	{
+	    super::operator =(expr);
+	    return *this;
+	}
 
     template <class T_> std::enable_if_t<rank<T_>() == 0, Image&>
-		operator =(const T_& c)
-		{
-		    super::operator =(c);
-		    return *this;
-		}
+    operator =(const T_& c)
+	{
+	    super::operator =(c);
+	    return *this;
+	}
     
     using	super::begin;
     using	super::end;
     using	super::rbegin;
     using	super::rend;
-
-//! 指定された位置の画素にアクセスする．
+    using	super::resize;
+    using	base::width;
+    using	base::height;
+    using	base::restoreHeader;
+    using	base::saveHeader;
+    
+  //! 指定された位置の画素にアクセスする．
   /*!
     \param p	画素の位置
     \return	指定された画素
   */
     template <class S>
-    const T&	operator ()(const Array<S, 2>& p)
-					const	{return (*this)[p[1]][p[0]];}
+    const T&		operator ()(const Array<S, 2>& p) const
+			{
+			    return (*this)[p[1]][p[0]];
+			}
 
   //! 指定された位置の画素にアクセスする．
   /*!
@@ -1336,168 +1894,167 @@ class Image : public Array2<T, 0, 0, ALLOC>, public ImageBase
     \return	指定された画素
   */
     template <class S>
-    T&		operator ()(const Array<S, 2>& p)
-						{return (*this)[p[1]][p[0]];}
+    T&			operator ()(const Array<S, 2>& p)
+			{
+			    return (*this)[p[1]][p[0]];
+			}
     
-    size_t	width()			const	{return super::ncol();}
-    size_t	height()		const	{return super::nrow();}
+  //! 入力ストリームから画像を読み込む．
+  /*!
+    \param in	入力ストリーム
+    \return	inで指定した入力ストリーム
+  */
+    std::istream&	restore(std::istream& in)
+			{
+			    return restoreData(in, restoreHeader(in));
+			}
 
-    std::istream&	restore(std::istream& in)			;
+  //! 指定した画素の型で出力ストリームに画像を書き出す．
+  /*!
+    \param out	出力ストリーム
+    \param type	画素の型．ただし，#ImageFormat::DEFAULT を指定した場合は，
+		この画像オブジェクトの画素の型で書き出される．
+    \return	outで指定した出力ストリーム
+  */
     std::ostream&	save(std::ostream& out,
-			     Type type=DEFAULT)			const	;
+			     ImageFormat::Type type=ImageFormat::DEFAULT) const
+			{
+			    return saveData(out, saveHeader(out, type));
+			}
     std::istream&	restoreData(std::istream& in,
-				    const TypeInfo& typeInfo)		;
+				    const ImageFormat& format)		;
     std::ostream&	saveData(std::ostream& out,
-				 Type type=DEFAULT)		const	;
+				 ImageFormat::Type type
+				     =ImageFormat::DEFAULT)	const	;
+    void		resize(size_t h, size_t w, const ImageFormat& format)
+			{
+			    super::resize(h, w);
+			}
+    ImageFormat::Type	defaultType() const
+			{
+			    return ImageFormat::defaultType<T>::value;
+			}
 
   private:
-    template <class S>
+    template <class T_>
     std::istream&	restoreRows(std::istream& in,
-				    const TypeInfo& typeInfo)		;
-    template <class S, class L>
+				    const ImageFormat& format)		;
+    template <class T_, class C_>
     std::istream&	restoreAndLookupRows(std::istream& in,
-					     const TypeInfo& typeInfo)	;
-    template <class D, class L>
-    std::ostream&	saveRows(std::ostream& out, Type type)	const	;
-    Type		defaultType()				const	;
-    
-    virtual size_t	_width()				const	;
-    virtual size_t	_height()				const	;
-    virtual Type	_defaultType()				const	;
-    virtual void	_resize(size_t h, size_t w, const TypeInfo&)	;
+					     const ImageFormat& format)	;
+    template <class T_, class C_>
+    std::ostream&	saveRows(std::ostream& out,
+				 ImageFormat::Type type)	const	;
 };
-
-//! 入力ストリームから画像を読み込む．
-/*!
-  \param in	入力ストリーム
-  \return	inで指定した入力ストリーム
-*/
-template <class T, class ALLOC> inline std::istream&
-Image<T, ALLOC>::restore(std::istream& in)
-{
-    return restoreData(in, restoreHeader(in));
-}
-
-//! 指定した画素タイプで出力ストリームに画像を書き出す．
-/*!
-  \param out	出力ストリーム
-  \param type	画素タイプ．ただし， #DEFAULT を指定した場合は，
-		この画像オブジェクトの画素タイプで書き出される．
-  \return	outで指定した出力ストリーム
-*/
-template <class T, class ALLOC> inline std::ostream&
-Image<T, ALLOC>::save(std::ostream& out, Type type) const
-{
-    return saveData(out, saveHeader(out, type));
-}
 
 //! 入力ストリームから画像の画素データを読み込む．
 /*!
-  \param in		入力ストリーム
-  \param typeInfo	ストリーム中のデータの画素タイプ
-			(読み込み先の画像の画素タイプではない)
-  \return		inで指定した入力ストリーム
+  \param in	入力ストリーム
+  \param format	ストリーム中のデータの画素フォーマット
+		(読み込み先の画像の画素フォーマットではない)
+  \return	inで指定した入力ストリーム
 */
 template <class T, class ALLOC> std::istream&
-Image<T, ALLOC>::restoreData(std::istream& in, const TypeInfo& typeInfo)
+Image<T, ALLOC>::restoreData(std::istream& in, const ImageFormat& format)
 {
-    switch (typeInfo.type)
+    switch (format.type())
     {
-      case DEFAULT:
+      case ImageFormat::DEFAULT:
 	break;
-      case U_CHAR:
-	return restoreRows<u_char>(in, typeInfo);
-      case SHORT:
-	return restoreRows<short>(in, typeInfo);
-      case INT:
-	return restoreRows<int>(in, typeInfo);
-      case FLOAT:
-	return restoreRows<float>(in, typeInfo);
-      case DOUBLE:
-	return restoreRows<double>(in, typeInfo);
-      case RGB_24:
-	return restoreRows<RGB>(in, typeInfo);
-      case YUV_444:
-	return restoreRows<YUV444>(in, typeInfo);
-      case YUV_422:
-	return restoreRows<YUV422>(in, typeInfo);
-      case YUYV_422:
-	return restoreRows<YUYV422>(in, typeInfo);
-      case YUV_411:
-	return restoreRows<YUV411>(in, typeInfo);
-      case BMP_8:
-	return restoreAndLookupRows<u_char, BGRA>(in, typeInfo);
-      case BMP_24:
-	return restoreRows<BGR>(in, typeInfo);
-      case BMP_32:
-	return restoreRows<BGRA>(in, typeInfo);
+      case ImageFormat::U_CHAR:
+	return restoreRows<u_char >(in, format);
+      case ImageFormat::SHORT:
+	return restoreRows<short  >(in, format);
+      case ImageFormat::INT:
+	return restoreRows<int	  >(in, format);
+      case ImageFormat::FLOAT:
+	return restoreRows<float  >(in, format);
+      case ImageFormat::DOUBLE:
+	return restoreRows<double >(in, format);
+      case ImageFormat::RGB_24:
+	return restoreRows<RGB	  >(in, format);
+      case ImageFormat::YUV_444:
+	return restoreRows<YUV444 >(in, format);
+      case ImageFormat::YUV_422:
+	return restoreRows<YUV422 >(in, format);
+      case ImageFormat::YUYV_422:
+	return restoreRows<YUYV422>(in, format);
+      case ImageFormat::YUV_411:
+	return restoreRows<YUV411 >(in, format);
+      case ImageFormat::BMP_8:
+	return restoreAndLookupRows<u_char, BGRA>(in, format);
+      case ImageFormat::BMP_24:
+	return restoreRows<BGR	  >(in, format);
+      case ImageFormat::BMP_32:
+	return restoreRows<BGRA	  >(in, format);
       default:
 	throw std::runtime_error("Image<T, ALLOC>::restoreData(): unknown pixel type!!");
     }
     return in;
 }
 
-//! 指定した画素タイプで出力ストリームに画像の画素データを書き出す．
+//! 指定した画素フォーマットで出力ストリームに画像の画素データを書き出す．
 /*!
   \param out	出力ストリーム
-  \param type	画素タイプ．ただし， #DEFAULT を指定した場合は，
-		この画像オブジェクトの画素タイプで書き出される．
+  \param type	画素の型．ただし，#PixelType::DEFAULT を指定した場合は，
+		この画像オブジェクトのデフォルトの画素型で書き出される．
   \return	outで指定した出力ストリーム
 */
 template <class T, class ALLOC> std::ostream&
-Image<T, ALLOC>::saveData(std::ostream& out, Type type) const
+Image<T, ALLOC>::saveData(std::ostream& out, ImageFormat::Type type) const
 {
-    if (type == DEFAULT)
+    if (type == ImageFormat::DEFAULT)
 	type = defaultType();
 
     switch (type)
     {
-      case U_CHAR:
-	return saveRows<u_char, RGB>(out, type);
-      case SHORT:
-	return saveRows<short, RGB>(out, type);
-      case INT:
-	return saveRows<int, RGB>(out, type);
-      case FLOAT:
-	return saveRows<float, RGB>(out, type);
-      case DOUBLE:
-	return saveRows<double, RGB>(out, type);
-      case RGB_24:
-	return saveRows<RGB, RGB>(out, type);
-      case YUV_444:
-	return saveRows<YUV444, RGB>(out, type);
-      case YUV_422:
-	return saveRows<YUV422, RGB>(out, type);
-      case YUYV_422:
-	return saveRows<YUYV422, RGB>(out, type);
-      case YUV_411:
-	return saveRows<YUV411, RGB>(out, type);
-      case BMP_8:
-	return saveRows<u_char, BGRA>(out, type);
-      case BMP_24:
-	return saveRows<BGR, BGRA>(out, type);
-      case BMP_32:
-	return saveRows<BGRA, BGRA>(out, type);
+      case ImageFormat::U_CHAR:
+	return saveRows<u_char,	 RGB >(out, type);
+      case ImageFormat::SHORT:
+	return saveRows<short,	 RGB >(out, type);
+      case ImageFormat::INT:
+	return saveRows<int,	 RGB >(out, type);
+      case ImageFormat::FLOAT:
+	return saveRows<float,	 RGB >(out, type);
+      case ImageFormat::DOUBLE:
+	return saveRows<double,	 RGB >(out, type);
+      case ImageFormat::RGB_24:
+	return saveRows<RGB,	 RGB >(out, type);
+      case ImageFormat::YUV_444:
+	return saveRows<YUV444,	 RGB >(out, type);
+      case ImageFormat::YUV_422:
+	return saveRows<YUV422,	 RGB >(out, type);
+      case ImageFormat::YUYV_422:
+	return saveRows<YUYV422, RGB >(out, type);
+      case ImageFormat::YUV_411:
+	return saveRows<YUV411,  RGB >(out, type);
+      case ImageFormat::BMP_8:
+	return saveRows<u_char,	 BGRA>(out, type);
+      case ImageFormat::BMP_24:
+	return saveRows<BGR,	 RGB >(out, type);
+      case ImageFormat::BMP_32:
+	return saveRows<BGRA,	 RGB >(out, type);
       default:
 	throw std::runtime_error("Image<T, ALLOC>::saveData(): unknown pixel type!!");
     }
+
     return out;
 }
 
-template <class T, class ALLOC> template <class S> std::istream&
-Image<T, ALLOC>::restoreRows(std::istream& in, const TypeInfo& typeInfo)
+template <class T, class ALLOC> template <class T_> std::istream&
+Image<T, ALLOC>::restoreRows(std::istream& in, const ImageFormat& format)
 {
-    const size_t	npads = type2nbytes(typeInfo.type, true);
-    Array<S>		buf(width());
-    if (typeInfo.bottomToTop)
+    const auto	npads = format.nbytesForPadding(width());
+    Array<T_>	buf(width());
+    if (format.bottomToTop())
     {
-	for (auto iter = rbegin(); iter != rend(); ++iter)
+	for (auto row = rbegin(); row != rend(); ++row)
 	{
 	    if (!buf.restore(in) || !in.ignore(npads))
 		break;
 	    std::copy(make_pixel_iterator(buf.cbegin()),
 		      make_pixel_iterator(buf.cend()),
-		      make_pixel_iterator(TU::begin(*iter)));
+		      make_pixel_iterator(TU::begin(*row)));
 	}
     }
     else
@@ -1515,26 +2072,28 @@ Image<T, ALLOC>::restoreRows(std::istream& in, const TypeInfo& typeInfo)
     return in;
 }
 
-template <class T, class ALLOC> template <class S, class L> std::istream&
+template <class T, class ALLOC> template <class T_, class C_> std::istream&
 Image<T, ALLOC>::restoreAndLookupRows(std::istream& in,
-				      const TypeInfo& typeInfo)
+				      const ImageFormat& format)
 {
-    Colormap<L>	colormap(typeInfo.ncolors);
+    Array<C_>	colormap(format.ncolors());
     colormap.restore(in);
 	
-    const size_t	npads = type2nbytes(typeInfo.type, true);
-    Array<S>		buf(width());
-    if (typeInfo.bottomToTop)
+    const auto	lookup = [&colormap](T_ i){ return colormap[i]; };
+    const auto	npads = format.nbytesForPadding(width());
+    Array<T_>	buf(width());
+    if (format.bottomToTop())
     {
-	for (auto iter = rbegin(); iter != rend(); ++iter)
+	for (auto row = rbegin(); row != rend(); ++row)
 	{
 	    if (!buf.restore(in) || !in.ignore(npads))
 		break;
-	    std::copy(make_pixel_iterator(make_map_iterator(colormap,
+
+	    std::copy(make_pixel_iterator(make_map_iterator(lookup,
 							    buf.cbegin())),
-		      make_pixel_iterator(make_map_iterator(colormap,
+		      make_pixel_iterator(make_map_iterator(lookup,
 							    buf.cend())),
-		      make_pixel_iterator(TU::begin(*iter)));
+		      make_pixel_iterator(TU::begin(*row)));
 	}
     }
     else
@@ -1543,9 +2102,10 @@ Image<T, ALLOC>::restoreAndLookupRows(std::istream& in,
 	{
 	    if (!buf.restore(in) || !in.ignore(npads))
 		break;
-	    std::copy(make_pixel_iterator(make_map_iterator(colormap,
+
+	    std::copy(make_pixel_iterator(make_map_iterator(lookup,
 							    buf.cbegin())),
-		      make_pixel_iterator(make_map_iterator(colormap,
+		      make_pixel_iterator(make_map_iterator(lookup,
 							    buf.cend())),
 		      make_pixel_iterator(row.begin()));
 	}
@@ -1554,72 +2114,41 @@ Image<T, ALLOC>::restoreAndLookupRows(std::istream& in,
     return in;
 }
 
-template <class T, class ALLOC> template <class D, class L> std::ostream&
-Image<T, ALLOC>::saveRows(std::ostream& out, Type type) const
+template <class T, class ALLOC> template <class T_, class C_> std::ostream&
+Image<T, ALLOC>::saveRows(std::ostream& out, ImageFormat::Type type) const
 {
-    TypeInfo	typeInfo(type);
-
-    Colormap<L>	colormap(typeInfo.ncolors);
+    ImageFormat	format(type);
+    Array<C_>	colormap(format.ncolors());
     for (size_t i = 0; i < colormap.size(); ++i)
 	colormap[i] = i;
     colormap.save(out);
     
-    Array<u_char>	pad(type2nbytes(type, true));
-    Array<D>		buf(width());
-    if (typeInfo.bottomToTop)
+    Array<u_char>	pads(format.nbytesForPadding(width()));
+    Array<T_>		buf(width());
+    if (format.bottomToTop())
     {
 	for (auto row = rbegin(); row != rend(); ++row)
 	{
 	    std::copy(make_pixel_iterator(TU::begin(*row)),
 		      make_pixel_iterator(TU::end(*row)),
 		      make_pixel_iterator(buf.begin()));
-	    if (!buf.save(out) || !pad.save(out))
+	    if (!buf.save(out) || !pads.save(out))
 		break;
 	}
     }
     else
     {
-	for (auto row = begin(); row != end(); ++row)
+	for (const auto& row : *this)
 	{
-	    std::copy(make_pixel_iterator(TU::begin(*row)),
-		      make_pixel_iterator(TU::end(*row)),
+	    std::copy(make_pixel_iterator(TU::begin(row)),
+		      make_pixel_iterator(TU::end(row)),
 		      make_pixel_iterator(buf.begin()));
-	    if (!buf.save(out) || !pad.save(out))
+	    if (!buf.save(out) || !pads.save(out))
 		break;
 	}
     }
 
     return out;
-}
-
-template <class T, class ALLOC> size_t
-Image<T, ALLOC>::_width() const
-{
-    return Image::width();		// Don't call ImageBase::width!
-}
-
-template <class T, class ALLOC> size_t
-Image<T, ALLOC>::_height() const
-{
-    return Image::height();		// Don't call ImageBase::height!
-}
-
-template <class T, class ALLOC> ImageBase::Type
-Image<T, ALLOC>::_defaultType() const
-{
-    return Image::defaultType();
-}
-
-template <class T, class ALLOC> inline ImageBase::Type
-Image<T, ALLOC>::defaultType() const
-{
-    return ImageBase::type2type<T>::value;
-}
-
-template <class T, class ALLOC> void
-Image<T, ALLOC>::_resize(size_t h, size_t w, const TypeInfo&)
-{
-    Image<T, ALLOC>::resize(h, w);	// Don't call ImageBase::resize!
 }
 
 /************************************************************************
@@ -1629,10 +2158,10 @@ Image<T, ALLOC>::_resize(size_t h, size_t w, const TypeInfo&)
 /*!
   個々の行や画素にアクセスすることはできない．
 */
-class GenericImage : public ImageBase
+class GenericImage : public ImageBase<GenericImage>
 {
   private:
-    using array2_type = Array2<char>;
+    using array2_type	= Array2<char>;
 
   public:
     using pointer	= array2_type::pointer;
@@ -1640,74 +2169,63 @@ class GenericImage : public ImageBase
     
   public:
   //! 総称画像を生成する．
-    GenericImage() :_a(), _typeInfo(U_CHAR), _colormap(0)		{}
+    GenericImage() :_a(), _format(ImageFormat::U_CHAR), _colormap(0)	{}
 
-    pointer		data()						;
-    const_pointer	data()					const	;
-    const TypeInfo&	typeInfo()				const	;
-    std::istream&	restore(std::istream& in)			;
-    std::ostream&	save(std::ostream& out)			const	;
-    std::istream&	restoreData(std::istream& in)			;
-    std::ostream&	saveData(std::ostream& out)		const	;
-    
-  private:
-    virtual size_t	_width()				const	;
-    virtual size_t	_height()				const	;
-    virtual Type	_defaultType()				const	;
-    virtual void	_resize(size_t h, size_t w,
-				const TypeInfo& typeInfo)		;
+    pointer		data()				{ return _a.data(); }
+    const_pointer	data()			const	{ return _a.data(); }
+    size_t		nrow()			const	{ return _a.nrow(); }
+    size_t		ncol() const
+			{
+			    return (_a.ncol()*8) / _format.depth();
+			}
 
+  //! 現在保持している画像のタイプ情報を返す．
+  /*!
+    \return	タイプ情報
+  */
+    const ImageFormat&	format()		const	{ return _format; }
+
+  //! 入力ストリームから画像を読み込む．
+  /*!
+    \param in	入力ストリーム
+    \return	inで指定した入力ストリーム
+  */
+    std::istream&	restore(std::istream& in)
+			{
+			    restoreHeader(in);
+			    return restoreData(in);
+			}
+
+  //! 出力ストリームに画像を書き出す．
+  /*!
+    \param out	出力ストリーム
+    \return	outで指定した出力ストリーム
+  */
+    std::ostream&	save(std::ostream& out) const
+			{
+			    saveHeader(out, _format.type());
+			    return saveData(out);
+			}
+    std::istream&	restoreData(std::istream& in)		;
+    std::ostream&	saveData(std::ostream& out)	const	;
+
+    ImageFormat::Type	defaultType() const
+			{
+			    return _format.type();
+			}
+    void		resize(size_t h, size_t w,
+			       const ImageFormat& format)
+			{
+			    _format = format;
+			    w = (_format.depth()*w + 7) / 8;
+			    _a.resize(h, w);
+			}
+			       
   private:
     array2_type		_a;
-    TypeInfo		_typeInfo;
+    ImageFormat		_format;
     Array<BGRA>		_colormap;
 };
-
-inline GenericImage::pointer
-GenericImage::data()
-{
-    return _a.data();
-}
-    
-inline GenericImage::const_pointer
-GenericImage::data() const
-{
-    return _a.data();
-}
-    
-//! 現在保持している画像のタイプ情報を返す．
-/*!
-  \return	タイプ情報
-*/
-inline const ImageBase::TypeInfo&
-GenericImage::typeInfo() const
-{
-    return _typeInfo;
-}
-
-//! 入力ストリームから画像を読み込む．
-/*!
-  \param in	入力ストリーム
-  \return	inで指定した入力ストリーム
-*/
-inline std::istream&
-GenericImage::restore(std::istream& in)
-{
-    restoreHeader(in);
-    return restoreData(in);
-}
-
-//! 出力ストリームに画像を書き出す．
-/*!
-  \param out	出力ストリーム
-  \return	outで指定した出力ストリーム
-*/
-inline std::ostream&
-GenericImage::save(std::ostream& out) const
-{
-    saveHeader(out, _typeInfo.type);
-    return saveData(out);
-}
 
 }
 #endif	// !TU_IMAGEPP_H
