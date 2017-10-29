@@ -69,38 +69,33 @@ class Buf : public BufTraits<T, ALLOC>
     using const_base_iterator	= typename super::const_iterator;
 
   // このバッファの総容量をコンパイル時に計算
-    template <size_t SIZE_, size_t... SIZES_>
-    struct cap
-    {
-	constexpr static size_t	value = SIZE_ * cap<SIZES_...>::value;
-    };
-    template <size_t SIZE_>
-    struct cap<SIZE_>
-    {
-      private:
-	constexpr static auto	n = (super::Alignment ?
-				     lcm(sizeof(T), super::Alignment) /
-				     sizeof(T) :
-				     1);
-
-      public:
-	constexpr static size_t value = n*((SIZE_ + n - 1)/n);
-    };
+    constexpr static size_t	cap(size_t size)
+				{
+				    constexpr size_t
+					n = (super::Alignment ?
+					     lcm(sizeof(T),
+						 super::Alignment)/sizeof(T) :
+					     1);
+				    return n*((size + n - 1)/n);
+				}
+    template <class... SIZES_>
+    constexpr static size_t	cap(size_t size, SIZES_... sizes)
+				{
+				    return size * cap(sizes...);
+				}
 
   // このバッファの各軸のサイズをコンパイル時に計算
-    template <size_t I_, size_t SIZE_, size_t... SIZES_>
-    struct nth
-    {
-	constexpr static size_t	value = nth<I_-1, SIZES_...>::value;
-    };
-    template <size_t SIZE_, size_t... SIZES_>
-    struct nth<0, SIZE_, SIZES_...>
-    {
-	constexpr static size_t	value = SIZE_;
-    };
+    constexpr static size_t	siz(size_t)
+				{
+				    return 0;
+				}
+    template <class... SIZES_>
+    constexpr static size_t	siz(size_t axis, size_t size, SIZES_... sizes)
+				{
+				    return (axis == 0 ?
+					    size : siz(axis - 1, sizes...));
+				}
 
-    template <size_t I_>
-    using siz			= nth<I_, SIZE, SIZES...>;
     template <size_t I_>
     using axis			= std::integral_constant<size_t, I_>;
     
@@ -138,19 +133,17 @@ class Buf : public BufTraits<T, ALLOC>
 		}
 
     template <size_t I_=0>
-    constexpr static auto	size()		{ return siz<I_>::value; }
-    constexpr static ptrdiff_t	stride()
-		   		{
-				    return cap<size<rank()-1>()>::value;
-				}
-    constexpr static auto	nrow()		{ return siz<0>::value; }
-    constexpr static auto	ncol()		{ return siz<1>::value; }
-    constexpr static auto	capacity()
+    constexpr static auto	size()
 				{
-				    return cap<SIZE, SIZES...>::value;
+				    return siz(I_, SIZE, SIZES...);
 				}
-    auto	data()		{ return _a.data(); }
-    auto	data()	const	{ return _a.data(); }
+    constexpr static ptrdiff_t	stride()	{ return cap(size<rank()-1>());}
+    constexpr static auto	nrow()		{ return size<0>(); }
+    constexpr static auto	ncol()		{ return size<1>(); }
+    constexpr static auto	capacity()	{ return cap(SIZE, SIZES...); }
+    
+    auto	data()				{ return _a.data(); }
+    auto	data()			const	{ return _a.data(); }
     auto	begin()
 		{
 		    return make_iterator<SIZES...>(base_iterator(data()));
@@ -225,7 +218,9 @@ class Buf : public BufTraits<T, ALLOC>
 		}
 
   private:
-    alignas(super::Alignment) std::array<T, capacity()>	_a;
+  // nvcc-9.0.176 のバグ回避のため capacity() を使わない（完全に回避できていない)
+  //alignas(super::Alignment) std::array<T, capacity()>	_a;
+    alignas(super::Alignment) std::array<T, cap(SIZE, SIZES...)>	_a;
 };
 
 //! 可変長多次元バッファクラス
