@@ -708,7 +708,7 @@ Intrinsic<T>::u(const point2_type& x, matrix_type* J, matrix_type* H) const
     
     return super::u(x, J, H);
 }
-    
+
 /************************************************************************
 *  class IntrinsicWithDistortion<I>					*
 ************************************************************************/
