@@ -1420,16 +1420,16 @@ ImageBase<IMAGE>::restorePBMHeader(std::istream& in)
     in >> c >> std::ws;		// Read pbm type and skip trailing white spaces.
     switch (c)
     {
-      case static_cast<int>(ImageFormat::U_CHAR):
+      case ImageFormat::U_CHAR:
 	type = ImageFormat::U_CHAR;
 	break;
-      case static_cast<int>(ImageFormat::RGB_24):
+      case ImageFormat::RGB_24:
 	type = ImageFormat::RGB_24;
 	break;
       default:
 	throw std::runtime_error("TU::ImageBase::restorePBMHeader: unknown pbm type!!");
     }
-    
+
   // Process comment lines.
     bool	legacy = false;	// legacy style of dist. param. representation
     for (; (c = in.get()) == '#'; in >> skipl)
@@ -1520,7 +1520,7 @@ ImageBase<IMAGE>::restorePBMHeader(std::istream& in)
 	}
     }
     in.putback(c);
-
+#  ifndef __NVCC__	// nvcc-9.0.176 cannot compile Camera++.h.
     if (legacy)
     {
 	Camera<Intrinsic<double> >	camera(P);
@@ -1528,7 +1528,7 @@ ImageBase<IMAGE>::restorePBMHeader(std::istream& in)
 	d1 *= (k * k);
 	d2 *= (k * k * k * k);
     }
-
+#  endif
     size_t	w, h;
     in >> w >> h;
     resize(h, w, type);				// set width & height
