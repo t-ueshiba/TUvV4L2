@@ -83,7 +83,7 @@ class SADStereo : public StereoBase<SADStereo<SCORE, DISP> >
     {
 	Parameters()	:windowSize(11), intensityDiffMax(20),
 			 derivativeDiffMax(20), blend(0)		{}
-
+	
 	std::istream&	get(std::istream& in)
 			{
 			    super::Parameters::get(in);
