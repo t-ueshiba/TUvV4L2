@@ -122,13 +122,23 @@
   - #TU::Mesh
 
   <b>アルゴリズム</b>
-  - #TU::pull_if(Iter, Iter, Pred)
   - #TU::diff(const T&, const T&)
-  - #TU::op3x3(Iterator begin, Iterator end, OP op)
-  - #TU::max3x3(P p, P q, P r)
-  - #TU::min3x3(P p, P q, P r)
-  - #TU::mopOpen(Iterator begin, Iterator end, size_t niter)
-  - #TU::mopClose(Iterator begin, Iterator end, size_t niter)
+  - #TU::gcd(S, T)
+  - #TU::gcd(S, T, ARGS...)
+  - #TU::lcm(S, T)
+  - #TU::lcm(S, T, ARGS...)
+  - #TU::for_each(ITER, ARG, FUNC)
+  - #TU::fill(ITER, ARG, const T&)
+  - #TU::for_each(ITER0, ARG, ITER1, FUNC)
+  - #TU::copy(IN, ARG, OUT)
+  - #TU::inner_product(ITER0, ARG, ITER1, T)
+  - #TU::square(ITER, ARG)
+  - #TU::square(T)
+  - #TU::op3x3(ROW, ROW, OP)
+  - #TU::max3x3(COL, COL, COL)
+  - #TU::min3x3(COL, COL, COL)
+  - #TU::mopOpen(ROW, ROW, size_t)
+  - #TU::mopClose(ROW, ROW, size_t)
 
   <b>関数オブジェクト</b>
   - #TU::identity
@@ -140,12 +150,6 @@
   - #TU::bit_and_assign
   - #TU::bit_or_assign
   - #TU::bit_xor_assign
-  - #TU::square()
-  - #TU::length()
-  - #TU::square_distance()
-  - #TU::distance()
-  - #TU::gcd()
-  - #TU::lcm()
 
   <b>反復子</b>
   - #TU::make_mbr_iterator()

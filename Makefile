@@ -117,7 +117,6 @@ HDRS		= TU/Array++.h \
 		TU/simd/arm/type_traits.h \
 		TU/simd/arm/vec.h \
 		TU/simd/arm/zero.h \
-		TU/simd/assignment_iterator.h \
 		TU/simd/bit_shift.h \
 		TU/simd/cast.h \
 		TU/simd/compare.h \
