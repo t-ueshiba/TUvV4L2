@@ -21,6 +21,8 @@ ifeq ($(shell arch), armv7l)
 else ifeq ($(shell arch), aarch64)
   CPPFLAGS     += -DNEON
 else
+#  CPPFLAGS     += -DAVX2
+#  CFLAGS       += -mavx2
   CPPFLAGS     += -DSSE4
   CFLAGS       += -msse4
 endif
@@ -76,7 +78,6 @@ HDRS		= TU/Array++.h \
 		TU/Ransac.h \
 		TU/Rectify.h \
 		TU/SADStereo.h \
-		TU/SADStereo2.h \
 		TU/SHOT602.h \
 		TU/SURFCreator.h \
 		TU/SeparableFilter2.h \
