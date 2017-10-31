@@ -3,6 +3,7 @@ SUBDIR	= BandMatrix		\
 	  BoxFilter		\
 	  BoxFilter2		\
 	  DP			\
+	  EdgeDetector		\
 	  FIRFilter		\
 	  GraphCuts		\
 	  GuidedFilter		\
