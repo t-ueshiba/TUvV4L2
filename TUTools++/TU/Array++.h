@@ -68,15 +68,14 @@ class Buf : public BufTraits<T, ALLOC>
     using base_iterator		= typename super::iterator;
     using const_base_iterator	= typename super::const_iterator;
 
+    constexpr static size_t	Unit = (super::Alignment ?
+					lcm(sizeof(T),
+					    super::Alignment)/sizeof(T) : 1);
+    
   // このバッファの総容量をコンパイル時に計算
     constexpr static size_t	cap(size_t size)
 				{
-				    constexpr size_t
-					n = (super::Alignment ?
-					     lcm(sizeof(T),
-						 super::Alignment)/sizeof(T) :
-					     1);
-				    return n*((size + n - 1)/n);
+				    return Unit*((size + Unit - 1)/Unit);
 				}
     template <class... SIZES_>
     constexpr static size_t	cap(size_t size, SIZES_... sizes)
@@ -218,7 +217,7 @@ class Buf : public BufTraits<T, ALLOC>
 		}
 
   private:
-  // nvcc-9.0.176 のバグ回避のため capacity() を使わない（完全に回避できていない)
+  // nvcc-9.0.176 のバグ回避のため capacity() を使わない
   //alignas(super::Alignment) std::array<T, capacity()>	_a;
     alignas(super::Alignment) std::array<T, cap(SIZE, SIZES...)>	_a;
 };
