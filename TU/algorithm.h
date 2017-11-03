@@ -139,7 +139,8 @@
   - #TU::min3x3(COL, COL, COL)
   - #TU::mopOpen(ROW, ROW, size_t)
   - #TU::mopClose(ROW, ROW, size_t)
-
+  - #TU::inclusive_scan(IN, IN, OUT)
+  
   <b>関数オブジェクト</b>
   - #TU::identity
   - #TU::plus_assign
@@ -198,6 +199,7 @@
 #include <algorithm>		// for std::copy(), std::copy_n(),...
 #include <numeric>		// for std::inner_product()
 #include <utility>		// for std::forward()
+#include <functional>		// for std::plus<>
 #ifdef TU_DEBUG
 #  include <iostream>
 #endif
@@ -721,6 +723,26 @@ mopClose(ROW row, ROW rowe, size_t niter=1)
 	op3x3(row, rowe, max3x3<col_iterator>);	// 膨張(dilation)
     for (size_t n = 0; n < niter; ++n)
 	op3x3(row, rowe, min3x3<col_iterator>);	// 収縮(erosion)
+}
+    
+//! 先頭要素がそのまま出力されるscan演算を行う．
+/*
+  \param in	入力の先頭を指す反復子
+  \param ie	入力の末尾の次を指す反復子
+  \param out	出力の先頭を指す反復子
+  \return	出力の末尾の次を指す反復子
+*/
+template <class IN, class OUT, class OP=std::plus<> > OUT
+inclusive_scan(IN in, IN ie, OUT out, OP op=OP())
+{
+    if (in != ie)
+	for (*out = *in; ++in != ie; )
+	{
+	    const auto	prev = out;
+	    *++out = op(*prev, *in);
+	}
+
+    return out;
 }
     
 }	// namespace TU
