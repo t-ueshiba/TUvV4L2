@@ -139,7 +139,7 @@
   - #TU::min3x3(COL, COL, COL)
   - #TU::mopOpen(ROW, ROW, size_t)
   - #TU::mopClose(ROW, ROW, size_t)
-  - #TU::inclusive_scan(IN, IN, OUT)
+  - #TU::inclusive_scan(IN, IN, OUT, OP)
   
   <b>関数オブジェクト</b>
   - #TU::identity
@@ -688,7 +688,7 @@ min3x3(COL p, COL q, COL r)
 }
 
 //! morphological open演算をin-placeで行う．
-/*
+/*!
   指定された回数だけ収縮(erosion)を行った後，同じ回数だけ膨張(dilation)を行う．
   \param row	最初の行を示す反復子
   \param rowe	最後の行の次を示す反復子
@@ -707,7 +707,7 @@ mopOpen(ROW row, ROW rowe, size_t niter=1)
 }
 
 //! morphological close演算をin-placeで行う．
-/*
+/*!
   指定された回数だけ膨張(dilation)を行った後，同じ回数だけ収縮(erosion)を行う．
   \param row	最初の行を示す反復子
   \param rowe	最後の行の次を示す反復子
@@ -726,10 +726,11 @@ mopClose(ROW row, ROW rowe, size_t niter=1)
 }
     
 //! 先頭要素がそのまま出力されるscan演算を行う．
-/*
+/*!
   \param in	入力の先頭を指す反復子
   \param ie	入力の末尾の次を指す反復子
   \param out	出力の先頭を指す反復子
+  \param op	結合律を滿たす2変数演算子
   \return	出力の末尾の次を指す反復子
 */
 template <class IN, class OUT, class OP=std::plus<> > OUT
