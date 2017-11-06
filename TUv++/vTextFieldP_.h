@@ -26,6 +26,7 @@
 #define V_TEXTFIELDP_H
 
 #include <X11/Core.h>
+#include <X11/Xaw3d/Xaw3dP.h>
 #include <X11/Xaw3d/ThreeDP.h>
 #include "vTextField_.h"
 

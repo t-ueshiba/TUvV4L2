@@ -30,6 +30,7 @@
 #include "SliderCmd_.h"
 #include "vSlider_.h"
 #include "vGridbox_.h"
+#include <X11/Xaw3d/ThreeD.h>
 #include <X11/Xaw3d/Label.h>
 #include <cmath>
 #include <sstream>
@@ -62,6 +63,7 @@ SliderCmd::SliderCmd(Object& parentObject, const CmdDef& cmd)
 				    _widget,
 				    XtNlabel,		cmd.title,
 				    XtNborderWidth,	0,
+				    XtNrelief,		XtReliefNone,
 				    XtNfill,		"none",
 				    XtNgravity,		EastGravity,
 				    XtNgridx,		0,
@@ -88,6 +90,7 @@ SliderCmd::SliderCmd(Object& parentObject, const CmdDef& cmd)
 				   labelWidgetClass,
 				   _widget,
 				   XtNborderWidth,	1,
+				   XtNrelief,		XtReliefNone,
 				   XtNfill,		"none",
 				   XtNgravity,		EastGravity,
 				   XtNgridx,		2,
