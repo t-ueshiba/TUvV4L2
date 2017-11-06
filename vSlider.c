@@ -110,7 +110,11 @@ static XtResource resources[] = {
   {XtNpickTop, XtCPickTop, XtRBoolean, sizeof(Boolean),
        Offset(slider.pick_top), XtRBoolean, (XtPointer) False},
   {XtNminimumThumb, XtCMinimumThumb, XtRDimension, sizeof(Dimension),
-       Offset(slider.min_thumb), XtRImmediate, (XtPointer) 7}
+       Offset(slider.min_thumb), XtRImmediate, (XtPointer) 7},
+  {XtNshadowWidth, XtCShadowWidth, XtRDimension, sizeof(Dimension),
+       Offset(threeD.shadow_width), XtRImmediate, (XtPointer)2},
+  {XtNrelief, XtCRelief, XtRInt, sizeof(int),
+       Offset(threeD.relief), XtRImmediate, (XtPointer)XtReliefRaised},
 };
 #undef Offset
 

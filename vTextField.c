@@ -34,35 +34,38 @@
 
 #include "vTextFieldP_.h"
 
-#define offset(field) XtOffsetOf(TextFieldRec, text.field)
+#define offset(field) XtOffsetOf(TextFieldRec, field)
 static XtResource resources[] =
 {
   {XtNallowSelection, XtCBoolean, XtRBoolean, sizeof(Boolean),
-    offset(AllowSelection), XtRString, "True"},
+    offset(text.AllowSelection), XtRString, "True"},
   {XtNdisplayCaret, XtCBoolean, XtRBoolean, sizeof(Boolean),
-    offset(DisplayCursor), XtRString, "True"},
+    offset(text.DisplayCursor), XtRString, "True"},
   {XtNecho, XtCBoolean, XtRBoolean, sizeof(Boolean),
-    offset(Echo), XtRString, "True"},
+    offset(text.Echo), XtRString, "True"},
   {XtNeditable, XtCBoolean, XtRBoolean, sizeof(Boolean),
-    offset(Editable), XtRString, "True"},
+    offset(text.Editable), XtRString, "True"},
   {XtNfont, XtCFont, XtRFontStruct, sizeof(XFontStruct *),
-    offset(font), XtRString, XtDefaultFont},
+    offset(text.font), XtRString, XtDefaultFont},
   {XtNforeground, XtCForeground, XtRPixel, sizeof(Pixel),
-    offset(foreground_pixel), XtRString, XtDefaultForeground},
+    offset(text.foreground_pixel), XtRString, XtDefaultForeground},
   {XtNinsertPosition, XtCInsertPosition, XtRInt, sizeof(int),
-    offset(CursorPos), XtRString, "0"},
+    offset(text.CursorPos), XtRString, "0"},
   {XtNlength, XtCLength, XtRInt, sizeof(int),
-    offset(TextMaxLen), XtRString, "0"},
+    offset(text.TextMaxLen), XtRString, "0"},
   {XtNmargin, XtCMargin, XtRDimension, sizeof(Dimension),
-    offset(Margin), XtRString, "3"},
+    offset(text.Margin), XtRString, "3"},
   {XtNpendingDelete, XtCBoolean, XtRBoolean, sizeof(Boolean),
-    offset(PendingDelete), XtRString, "True"},
+    offset(text.PendingDelete), XtRString, "True"},
   {XtNstring, XtCString, XtRString, sizeof(char *),
-    offset(DefaultString), XtRString, NULL},
+    offset(text.DefaultString), XtRString, NULL},
   {XtNactivateCallback, XtCCallback, XtRCallback, sizeof(XtPointer),
-    offset(ActivateCallback), XtRCallback, NULL},
+    offset(text.ActivateCallback), XtRCallback, NULL},
+  {XtNshadowWidth, XtCShadowWidth, XtRDimension, sizeof(Dimension),
+    offset(threeD.shadow_width), XtRImmediate, (XtPointer)2},
+  {XtNrelief, XtCRelief, XtRInt, sizeof(int),
+    offset(threeD.relief), XtRImmediate, (XtPointer)XtReliefSunken},
 };
-
 #undef offset
 
 static void Initialize();
@@ -161,8 +164,9 @@ TextFieldClassRec textfieldClassRec =
   {
 	/* shadowdraw		*/ XtInheritXaw3dShadowDraw
   },
+/* TextField class fields initialization */
   {
-    0				/* some stupid compilers barf on empty structures */
+	/* dummy		*/ 0
   }
 };
 
@@ -340,7 +344,8 @@ Redisplay(Widget aw, XExposeEvent * event, Region region)
   if (!XtIsRealized(aw))
     return;
   if (w->threeD.shadow_width > 0)
-    (*wclass->threeD_class.shadowdraw)(w, event, region, w->threeD.relief, False);
+    (*wclass->threeD_class.shadowdraw)(w, event, region, w->threeD.relief,
+				       True);
   
   Draw(w);
 }
@@ -804,7 +809,8 @@ ExtendAdjust(Widget aw, XEvent * event, String * params, Cardinal * num_params)
     if (w->text.timer_id)
       ExtendHighlight(w);
     else
-      ExtendTimer((XtPointer) w, (XtIntervalId) 0);
+      //ExtendTimer((XtPointer) w, (XtIntervalId) 0);
+      ExtendTimer((XtPointer) w, 0);
   }
   else {
     if (w->text.timer_id) {
@@ -924,7 +930,7 @@ static void
 InsertSelection(Widget aw, XEvent * event, String * params, Cardinal * num_params)
 {
   TextFieldWidget w = (TextFieldWidget) aw;
-  int pos;
+  intptr_t pos;
 
   if (!w->text.AllowSelection)
     return;
