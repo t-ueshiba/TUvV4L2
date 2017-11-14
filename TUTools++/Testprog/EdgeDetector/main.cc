@@ -127,7 +127,7 @@ main(int argc, char* argv[])
 
 	Image<RGB>	out;
 	superImpose(in, edge, out);
-	out.save(cout, ImageBase::RGB_24);
+	out.save(cout, ImageFormat::RGB_24);
     }
     catch (exception& err)
     {

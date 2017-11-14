@@ -104,6 +104,8 @@ extern const ColorConverter	colorConverter;
 struct RGB
 {
     using element_type = u_char;
+
+    constexpr static size_t	size = 3;
     
     RGB(element_type rr, element_type gg, element_type bb)
 	:r(rr), g(gg), b(bb)						{}
@@ -114,6 +116,8 @@ struct RGB
 struct BGR
 {
     using element_type = u_char;
+
+    constexpr static size_t	size = 3;
     
     BGR(element_type rr, element_type gg, element_type bb)
 	:b(bb), g(gg), r(rr)						{}
@@ -124,6 +128,8 @@ struct BGR
 struct RGBA
 {
     using element_type = u_char;
+
+    constexpr static size_t	size = 4;
     
     RGBA(element_type rr, element_type gg, element_type bb,
 	 element_type aa=255)	:r(rr), g(gg), b(bb), a(aa)		{}
@@ -134,6 +140,8 @@ struct RGBA
 struct ABGR
 {
     using element_type = u_char;
+
+    constexpr static size_t	size = 4;
     
     ABGR(element_type rr, element_type gg, element_type bb,
 	 element_type aa=255)	:a(aa), b(bb), g(gg), r(rr)		{}
@@ -144,7 +152,9 @@ struct ABGR
 struct ARGB
 {
     using element_type = u_char;
-    
+
+    constexpr static size_t	size = 4;
+
     ARGB(element_type rr, element_type gg, element_type bb,
 	 element_type aa=255)	:a(aa), r(rr), g(gg), b(bb)		{}
     
@@ -154,6 +164,8 @@ struct ARGB
 struct BGRA
 {
     using element_type = u_char;
+
+    constexpr static size_t	size = 4;
     
     BGRA(element_type rr, element_type gg, element_type bb,
 	 element_type aa=255)	:b(bb), g(gg), r(rr), a(aa)		{}
@@ -330,6 +342,7 @@ using BGRA = RGB_<detail::BGRA>;
 struct YUV444
 {
     using element_type = u_char;
+    constexpr static size_t	size = 3;
 
     YUV444(element_type yy=0, element_type uu=128, element_type vv=128)
 		    :u(uu), y(yy), v(vv)				{}
@@ -388,6 +401,7 @@ struct YUYV422;
 struct YUV422
 {
     using element_type = u_char;
+    constexpr static size_t	size = 2;
 
     YUV422(element_type yy=0, element_type xx=128)	:x(xx), y(yy)	{}
     YUV422(const YUYV422& p)						;
@@ -423,6 +437,7 @@ operator <<(std::ostream& out, const YUV422& yuv)
 struct YUYV422
 {
     using element_type = u_char;
+    constexpr static size_t	size = 2;
 
     YUYV422(element_type yy=0, element_type xx=128)	:y(yy), x(xx)	{}
     YUYV422(const YUV422& p)				:y(p.y), x(p.x)	{}
@@ -461,6 +476,8 @@ YUV422::YUV422(const YUYV422& p)  :x(p.x), y(p.y)	{}
 struct YUV411
 {
     using element_type = u_char;
+
+    constexpr static size_t	size = 3;
 
     YUV411(element_type yy0=0, element_type yy1=0, element_type xx=128)
 	:x(xx), y0(yy0), y1(yy1)					{}
