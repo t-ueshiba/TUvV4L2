@@ -1396,7 +1396,7 @@ ImageBase<IMAGE>::restoreHeader(std::istream& in)
 	return restoreBMPHeader(in);
       default:
 	throw std::runtime_error("TU::ImageBase::restoreHeader: neighter PBM nor BMP file!!");
-	break;
+    	break;
     }
 
     return ImageFormat::DEFAULT;
