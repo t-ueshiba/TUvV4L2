@@ -136,7 +136,7 @@ MyCmdWindow<T, G>::filter()
 template <class T, class G> void
 MyCmdWindow<T, G>::tick()
 {
-    _image.restoreData(std::cin, ImageBase::U_CHAR);
+    _image.restoreData(std::cin, ImageFormat::U_CHAR);
     filter();
 }
 
