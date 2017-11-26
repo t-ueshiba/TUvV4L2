@@ -10,6 +10,9 @@
 #include <initializer_list>
 #include "TU/iterator.h"
 #include "TU/algorithm.h"
+#if defined(__NVCC__)
+#  include "TU/cuda/tuple.h"
+#endif
 
 namespace TU
 {
@@ -368,8 +371,10 @@ class range
     template <class E_> std::enable_if_t<rank<E_>() != 0, range&>
 		operator =(const E_& expr)
 		{
+		    using	std::cbegin;
+		    
 		    assert(TU::size(expr) == SIZE);
-		    copy<SIZE>(std::cbegin(expr), SIZE, _begin);
+		    copy<SIZE>(cbegin(expr), SIZE, _begin);
 		    return *this;
 		}
 
@@ -458,8 +463,10 @@ class range<ITER, 0>
     template <class E_> std::enable_if_t<rank<E_>() != 0, range&>
 		operator =(const E_& expr)
 		{
+		    using	std::cbegin;
+		    
 		    assert(TU::size(expr) == _size);
-		    copy<TU::size0<E_>()>(std::cbegin(expr), _size, _begin);
+		    copy<TU::size0<E_>()>(cbegin(expr), _size, _begin);
 		    return *this;
 		}
 		
@@ -560,31 +567,53 @@ namespace detail
   struct iterator_stride
   {
     private:
+    // ITER が boost::iterator_adaptor から派生している場合，
+    // 元になっている反復子を抽出
       template <class ITER_, class BASE_, class VAL_,
 		class CAT_,  class REF_,  class DIFF_>
       static BASE_	check_base_type(
 			    boost::iterator_adaptor<ITER_, BASE_, VAL_,
 						    CAT_, REF_, DIFF_>)	;
+#if 0
+    //#if defined(__NVCC__)
+    // ITER が thrust::iterator_adaptor から派生している場合，
+    // 元になっている反復子を抽出
+      template <class ITER_, class BASE_, class VAL_,
+		class SYS_, class CAT_,  class REF_,  class DIFF_>
+      static BASE_	check_base_type(
+			    thrust::iterator_adaptor<ITER_, BASE_, VAL_, SYS_,
+						     CAT_, REF_, DIFF_>);
+#endif
       static void	check_base_type(...)				;
       using base_type	= decltype(check_base_type(std::declval<ITER>()));
-
-      template <class ITER_>
-      static auto	check_difference(ITER_)
-			    -> iterator_difference<ITER_>		;
-      static ptrdiff_t	check_difference(...)				;
-      using diff_type	= decltype(check_difference(std::declval<ITER>()));
       
     public:
       using type	= typename std::conditional_t<
-				       std::is_void<base_type>::value,
-				       identity<diff_type>,
-				       iterator_stride<base_type> >::type;
+					std::is_void<base_type>::value,
+					identity<iterator_difference<ITER> >,
+					iterator_stride<base_type> >::type;
   };
   template <class... ITER_>
   struct iterator_stride<zip_iterator<std::tuple<ITER_...> > >
   {
       using type	= std::tuple<typename iterator_stride<ITER_>::type...>;
   };
+#if 0
+  //#if defined(__NVCC__)
+  template <class ITER_TUPLE>
+  struct iterator_stride<thrust::zip_iterator<ITER_TUPLE> >
+  {
+      struct iter_stride
+      {
+	  template <class ITER_> typename iterator_stride<ITER_>::type
+	  operator ()(ITER_)					const	;
+      };
+      
+      using type	= decltype(thrust::tuple_transform(
+				       iter_stride(),
+				       std::declval<ITER_TUPLE>()));
+  };
+#endif
 }	// namespace detail
 
 template <class ITER>
@@ -736,7 +765,26 @@ class range_iterator
 		    advance(const_cast<typename ITER_::base_type&>(iter.base()),
 			    stride);
 		}
-
+#if 0
+  //#if defined(__NVCC__)
+    template <class ITER_TUPLE_, class STRIDE_, class TAIL_>
+    static void	advance(thrust::zip_iterator<ITER_TUPLE_>& iter,
+			thrust::detail::cons<STRIDE_, TAIL_> stride)
+		{
+		    tuple_for_each([](auto&& x, auto y)
+				   { range_iterator::advance(x, y); },
+				   const_cast<ITER_TUPLE_&>(
+				       iter.get_iterator_tuple()),
+				   stride);
+		}
+    template <class ITER_, class STRIDE_, class TAIL_>
+    static void	advance(ITER_& iter,
+			thrust::detail::cons<STRIDE_, TAIL_> stride)
+		{
+		    advance(const_cast<typename ITER_::base_type&>(iter.base()),
+			    stride);
+		}
+#endif
     template <class STRIDE_>
     static auto	leftmost(STRIDE_ stride)
 		{
@@ -770,7 +818,16 @@ stride(const zip_iterator<ITER_TUPLE>& iter)
     return tuple_transform([](const auto& it){ return stride(it); },
 			   iter.get_iterator_tuple());
 }
-
+#if 0
+  //#if defined(__NVCC__)
+template <class ITER_TUPLE> inline auto
+stride(const thrust::zip_iterator<ITER_TUPLE>& iter)
+{
+    return tuple_transform([](const auto& it){ return stride(it); },
+			   iter.get_iterator_tuple());
+}
+#endif
+    
 //! 固定長レンジを指し，インクリメント時に固定した要素数だけ進める反復子を生成する
 /*!
   \param STRIDE	インクリメント時に進める要素数
@@ -954,7 +1011,9 @@ template <class RANGE, class... IS,
 inline auto
 slice(RANGE&& r, size_t idx, size_t size, IS... is)
 {
-    return make_range(detail::make_slice_iterator(TU::begin(r) + idx, is...),
+    using	std::begin;
+    
+    return make_range(detail::make_slice_iterator(begin(r) + idx, is...),
 		      size);
 }
 
@@ -964,8 +1023,10 @@ template <size_t SIZE, size_t... SIZES, class RANGE, class... INDICES,
 inline auto
 slice(RANGE&& r, size_t idx, INDICES... indices)
 {
+    using	std::begin;
+    
     return make_range<SIZE>(detail::make_slice_iterator<SIZES...>(
-				TU::begin(r) + idx, indices...));
+				begin(r) + idx, indices...));
 }
 
 /************************************************************************
@@ -989,7 +1050,7 @@ slice(TUPLE&& t, ARGS... args)
 			   {
 			       return slice<SIZES...>(
 				   std::forward<decltype(x)>(x), args...);
-			   }, t);
+			   }, std::forward<TUPLE>(t));
 }
     
 /************************************************************************
@@ -1048,9 +1109,10 @@ make_column_iterator(ROW row, size_t nrows, size_t col)
 template <class E> inline auto
 column_begin(E&& expr)
 {
+    using		std::begin;
     constexpr auto	N = size0<std::remove_reference_t<E> >();
     
-    return make_column_iterator<N>(TU::begin(expr), TU::size(expr), 0);
+    return make_column_iterator<N>(begin(expr), TU::size(expr), 0);
 }
 
 template <class E> inline auto
@@ -1062,10 +1124,10 @@ column_cbegin(const E& expr)
 template <class E> inline auto
 column_end(E&& expr)
 {
+    using		std::begin;
     constexpr auto	N = size0<std::remove_reference_t<E> >();
     
-    return make_column_iterator<N>(TU::begin(expr), TU::size(expr),
-				   size<1>(expr));
+    return make_column_iterator<N>(begin(expr), TU::size(expr), size<1>(expr));
 }
 
 template <class E> inline auto
@@ -1292,9 +1354,10 @@ operator /(E&& expr, element_t<E> c)
 template <class E> inline std::enable_if_t<rank<E>() != 0, E&>
 operator *=(E&& expr, element_t<E> c)
 {
+    using		std::begin;
     constexpr size_t	N = size0<E>();
     
-    for_each<N>(TU::begin(expr), TU::size(expr), [c](auto&& x){ x *= c; });
+    for_each<N>(begin(expr), TU::size(expr), [c](auto&& x){ x *= c; });
     return expr;
 }
 
@@ -1307,9 +1370,10 @@ operator *=(E&& expr, element_t<E> c)
 template <class E> inline std::enable_if_t<rank<E>() != 0, E&>
 operator /=(E&& expr, element_t<E> c)
 {
+    using		std::begin;
     constexpr size_t	N = size0<E>();
     
-    for_each<N>(TU::begin(expr), TU::size(expr), [c](auto&& x){ x /= c; });
+    for_each<N>(begin(expr), TU::size(expr), [c](auto&& x){ x /= c; });
     return expr;
 }
 
@@ -1357,9 +1421,11 @@ template <class L, class R>
 inline std::enable_if_t<rank<L>() != 0 && rank<L>() == rank<R>(), L&>
 operator +=(L&& l, const R& r)
 {
+    using		std::begin;
+    using		std::cbegin;
     constexpr size_t	N = detail::max<size0<L>(), size0<R>()>::value;
     
-    for_each<N>(TU::begin(l), TU::size(l), std::cbegin(r),
+    for_each<N>(begin(l), TU::size(l), cbegin(r),
 		[](auto&& x, const auto& y){ x += y; });
     return l;
 }
@@ -1374,9 +1440,11 @@ template <class L, class R>
 inline std::enable_if_t<rank<L>() != 0 && rank<L>() == rank<R>(), L&>
 operator -=(L&& l, const R& r)
 {
+    using		std::begin;
+    using		std::cbegin;
     constexpr size_t	N = detail::max<size0<L>(), size0<R>()>::value;
     
-    for_each<N>(TU::begin(l), TU::size(l), std::cbegin(r),
+    for_each<N>(begin(l), TU::size(l), cbegin(r),
 		[](auto&& x, const auto& y){ x -= y; });
     return l;
 }

@@ -192,7 +192,8 @@ class zip_iterator : public boost::iterator_facade<
     ITER_TUPLE	_iter_tuple;
 };
 
-template <class ITER_TUPLE> inline zip_iterator<ITER_TUPLE>
+template <class ITER_TUPLE>
+inline std::enable_if_t<is_tuple<ITER_TUPLE>::value, zip_iterator<ITER_TUPLE> >
 make_zip_iterator(ITER_TUPLE iter_tuple)
 {
     return {iter_tuple};
@@ -294,8 +295,9 @@ template <class TUPLE,
 begin(TUPLE&& t)
 {
     return TU::make_zip_iterator(tuple_transform(
-  				     [](auto&& x){ return begin(x); },
-  				     std::forward<TUPLE>(t)));
+				     [](auto&& x)
+				 { using std::begin; return begin(x); },
+				 std::forward<TUPLE>(t)));
 }
 
 template <class TUPLE,
@@ -303,8 +305,9 @@ template <class TUPLE,
 end(TUPLE&& t)
 {
     return TU::make_zip_iterator(tuple_transform(
-  				     [](auto&& x){ return end(x); },
-				     std::forward<TUPLE>(t)));
+				 [](auto&& x)
+				 { using std::end; return end(x); },
+				 std::forward<TUPLE>(t)));
 }
 
 template <class TUPLE,
@@ -598,7 +601,9 @@ class row2col
     
     decltype(auto)	operator ()(argument_type row) const
 			{
-			    return *(TU::begin(row) + _col);
+			    using	std::begin;
+			    
+			    return *(begin(row) + _col);
 			}
     
   private:

@@ -1,6 +1,7 @@
 /*
  *  $Id$
  */
+#include <boost/core/demangle.hpp>
 #include "TU/Array++.h"
 
 namespace TU
@@ -55,9 +56,9 @@ zip_iterator_test()
     cout << "tuple_t: "
 	 << demangle(typeid(decltype(t)).name()) << endl << endl;
     cout << "begin(t): "
-	 << demangle(typeid(decltype(std::begin(t))).name()) << endl << endl;
+	 << demangle(typeid(decltype(begin(t))).name()) << endl << endl;
     cout << "begin(*begin(t): "
-	 << demangle(typeid(decltype(std::begin(*std::begin(t)))).name())
+	 << demangle(typeid(decltype(begin(*begin(t)))).name())
 	 << endl << endl;
 
   //cout << demangle(typeid(decltype(u)).name()) << endl << endl;
