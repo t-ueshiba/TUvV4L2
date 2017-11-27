@@ -85,6 +85,7 @@ RadioButtonCmd::RadioButtonCmd(Object& parentObject, const CmdDef& cmd)
 				    XtNinternalHeight,		3,
 				    XtNinternalWidth,		0,
 				    XtNborderWidth,		0,
+				    XtNrelief,			XtReliefNone,
 				    XtNhighlightThickness,	0,
 				    XtNgridx,			1,
 				    nullptr))
