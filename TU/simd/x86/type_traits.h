@@ -13,7 +13,9 @@ namespace simd
 /************************************************************************
 *  SIMD vector types							*
 ************************************************************************/
-#if defined(AVX2)
+#if defined(AVX512)
+  typedef __m512i	ivec_t;		//!< 整数ベクトルのSIMD型
+#elif defined(AVX2)
   typedef __m256i	ivec_t;		//!< 整数ベクトルのSIMD型
 #elif defined(SSE2)  
   typedef __m128i	ivec_t;		//!< 整数ベクトルのSIMD型
@@ -21,7 +23,9 @@ namespace simd
   typedef __m64		ivec_t;		//!< 整数ベクトルのSIMD型
 #endif
     
-#if defined(AVX)
+#if defined(AVX512)
+  typedef __m512	fvec_t;		//!< floatベクトルのSIMD型
+#elif defined(AVX)
   typedef __m256	fvec_t;		//!< floatベクトルのSIMD型
 #elif defined(SSE)
   typedef __m128	fvec_t;		//!< floatベクトルのSIMD型
@@ -29,7 +33,9 @@ namespace simd
   typedef char		fvec_t;		//!< ダミー
 #endif
 
-#if defined(AVX)
+#if defined(AVX512)
+  typedef __m512d	dvec_t;		//!< doubleベクトルのSIMD型
+#elif defined(AVX)
   typedef __m256d	dvec_t;		//!< doubleベクトルのSIMD型
 #elif defined(SSE2)
   typedef __m128d	dvec_t;		//!< doubleベクトルのSIMD型

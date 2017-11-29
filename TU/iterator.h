@@ -574,20 +574,17 @@ class assignment_iterator
     assignment_iterator(const FUNC& func, const ITER&... iter)
 	:assignment_iterator(
 	    std::integral_constant<bool, (sizeof...(ITER) > 1)>(),
-	    func, iter...)					{}
+	    func, iter...)						{}
 
-    const auto&	functor()				const	{ return _func; }
+    const auto&	functor()	const	{ return _func; }
 
   private:
     assignment_iterator(std::true_type,  const FUNC& func, const ITER&... iter)
-	:super(std::make_tuple(iter...)), _func(func)		{}
+	:super(std::make_tuple(iter...)), _func(func)			{}
     assignment_iterator(std::false_type, const FUNC& func, const ITER&... iter)
-	:super(iter...), _func(func)				{}
+	:super(iter...), _func(func)					{}
 
-    reference	dereference() const
-		{
-		    return {super::base(), _func};
-		}
+    reference	dereference()	const	{ return {super::base(), _func}; }
     
   private:
     FUNC 	_func;	// 代入を可能にするためconstは付けない
