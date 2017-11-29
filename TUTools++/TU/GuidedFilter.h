@@ -259,16 +259,19 @@ GuidedFilter2<T>::convolve(IN ib, IN ie,
 			make_map_iterator(init_params(),
 					  std::cbegin(*ib),
 					  std::cbegin(*gb)),
-			{stride(ib), stride(gb)}, TU::size(*ib)),
+			std::make_tuple(stride(ib), stride(gb)),
+			TU::size(*ib)),
 		    make_range_iterator(
 			make_map_iterator(init_params(),
 					  std::cbegin(*ie),
 					  std::cbegin(*ge)),
-			{stride(ie), stride(ge)}, TU::size(*ie)),
+			std::make_tuple(stride(ie), stride(ge)),
+			TU::size(*ie)),
 		    make_range_iterator(
 			make_assignment_iterator(init_coeffs(n, _e),
 						 c.begin()->begin()),
-			stride(c.begin()), c.ncol()));
+			stride(c.begin()),
+			c.ncol()));
 
   // 係数ベクトルの平均値を求め，それによってガイドデータ列を線型変換する．
     std::advance(gb, offsetV());
@@ -280,7 +283,8 @@ GuidedFilter2<T>::convolve(IN ib, IN ie,
 			    trans_guides(n),
 			    TU::begin(*gb)   + offsetH(),
 			    TU::begin(*out)) + (shift ? offsetH() : 0),
-			{stride(gb), stride(out)}, TU::size(*out)));
+			std::make_tuple(stride(gb), stride(out)),
+			TU::size(*out)));
 }
 
 //! 2次元入力データにguided filterを適用する
@@ -330,7 +334,8 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, OUT out, bool shift) const
 			    trans_guides(n),
 			    TU::begin(*ib)  + offsetH(),
 			    TU::begin(*out) + (shift ? offsetH() : 0)),
-			{stride(ib), stride(out)}, TU::size(*out)));
+			std::make_tuple(stride(ib), stride(out)),
+			TU::size(*out)));
 }
 
 }
