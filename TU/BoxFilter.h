@@ -146,14 +146,20 @@ class BoxFilter
     size_t	winSize()		const	{return _winSize;}
 
     template <class IN, class OUT>
-    void	convolve(IN ib, IN ie, OUT out)	const	;
+    void	convolve(IN ib, IN ie, OUT out, bool shift=false) const	;
 
   //! 与えられた長さの入力データ列に対する出力データ列の長さを返す
   /*!
-    \param inLen	入力データ列の長さ
+    \param inSize	入力データ列の長さ
     \return		出力データ列の長さ
    */
-    size_t	outLength(size_t inLen)	const	{return inLen + 1 - _winSize;}
+    size_t	outSize(size_t inSize)	const	{return inSize + 1 - _winSize;}
+
+  //! 入力データ列と対応づけるために出力データ列をシフトすべき量を返す
+  /*!
+    \return		出力データ列のシフト量
+  */
+    size_t	offset()		const	{return _winSize/2;}
 	
   private:
     size_t	_winSize;		//!< box filterのウィンドウ幅
@@ -164,11 +170,16 @@ class BoxFilter
   \param ib	1次元入力データ列の先頭を示す反復子
   \param ie	1次元入力データ列の末尾の次を示す反復子
   \param out	box filterを適用した出力データ列の先頭を示す反復子
+  \param shift	true ならば，入力データと対応するよう，出力位置を
+		offset() だけシフトする
   \return	出力データ列の末尾の次を示す反復子
 */
 template <class T> template <class IN, class OUT> void
-BoxFilter<T>::convolve(IN ib, IN ie, OUT out) const
+BoxFilter<T>::convolve(IN ib, IN ie, OUT out, bool shift) const
 {
+    if (shift)
+	std::advance(out, offset());
+    
     std::copy(make_box_filter_iterator<T>(ib, _winSize),
 	      make_box_filter_iterator<T>(ie), out);
 }
@@ -193,10 +204,10 @@ class BoxFilter2 : public Filter2<BoxFilter2<T> >
     \param wcol	box filterのウィンドウの列幅(幅)
    */	
 		BoxFilter2(size_t wrow=3, size_t wcol=3)
-		    :super(*this), _rowWinSize(wrow), _colFilter(wcol)
+		    :super(*this), _winSizeV(wrow), _colFilter(wcol)
 		{
-		    if (grainSize() < 2*_rowWinSize)
-			setGrainSize(2*_rowWinSize);
+		    if (grainSize() < 2*_winSizeV)
+			setGrainSize(2*_winSizeV);
 		}
     
   //! box filterのウィンドウの行幅(高さ)を設定する．
@@ -204,11 +215,11 @@ class BoxFilter2 : public Filter2<BoxFilter2<T> >
     \param wrow	box filterのウィンドウの行幅
     \return	このbox filter
    */
-    BoxFilter2&	setRowWinSize(size_t wrow)
+    BoxFilter2&	setWinSizeV(size_t wrow)
 		{
-		    _rowWinSize = wrow;
-		    if (grainSize() < 2*_rowWinSize)
-			setGrainSize(2*_rowWinSize);
+		    _winSizeV = wrow;
+		    if (grainSize() < 2*_winSizeV)
+			setGrainSize(2*_winSizeV);
 		    return *this;
 		}
 
@@ -217,7 +228,7 @@ class BoxFilter2 : public Filter2<BoxFilter2<T> >
     \param wcol	box filterのウィンドウの列幅
     \return	このbox filter
    */
-    BoxFilter2&	setColWinSize(size_t wcol)
+    BoxFilter2&	setWinSizeH(size_t wcol)
 		{
 		    _colFilter.setWinSize(wcol);
 		    return *this;
@@ -227,41 +238,47 @@ class BoxFilter2 : public Filter2<BoxFilter2<T> >
   /*!
     \return	box filterのウィンドウの行幅
    */
-    size_t	rowWinSize()	const	{ return _rowWinSize; }
+    size_t	winSizeV()		const	{return _winSizeV;}
 
   //! box filterのウィンドウ列幅(幅)を返す．
   /*!
     \return	box filterのウィンドウの列幅
    */
-    size_t	colWinSize()	const	{ return _colFilter.winSize(); }
+    size_t	winSizeH()		const	{return _colFilter.winSize();}
 
   //! 与えられた行幅(高さ)を持つ入力データ列に対する出力データ列の行幅を返す．
   /*!
-    \param inRowLength	入力データ列の行幅
+    \param inNrow	入力データ列の行幅
     \return		出力データ列の行幅
    */
-    size_t	outRowLength(size_t inRowLength) const
-		{
-		    return inRowLength + 1 - rowWinSize();
-		}
+    size_t	outSizeV(size_t nrow)	const	{return nrow + 1 - _winSizeV;}
     
   //! 与えられた列幅(幅)を持つ入力データ列に対する出力データ列の列幅を返す．
   /*!
-    \param inColLength	入力データ列の列幅
+    \param inNcol	入力データ列の列幅
     \return		出力データ列の列幅
    */
-    size_t	outColLength(size_t inColLength) const
-		{
-		    return inColLength + 1 - colWinSize();
-		}
+    size_t	outSizeH(size_t ncol)	const	{return _colFilter.outSize(ncol);}
 
-    size_t	overlap()	const	{ return rowWinSize() - 1; }
+  //! 入力データ列と対応づけるために出力データ列を行方向にシフトすべき量を返す
+  /*!
+    \return		出力データ列の行方向シフト量
+  */
+    size_t	offsetV()		const	{return _winSizeV/2;}
+	
+  //! 入力データ列と対応づけるために出力データ列を列方向にシフトすべき量を返す
+  /*!
+    \return		出力データ列の列方向シフト量
+  */
+    size_t	offsetH()		const	{return _colFilter.offset();}
+	
+    size_t	overlap()		const	{return _winSizeV - 1;}
 
     template <class IN, class OUT>
-    void	convolveRows(IN ib, IN ie, OUT out)	const	;
+    void	convolveRows(IN ib, IN ie, OUT out, bool shift)	const	;
     
   private:
-    size_t		_rowWinSize;
+    size_t		_winSizeV;
     BoxFilter<T>	_colFilter;
 };
 
@@ -270,17 +287,22 @@ class BoxFilter2 : public Filter2<BoxFilter2<T> >
   \param ib	入力2次元データ配列の先頭行を指す反復子
   \param ie	入力2次元データ配列の末尾の次の行を指す反復子
   \param out	出力2次元データ配列の先頭行を指す反復子
+  \param shift	trueならば，入力データと対応するよう，出力位置を水平/垂直
+		方向にそれぞれ offsetH(), offsetV() だけシフトする
 */
 template <class T> template <class IN, class OUT> void
-BoxFilter2<T>::convolveRows(IN ib, IN ie, OUT out) const
+BoxFilter2<T>::convolveRows(IN ib, IN ie, OUT out, bool shift) const
 {
-    if (std::distance(ib, ie) < rowWinSize())
+    if (std::distance(ib, ie) < winSizeV())
 	throw std::runtime_error("BoxFilter2::convolveRows(): not enough rows!");
+
+    if (shift)
+	std::advance(out, offsetV());
     
-    for (box_filter_iterator<IN, T> row(ib, _rowWinSize), rowe(ie);
+    for (box_filter_iterator<IN, T> row(ib, _winSizeV), rowe(ie);
 	 row != rowe; ++row, ++out)
 	_colFilter.convolve(std::cbegin(*row), std::cend(*row),
-			    TU::begin(*out));
+			    TU::begin(*out), shift);
 }
 
 }

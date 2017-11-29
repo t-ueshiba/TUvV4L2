@@ -772,11 +772,7 @@ template <class T, bool SYM> bool
 SparseMatrix<T, SYM>::isfinite() const
 {
     for (size_t n = 0; n < _values.size(); ++n)
-#ifdef __INTEL_COMPILER
 	if (!std::isfinite(_values[n]))
-#else
-	if (_values[n] != _values[n])
-#endif
 	    return false;
     return true;
 }

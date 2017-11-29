@@ -51,12 +51,13 @@ class FIRGaussianConvolver : public  FIRGaussianCoefficients<D, T>,
     FIRGaussianConvolver(coeff_type sigma=1.0)	:coeffs(sigma)		{}
 
     FIRGaussianConvolver&	initialize(coeff_type sigma)		;
-    using			super::winSize;
-    using			super::outLength;
 
-    template <class IN, class OUT> void	smooth(IN ib, IN ie, OUT out)	;
-    template <class IN, class OUT> void	diff  (IN ib, IN ie, OUT out)	;
-    template <class IN, class OUT> void	diff2 (IN ib, IN ie, OUT out)	;
+    template <class IN, class OUT>
+    void	smooth(IN ib, IN ie, OUT out, bool shift=false)		;
+    template <class IN, class OUT>
+    void	diff(  IN ib, IN ie, OUT out, bool shift=false)		;
+    template <class IN, class OUT>
+    void	diff2( IN ib, IN ie, OUT out, bool shift=false)		;
 
   protected:
     using	coeffs::_c0;
@@ -81,12 +82,14 @@ FIRGaussianConvolver<D, T>::initialize(coeff_type sigma)
   \param ib	入力データ列の先頭を指す反復子
   \param ie	入力データ列の末尾の次を指す反復子
   \param out	出力データ列の先頭を指す反復子
+  \param shift	true ならば，入力データと対応するよう，出力位置を
+		offset() だけシフトする
   \return	出力データ列の末尾の次を指す反復子
 */
 template <size_t D, class T> template <class IN, class OUT> inline void
-FIRGaussianConvolver<D, T>::smooth(IN ib, IN ie, OUT out)
+FIRGaussianConvolver<D, T>::smooth(IN ib, IN ie, OUT out, bool shift)
 {
-    super::initialize(coeffs::_c0).convolve(ib, ie, out);
+    super::initialize(coeffs::_c0).convolve(ib, ie, out, shift);
 }
 
 //! Gauss核による1階微分
@@ -94,12 +97,14 @@ FIRGaussianConvolver<D, T>::smooth(IN ib, IN ie, OUT out)
   \param ib	入力データ列の先頭を指す反復子
   \param ie	入力データ列の末尾の次を指す反復子
   \param out	出力データ列の先頭を指す反復子
+  \param shift	true ならば，入力データと対応するよう，出力位置を
+		offset() だけシフトする
   \return	出力データ列の末尾の次を指す反復子
 */
 template <size_t D, class T> template <class IN, class OUT> inline void
-FIRGaussianConvolver<D, T>::diff(IN ib, IN ie, OUT out)
+FIRGaussianConvolver<D, T>::diff(IN ib, IN ie, OUT out, bool shift)
 {
-    super::initialize(coeffs::_c1).convolve(ib, ie, out);
+    super::initialize(coeffs::_c1).convolve(ib, ie, out, shift);
 }
 
 //! Gauss核による2階微分
@@ -107,12 +112,14 @@ FIRGaussianConvolver<D, T>::diff(IN ib, IN ie, OUT out)
   \param ib	入力データ列の先頭を指す反復子
   \param ie	入力データ列の末尾の次を指す反復子
   \param out	出力データ列の先頭を指す反復子
+  \param shift	true ならば，入力データと対応するよう，出力位置を
+		offset() だけシフトする
   \return	出力データ列の末尾の次を指す反復子
 */
 template <size_t D, class T> template <class IN, class OUT> inline void
-FIRGaussianConvolver<D, T>::diff2(IN ib, IN ie, OUT out)
+FIRGaussianConvolver<D, T>::diff2(IN ib, IN ie, OUT out, bool shift)
 {
-    super::initialize(coeffs::_c2).convolve(ib, ie, out);
+    super::initialize(coeffs::_c2).convolve(ib, ie, out, shift);
 }
 
 /************************************************************************
@@ -136,15 +143,19 @@ class FIRGaussianConvolver2 : public  FIRGaussianCoefficients<D, T>,
     FIRGaussianConvolver2&	initialize(coeff_type sigma)		;
     using			super::grainSize;
     using			super::setGrainSize;
-    using			super::winSize;
-    using			super::outLength;
     
-    template <class IN, class OUT> void	smooth(IN ib, IN ie, OUT out)	;
-    template <class IN, class OUT> void	diffH (IN ib, IN ie, OUT out)	;
-    template <class IN, class OUT> void	diffV (IN ib, IN ie, OUT out)	;
-    template <class IN, class OUT> void	diffHH(IN ib, IN ie, OUT out)	;
-    template <class IN, class OUT> void	diffHV(IN ib, IN ie, OUT out)	;
-    template <class IN, class OUT> void	diffVV(IN ib, IN ie, OUT out)	;
+    template <class IN, class OUT>
+    void	smooth(IN ib, IN ie, OUT out, bool shift=false)		;
+    template <class IN, class OUT>
+    void	diffH( IN ib, IN ie, OUT out, bool shift=false)		;
+    template <class IN, class OUT>
+    void	diffV( IN ib, IN ie, OUT out, bool shift=false)		;
+    template <class IN, class OUT>
+    void	diffHH(IN ib, IN ie, OUT out, bool shift=false)		;
+    template <class IN, class OUT>
+    void	diffHV(IN ib, IN ie, OUT out, bool shift=false)		;
+    template <class IN, class OUT>
+    void	diffVV(IN ib, IN ie, OUT out, bool shift=false)		;
 };
 
 //! Gauss核のsigma値を設定する
@@ -164,13 +175,15 @@ FIRGaussianConvolver2<D, T>::initialize(coeff_type sigma)
   \param ib	入力2次元データ配列の先頭行を指す反復子
   \param ie	入力2次元データ配列の末尾の次の行を指す反復子
   \param out	出力2次元データ配列の先頭行を指す反復子
+  \param shift	trueならば，入力データと対応するよう，出力位置を水平/垂直
+		方向にそれぞれ offsetH(), offsetV() だけシフトする
   \return	出力2次元データ配列の末尾の次の行を指す反復子
 */
 template <size_t D, class T> template <class IN, class OUT> inline void
-FIRGaussianConvolver2<D, T>::smooth(IN ib, IN ie, OUT out)
+FIRGaussianConvolver2<D, T>::smooth(IN ib, IN ie, OUT out, bool shift)
 {
     super::initialize(coeffs::_c0, coeffs::_c0)
-	  .template convolve<IN, OUT>(ib, ie, out);
+	.template convolve<IN, OUT>(ib, ie, out, shift);
 }
 
 //! Gauss核による横方向1階微分(DOG)
@@ -178,13 +191,15 @@ FIRGaussianConvolver2<D, T>::smooth(IN ib, IN ie, OUT out)
   \param ib	入力2次元データ配列の先頭行を指す反復子
   \param ie	入力2次元データ配列の末尾の次の行を指す反復子
   \param out	出力2次元データ配列の先頭行を指す反復子
+  \param shift	trueならば，入力データと対応するよう，出力位置を水平/垂直
+		方向にそれぞれ offsetH(), offsetV() だけシフトする
   \return	出力2次元データ配列の末尾の次の行を指す反復子
 */
 template <size_t D, class T> template <class IN, class OUT> inline void
-FIRGaussianConvolver2<D, T>::diffH(IN ib, IN ie, OUT out)
+FIRGaussianConvolver2<D, T>::diffH(IN ib, IN ie, OUT out, bool shift)
 {
     super::initialize(coeffs::_c1, coeffs::_c0)
-	  .template convolve<IN, OUT>(ib, ie, out);
+	.template convolve<IN, OUT>(ib, ie, out, shift);
 }
 
 //! Gauss核による縦方向1階微分(DOG)
@@ -192,13 +207,15 @@ FIRGaussianConvolver2<D, T>::diffH(IN ib, IN ie, OUT out)
   \param ib	入力2次元データ配列の先頭行を指す反復子
   \param ie	入力2次元データ配列の末尾の次の行を指す反復子
   \param out	出力2次元データ配列の先頭行を指す反復子
+  \param shift	trueならば，入力データと対応するよう，出力位置を水平/垂直
+		方向にそれぞれ offsetH(), offsetV() だけシフトする
   \return	出力2次元データ配列の末尾の次の行を指す反復子
 */
 template <size_t D, class T> template <class IN, class OUT> inline void
-FIRGaussianConvolver2<D, T>::diffV(IN ib, IN ie, OUT out)
+FIRGaussianConvolver2<D, T>::diffV(IN ib, IN ie, OUT out, bool shift)
 {
     super::initialize(coeffs::_c0, coeffs::_c1)
-	  .template convolve<IN, OUT>(ib, ie, out);
+	.template convolve<IN, OUT>(ib, ie, out, shift);
 }
 
 //! Gauss核による横方向2階微分
@@ -206,13 +223,15 @@ FIRGaussianConvolver2<D, T>::diffV(IN ib, IN ie, OUT out)
   \param ib	入力2次元データ配列の先頭行を指す反復子
   \param ie	入力2次元データ配列の末尾の次の行を指す反復子
   \param out	出力2次元データ配列の先頭行を指す反復子
+  \param shift	trueならば，入力データと対応するよう，出力位置を水平/垂直
+		方向にそれぞれ offsetH(), offsetV() だけシフトする
   \return	出力2次元データ配列の末尾の次の行を指す反復子
 */
 template <size_t D, class T> template <class IN, class OUT> inline void
-FIRGaussianConvolver2<D, T>::diffHH(IN ib, IN ie, OUT out)
+FIRGaussianConvolver2<D, T>::diffHH(IN ib, IN ie, OUT out, bool shift)
 {
     super::initialize(coeffs::_c2, coeffs::_c0)
-	  .template convolve<IN, OUT>(ib, ie, out);
+	.template convolve<IN, OUT>(ib, ie, out, shift);
 }
 
 //! Gauss核による縦横両方向2階微分
@@ -220,13 +239,15 @@ FIRGaussianConvolver2<D, T>::diffHH(IN ib, IN ie, OUT out)
   \param ib	入力2次元データ配列の先頭行を指す反復子
   \param ie	入力2次元データ配列の末尾の次の行を指す反復子
   \param out	出力2次元データ配列の先頭行を指す反復子
+  \param shift	trueならば，入力データと対応するよう，出力位置を水平/垂直
+		方向にそれぞれ offsetH(), offsetV() だけシフトする
   \return	出力2次元データ配列の末尾の次の行を指す反復子
 */
 template <size_t D, class T> template <class IN, class OUT> inline void
-FIRGaussianConvolver2<D, T>::diffHV(IN ib, IN ie, OUT out)
+FIRGaussianConvolver2<D, T>::diffHV(IN ib, IN ie, OUT out, bool shift)
 {
     super::initialize(coeffs::_c1, coeffs::_c1)
-	  .template convolve<IN, OUT>(ib, ie, out);
+	.template convolve<IN, OUT>(ib, ie, out, shift);
 }
 
 //! Gauss核による縦方向2階微分
@@ -234,13 +255,15 @@ FIRGaussianConvolver2<D, T>::diffHV(IN ib, IN ie, OUT out)
   \param ib	入力2次元データ配列の先頭行を指す反復子
   \param ie	入力2次元データ配列の末尾の次の行を指す反復子
   \param out	出力2次元データ配列の先頭行を指す反復子
+  \param shift	trueならば，入力データと対応するよう，出力位置を水平/垂直
+		方向にそれぞれ offsetH(), offsetV() だけシフトする
   \return	出力2次元データ配列の末尾の次の行を指す反復子
 */
 template <size_t D, class T> template <class IN, class OUT> inline void
-FIRGaussianConvolver2<D, T>::diffVV(IN ib, IN ie, OUT out)
+FIRGaussianConvolver2<D, T>::diffVV(IN ib, IN ie, OUT out, bool shift)
 {
     super::initialize(coeffs::_c0, coeffs::_c2)
-	  .template convolve<IN, OUT>(ib, ie, out);
+	.template convolve<IN, OUT>(ib, ie, out, shift);
 }
     
 }

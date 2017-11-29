@@ -301,11 +301,12 @@ template <size_t D, class T=float> class IIRFilter
     template <class IN, class OUT>
     OUT		backward(IN ib, IN ie, OUT out)			const	;
     
-    const coeffs_type&	ci()			const	{return _ci;}
-    const coeffs_type&	co()			const	{return _co;}
+    const coeffs_type&		ci()		const	{return _ci;}
+    const coeffs_type&		co()		const	{return _co;}
 	
-    static size_t	outLength(size_t inLength)	;
-
+    constexpr static size_t	outSize(size_t inSize)	{return inSize;}
+    constexpr static size_t	offset()		{return 0;}
+	
   private:
     coeffs_type	_ci;	//!< 入力フィルタ係数
     coeffs_type	_co;	//!< 出力フィルタ係数
@@ -421,17 +422,6 @@ IIRFilter<D, T>::backward(IN ib, IN ie, OUT oe) const
 			 ie, _ci.rbegin(), _co.rbegin()),
 		     oe);
 }
-
-//! 与えられた長さの入力データ列に対する出力データ列の長さを返す
-/*!
-  \param inLength	入力データ列の長さ
-  \return		出力データ列の長さ
-*/
-template <size_t D, class T> inline size_t
-IIRFilter<D, T>::outLength(size_t inLength)
-{
-    return inLength;
-}
     
 /************************************************************************
 *  class BidirectionalIIRFilter<D, T>					*
@@ -460,14 +450,15 @@ template <size_t D, class T=float> class BidirectionalIIRFilter
 		initialize(const T c[D+D], Order order)			;
     void	limits(T& limit0, T& limit1, T& limit2)		const	;
     template <class IN, class OUT>
-    OUT		convolve(IN ib, IN ie, OUT out)			const	;
+    OUT		convolve(IN ib, IN ie, OUT out, bool=false)	const	;
 
-    const coeffs_type&	ciF()			const	{return _iirF.ci();}
-    const coeffs_type&	coF()			const	{return _iirF.co();}
-    const coeffs_type&	ciB()			const	{return _iirB.ci();}
-    const coeffs_type&	coB()			const	{return _iirB.co();}
+    const coeffs_type&		ciF()		const	{return _iirF.ci();}
+    const coeffs_type&		coF()		const	{return _iirF.co();}
+    const coeffs_type&		ciB()		const	{return _iirB.ci();}
+    const coeffs_type&		coB()		const	{return _iirB.co();}
 
-    static size_t	outLength(size_t inLength)	;
+    constexpr static size_t	outSize(size_t inSize)	{return inSize;}
+    constexpr static size_t	offset()		{return 0;}
 	
   private:
     IIRFilter<D, T>	_iirF;
@@ -598,7 +589,7 @@ BidirectionalIIRFilter<D, T>::limits(T& limit0, T& limit1, T& limit2) const
   \param out	出力データ列の先頭を指す反復子
 */
 template <size_t D, class T> template <class IN, class OUT> inline OUT
-BidirectionalIIRFilter<D, T>::convolve(IN ib, IN ie, OUT out) const
+BidirectionalIIRFilter<D, T>::convolve(IN ib, IN ie, OUT out, bool) const
 {
     auto	oute = out;
     std::advance(oute, std::distance(ib, ie));
@@ -607,19 +598,9 @@ BidirectionalIIRFilter<D, T>::convolve(IN ib, IN ie, OUT out) const
 		   std::make_reverse_iterator(ib),
 		   std::make_reverse_iterator(oute));
     _iirF.forward(ib, ie, make_assignment_iterator(
-			      out, [](auto&& y, const auto& x){ y += x; }));
+			      [](auto&& y, const auto& x){ y += x; }, out));
 
     return oute;
-}
-//! 与えられた長さの入力データ列に対する出力データ列の長さを返す
-/*!
-  \param inLength	入力データ列の長さ
-  \return		出力データ列の長さ
-*/
-template <size_t D, class T> inline size_t
-BidirectionalIIRFilter<D, T>::outLength(size_t inLength)
-{
-    return IIRFilter<D, T>::outLength(inLength);
 }
     
 /************************************************************************

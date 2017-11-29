@@ -161,17 +161,24 @@ class FIRFilter
     using element_type	= T;
     using coeffs_type	= std::array<T, D>;
 
-    FIRFilter&		initialize(const T c[D])			;
-    void		limits(T& limit0, T& limit1, T& limit2)	const	;
+    FIRFilter&	initialize(const T c[D])				;
+    void	limits(T& limit0, T& limit1, T& limit2)		  const	;
     template <class IN, class OUT>
-    OUT			convolve(IN ib, IN ie, OUT out)		const	;
-    
-    const coeffs_type&	c()				const	{return _c;}
-    static size_t	winSize()				{return D;}
-    static size_t	outLength(size_t inLength)		;
+    OUT		convolve(IN ib, IN ie, OUT out, bool shift=false) const	;
+
+    const coeffs_type&		c()		const	{return _c;}
+
+  //! 与えられた長さの入力データ列に対する出力データ列の長さを返す
+  /*!
+    \param inSize	入力データ列の長さ
+    \return		出力データ列の長さ
+  */
+    constexpr static size_t	outSize(size_t inSize)	{return inSize + 1 - D;}
+    constexpr static size_t	offset()		{return D/2;}
+    constexpr static size_t	winSize()		{return D;}
 	
   private:
-    coeffs_type	_c;	//!< フィルタ係数
+    coeffs_type	_c;			//!< フィルタ係数
 };
 
 //! フィルタのz変換係数をセットする
@@ -217,27 +224,20 @@ FIRFilter<D, T>::limits(T& limit0, T& limit1, T& limit2) const
   \param ib	入力データ列の先頭を指す反復子
   \param ie	入力データ列の末尾の次を指す反復子
   \param out	出力データ列の先頭を指す反復子
+  \param shift	true ならば，入力データと対応するよう，出力位置を
+		offset() だけシフトする
   \return	出力データ列の末尾の次を指す反復子
 */
 template <size_t D, class T> template <class IN, class OUT> OUT
-FIRFilter<D, T>::convolve(IN ib, IN ie, OUT out) const
+FIRFilter<D, T>::convolve(IN ib, IN ie, OUT out, bool shift) const
 {
     using citerator	= typename coeffs_type::const_iterator;
+
+    if (shift)
+	std::advance(out, offset());
     
     return std::copy(make_fir_filter_iterator<D>(ib, _c.begin()),
-		     make_fir_filter_iterator<D, citerator>(ie),
-		     out);
-}
-
-//! 与えられた長さの入力データ列に対する出力データ列の長さを返す
-/*!
-  \param inLength	入力データ列の長さ
-  \return		出力データ列の長さ
-*/
-template <size_t D, class T> inline size_t
-FIRFilter<D, T>::outLength(size_t inLength)
-{
-    return inLength + 1 - D;
+		     make_fir_filter_iterator<D, citerator>(ie), out);
 }
 
 /************************************************************************
@@ -258,21 +258,13 @@ class FIRFilter2 : public SeparableFilter2<FIRFilter<D, T> >
   public:
     FIRFilter2&		initialize(const T cH[], const T cV[])		;
 
-    template <class IN, class OUT>
-    void		convolve(IN ib, IN iue, OUT out)	const	;
     using		super::filterH;
     using		super::filterV;
 
-    const coeffs_type&	cH()		const	{return filterH().c();}
-    const coeffs_type&	cV()		const	{return filterV().c();}
-    static size_t	winSize()
-			{
-			    return fir_type::winSize();
-			}
-    static size_t	outLength(size_t inLen)
-			{
-			    return fir_type::outLength(inLen);
-			}
+    const coeffs_type&		cH()	const	{return filterH().c();}
+    const coeffs_type&		cV()	const	{return filterV().c();}
+    constexpr static size_t	winSizeH()	{return fir_type::winSize();}
+    constexpr static size_t	winSizeV()	{return fir_type::winSize();}
 };
     
 //! フィルタのz変換係数をセットする
@@ -290,14 +282,5 @@ FIRFilter2<D, T>::initialize(const T cH[], const T cV[])
     return *this;
 }
 
-template <size_t D, class T> template <class IN, class OUT> inline void
-FIRFilter2<D, T>::convolve(IN ib, IN ie, OUT out) const
-{
-    std::advance(out, D/2);
-    super::convolve(ib, ie, make_range_iterator(begin(*out) + D/2,
-						stride(out),
-						size(*out) - D/2));
-}
-
-}
+}	// namespace TU
 #endif	// !TU_FIRFILTER_H

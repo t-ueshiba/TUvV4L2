@@ -557,11 +557,11 @@ GFStereo<SCORE, DISP>::initializeFilterParameters(COL colL, COL colLe,
 					    make_col_accessor(colRV) + 1,
 					    make_col_accessor(colRV) - 1))));
 	    for (qiterator Q( make_assignment_iterator(
-				  begin(*colQ),
-				  init_params2(pixL, _params.blend))),
+				  init_params2(pixL, _params.blend),
+				  begin(*colQ))),
 			   Qe(make_assignment_iterator(
-				  end(*colQ),
-				  init_params2(pixL, _params.blend)));
+				  init_params2(pixL, _params.blend),
+				  end(*colQ)));
 		 Q != Qe; ++Q, ++P)
 		*Q += *P;
 
@@ -585,10 +585,10 @@ GFStereo<SCORE, DISP>::initializeFilterParameters(COL colL, COL colLe,
 	    const diff_t	diff(pixL, _params.intensityDiffMax);
 	    auto		in = make_col_accessor(colRV);
 	
-	    for (qiterator Q( make_assignment_iterator(begin(*colQ),
-						       init_params(pixL))),
-			   Qe(make_assignment_iterator(end(*colQ),
-						       init_params(pixL)));
+	    for (qiterator Q( make_assignment_iterator(init_params(pixL),
+						       begin(*colQ))),
+			   Qe(make_assignment_iterator(init_params(pixL),
+						       end(*colQ)));
 		 Q != Qe; ++Q, ++in)
 		*Q += diff(*in);
 	    
@@ -658,11 +658,11 @@ GFStereo<SCORE, DISP>::updateFilterParameters(COL colL, COL colLe, COL_RV colRV,
 					    make_col_accessor(colRVp) + 1,
 					    make_col_accessor(colRVp) - 1))));
 	    for (qiterator Q( make_assignment_iterator(
-				  begin(*colQ),
-				  update_params2(pixL, pixLp, _params.blend))),
+				  update_params2(pixL, pixLp, _params.blend),
+				  begin(*colQ))),
 			   Qe(make_assignment_iterator(
-				  end(*colQ),
-				  update_params2(pixL, pixLp, _params.blend)));
+				  update_params2(pixL, pixLp, _params.blend),
+				  end(*colQ)));
 		 Q != Qe; ++Q, ++P)
 		*Q += *P;
 
@@ -690,11 +690,11 @@ GFStereo<SCORE, DISP>::updateFilterParameters(COL colL, COL colLe, COL_RV colRV,
 	    auto		in_n = make_col_accessor(colRV);
 	
 	    for (qiterator Q( make_assignment_iterator(
-				  begin(*colQ),
-				  update_params(pixL, pixLp))),
+				  update_params(pixL, pixLp),
+				  begin(*colQ))),
 			   Qe(make_assignment_iterator(
-				  end(*colQ),
-				  update_params(pixL, pixLp)));
+				  update_params(pixL, pixLp),
+				  end(*colQ)));
 		 Q != Qe; ++Q, ++in_p, ++in_n)
 		*Q += std::make_tuple(diff_n(*in_n), diff_p(*in_p));
 

@@ -48,7 +48,7 @@ doJob(const Image<T>& imageL, const Image<T>& imageR,
 {
     using	disparity_type	= float;
     
-  // $B2hA|$rJ?9T2=$9$k!%(B
+  // 画像を平行化する．
     Rectify	rectify;
     Image<T, allocator<T> >	rectifiedImageL, rectifiedImageR;
     rectify.initialize(imageL, imageR, scale,
@@ -64,7 +64,7 @@ doJob(const Image<T>& imageL, const Image<T>& imageR,
 	      << rectifiedImageR.width()  << "(W)"
 	      << std::endl;
     
-  // $B%U%#%k%?$NF~=PNO9T$r;X$9H?I|;R$r:n$k!%(B
+  // フィルタの入出力行を指す反復子を作る．
     const auto	rowL  = std::cbegin(rectifiedImageL);
     const auto	rowR  = std::cbegin(rectifiedImageR);
     const auto	rowLe = std::cend(rectifiedImageL);
@@ -74,14 +74,14 @@ doJob(const Image<T>& imageL, const Image<T>& imageR,
 						  params.intensityDiffMax,
 						  std::cbegin(*rowL),
 						  std::cbegin(*rowR)),
-			    std::make_tuple(stride(rowL), stride(rowR)),
+			    {stride(rowL), stride(rowR)},
 			    TU::size(*rowL));
     const auto	rowIe = make_range_iterator(
 			    make_diff_iterator<S>(params.disparitySearchWidth,
 						  params.intensityDiffMax,
 						  std::cbegin(*rowLe),
 						  std::cbegin(*rowRe)),
-			    std::make_tuple(stride(rowLe), stride(rowRe)),
+			    {stride(rowLe), stride(rowRe)},
 			    TU::size(*rowLe));
 
     Image<S, allocator<S> >
@@ -103,13 +103,13 @@ doJob(const Image<T>& imageL, const Image<T>& imageR,
 #else
     const auto	rowO  = rowD;
 #endif
-  // $B%9%F%l%*%^%C%A%s%0$r9T$&!%(B
+  // ステレオマッチングを行う．
     switch (algo)
     {
       case SAD:
       {
 	BoxFilter2<S>	filter(params.windowSize, params.windowSize);
-	filter.convolve(rowI, rowIe, rowO);
+	filter.convolve(rowI, rowIe, rowO, true);
       }
 	break;
 
@@ -117,7 +117,7 @@ doJob(const Image<T>& imageL, const Image<T>& imageR,
       {
 	GuidedFilter2<S>
 		filter(params.windowSize, params.windowSize, params.sigma);
-	filter.convolve(rowI, rowIe, rowL, rowLe, rowO);
+	filter.convolve(rowI, rowIe, rowL, rowLe, rowO, true);
       }
 	break;
 	
@@ -162,7 +162,7 @@ main(int argc, char* argv[])
     bool	doHorizontalBackMatch	= true;
     size_t	grainSize		= DEFAULT_GRAINSIZE;
     
-  // $B%3%^%s%I9T$N2r@O!%(B
+  // コマンド行の解析．
     extern char*	optarg;
     for (int c; (c = getopt(argc, argv, "GMTp:c:s:w:d:m:Hg:")) != EOF; )
 	switch (c)
@@ -202,7 +202,7 @@ main(int argc, char* argv[])
 	    break;
 	}
     
-  // $BK\Ev$N$*;E;v!%(B
+  // 本当のお仕事．
     try
     {
 	std::ifstream		in;
@@ -219,11 +219,11 @@ main(int argc, char* argv[])
 	params.doHorizontalBackMatch	= doHorizontalBackMatch;
 	params.grainSize		= grainSize;
 
-      // $B%9%F%l%*%^%C%A%s%0%Q%i%a!<%?$rI=<(!%(B
+      // ステレオマッチングパラメータを表示．
 	std::cerr << "--- Stereo matching parameters ---\n";
 	params.put(std::cerr);
 
-      // $B2hA|$rFI$_9~$`!%(B
+      // 画像を読み込む．
 	Image<pixel_type>	imageL, imageR;
 	imageL.restore(std::cin);
 	imageR.restore(std::cin);

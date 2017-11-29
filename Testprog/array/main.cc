@@ -356,6 +356,6 @@ main()
     TU::test_prod();
     TU::test_vector();
     TU::test_rotation();
-    
+
     return 0;
 }

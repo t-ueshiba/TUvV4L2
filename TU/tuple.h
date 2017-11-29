@@ -501,46 +501,6 @@ select(const std::tuple<S...>& s, X&& x, Y&& y)
 			   s, std::forward<X>(x), std::forward<Y>(y));
 }
 
-/************************************************************************
-*  class unarizer<FUNC>							*
-************************************************************************/
-//! 引数をtupleにまとめることによって多変数関数を1変数関数に変換
-template <class FUNC>
-class unarizer
-{
-  public:
-    using functor_type = FUNC;
-
-  public:
-    unarizer(FUNC func=FUNC())	:_func(func)		{}
-
-    template <class TUPLE_,
-	      std::enable_if_t<is_tuple<TUPLE_>::value>* = nullptr>
-    auto	operator ()(const TUPLE_& arg) const
-		{
-		    return exec(arg, std::make_index_sequence<
-					 std::tuple_size<TUPLE_>::value>());
-		}
-
-    const FUNC&	functor()			const	{return _func;}
-
-  private:
-    template <class TUPLE_, size_t... IDX_>
-    auto	exec(const TUPLE_& arg, std::index_sequence<IDX_...>) const
-		{
-		    return _func(std::get<IDX_>(arg)...);
-		}
-
-  private:
-    const FUNC	_func;
-};
-
-template <class FUNC> inline unarizer<FUNC>
-make_unarizer(FUNC func)
-{
-    return {func};
-}
-    
 }	// namespace TU
 
 namespace std

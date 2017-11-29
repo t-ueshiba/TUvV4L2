@@ -29,7 +29,7 @@ doJob(const Image<T>& in, const Image<G>& guide,
     {
 	profiler.start(0);
 	wmf.convolve(in.begin(), in.end(),
-		     guide.begin(), guide.end(), out.begin());
+		     guide.begin(), guide.end(), out.begin(), true);
 	profiler.nextFrame();
     }
     wmf.print(std::cerr);

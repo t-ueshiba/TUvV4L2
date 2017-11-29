@@ -40,7 +40,7 @@ class GuidedFilter : public BoxFilter<T>
     class init_coeffs
     {
       public:
-	init_coeffs(size_t n, T e)	:_n(n), _sq_e(e*e)	{}
+	init_coeffs(size_t n, T e)	:_n(n), _sq_e(e*e)		{}
 
 	template <class VAL_>
 	auto	operator ()(const std::tuple<VAL_, T, VAL_, T>& params) const
@@ -100,14 +100,19 @@ class GuidedFilter : public BoxFilter<T>
     auto&	setEpsilon(T e)			{ _e = e; return *this; }
     
     template <class IN, class GUIDE, class OUT>
-    void	convolve(IN ib, IN ie,
-			 GUIDE gb, GUIDE ge, OUT out)		const	;
+    void	convolve(IN ib, IN ie, GUIDE gb, GUIDE ge,
+			 OUT out, bool shift=false)		const	;
     template <class IN, class OUT>
-    void	convolve(IN ib, IN ie, OUT out)			const	;
+    void	convolve(IN ib, IN ie,
+			 OUT out, bool shift=false)		const	;
 
-    auto	outLength(size_t inLen) const
+    auto	outSize(size_t inSize) const
 		{
-		    return inLen + 2 - 2*winSize();
+		    return inSize + 2 - 2*winSize();
+		}
+    auto	offset() const
+		{
+		    return winSize() - 1;
 		}
     
   private:
@@ -121,26 +126,29 @@ class GuidedFilter : public BoxFilter<T>
   \param gb	1次元ガイドデータ列の先頭を示す反復子
   \param ge	1次元ガイドデータ列の末尾の次を示す反復子
   \param out	guided filterを適用したデータの出力先を示す反復子
+  \param shift	true ならば，入力データと対応するよう，出力位置を
+		offset() だけシフトする
 */
 template <class T> template <class IN, class GUIDE, class OUT> void
-GuidedFilter<T>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out) const
+GuidedFilter<T>::convolve(IN ib, IN ie,
+			  GUIDE gb, GUIDE ge, OUT out, bool shift) const
 {
     using coeff_t	= replace_element<iterator_substance<IN>, T>;
     using coeffs_t	= std::tuple<coeff_t, coeff_t>;
     
   // guided filterの2次元係数ベクトルを計算する．
-    Array<coeffs_t>	c(super::outLength(std::distance(ib, ie)));
+    Array<coeffs_t>	c(super::outSize(std::distance(ib, ie)));
     super::convolve(make_map_iterator(init_params(), ib, gb),
 		    make_map_iterator(init_params(), ie, ge),
-		    make_assignment_iterator(c.begin(),
-					     init_coeffs(winSize(), _e)));
+		    make_assignment_iterator(init_coeffs(winSize(), _e),
+					     c.begin()));
     
   // 係数ベクトルの平均値を求め，それによってガイドデータ列を線型変換する．
-    std::advance(gb, winSize() - 1);
+    std::advance(gb, offset());
+    if (shift)
+	std::advance(out, offset());
     super::convolve(c.cbegin(), c.cend(),
-		    make_assignment_iterator(
-			make_zip_iterator(std::make_tuple(gb, out)),
-			trans_guides(winSize())));
+		    make_assignment_iterator(trans_guides(winSize()), gb, out));
 }
 
 //! 1次元入力データ列にguided filterを適用する
@@ -149,28 +157,28 @@ GuidedFilter<T>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out) const
   \param ib	1次元入力データ列の先頭を示す反復子
   \param ie	1次元入力データ列の末尾の次を示す反復子
   \param out	guided filterを適用したデータの出力先を示す反復子
-  \param w	box filterのウィンドウ幅
-  \param e	正則化のための微小定数
+  \param shift	true ならば，入力データと対応するよう，出力位置を
+		offset() だけシフトする
 */
 template <class T> template <class IN, class OUT> void
-GuidedFilter<T>::convolve(IN ib, IN ie, OUT out) const
+GuidedFilter<T>::convolve(IN ib, IN ie, OUT out, bool shift) const
 {
     using coeff_t	= replace_element<iterator_substance<IN>, T>;
     using coeffs_t	= std::tuple<coeff_t, coeff_t>;
     
   // guided filterの2次元係数ベクトルを計算する．
-    Array<coeffs_t>	c(super::outLength(std::distance(ib, ie)));
+    Array<coeffs_t>	c(super::outSize(std::distance(ib, ie)));
     super::convolve(make_map_iterator(init_params(), ib),
 		    make_map_iterator(init_params(), ie),
 		    make_assignment_iterator(c.begin(),
 					     init_coeffs(winSize(), _e)));
 
   // 係数ベクトルの平均値を求め，それによって入力データ列を線型変換する．
-    std::advance(ib, winSize() - 1);
+    std::advance(ib, offset());
+    if (shift)
+	std::advance(out, offset());
     super::convolve(c.cbegin(), c.cend(),
-		    make_assignment_iterator(
-			make_zip_iterator(std::make_tuple(ib, out)),
-			trans_guides(winSize())));
+		    make_assignment_iterator(trans_guides(winSize()), ib, out));
 }
 
 /************************************************************************
@@ -193,21 +201,27 @@ class GuidedFilter2 : private BoxFilter2<T>
     GuidedFilter2(size_t wrow, size_t wcol, T e)
 	:super(wrow, wcol), _e(e)					{}
 
-    using	super::rowWinSize;
-    using	super::colWinSize;
+    using	super::winSizeV;
+    using	super::winSizeH;
     using	super::grainSize;
-    using	super::setRowWinSize;
-    using	super::setColWinSize;
+    using	super::setWinSizeV;
+    using	super::setWinSizeH;
     using	super::setGrainSize;
     
     auto	epsilon()		const	{ return _e; }
     auto&	setEpsilon(T e)			{ _e = e; return *this; }
     
     template <class IN, class GUIDE, class OUT>
-    void	convolve(IN ib, IN ie,
-			 GUIDE gb, GUIDE ge, OUT out)		const	;
+    void	convolve(IN ib, IN ie, GUIDE gb, GUIDE ge,
+			 OUT out, bool shift=false)		const	;
     template <class IN, class OUT>
-    void	convolve(IN ib, IN ie, OUT out)			const	;
+    void	convolve(IN ib, IN ie,
+			 OUT out, bool shift=false)		const	;
+    
+    auto	outSizeV(size_t nrow)	const	{return nrow + 2 - 2*winSizeV();}
+    auto	outSizeH(size_t ncol)	const	{return ncol + 2 - 2*winSizeH();}
+    auto	offsetV()		const	{return winSizeV() - 1;}
+    auto	offsetH()		const	{return winSizeH() - 1;}
     
   private:
     T	_e;
@@ -220,9 +234,12 @@ class GuidedFilter2 : private BoxFilter2<T>
   \param gb	2次元ガイドデータの先頭の行を示す反復子
   \param ge	2次元ガイドデータの末尾の次の行を示す反復子
   \param out	guided filterを適用したデータの出力先の先頭行を示す反復子
+  \param shift	trueならば，入力データと対応するよう，出力位置を水平/垂直
+		方向にそれぞれ offsetH(), offsetV() だけシフトする
 */
 template <class T> template <class IN, class GUIDE, class OUT> void
-GuidedFilter2<T>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out) const
+GuidedFilter2<T>::convolve(IN ib, IN ie,
+			   GUIDE gb, GUIDE ge, OUT out, bool shift) const
 {
     using coeff_t	= replace_element<
 				iterator_substance<
@@ -233,40 +250,37 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out) const
     if (ib == ie)
 	return;
 
-    const auto		n    = rowWinSize() * colWinSize();
-    const auto		nrow = super::outRowLength(std::distance(ib, ie));
-    const auto		ncol = super::outColLength(TU::size(*ib));
-    Array2<coeffs_t>	c(nrow, ncol);
+    const auto		n = winSizeV() * winSizeH();
+    Array2<coeffs_t>	c(super::outSizeV(std::distance(ib, ie)),
+			  super::outSizeH(TU::size(*ib)));
     
   // guided filterの2次元係数ベクトルを計算する．
     super::convolve(make_range_iterator(
 			make_map_iterator(init_params(),
 					  std::cbegin(*ib),
 					  std::cbegin(*gb)),
-			std::make_tuple(stride(ib), stride(gb)),
-			TU::size(*ib)),
+			{stride(ib), stride(gb)}, TU::size(*ib)),
 		    make_range_iterator(
 			make_map_iterator(init_params(),
 					  std::cbegin(*ie),
 					  std::cbegin(*ge)),
-			std::make_tuple(stride(ie), stride(ge)),
-			TU::size(*ie)),
+			{stride(ie), stride(ge)}, TU::size(*ie)),
 		    make_range_iterator(
-			make_assignment_iterator(c.begin()->begin(),
-						 init_coeffs(n, _e)),
+			make_assignment_iterator(init_coeffs(n, _e),
+						 c.begin()->begin()),
 			stride(c.begin()), c.ncol()));
 
   // 係数ベクトルの平均値を求め，それによってガイドデータ列を線型変換する．
-    gb  += (rowWinSize() - 1);
-    out += (rowWinSize() - 1);
+    std::advance(gb, offsetV());
+    if (shift)
+	std::advance(out, offsetV());
     super::convolve(c.cbegin(), c.cend(),
 		    make_range_iterator(
 			make_assignment_iterator(
-			    TU::begin(std::make_tuple(*gb, *out))
-			    += (colWinSize() - 1),
-			    trans_guides(n)),
-			std::make_tuple(stride(gb), stride(out)),
-			TU::size(*out)));
+			    trans_guides(n),
+			    TU::begin(*gb)   + offsetH(),
+			    TU::begin(*out)) + (shift ? offsetH() : 0),
+			{stride(gb), stride(out)}, TU::size(*out)));
 }
 
 //! 2次元入力データにguided filterを適用する
@@ -275,9 +289,11 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out) const
   \param ib	2次元入力データの先頭の行を示す反復子
   \param ie	2次元入力データの末尾の次の行を示す反復子
   \param out	guided filterを適用したデータの出力先の先頭行を示す反復子
+  \param shift	trueならば，入力データと対応するよう，出力位置を水平/垂直
+		方向にそれぞれ offsetH(), offsetV() だけシフトする
 */
 template <class T> template <class IN, class OUT> void
-GuidedFilter2<T>::convolve(IN ib, IN ie, OUT out) const
+GuidedFilter2<T>::convolve(IN ib, IN ie, OUT out, bool shift) const
 {
     using coeff_t	= replace_element<
 				iterator_substance<
@@ -288,10 +304,9 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, OUT out) const
     if (ib == ie)
 	return;
 
-    const auto		n    = rowWinSize() * colWinSize();
-    const auto		nrow = super::outRowLength(std::distance(ib, ie));
-    const auto		ncol = super::outColLength(TU::size(*ib));
-    Array2<coeffs_t>	c(nrow, ncol);
+    const auto		n = winSizeV() * winSizeH();
+    Array2<coeffs_t>	c(super::outSizeV(std::distance(ib, ie)),
+			  super::outSizeH(TU::size(*ib)));
 
   // guided filterの2次元係数ベクトルを計算する．
     super::convolve(make_range_iterator(
@@ -301,21 +316,21 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, OUT out) const
 			make_map_iterator(init_params(), std::cbegin(*ie)),
 			stride(ie), TU::size(*ie)),
 		    make_range_iterator(
-			make_assignment_iterator(c.begin()->begin(),
-						 init_coeffs(n, _e)),
+			make_assignment_iterator(init_coeffs(n, _e),
+						 c.begin()->begin()),
 			stride(c.begin()), c.ncol()));
 
   // 係数ベクトルの平均値を求め，それによって入力データ列を線型変換する．
-    std::advance(ib,  rowWinSize() - 1);
-    std::advance(out, rowWinSize() - 1);
+    std::advance(ib, offsetV());
+    if (shift)
+	std::advance(out, offsetV());
     super::convolve(c.cbegin(), c.cend(),
 		    make_range_iterator(
 			make_assignment_iterator(
-			    TU::begin(std::make_tuple(*ib, *out))
-			    + colWinSize() - 1,
-			    trans_guides(n)),
-			std::make_tuple(stride(ib), stride(out)),
-			TU::size(*out)));
+			    trans_guides(n),
+			    TU::begin(*ib)  + offsetH(),
+			    TU::begin(*out) + (shift ? offsetH() : 0)),
+			{stride(ib), stride(out)}, TU::size(*out)));
 }
 
 }

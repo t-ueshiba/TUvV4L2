@@ -384,9 +384,9 @@ SADStereo<SCORE, DISP>::initializeDissimilarities(COL colL, COL colLe,
 					    make_col_accessor(colRV) + 1,
 					    make_col_accessor(colRV) - 1))));
 	    for (qiterator Q( make_assignment_iterator(
-				  colQ->begin(), blend_t(_params.blend))),
+				  blend_t(_params.blend), colQ->begin())),
 			   Qe(make_assignment_iterator(
-				  colQ->end(), blend_t(_params.blend)));
+				  blend_t(_params.blend), colQ->end()));
 		 Q != Qe; ++Q, ++P)
 		*Q += *P;
 	}
@@ -466,9 +466,9 @@ SADStereo<SCORE, DISP>::updateDissimilarities(COL colL,  COL colLe,
 					    make_col_accessor(colRVp) + 1,
 					    make_col_accessor(colRVp) - 1))));
 	    for (qiterator Q( make_assignment_iterator(
-				  colQ->begin(), ScoreUpdate(_params.blend))),
+				  ScoreUpdate(_params.blend), colQ->begin())),
 			   Qe(make_assignment_iterator(
-				  colQ->end(), ScoreUpdate(_params.blend)));
+				  ScoreUpdate(_params.blend), colQ->end()));
 		 Q != Qe; ++Q, ++P)
 		*Q += *P;
 	}

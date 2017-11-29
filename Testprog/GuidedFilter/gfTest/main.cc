@@ -128,7 +128,7 @@ MyCmdWindow<T, G>::filter()
     float	s = _cmd.getValue(c_Regularization).f();
     GuidedFilter2<float>	gf2(w, w, s*s);
     gf2.convolve(_image.begin(), _image.end(), _guide.begin(), _guide.end(),
-		 _filteredImage.begin());
+		 _filteredImage.begin(), true);
 
     _resultCanvas.repaintUnderlay();
 }
