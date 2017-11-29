@@ -271,6 +271,8 @@ class WeightedMedianFilterBase
 			     size_t nbinsI, size_t nbinsG)		;
 
     size_t	winSize()		const	{ return _winSize; }
+    size_t	outSize(size_t inSize)	const	{ return inSize + 1 - _winSize; }
+    size_t	offset()		const	{ return _winSize/2; }
     size_t	nbinsI()		const	{ return _nbinsI; }
     size_t	nbinsG()		const	{ return _nbinsG; }
     void	setWinSize(size_t w)		{ _winSize = w; }
@@ -341,11 +343,14 @@ class WeightedMedianFilter : public detail::WeightedMedianFilterBase<W>
 	:super(wfunc, winSize, nbinsI, nbinsG)				{}
 
     using	super::winSize;
+    using	super::outSize;
+    using	super::offset;
     using	super::nbinsI;
     using	super::nbinsG;
     
     template <class IN, class GUIDE, class OUT>
-    void	convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out)	;
+    void	convolve(IN ib, IN ie, GUIDE gb, GUIDE ge,
+			 OUT out, bool shift=false)			;
 
   private:
     Quantizer<value_type>	_quantizerI;
@@ -355,7 +360,8 @@ class WeightedMedianFilter : public detail::WeightedMedianFilterBase<W>
     
 template <class T, class W>
 template <class IN, class GUIDE, class OUT> void
-WeightedMedianFilter<T, W>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out)
+WeightedMedianFilter<T, W>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge,
+				     OUT out, bool shift)
 {
     if (std::distance(ib, ie) < winSize())
 	return;
@@ -370,12 +376,15 @@ WeightedMedianFilter<T, W>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out)
     auto	tailI = headI;
     auto	idxG  = headG;
     std::advance(tailI, winSize()-1);
-    std::advance(idxG,  winSize()/2);
+    std::advance(idxG,  offset());
 
   // ウィンドウ初期位置におけるヒストグラムをセット
     _tracker.initialize(_quantizerI.size(), _quantizerG.size());
     auto	tailG = _tracker.add(headI, tailI, headG);
 
+    if (shift)
+	std::advance(out, offset());
+    
   // median点を探索し，その値を出力
     for (; tailI != indicesI.end(); ++tailI)
     {
@@ -415,13 +424,14 @@ class WeightedMedianFilter2 : public detail::WeightedMedianFilterBase<W>,
     {
       public:
 	Filter(const WeightedMedianFilter2<T, W>& wmf,
-	       ROW_I rowI, ROW_G rowG, ROW_O rowO)
-	    :_wmf(wmf), _rowI(rowI), _rowG(rowG), _rowO(rowO)		{}
+	       ROW_I rowI, ROW_G rowG, ROW_O rowO, bool shift)
+	    :_wmf(wmf),
+	     _rowI(rowI), _rowG(rowG), _rowO(rowO), _shift(shift)	{}
 	    
 	void	operator ()(const tbb::blocked_range<size_t>& r) const
 		{
 		    _wmf.filter(_rowI + r.begin(), _rowI + r.end(),
-				_rowG + r.begin(), _rowO + r.begin());
+				_rowG + r.begin(), _rowO + r.begin(), _shift);
 		}
 
       private:
@@ -429,13 +439,15 @@ class WeightedMedianFilter2 : public detail::WeightedMedianFilterBase<W>,
 	ROW_I					_rowI;
 	ROW_G					_rowG;
 	ROW_O					_rowO;
+	const bool				_shift;
     };
 
     template <class ROW_I, class ROW_G, class ROW_O>
     Filter<ROW_I, ROW_G, ROW_O>
-		makeFilter(ROW_I rowI, ROW_G rowG, ROW_O rowO) const
+		makeFilter(ROW_I rowI, ROW_G rowG, ROW_O rowO, bool shift) const
 		{
-		    return Filter<ROW_I, ROW_G, ROW_O>(*this, rowI, rowG, rowO);
+		    return Filter<ROW_I, ROW_G, ROW_O>(*this,
+						       rowI, rowG, rowO, shift);
 		}
 #endif
   // std::reverse_iterator<ITER> はITERが指すオブジェクトへの参照を返すため
@@ -494,18 +506,28 @@ class WeightedMedianFilter2 : public detail::WeightedMedianFilterBase<W>,
 	 _grainSize(100)						{}
 
     using	super::winSize;
+    using	super::outSize;
+    using	super::offset;
     using	super::nbinsI;
     using	super::nbinsG;
 
+    auto	winSizeV()			const	{return winSize();}
+    auto	winSizeH()			const	{return winSize();}
+    auto	outSizeV(size_t nrow)		const	{return outSize(nrow);}
+    auto	outSizeH(size_t ncol)		const	{return outSize(ncol);}
+    auto	offsetV()			const	{return offset();}
+    auto	offsetH()			const	{return offset();}
+	
     template <class IN, class GUIDE, class OUT>
-    void	convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out)	;
-    size_t	grainSize()			const	{ return _grainSize; }
-    void	setGrainSize(size_t gs)			{ _grainSize = gs; }
+    void	convolve(IN ib, IN ie, GUIDE gb, GUIDE ge,
+			 OUT out, bool shift=false)	;
+    size_t	grainSize()			const	{return _grainSize;}
+    void	setGrainSize(size_t gs)			{_grainSize = gs;}
     
   private:
     template <class ROW_I, class ROW_G, class ROW_O>
     void	filter(ROW_I rowI, ROW_I rowIe,
-		       ROW_G rowG, ROW_O out)			const	;
+		       ROW_G rowG, ROW_O out, bool shift)	const	;
     template <class ROW_I, class ROW_G, class COL_C, class COL_G, class COL_O>
     void	filterRow(MedianTracker& tracker,
 			  ROW_I rowI, ROW_G rowG, COL_C c,
@@ -519,7 +541,8 @@ class WeightedMedianFilter2 : public detail::WeightedMedianFilterBase<W>,
 
 template <class T, class W>
 template <class IN, class GUIDE, class OUT> void
-WeightedMedianFilter2<T, W>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out)
+WeightedMedianFilter2<T, W>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge,
+				      OUT out, bool shift)
 {
     if (std::distance(ib, ie) < winSize() || ib->size() < winSize())
 	return;
@@ -534,10 +557,10 @@ WeightedMedianFilter2<T, W>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out)
 #if defined(USE_TBB)
     tbb::parallel_for(tbb::blocked_range<size_t>(
 			  0, indicesI.size() + 1 - winSize(), _grainSize),
-		      makeFilter(indicesI.begin(), indicesG.begin(), out));
+		      makeFilter(indicesI.begin(), indicesG.begin(), out, shift));
 #else
     filter(indicesI.begin(), indicesI.end() + 1 - winSize(),
-	   indicesG.begin(), out);
+	   indicesG.begin(), out, shift);
 #endif
     pf_type::nextFrame();
 }
@@ -545,7 +568,7 @@ WeightedMedianFilter2<T, W>::convolve(IN ib, IN ie, GUIDE gb, GUIDE ge, OUT out)
 template <class T, class W>
 template <class ROW_I, class ROW_G, class ROW_O> void
 WeightedMedianFilter2<T, W>::filter(ROW_I rowI, ROW_I rowIe,
-				    ROW_G rowG, ROW_O rowO) const
+				    ROW_G rowG, ROW_O rowO, bool shift) const
 {
     using col_iterator	= boost::counting_iterator<size_t>;
     using rcol_iterator	= reverse_iterator<col_iterator>;
@@ -561,25 +584,29 @@ WeightedMedianFilter2<T, W>::filter(ROW_I rowI, ROW_I rowIe,
 	tracker.add(row->begin(), row->begin() + winSize() - 1, midG->begin());
     
     pf_type::start(3);
-    const auto	mid  = winSize()/2;
-    const auto	rmid = (winSize()-1)/2;
+    const auto	mid   = offset();
+    const auto	rmid  = winSize() - offset() - 1;
+    const auto	midO  = (shift ? mid  : 0);
+    const auto	rmidO = (shift ? rmid : 0);
     midG = rowG;
     std::advance(midG, mid);		// ウィンドウの中央行
-    std::advance(rowO, mid);		// 出力行をウィンドウの中央に合わせる
+    if (shift)
+	std::advance(rowO, mid);
+
   // 左から右／右から左に交互に走査してmedian点を探索
     for (bool reverse = false; rowI != rowIe; ++rowI)
     {
 	if (!reverse)
 	{
 	    filterRow(tracker, rowI, rowG, col_iterator(0),
-		      midG->begin() + mid, rowO->begin() + mid);
+		      midG->begin() + mid, rowO->begin() + midO);
 	    reverse = true;
 	}
 	else
 	{
 	    filterRow(tracker, rowI, rowG,
 		      rcol_iterator(col_iterator(rowI->size())),
-		      midG->rbegin() + rmid, rowO->rbegin() + rmid);
+		      midG->rbegin() + rmid, rowO->rbegin() + rmidO);
 	    reverse = false;
 	}
 

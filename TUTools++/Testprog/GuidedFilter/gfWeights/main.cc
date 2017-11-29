@@ -18,16 +18,16 @@ namespace v
 ************************************************************************/
 enum	{c_WinSize, c_Regularization, c_Saturation, c_Cursor};
 
-static float	range[][3] = {{1, 64, 1}, {0, 255, 1}, {1, 64, 4}};
+static float	range[][3] = {{1, 64, 1}, {0.1, 10, 0.1}, {1, 64, 4}};
 static CmdDef	Cmds[] =
 {
-    {C_Slider, c_WinSize,	 11, "Window size:",	range[0], CA_None,
+    {C_Slider, c_WinSize,	 11,	"Window size:",	   range[0], CA_None,
      0, 0, 1, 1, 0},
-    {C_Slider, c_Regularization,  5, "Regularization:",	range[1], CA_None,
+    {C_Slider, c_Regularization, 0.1f,	"Regularization:", range[1], CA_None,
      1, 0, 1, 1, 0},
-    {C_Slider, c_Saturation,     12, "Saturation:",     range[2], CA_None,
+    {C_Slider, c_Saturation,     12,	"Saturation:",     range[2], CA_None,
      0, 1, 1, 1, 0},
-    {C_Label,  c_Cursor,	  0, "         ",	noProp,	  CA_None,
+    {C_Label,  c_Cursor,	 0,	"         ",	   noProp,   CA_None,
      1, 1, 1, 1, 0},
     EndOfCmds
 };
@@ -123,10 +123,10 @@ MyCmdWindow<T>::MyCmdWindow(App& parentApp, const char* name,
     _weightsCanvas.place(1, 1, 1, 1);
 
     size_t	w = _cmd.getValue(c_WinSize);
-    float	s = _cmd.getValue(c_Regularization).f();
-    _gf2.setRowWinSize(w);
-    _gf2.setColWinSize(w);
-    _gf2.setEpsilon(s*s);
+    float	e = _cmd.getValue(c_Regularization).f();
+    _gf2.setWinSizeV(w);
+    _gf2.setWinSizeH(w);
+    _gf2.setEpsilon(e);
     colormap().setSaturationF(_cmd.getValue(c_Saturation).f());
     _weightsCanvas.setZoom(8);
     _weightsCanvas.setSize(2*w - 1, 2*w - 1);
@@ -141,36 +141,31 @@ MyCmdWindow<T>::showWeights(size_t u, size_t v)
 	return;
     
     const size_t	w = _cmd.getValue(c_WinSize);
-#if 0
-    const size_t	uc = (u < w - 1 ? w - 1 :
-			      u > _guide.width() - w + 1 ?
-			      _guide.width() - w + 1 : u);
-    const size_t	vc = (v < w - 1 ? w - 1 :
-			      v > _guide.height() - w + 1 ?
-			      _guide.height() - w + 1 : v);
-    Image<T>		in(_guide.width(), _guide.height());
-    Image<float>	out(in.width(), in.height());
-    in[v][u] = 255;
-    _gf2.convolve(in.begin(), in.end(),
-		  _guide.begin(), _guide.end(), out.begin());
-    _weights = slice(out, vc - w + 1, 2*w - 1, uc - w + 1, 2*w - 1);
-#else
+
+  // (u, v)を中心とする(4w-3)*(4w-3)の小領域の左上／右下隅を求める．
     const size_t	ub = std::max(u,  2*w - 2) - 2*w + 2,
 			ue = std::min(u + 2*w - 1, _guide.width()),
 			vb = std::max(v,  2*w - 2) - 2*w + 2,
 			ve = std::min(v + 2*w - 1, _guide.height());
-    Image<T>		in(ue - ub, ve - vb);
-    Image<float>	out(in.width(), in.height());
+
+  // 前後左右にそれぞれw-1画素の余裕があるような位置を新たな中心とする，
     const size_t	uc = (u < w - 1 ? w - 1 : u < 2*w - 2 ? u : 2*w - 2),
 			vc = (v < w - 1 ? w - 1 : v < 2*w - 2 ? v : 2*w - 2);
+
+  // フィルタへの入力となる(uc, vc)を中心とするインパルス画像
+    Array2<T>		in(ue - ub, ve - vb);
     in[vc][uc] = 255;
-    const Image<T>	guide = slice(_guide, vb, in.height(), ub, in.width());
-  //const auto		guide = slice(_guide, vb, in.height(), ub, in.width());
+
+  // ファイルから読み込んだ画像から小領域を切り出してガイド画像とする．
+    const auto		guide = slice(_guide, vb, in.nrow(), ub, in.ncol());
+
+  // フィルタから出力される重みを格納する領域を確保する．
+    _weights.resize(_gf2.outSizeV(in.nrow()), _gf2.outSizeH(in.ncol()));
+
+  // 小領域をガイドとしてインパルス画像にフィルタを適用し，インパルス位置での重みを得る．
     _gf2.convolve(in.begin(), in.end(),
-		  guide.begin(), guide.end(), out.begin());
-    _weights = slice(out, vc - w + 1, out.height() - w + 1,
-			  uc - w + 1, out.width()  - w + 1);
-#endif
+		  guide.begin(), guide.end(), _weights.begin());
+
     _weightsCanvas.setSize(2*w - 1, 2*w - 1);
     _weightsCanvas.repaintUnderlay();
 }
@@ -185,12 +180,12 @@ MyCmdWindow<T>::callback(CmdId id, CmdVal val)
 	break;
 
       case c_WinSize:
-	_gf2.setRowWinSize(val);
-	_gf2.setColWinSize(val);
+	_gf2.setWinSizeV(val);
+	_gf2.setWinSizeH(val);
 	break;
 
       case c_Regularization:
-	_gf2.setEpsilon(val.f()*val.f());
+	_gf2.setEpsilon(val.f());
 	break;
 	
       case c_Saturation:

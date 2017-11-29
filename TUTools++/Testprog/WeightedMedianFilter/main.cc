@@ -38,7 +38,7 @@ main()
     cerr << endl;
 
     WeightedMedianFilter<value_type, wfunc_type> wmf(wfunc_type(), 5, 8, 8);
-    data_type					 out(in.size());
+    data_type					 out(wmf.outSize(in.size()));
     wmf.convolve(in.cbegin(), in.cend(), in.cbegin(), in.cend(), out.begin());
 
     cerr << "--- out ---\n ";

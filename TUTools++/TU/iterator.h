@@ -124,7 +124,7 @@ class zip_iterator : public boost::iterator_facade<
 			zip_iterator<ITER_TUPLE>,
 			decltype(tuple_transform(detail::generic_dereference(),
 						 std::declval<ITER_TUPLE>())),
-			iterator_category<tuple_head<ITER_TUPLE> >,
+			iterator_category<std::tuple_element_t<0, ITER_TUPLE> >,
 			decltype(tuple_transform(detail::generic_dereference(),
 						 std::declval<ITER_TUPLE>()))>
 {
@@ -133,7 +133,7 @@ class zip_iterator : public boost::iterator_facade<
 			zip_iterator,
 			decltype(tuple_transform(detail::generic_dereference(),
 						 std::declval<ITER_TUPLE>())),
-			iterator_category<tuple_head<ITER_TUPLE> >,
+			iterator_category<std::tuple_element_t<0, ITER_TUPLE> >,
 			decltype(tuple_transform(detail::generic_dereference(),
 						 std::declval<ITER_TUPLE>()))>;
     friend	class boost::iterator_core_access;
@@ -380,8 +380,8 @@ class map_iterator
     using	typename super::reference;
 	
   public:
-		map_iterator(FUNC func, const ITER&... iter)
-		    :super(std::tuple<ITER...>(iter...)), _func(func)
+		map_iterator(const FUNC& func, const ITER&... iter)
+		    :super(std::make_tuple(iter...)), _func(func)
 		{
 		}
 	
@@ -401,9 +401,8 @@ class map_iterator
     FUNC	_func;	//!< 演算子
 };
 
-template <class FUNC, class... ITER>
-inline map_iterator<FUNC, ITER...>
-make_map_iterator(FUNC func, const ITER&... iter)
+template <class FUNC, class... ITER> inline map_iterator<FUNC, ITER...>
+make_map_iterator(const FUNC& func, const ITER&... iter)
 {
     return {func, iter...};
 }
@@ -449,28 +448,34 @@ make_second_iterator(const ITER& iter)
 }
     
 /************************************************************************
-*  class assignment_iterator<FUNC, ITER>				*
+*  class assignment_iterator<FUNC, ITER...>				*
 ************************************************************************/
 //! libTUTools++ のクラスや関数の実装の詳細を収める名前空間
 namespace detail
 {
-  template <class FUNC, class ITER>
+  template <class FUNC, class ITER, class... ITERS>
   class assignment_proxy
   {
+    public:
+      using iterator	= std::conditional_t<
+				sizeof...(ITERS),
+				zip_iterator<std::tuple<ITER, ITERS...> >,
+				ITER>;
+      
     private:
       template <class T_>
-      static auto	check_func(ITER iter, const T_& val, FUNC func)
+      static auto	check_func(iterator iter, const T_& val, FUNC func)
 			    -> decltype(func(*iter, val), std::true_type());
       template <class T_>
-      static auto	check_func(ITER iter, const T_& val, FUNC func)
+      static auto	check_func(iterator iter, const T_& val, FUNC func)
 			    -> decltype(*iter = func(val), std::false_type());
       template <class T_>
-      using is_binary_func	= decltype(check_func(std::declval<ITER>(),
+      using is_binary_func	= decltype(check_func(std::declval<iterator>(),
 						      std::declval<T_>(),
 						      std::declval<FUNC>()));
       
     public:
-      assignment_proxy(const ITER& iter, const FUNC& func)
+      assignment_proxy(const iterator& iter, const FUNC& func)
 	  :_iter(iter), _func(func)					{}
 
       template <class T_>
@@ -531,7 +536,7 @@ namespace detail
 			}
 
     private:
-      const ITER&	_iter;
+      const iterator&	_iter;
       const FUNC&	_func;
   };
 }
@@ -541,33 +546,44 @@ namespace detail
   \param FUNC	変換を行う関数オブジェクトの型
   \param ITER	変換結果の代入先を指す反復子
 */
-template <class FUNC, class ITER>
+template <class FUNC, class... ITER>
 class assignment_iterator
-    : public boost::iterator_adaptor<assignment_iterator<FUNC, ITER>,
-				     ITER,
-				     iterator_value<ITER>,
-				     iterator_category<ITER>,
-				     detail::assignment_proxy<FUNC, ITER> >
+    : public boost::iterator_adaptor<
+		assignment_iterator<FUNC, ITER...>,
+		typename detail::assignment_proxy<FUNC, ITER...>::iterator,
+		iterator_value<
+		    typename detail::assignment_proxy<FUNC, ITER...>::iterator>,
+		iterator_category<
+		    typename detail::assignment_proxy<FUNC, ITER...>::iterator>,
+		detail::assignment_proxy<FUNC, ITER...> >
 {
   private:
+    using proxy	= detail::assignment_proxy<FUNC, ITER...>;
     using super	= boost::iterator_adaptor<
 			assignment_iterator,
-			ITER,
-			iterator_value<ITER>,
-			iterator_category<ITER>,
-			detail::assignment_proxy<FUNC, ITER> >;
+			typename proxy::iterator,
+			iterator_value<typename proxy::iterator>,
+			iterator_category<typename proxy::iterator>,
+			proxy>;
     friend	class boost::iterator_core_access;
 
   public:
     using	typename super::reference;
     
   public:
-    assignment_iterator(const ITER& iter, const FUNC& func=FUNC())
-	:super(iter), _func(func)			{}
+    assignment_iterator(const FUNC& func, const ITER&... iter)
+	:assignment_iterator(
+	    std::integral_constant<bool, (sizeof...(ITER) > 1)>(),
+	    func, iter...)					{}
 
-    const auto&	functor()			const	{ return _func; }
+    const auto&	functor()				const	{ return _func; }
 
   private:
+    assignment_iterator(std::true_type,  const FUNC& func, const ITER&... iter)
+	:super(std::make_tuple(iter...)), _func(func)		{}
+    assignment_iterator(std::false_type, const FUNC& func, const ITER&... iter)
+	:super(iter...), _func(func)				{}
+
     reference	dereference() const
 		{
 		    return {super::base(), _func};
@@ -577,10 +593,10 @@ class assignment_iterator
     FUNC 	_func;	// 代入を可能にするためconstは付けない
 };
     
-template <class FUNC, class ITER> inline assignment_iterator<FUNC, ITER>
-make_assignment_iterator(const ITER& iter, const FUNC& func=FUNC())
+template <class FUNC, class... ITER> inline assignment_iterator<FUNC, ITER...>
+make_assignment_iterator(const FUNC& func, const ITER&... iter)
 {
-    return {iter, func};
+    return {func, iter...};
 }
 
 /************************************************************************

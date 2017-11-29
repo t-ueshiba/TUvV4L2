@@ -40,9 +40,9 @@ class MyCanvasPane : public CanvasPane
   public:
     MyCanvasPane(Window& parentWin, const Image<T>& image)
 	:CanvasPane(parentWin, image.width(), image.height()),
-	 _image(image), _dc(*this)			{}
+	 _image(image), _dc(*this)					{}
 
-    virtual void	repaintUnderlay()		{ _dc << _image; }
+    virtual void	repaintUnderlay()	{ _dc << clear << _image; }
     
   private:
     const Image<T>&	_image;
@@ -132,8 +132,10 @@ MyCmdWindow<T, G>::callback(CmdId id, CmdVal val)
 template <class T, class G> void
 MyCmdWindow<T, G>::filter()
 {
+    _result.resize(_image.height(), _image.width());
+    _result = 0;
     _wmf.convolve(_image.cbegin(), _image.cend(),
-		  _guide.cbegin(), _guide.cend(), _result.begin());
+		  _guide.cbegin(), _guide.cend(), _result.begin(), true);
     _imageCanvas.repaintUnderlay();
     _resultCanvas.repaintUnderlay();
 }

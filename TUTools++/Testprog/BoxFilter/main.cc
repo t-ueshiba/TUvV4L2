@@ -38,7 +38,7 @@ doJob(size_t winSize, size_t grainSize, int niter)
 	for (int j = 0; j < niter; ++j)
 	{
 	    profiler.start(0);
-	    box.convolve(in.begin(), in.end(), out.begin());
+	    box.convolve(in.cbegin(), in.cend(), out.begin());
 	    profiler.nextFrame();
 	}
 	cerr << "---------------------------------------------" << endl;
