@@ -126,6 +126,9 @@ template <class T>
 class BoxFilter
 {
   public:
+    using element_type	= T;
+    
+  public:
   //! box filterを生成する．
   /*!
     \param w	box filterのウィンドウ幅
@@ -195,8 +198,9 @@ class BoxFilter2 : public Filter2<BoxFilter2<T> >
     using super	= Filter2<BoxFilter2<T> >;
     
   public:
-    using	super::grainSize;
-    using	super::setGrainSize;
+    using element_type	= T;
+    using super::grainSize;
+    using super::setGrainSize;
     
   //! box filterを生成する．
   /*!

@@ -5,7 +5,11 @@
 #define TU_SIMD_X86_ARCH_H
 
 #include <sys/types.h>
-#include <immintrin.h>
+#ifdef _MSC_VER
+#  include <intrin.h>
+#else
+#  include <x86intrin.h>
+#endif
 
 /************************************************************************
 *  Emulations								*
@@ -27,6 +31,17 @@
 #endif
 
 // AVX以降では alignr が上下のlaneに分断されて使いにくいので，自然なバージョンを定義
+#if defined(AVX512)
+  template <size_t N> inline __m512i
+  emu_alignr_impl(__m512i y, __m512i x, std::integral_constant<int, 0>)
+  {
+      return _mm512_permutex2var_epi8(x, y, 0x21), x, N);
+  }
+
+
+
+
+#endif
 #if defined(AVX)
 #  if defined(AVX2)
   template <size_t N> inline __m256i
@@ -181,7 +196,17 @@
 #define SIMD_SIGNED(type)	SIMD_SIGNED_##type
 #define SIMD_BASE(type)		SIMD_BASE_##type
 
-#if defined(AVX2)
+#if defined(AVX512)
+#  define SIMD_PREFIX_int8_t	_mm512_
+#  define SIMD_PREFIX_int16_t	_mm512_
+#  define SIMD_PREFIX_int32_t	_mm512_
+#  define SIMD_PREFIX_int64_t	_mm512_
+#  define SIMD_PREFIX_uint8_t	_mm512_
+#  define SIMD_PREFIX_uint16_t	_mm512_
+#  define SIMD_PREFIX_uint32_t	_mm512_
+#  define SIMD_PREFIX_uint64_t	_mm512_
+#  define SIMD_PREFIX_ivec_t	_mm512_
+#elif defined(AVX2)
 #  define SIMD_PREFIX_int8_t	_mm256_
 #  define SIMD_PREFIX_int16_t	_mm256_
 #  define SIMD_PREFIX_int32_t	_mm256_
@@ -212,7 +237,9 @@
 #  define SIMD_SUFFIX_uint16_t	epu16
 #  define SIMD_SUFFIX_uint32_t	epu32
 #  define SIMD_SUFFIX_uint64_t	epi64
-#  if defined(AVX2)
+#  if defined(AVX512)
+#    define SIMD_SUFFIX_ivec_t	si512
+#  elif defined(AVX2)
 #    define SIMD_SUFFIX_ivec_t	si256
 #  else
 #    define SIMD_SUFFIX_ivec_t	si128
@@ -249,7 +276,12 @@
 #define SIMD_BASE_uint64_t	SIMD_SUFFIX_ivec_t
 #define SIMD_BASE_ivec_t	SIMD_SUFFIX_ivec_t
 
-#if defined(AVX)
+#if defined(AVX512)
+#  define SIMD_PREFIX_float	_mm512_
+#  define SIMD_PREFIX_fvec_t	_mm512_
+#  define SIMD_PREFIX_double	_mm512_
+#  define SIMD_PREFIX_dvec_t	_mm512_
+#elif defined(AVX)
 #  define SIMD_PREFIX_float	_mm256_
 #  define SIMD_PREFIX_fvec_t	_mm256_
 #  define SIMD_PREFIX_double	_mm256_

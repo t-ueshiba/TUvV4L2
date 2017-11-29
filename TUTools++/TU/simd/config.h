@@ -6,6 +6,9 @@
 #if !defined(TU_SIMD_CONFIG_H)
 #define TU_SIMD_CONFIG_H
 
+#if defined(AVX512)		// Core-i7/9 Skylake-X (2015)
+#  define AVX2
+#endif
 #if defined(AVX2)		// Core-i7 Haswell (2013)
 #  define AVX
 #endif
