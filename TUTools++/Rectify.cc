@@ -25,6 +25,14 @@ computeBoundingBox(size_t width, size_t height, const Homography<T>& H)
 /************************************************************************
 *  class Rectify							*
 ************************************************************************/
+Rectify::matrix34_type
+Rectify::operator ()(size_t i, const matrix34_type& P) const
+{
+    matrix34_type	Prect = H(i) * P;
+    Prect /= length(slice(Prect[2], 0, 3));
+    return Prect;
+}
+    
 void
 Rectify::computeBaseHomographies(const camera_type& cameraL,
 				 const camera_type& cameraR,

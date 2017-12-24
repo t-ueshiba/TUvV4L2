@@ -20,6 +20,7 @@ class Rectify
     using camera_type		= Camera<IntrinsicWithDistortion<
 					     IntrinsicBase<element_type> > >;
     using homography_type	= Homography<element_type>;
+    using matrix34_type		= camera_type::matrix34_type;
     
   public:
     Rectify()								{}
@@ -29,7 +30,7 @@ class Rectify
 	    size_t widthL, size_t heightL,
 	    size_t widthR, size_t heightR,
 	    element_type scale=1.0,
-	    int disparitySearchWidth=0, int disparityMax=0)
+	    size_t disparitySearchWidth=0, size_t disparityMax=0)
     {
 	initialize(cameraL, cameraR, widthL, heightL, widthR, heightR,
 		   scale, disparitySearchWidth, disparityMax);
@@ -39,7 +40,7 @@ class Rectify
     Rectify(const ImageBase<IMAGE>& imageL,
 	    const ImageBase<IMAGE>& imageR,
 	    element_type scale=1.0,
-	    int disparitySearchWidth=0, int disparityMax=0)
+	    size_t disparitySearchWidth=0, size_t disparityMax=0)
     {
 	initialize(imageL, imageR, scale, disparitySearchWidth, disparityMax);
     }
@@ -51,7 +52,7 @@ class Rectify
 	    size_t widthR, size_t heightR,
 	    size_t widthV, size_t heightV,
 	    element_type scale=1.0,
-	    int disparitySearchWidth=0, int disparityMax=0)
+	    size_t disparitySearchWidth=0, size_t disparityMax=0)
     {
 	initialize(cameraL, cameraR, cameraV,
 		   widthL, heightL, widthR, heightR, widthV, heightV,
@@ -63,7 +64,7 @@ class Rectify
 	    const ImageBase<IMAGE>& imageR,
 	    const ImageBase<IMAGE>& imageV,
 	    element_type scale=1.0,
-	    int disparitySearchWidth=0, int disparityMax=0)
+	    size_t disparitySearchWidth=0, size_t disparityMax=0)
     {
 	initialize(imageL, imageR, imageV,
 		   scale, disparitySearchWidth, disparityMax);
@@ -149,13 +150,16 @@ class Rectify
 				    Image<T, ALLOC2>& outR,
 				    Image<T, ALLOC2>& outV)	const	;
     
+    matrix34_type	operator ()(size_t i,
+				    const matrix34_type& P)	const	;
+    
     const homography_type&
-		H(int i)		const	{return _H[i];}
-    const Warp&	warp(int i)		const	{return _warp[i];}
-    size_t	width(int i)		const	{return _warp[i].width();}
-    size_t	height(int i)		const	{return _warp[i].height();}
-    int		lmost(int i, int v)	const	{return _warp[i].lmost(v);}
-    int		rmost(int i, int v)	const	{return _warp[i].rmost(v);}
+		H(size_t i)		  const	{return _H[i];}
+    const Warp&	warp(size_t i)		  const	{return _warp[i];}
+    size_t	width(size_t i)		  const	{return _warp[i].width();}
+    size_t	height(size_t i)	  const	{return _warp[i].height();}
+    size_t	lmost(size_t i, size_t v) const	{return _warp[i].lmost(v);}
+    size_t	rmost(size_t i, size_t v) const	{return _warp[i].rmost(v);}
     
   private:
     void	computeBaseHomographies(const camera_type& cameraL,
@@ -301,9 +305,9 @@ Rectify::initialize(const camera_type& cameraL,
     scaleHomographies(widthL, heightL, scale);
 	
     const auto	b = baselineLength(cameraL, cameraR);
-    disparityMax = int(b/depthMin + 0.5);
+    disparityMax = size_t(b/depthMin + 0.5);
     if (depthMax >= depthMin)
-	disparitySearchWidth = int(b/depthMin - b/depthMax + 0.5);
+	disparitySearchWidth = size_t(b/depthMin - b/depthMax + 0.5);
     else
 	disparitySearchWidth = disparityMax;
     
