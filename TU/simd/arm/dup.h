@@ -16,8 +16,8 @@ dup(vec<T> x)
 {
     using I = typename std::conditional<
 		  std::is_integral<T>::value,
-		  unsigned_type<T>,
-		  unsigned_type<complementary_type<T> > >::type;
+		  mask_type<T>,
+		  mask_type<complementary_type<T> > >::type;
     using U = upper_type<I>;
     
     const auto	y = cvt<U, HI>(cast<I>(x));

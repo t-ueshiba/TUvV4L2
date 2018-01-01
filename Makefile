@@ -78,7 +78,6 @@ HDRS		= TU/Array++.h \
 		TU/Ransac.h \
 		TU/Rectify.h \
 		TU/SADStereo.h \
-		TU/SADStereo2.h \
 		TU/SHOT602.h \
 		TU/SURFCreator.h \
 		TU/SeparableFilter2.h \
@@ -118,7 +117,6 @@ HDRS		= TU/Array++.h \
 		TU/simd/arm/type_traits.h \
 		TU/simd/arm/vec.h \
 		TU/simd/arm/zero.h \
-		TU/simd/assignment_iterator.h \
 		TU/simd/bit_shift.h \
 		TU/simd/cast.h \
 		TU/simd/compare.h \

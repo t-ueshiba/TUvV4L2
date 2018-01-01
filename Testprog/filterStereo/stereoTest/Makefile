@@ -17,9 +17,9 @@ CPPFLAGS	= -DNDEBUG #-DSCORE_ARRAY3 #-DTU_DEBUG #-DUSE_TBB
 CFLAGS		= -g -O3
 NVCCFLAGS	= -g
 ifeq ($(shell arch), armv7l)
-  CPPFLAGS     += -DNEON
+#  CPPFLAGS     += -DNEON
 else ifeq ($(shell arch), aarch64)
-  CPPFLAGS     += -DNEON
+#  CPPFLAGS     += -DNEON
 else
 #  CPPFLAGS     += -DSSE4
 #  CFLAGS       += -msse4
@@ -177,8 +177,8 @@ Rectify.o: ../../../TU/Rectify.h ../../../TU/Warp.h \
 	../../../TU/simd/x86/lookup.h ../../../TU/simd/arm/lookup.h \
 	../../../TU/simd/load_store_iterator.h \
 	../../../TU/simd/cvtdown_iterator.h ../../../TU/simd/cvtup_iterator.h \
-	../../../TU/simd/shift_iterator.h ../../../TU/algorithm.h \
-	../../../TU/Array++.h ../../../TU/range.h ../../../TU/Image++.h \
+	../../../TU/simd/shift_iterator.h ../../../TU/Array++.h \
+	../../../TU/range.h ../../../TU/algorithm.h ../../../TU/Image++.h \
 	../../../TU/Manip.h ../../../TU/Camera++.h ../../../TU/Geometry++.h \
 	../../../TU/Minimize.h ../../../TU/Vector++.h
 main.o: ../../../TU/algorithm.h ../../../TU/io.h ../../../TU/Rectify.h \
