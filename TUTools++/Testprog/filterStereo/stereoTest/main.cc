@@ -74,14 +74,14 @@ doJob(const Image<T>& imageL, const Image<T>& imageR,
 						  params.intensityDiffMax,
 						  std::cbegin(*rowL),
 						  std::cbegin(*rowR)),
-			    {stride(rowL), stride(rowR)},
+			    std::make_tuple(stride(rowL), stride(rowR)),
 			    TU::size(*rowL));
     const auto	rowIe = make_range_iterator(
 			    make_diff_iterator<S>(params.disparitySearchWidth,
 						  params.intensityDiffMax,
 						  std::cbegin(*rowLe),
 						  std::cbegin(*rowRe)),
-			    {stride(rowLe), stride(rowRe)},
+			    std::make_tuple(stride(rowLe), stride(rowRe)),
 			    TU::size(*rowLe));
 
     Image<S, allocator<S> >

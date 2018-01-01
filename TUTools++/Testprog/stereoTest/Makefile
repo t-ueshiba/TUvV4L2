@@ -166,9 +166,9 @@ main.o: ../../TU/io.h ../../TU/Rectify.h ../../TU/Warp.h \
 	../../TU/simd/lookup.h ../../TU/simd/x86/lookup.h \
 	../../TU/simd/arm/lookup.h ../../TU/simd/load_store_iterator.h \
 	../../TU/simd/cvtdown_iterator.h ../../TU/simd/cvtup_iterator.h \
-	../../TU/simd/shift_iterator.h ../../TU/algorithm.h \
-	../../TU/Array++.h ../../TU/range.h ../../TU/Image++.h \
-	../../TU/Manip.h ../../TU/Camera++.h ../../TU/Geometry++.h \
-	../../TU/Minimize.h ../../TU/Vector++.h ../../TU/SADStereo.h \
-	../../TU/StereoBase.h ../../TU/Profiler.h ../../TU/BoxFilter.h \
-	../../TU/Filter2.h ../../TU/GFStereo.h
+	../../TU/simd/shift_iterator.h ../../TU/Array++.h ../../TU/range.h \
+	../../TU/algorithm.h ../../TU/Image++.h ../../TU/Manip.h \
+	../../TU/Camera++.h ../../TU/Geometry++.h ../../TU/Minimize.h \
+	../../TU/Vector++.h ../../TU/SADStereo.h ../../TU/StereoBase.h \
+	../../TU/Profiler.h ../../TU/BoxFilter.h ../../TU/Filter2.h \
+	../../TU/GFStereo.h
