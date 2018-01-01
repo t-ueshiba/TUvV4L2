@@ -4,7 +4,6 @@
 #if !defined(TU_SIMD_ARM_ARITHMETIC_H)
 #define TU_SIMD_ARM_ARITHMETIC_H
 
-#include "TU/simd/zero.h"
 #include "TU/simd/insert_extract.h"
 
 namespace TU
@@ -95,31 +94,31 @@ SIMD_RCP_RSQRT(float)
 #undef SIMD_MIN_MAX
 #undef SIMD_RCP_RSQRT
   
-template <class T> inline vec<signed_type<T> >
-operator -(vec<T> x)
-{
-    return zero<T>() - x;
-}
-    
 /************************************************************************
 *  Average values							*
 ************************************************************************/
-#define SIMD_AVG_SUB_AVG(type)						\
-    SIMD_BINARY_FUNC(avg, haddq, type)					\
+#define SIMD_AVG(type)							\
+    SIMD_BINARY_FUNC(avg, haddq, type)
+#define SIMD_SUB_AVG(type)						\
     SIMD_BINARY_FUNC(sub_avg, hsubq, type)
 
-SIMD_AVG_SUB_AVG(int8_t)
-SIMD_AVG_SUB_AVG(int16_t)
-SIMD_AVG_SUB_AVG(int32_t)
-SIMD_AVG_SUB_AVG(uint8_t)
-SIMD_AVG_SUB_AVG(uint16_t)
-SIMD_AVG_SUB_AVG(uint32_t)
+SIMD_AVG(int8_t)
+SIMD_AVG(int16_t)
+SIMD_AVG(int32_t)
+SIMD_SUB_AVG(int8_t)
+SIMD_SUB_AVG(int16_t)
+SIMD_SUB_AVG(int32_t)
+SIMD_AVG(uint8_t)
+SIMD_AVG(uint16_t)
+SIMD_AVG(uint32_t)
 
 template <> inline F32vec
 avg(F32vec x, F32vec y)			{return (x + y) * F32vec(0.5f);}
 
 template <> inline F32vec
 sub_avg(F32vec x, F32vec y)		{return (x - y) * F32vec(0.5f);}
+
+#undef SIMG_AVG
     
 /************************************************************************
 *  Absolute values							*

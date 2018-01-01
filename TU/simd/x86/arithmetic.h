@@ -6,7 +6,6 @@
 
 #include "TU/simd/x86/unpack.h"
 #include "TU/simd/select.h"
-#include "TU/simd/zero.h"
 #include "TU/simd/insert_extract.h"
 
 namespace TU
@@ -128,20 +127,9 @@ mul(vec<T> x, vec<T> y)
     return unpack<HI>(x * y, mulhi(x, y));
 }
 
-template <class T> inline vec<signed_type<T> >
-operator -(vec<T> x)
-{
-    return zero<T>() - x;
-}
-    
 /************************************************************************
 *  Average values							*
 ************************************************************************/
-template <class T> inline vec<T>
-avg(vec<T> x, vec<T> y)			{return (x + y) >> 1;}
-template <class T> inline vec<signed_type<T> >
-sub_avg(vec<T> x, vec<T> y)		{return (x - y) >> 1;}
-
 #if defined(SSE)
   SIMD_BINARY_FUNC(avg, avg, uint8_t)
   SIMD_BINARY_FUNC(avg, avg, uint16_t)
