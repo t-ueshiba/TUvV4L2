@@ -10,6 +10,7 @@
 #include "TU/simd/vec.h"
 #include "TU/simd/cast.h"
 #include "TU/simd/logical.h"
+#include "TU/simd/zero.h"
 
 namespace TU
 {
@@ -18,18 +19,17 @@ namespace simd
 /************************************************************************
 *  Arithmetic operators							*
 ************************************************************************/
-template <class T> vec<T>		operator +(vec<T> x, vec<T> y)	;
-template <class T> vec<T>		operator *(vec<T> x, vec<T> y)	;
-template <class T> vec<T>		operator /(vec<T> x, vec<T> y)	;
-template <class T> vec<T>		operator %(vec<T> x, vec<T> y)	;
-template <class T> vec<signed_type<T> >	operator -(vec<T> x)		;
-template <class T> vec<T>		subs(vec<T> x, vec<T> y)	;
-template <class T> vec<T>		mulhi(vec<T> x, vec<T> y)	;
-template <class T> vec<T>		min(vec<T> x, vec<T> y)		;
-template <class T> vec<T>		max(vec<T> x, vec<T> y)		;
-template <class T> vec<T>		rcp(vec<T> x)			;
-template <class T> vec<T>		sqrt(vec<T> x)			;
-template <class T> vec<T>		rsqrt(vec<T> x)			;
+template <class T> vec<T>	operator +(vec<T> x, vec<T> y)		;
+template <class T> vec<T>	operator *(vec<T> x, vec<T> y)		;
+template <class T> vec<T>	operator /(vec<T> x, vec<T> y)		;
+template <class T> vec<T>	operator %(vec<T> x, vec<T> y)		;
+template <class T> vec<T>	subs(vec<T> x, vec<T> y)		;
+template <class T> vec<T>	mulhi(vec<T> x, vec<T> y)		;
+template <class T> vec<T>	min(vec<T> x, vec<T> y)			;
+template <class T> vec<T>	max(vec<T> x, vec<T> y)			;
+template <class T> vec<T>	rcp(vec<T> x)				;
+template <class T> vec<T>	sqrt(vec<T> x)				;
+template <class T> vec<T>	rsqrt(vec<T> x)				;
 
 template <class T> inline vec<signed_type<T> >
 operator -(vec<T> x, vec<T> y)
@@ -39,6 +39,12 @@ operator -(vec<T> x, vec<T> y)
     return cast<signed_type<T> >(mask ^ x) - cast<signed_type<T> >(mask ^ y);
 }
 
+template <class T> inline vec<signed_type<T> >
+operator -(vec<T> x)
+{
+    return zero<T>() - x;
+}
+    
 template <class T> inline vec<T>
 operator *(T c, vec<T> x)
 {
@@ -66,8 +72,10 @@ operator %(vec<T> x, T c)
 /************************************************************************
 *  Average values							*
 ************************************************************************/
-template <class T> vec<T>		avg(vec<T> x, vec<T> y)		;
-template <class T> vec<signed_type<T> >	sub_avg(vec<T> x, vec<T> y)	;
+template <class T> inline vec<T>
+avg(vec<T> x, vec<T> y)			{return (x + y) >> 1;}
+template <class T> inline vec<signed_type<T> >
+sub_avg(vec<T> x, vec<T> y)		{return (x - y) >> 1;}
 
 /************************************************************************
 *  Absolute values							*
