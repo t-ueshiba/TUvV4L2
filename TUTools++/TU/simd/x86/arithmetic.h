@@ -5,7 +5,6 @@
 #define TU_SIMD_X86_ARITHMETIC_H
 
 #include "TU/simd/x86/unpack.h"
-#include "TU/simd/zero.h"
 #include "TU/simd/insert_extract.h"
 #include "TU/simd/select.h"
 
@@ -16,12 +15,6 @@ namespace simd
 /************************************************************************
 *  Arithmetic and max/min operators					*
 ************************************************************************/
-template <class T> inline vec<T>
-operator -(vec<T> x)
-{
-    return zero<T>() - x;
-}
-
 template <class T> inline vec<T>
 min(vec<T> x, vec<T> y)
 {
