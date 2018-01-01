@@ -5,8 +5,9 @@
 #define TU_SIMD_X86_ARITHMETIC_H
 
 #include "TU/simd/x86/unpack.h"
-#include "TU/simd/insert_extract.h"
 #include "TU/simd/select.h"
+#include "TU/simd/zero.h"
+#include "TU/simd/insert_extract.h"
 
 namespace TU
 {
@@ -125,6 +126,12 @@ template <bool HI, class T> inline vec<upper_type<T> >
 mul(vec<T> x, vec<T> y)
 {
     return unpack<HI>(x * y, mulhi(x, y));
+}
+
+template <class T> inline vec<signed_type<T> >
+operator -(vec<T> x)
+{
+    return zero<T>() - x;
 }
     
 /************************************************************************

@@ -95,6 +95,12 @@ SIMD_RCP_RSQRT(float)
 #undef SIMD_MIN_MAX
 #undef SIMD_RCP_RSQRT
   
+template <class T> inline vec<signed_type<T> >
+operator -(vec<T> x)
+{
+    return zero<T>() - x;
+}
+    
 /************************************************************************
 *  Average values							*
 ************************************************************************/

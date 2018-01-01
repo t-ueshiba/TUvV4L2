@@ -10,7 +10,6 @@
 #include "TU/simd/vec.h"
 #include "TU/simd/cast.h"
 #include "TU/simd/logical.h"
-#include "TU/simd/zero.h"
 
 namespace TU
 {
@@ -19,17 +18,18 @@ namespace simd
 /************************************************************************
 *  Arithmetic operators							*
 ************************************************************************/
-template <class T> vec<T>	operator +(vec<T> x, vec<T> y)		;
-template <class T> vec<T>	operator *(vec<T> x, vec<T> y)		;
-template <class T> vec<T>	operator /(vec<T> x, vec<T> y)		;
-template <class T> vec<T>	operator %(vec<T> x, vec<T> y)		;
-template <class T> vec<T>	subs(vec<T> x, vec<T> y)		;
-template <class T> vec<T>	mulhi(vec<T> x, vec<T> y)		;
-template <class T> vec<T>	min(vec<T> x, vec<T> y)			;
-template <class T> vec<T>	max(vec<T> x, vec<T> y)			;
-template <class T> vec<T>	rcp(vec<T> x)				;
-template <class T> vec<T>	sqrt(vec<T> x)				;
-template <class T> vec<T>	rsqrt(vec<T> x)				;
+template <class T> vec<T>		operator +(vec<T> x, vec<T> y)	;
+template <class T> vec<T>		operator *(vec<T> x, vec<T> y)	;
+template <class T> vec<T>		operator /(vec<T> x, vec<T> y)	;
+template <class T> vec<T>		operator %(vec<T> x, vec<T> y)	;
+template <class T> vec<signed_type<T> >	operator -(vec<T> x)		;
+template <class T> vec<T>		subs(vec<T> x, vec<T> y)	;
+template <class T> vec<T>		mulhi(vec<T> x, vec<T> y)	;
+template <class T> vec<T>		min(vec<T> x, vec<T> y)		;
+template <class T> vec<T>		max(vec<T> x, vec<T> y)		;
+template <class T> vec<T>		rcp(vec<T> x)			;
+template <class T> vec<T>		sqrt(vec<T> x)			;
+template <class T> vec<T>		rsqrt(vec<T> x)			;
 
 template <class T> inline vec<signed_type<T> >
 operator -(vec<T> x, vec<T> y)
@@ -37,12 +37,6 @@ operator -(vec<T> x, vec<T> y)
     const vec<T>	mask(1 << (8*sizeof(T) - 1));
     
     return cast<signed_type<T> >(mask ^ x) - cast<signed_type<T> >(mask ^ y);
-}
-
-template <class T> inline vec<signed_type<T> >
-operator -(vec<T> x)
-{
-    return zero<T>() - x;
 }
 
 template <class T> inline vec<T>
