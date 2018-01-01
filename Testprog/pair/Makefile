@@ -37,7 +37,8 @@ INCDIR		= $(PREFIX)/include
 #  Macros set by mkmf	#
 #########################
 SUFFIX		= .cc:sC .cpp:sC .cu:sC
-EXTHDRS		= ../../TU/pair.h
+EXTHDRS		= ../../TU/pair.h \
+		../../TU/type_traits.h
 HDRS		=
 SRCS		= main.cc
 OBJS		= main.o
@@ -48,4 +49,4 @@ OBJS		= main.o
 #include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
-main.o: ../../TU/pair.h
+main.o: ../../TU/pair.h ../../TU/type_traits.h

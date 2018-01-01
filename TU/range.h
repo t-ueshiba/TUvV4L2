@@ -32,10 +32,10 @@ namespace detail
   void	iterator_t(...)						;
 }	// namespace detail
 
-//! 式が持つ反復子の型を返す
+//! 式に適用できる反復子の型を返す
 /*!
   \param E	式またはそれへの参照の型
-  \return	E が反復子を持てばその型，持たなければ void
+  \return	E に反復子が適用できればその型，適用できなければ void
 */
 template <class E>
 using iterator_t = decltype(detail::iterator_t(std::declval<E>()));
@@ -1357,7 +1357,7 @@ operator *=(E&& expr, element_t<E> c)
     using		std::begin;
     constexpr size_t	N = size0<E>();
     
-    for_each<N>(begin(expr), TU::size(expr), [c](auto&& x){ x *= c; });
+    for_each<N>([c](auto&& x){ x *= c; }, TU::size(expr), begin(expr));
     return expr;
 }
 
@@ -1373,7 +1373,7 @@ operator /=(E&& expr, element_t<E> c)
     using		std::begin;
     constexpr size_t	N = size0<E>();
     
-    for_each<N>(begin(expr), TU::size(expr), [c](auto&& x){ x /= c; });
+    for_each<N>([c](auto&& x){ x /= c; }, TU::size(expr), begin(expr));
     return expr;
 }
 
@@ -1425,8 +1425,8 @@ operator +=(L&& l, const R& r)
     using		std::cbegin;
     constexpr size_t	N = detail::max<size0<L>(), size0<R>()>::value;
     
-    for_each<N>(begin(l), TU::size(l), cbegin(r),
-		[](auto&& x, const auto& y){ x += y; });
+    for_each<N>([](auto&& x, const auto& y){ x += y; },
+		TU::size(l), begin(l), cbegin(r));
     return l;
 }
 
@@ -1444,8 +1444,8 @@ operator -=(L&& l, const R& r)
     using		std::cbegin;
     constexpr size_t	N = detail::max<size0<L>(), size0<R>()>::value;
     
-    for_each<N>(begin(l), TU::size(l), cbegin(r),
-		[](auto&& x, const auto& y){ x -= y; });
+    for_each<N>([](auto&& x, const auto& y){ x -= y; },
+		TU::size(l), begin(l), cbegin(r));
     return l;
 }
 

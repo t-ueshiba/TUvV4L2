@@ -6,8 +6,8 @@
 #ifndef TU_PAIR_H
 #define TU_PAIR_H
 
-#include <utility>
 #include <iostream>
+#include "TU/type_traits.h"	// for TU::any<PRED, T...>
 
 namespace TU
 {
@@ -30,22 +30,6 @@ namespace detail
 */ 
 template <class T>
 using is_pair = detail::check_pair<std::decay_t<T> >;
-    
-/************************************************************************
-*  predicate: any_pair<ARGS...>						*
-************************************************************************/
-//! 少なくとも1つのテンプレート引数が std::pair 又はそれへの参照であるか判定する
-/*!
-  \param ARGS...	判定対象となる型の並び
-*/
-template <class... ARGS>
-struct any_pair;
-template <>
-struct any_pair<> : std::false_type					{};
-template <class ARG, class... ARGS>
-struct any_pair<ARG, ARGS...>
-    : std::integral_constant<bool, (is_pair<ARG>::value ||
-				    any_pair<ARGS...>::value)>		{};
     
 /************************************************************************
 *  struct pair_traits<PAIR>						*
@@ -98,7 +82,7 @@ template <class T, size_t N=1>
 using pair_tree = typename detail::pair_tree<T, N>::type;
     
 /************************************************************************
-*  pair_for_each(PAIRS..., FUNC)				`	*
+*  pair_for_each(FUNC, PAIRS&&...)				`	*
 ************************************************************************/
 namespace detail
 {
@@ -117,7 +101,7 @@ namespace detail
 }	// namespace detail
     
 template <class FUNC, class... PAIRS>
-inline std::enable_if_t<any_pair<PAIRS...>::value>
+inline std::enable_if_t<any<is_pair, PAIRS...>::value>
 pair_for_each(FUNC f, PAIRS&&... x)
 {
     f(detail::pair_get<0>(std::forward<PAIRS>(x))...);
@@ -125,10 +109,11 @@ pair_for_each(FUNC f, PAIRS&&... x)
 }
 
 /************************************************************************
-*  pair_transform(PAIRS..., FUNC)					*
+*  pair_transform(FUNC, PAIRS&&...)					*
 ************************************************************************/
 template <class FUNC, class... PAIRS,
-	  std::enable_if_t<any_pair<PAIRS...>::value>* = nullptr> inline auto
+	  std::enable_if_t<any<is_pair, PAIRS...>::value>* = nullptr>
+inline auto
 pair_transform(FUNC f, PAIRS&&... x)
 {
     return std::make_pair(f(detail::pair_get<0>(std::forward<PAIRS>(x))...),
@@ -145,8 +130,8 @@ operator -(E&& expr)
 			  std::forward<E>(expr));
 }
 
-template <class L, class R, std::enable_if_t<any_pair<L, R>::value>* = nullptr>
-inline auto
+template <class L, class R,
+	  std::enable_if_t<any<is_pair, L, R>::value>* = nullptr> inline auto
 operator +(L&& l, R&& r)
 {
     return pair_transform([](auto&& x, auto&& y)
@@ -155,8 +140,8 @@ operator +(L&& l, R&& r)
 			  std::forward<L>(l), std::forward<R>(r));
 }
 
-template <class L, class R, std::enable_if_t<any_pair<L, R>::value>* = nullptr>
-inline auto
+template <class L, class R,
+	  std::enable_if_t<any<is_pair, L, R>::value>* = nullptr> inline auto
 operator -(L&& l, R&& r)
 {
     return pair_transform([](auto&& x, auto&& y)
@@ -165,8 +150,8 @@ operator -(L&& l, R&& r)
 			  std::forward<L>(l), std::forward<R>(r));
 }
 
-template <class L, class R, std::enable_if_t<any_pair<L, R>::value>* = nullptr>
-inline auto
+template <class L, class R,
+	  std::enable_if_t<any<is_pair, L, R>::value>* = nullptr> inline auto
 operator *(L&& l, R&& r)
 {
     return pair_transform([](auto&& x, auto&& y)
@@ -175,8 +160,8 @@ operator *(L&& l, R&& r)
 			  std::forward<L>(l), std::forward<R>(r));
 }
 
-template <class L, class R, std::enable_if_t<any_pair<L, R>::value>* = nullptr>
-inline auto
+template <class L, class R,
+	  std::enable_if_t<any<is_pair, L, R>::value>* = nullptr> inline auto
 operator /(L&& l, R&& r)
 {
     return pair_transform([](auto&& x, auto&& y)
@@ -185,8 +170,8 @@ operator /(L&& l, R&& r)
 			  std::forward<L>(l), std::forward<R>(r));
 }
 
-template <class L, class R, std::enable_if_t<any_pair<L, R>::value>* = nullptr>
-inline auto
+template <class L, class R,
+	  std::enable_if_t<any<is_pair, L, R>::value>* = nullptr> inline auto
 operator %(L&& l, R&& r)
 {
     return pair_transform([](auto&& x, auto&& y)
@@ -245,7 +230,8 @@ operator --(T&& t)
 }
 
 template <class L, class C, class R,
-	  std::enable_if_t<any_pair<L, C, R>::value>* = nullptr> inline auto
+	  std::enable_if_t<any<is_pair, L, C, R>::value>* = nullptr>
+inline auto
 fma(L&& l, C&& c, R&& r)
 {
     return pair_transform([](auto&& x, auto&& y, auto&& z)
@@ -260,8 +246,8 @@ fma(L&& l, C&& c, R&& r)
 /************************************************************************
 *  Bit operators							*
 ************************************************************************/
-template <class L, class R, std::enable_if_t<any_pair<L, R>::value>* = nullptr>
-inline auto
+template <class L, class R,
+	  std::enable_if_t<any<is_pair, L, R>::value>* = nullptr> inline auto
 operator &(L&& l, R&& r)
 {
     return pair_transform([](auto&& x, auto&& y)
@@ -270,8 +256,8 @@ operator &(L&& l, R&& r)
 			  std::forward<L>(l), std::forward<R>(r));
 }
     
-template <class L, class R, std::enable_if_t<any_pair<L, R>::value>* = nullptr>
-inline auto
+template <class L, class R,
+	  std::enable_if_t<any<is_pair, L, R>::value>* = nullptr> inline auto
 operator |(L&& l, R&& r)
 {
     return pair_transform([](auto&& x, auto&& y)
@@ -280,8 +266,8 @@ operator |(L&& l, R&& r)
 			  std::forward<L>(l), std::forward<R>(r));
 }
     
-template <class L, class R, std::enable_if_t<any_pair<L, R>::value>* = nullptr>
-inline auto
+template <class L, class R,
+	  std::enable_if_t<any<is_pair, L, R>::value>* = nullptr> inline auto
 operator ^(L&& l, R&& r)
 {
     return pair_transform([](auto&& x, auto&& y)
@@ -320,16 +306,16 @@ operator !(const std::pair<S, T>& t)
     return pair_transform([](const auto& x){ return !x; }, t);
 }
     
-template <class L, class R, std::enable_if_t<any_pair<L, R>::value>* = nullptr>
-inline auto
+template <class L, class R,
+	  std::enable_if_t<any<is_pair, L, R>::value>* = nullptr> inline auto
 operator &&(const L& l, const R& r)
 {
     return pair_transform([](const auto& x, const auto& y)
 			  { return x && y; }, l, r);
 }
     
-template <class L, class R, std::enable_if_t<any_pair<L, R>::value>* = nullptr>
-inline auto
+template <class L, class R,
+	  std::enable_if_t<any<is_pair, L, R>::value>* = nullptr> inline auto
 operator ||(const L& l, const R& r)
 {
     return pair_transform([](const auto& x, const auto& y)
@@ -339,48 +325,48 @@ operator ||(const L& l, const R& r)
 /************************************************************************
 *  Relational operators							*
 ************************************************************************/
-template <class L, class R, std::enable_if_t<any_pair<L, R>::value>* = nullptr>
-inline auto
+template <class L, class R,
+	  std::enable_if_t<any<is_pair, L, R>::value>* = nullptr> inline auto
 operator ==(const L& l, const R& r)
 {
     return pair_transform([](const auto& x, const auto& y)
 			  { return x == y; }, l, r);
 }
     
-template <class L, class R, std::enable_if_t<any_pair<L, R>::value>* = nullptr>
-inline auto
+template <class L, class R,
+	  std::enable_if_t<any<is_pair, L, R>::value>* = nullptr> inline auto
 operator !=(const L& l, const R& r)
 {
     return pair_transform([](const auto& x, const auto& y)
 			  { return x != y; }, l, r);
 }
     
-template <class L, class R, std::enable_if_t<any_pair<L, R>::value>* = nullptr>
-inline auto
+template <class L, class R,
+	  std::enable_if_t<any<is_pair, L, R>::value>* = nullptr> inline auto
 operator <(const L& l, const R& r)
 {
     return pair_transform([](const auto& x, const auto& y)
 			  { return x < y; }, l, r);
 }
     
-template <class L, class R, std::enable_if_t<any_pair<L, R>::value>* = nullptr>
-inline auto
+template <class L, class R,
+	  std::enable_if_t<any<is_pair, L, R>::value>* = nullptr> inline auto
 operator >(const L& l, const R& r)
 {
     return pair_transform([](const auto& x, const auto& y)
 			  { return x > y; }, l, r);
 }
     
-template <class L, class R, std::enable_if_t<any_pair<L, R>::value>* = nullptr>
-inline auto
+template <class L, class R,
+	  std::enable_if_t<any<is_pair, L, R>::value>* = nullptr> inline auto
 operator <=(const L& l, const R& r)
 {
     return pair_transform([](const auto& x, const auto& y)
 			  { return x <= y; }, l, r);
 }
     
-template <class L, class R, std::enable_if_t<any_pair<L, R>::value>* = nullptr>
-inline auto
+template <class L, class R,
+	  std::enable_if_t<any<is_pair, L, R>::value>* = nullptr> inline auto
 operator >=(const L& l, const R& r)
 {
     return pair_transform([](const auto& x, const auto& y)

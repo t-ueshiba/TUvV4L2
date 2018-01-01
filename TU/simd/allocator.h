@@ -24,7 +24,7 @@ namespace simd
   本クラスの目的は，以下の2つである．
     (1)	iterator_value<ITER> がSIMDベクトル型となるあらゆる反復子を
 	その機能を保持したまま名前を変更することにより，TU/algorithm.h にある
-	関数のオーバーロード版(本ファイルで定義)を呼び出せるようにすること．
+	関数のオーバーロード版を呼び出せるようにすること．
     (2)	ITER が const T* 型または T* 型のとき，それぞれ load_iterator<T, true>
 	store_iterator<T, true> を生成できるようにすること．本クラスでラップ
 	されたポインタが指すアドレスは sizeof(vec<T>) にalignされているものと

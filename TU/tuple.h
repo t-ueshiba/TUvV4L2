@@ -7,34 +7,11 @@
 #define TU_TUPLE_H
 
 #include <tuple>
-#include <utility>	// for std::forward() and std::index_sequence<IDX...>
-#include <type_traits>	// for std::enable_if_t<B, T>
 #include <iostream>
+#include "TU/type_traits.h"	// for TU::any<PRED, T...>
 
 namespace TU
 {
-/************************************************************************
-*  predicates: all<PRED, TUPLE>						*
-************************************************************************/
-//! std::tuple の全要素型が指定された条件を満たすか判定する
-/*!
-  \param PRED	適用する述語
-  \param TUPLE	適用対象となる std::tuple
-*/
-template <template <class> class PRED, class TUPLE>
-struct all;
-template <template <class> class PRED>
-struct all<PRED, std::tuple<> >
-{
-    constexpr static bool	value = true;
-};
-template <template <class> class PRED, class HEAD, class... TAIL>
-struct all<PRED, std::tuple<HEAD, TAIL...> >
-{
-    constexpr static bool	value = PRED<HEAD>::value &&
-					all<PRED, std::tuple<TAIL...> >::value;
-};
-
 /************************************************************************
 *  predicate: is_tuple<T>						*
 ************************************************************************/
@@ -52,20 +29,6 @@ namespace detail
 template <class T>
 using is_tuple = decltype(detail::check_tuple(std::declval<T>()));
 
-/************************************************************************
-*  predicate: any_tuple<ARGS...>					*
-************************************************************************/
-//! 少なくとも1つのテンプレート引数が std::tuple 又はそれに変換可能であるか判定する
-/*!
-  \param ARGS...	判定対象となる型の並び
-*/
-template <class... ARGS>
-struct any_tuple : std::false_type					{};
-template <class ARG, class... ARGS>
-struct any_tuple<ARG, ARGS...>
-    : std::integral_constant<bool, (is_tuple<ARG>::value ||
-				    any_tuple<ARGS...>::value)>		{};
-    
 /************************************************************************
 *  type alias: tuple_head<T>						*
 ************************************************************************/
@@ -127,7 +90,7 @@ make_reference_wrapper(T&& x)
 }
     
 /************************************************************************
-*  tuple_for_each(TUPLES..., FUNC)				`	*
+*  tuple_for_each(FUNC, TUPLES&&...)				`	*
 ************************************************************************/
 namespace detail
 {
@@ -186,7 +149,7 @@ namespace detail
 }	// namespace detail
     
 template <class FUNC, class... TUPLES>
-inline std::enable_if_t<any_tuple<TUPLES...>::value>
+inline std::enable_if_t<any<is_tuple, TUPLES...>::value>
 tuple_for_each(FUNC f, TUPLES&&... x)
 {
     detail::tuple_for_each(std::make_index_sequence<
@@ -195,7 +158,7 @@ tuple_for_each(FUNC f, TUPLES&&... x)
 }
 
 /************************************************************************
-*  tuple_transform(TUPLES..., FUNC)					*
+*  tuple_transform(FUNC, TUPLES&&...)					*
 ************************************************************************/
 namespace detail
 {
@@ -217,7 +180,7 @@ namespace detail
 }	// namespace detail
     
 template <class FUNC, class... TUPLES,
-	  std::enable_if_t<any_tuple<TUPLES...>::value>* = nullptr>
+	  std::enable_if_t<any<is_tuple, TUPLES...>::value>* = nullptr>
 inline auto
 tuple_transform(FUNC f, TUPLES&&... x)
 {
@@ -240,7 +203,7 @@ operator -(E&& expr)
 }
 
 template <class L, class R,
-	  std::enable_if_t<any_tuple<L, R>::value>* = nullptr> inline auto
+	  std::enable_if_t<any<is_tuple, L, R>::value>* = nullptr> inline auto
 operator +(L&& l, R&& r)
 {
     return tuple_transform([](auto&& x, auto&& y)
@@ -250,7 +213,7 @@ operator +(L&& l, R&& r)
 }
 
 template <class L, class R,
-	  std::enable_if_t<any_tuple<L, R>::value>* = nullptr> inline auto
+	  std::enable_if_t<any<is_tuple, L, R>::value>* = nullptr> inline auto
 operator -(L&& l, R&& r)
 {
     return tuple_transform([](auto&& x, auto&& y)
@@ -260,7 +223,7 @@ operator -(L&& l, R&& r)
 }
 
 template <class L, class R,
-	  std::enable_if_t<any_tuple<L, R>::value>* = nullptr> inline auto
+	  std::enable_if_t<any<is_tuple, L, R>::value>* = nullptr> inline auto
 operator *(L&& l, R&& r)
 {
     return tuple_transform([](auto&& x, auto&& y)
@@ -270,7 +233,7 @@ operator *(L&& l, R&& r)
 }
 
 template <class L, class R,
-	  std::enable_if_t<any_tuple<L, R>::value>* = nullptr> inline auto
+	  std::enable_if_t<any<is_tuple, L, R>::value>* = nullptr> inline auto
 operator /(L&& l, R&& r)
 {
     return tuple_transform([](auto&& x, auto&& y)
@@ -280,7 +243,7 @@ operator /(L&& l, R&& r)
 }
 
 template <class L, class R,
-	  std::enable_if_t<any_tuple<L, R>::value>* = nullptr> inline auto
+	  std::enable_if_t<any<is_tuple, L, R>::value>* = nullptr> inline auto
 operator %(L&& l, R&& r)
 {
     return tuple_transform([](auto&& x, auto&& y)
@@ -339,7 +302,8 @@ operator --(T&& t)
 }
 
 template <class L, class C, class R,
-	  std::enable_if_t<any_tuple<L, C, R>::value>* = nullptr> inline auto
+	  std::enable_if_t<any<is_tuple, L, C, R>::value>* = nullptr>
+inline auto
 fma(L&& l, C&& c, R&& r)
 {
     return tuple_transform([](auto&& x, auto&& y, auto&& z)
@@ -355,7 +319,7 @@ fma(L&& l, C&& c, R&& r)
 *  Bit operators							*
 ************************************************************************/
 template <class L, class R,
-	  std::enable_if_t<any_tuple<L, R>::value>* = nullptr> inline auto
+	  std::enable_if_t<any<is_tuple, L, R>::value>* = nullptr> inline auto
 operator &(L&& l, R&& r)
 {
     return tuple_transform([](auto&& x, auto&& y)
@@ -365,7 +329,7 @@ operator &(L&& l, R&& r)
 }
 
 template <class L, class R,
-	  std::enable_if_t<any_tuple<L, R>::value>* = nullptr> inline auto
+	  std::enable_if_t<any<is_tuple, L, R>::value>* = nullptr> inline auto
 operator |(L&& l, R&& r)
 {
     return tuple_transform([](auto&& x, auto&& y)
@@ -375,7 +339,7 @@ operator |(L&& l, R&& r)
 }
     
 template <class L, class R,
-	  std::enable_if_t<any_tuple<L, R>::value>* = nullptr> inline auto
+	  std::enable_if_t<any<is_tuple, L, R>::value>* = nullptr> inline auto
 operator ^(L&& l, R&& r)
 {
     return tuple_transform([](auto&& x, auto&& y)
@@ -415,7 +379,7 @@ operator !(const std::tuple<T...>& t)
 }
     
 template <class L, class R,
-	  std::enable_if_t<any_tuple<L, R>::value>* = nullptr> inline auto
+	  std::enable_if_t<any<is_tuple, L, R>::value>* = nullptr> inline auto
 operator &&(const L& l, const R& r)
 {
     return tuple_transform([](const auto& x, const auto& y)
@@ -423,7 +387,7 @@ operator &&(const L& l, const R& r)
 }
     
 template <class L, class R,
-	  std::enable_if_t<any_tuple<L, R>::value>* = nullptr> inline auto
+	  std::enable_if_t<any<is_tuple, L, R>::value>* = nullptr> inline auto
 operator ||(const L& l, const R& r)
 {
     return tuple_transform([](const auto& x, const auto& y)
@@ -434,7 +398,7 @@ operator ||(const L& l, const R& r)
 *  Relational operators							*
 ************************************************************************/
 template <class L, class R,
-	  std::enable_if_t<any_tuple<L, R>::value>* = nullptr> inline auto
+	  std::enable_if_t<any<is_tuple, L, R>::value>* = nullptr> inline auto
 operator ==(const L& l, const R& r)
 {
     return tuple_transform([](const auto& x, const auto& y)
@@ -442,7 +406,7 @@ operator ==(const L& l, const R& r)
 }
     
 template <class L, class R,
-	  std::enable_if_t<any_tuple<L, R>::value>* = nullptr> inline auto
+	  std::enable_if_t<any<is_tuple, L, R>::value>* = nullptr> inline auto
 operator !=(const L& l, const R& r)
 {
     return tuple_transform([](const auto& x, const auto& y)
@@ -450,7 +414,7 @@ operator !=(const L& l, const R& r)
 }
     
 template <class L, class R,
-	  std::enable_if_t<any_tuple<L, R>::value>* = nullptr> inline auto
+	  std::enable_if_t<any<is_tuple, L, R>::value>* = nullptr> inline auto
 operator <(const L& l, const R& r)
 {
     return tuple_transform([](const auto& x, const auto& y)
@@ -458,7 +422,7 @@ operator <(const L& l, const R& r)
 }
     
 template <class L, class R,
-	  std::enable_if_t<any_tuple<L, R>::value>* = nullptr> inline auto
+	  std::enable_if_t<any<is_tuple, L, R>::value>* = nullptr> inline auto
 operator >(const L& l, const R& r)
 {
     return tuple_transform([](const auto& x, const auto& y)
@@ -466,7 +430,7 @@ operator >(const L& l, const R& r)
 }
     
 template <class L, class R,
-	  std::enable_if_t<any_tuple<L, R>::value>* = nullptr> inline auto
+	  std::enable_if_t<any<is_tuple, L, R>::value>* = nullptr> inline auto
 operator <=(const L& l, const R& r)
 {
     return tuple_transform([](const auto& x, const auto& y)
@@ -474,7 +438,7 @@ operator <=(const L& l, const R& r)
 }
     
 template <class L, class R,
-	  std::enable_if_t<any_tuple<L, R>::value>* = nullptr> inline auto
+	  std::enable_if_t<any<is_tuple, L, R>::value>* = nullptr> inline auto
 operator >=(const L& l, const R& r)
 {
     return tuple_transform([](const auto& x, const auto& y)
@@ -491,7 +455,7 @@ select(bool s, X&& x, Y&& y)
 }
     
 template <class... S, class X, class Y,
-	  std::enable_if_t<any_tuple<X, Y>::value>* = nullptr> inline auto
+	  std::enable_if_t<any<is_tuple, X, Y>::value>* = nullptr> inline auto
 select(const std::tuple<S...>& s, X&& x, Y&& y)
 {
     return tuple_transform([](const auto& t, auto&& u, auto&& v)

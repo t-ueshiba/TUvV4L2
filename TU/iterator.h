@@ -106,7 +106,7 @@ namespace detail
 {
   struct generic_dereference
   {
-    // assignment_iterator<FUNC, ITER> のように dereference すると
+    // assignment_iterator<FUNC, ITER...> のように dereference すると
     // その base iterator への参照を内包する proxy を返す反復子もあるので，
     // 引数は const ITER_& 型にする．もしも ITER_ 型にすると，呼出側から
     // コピーされたローカルな反復子 iter への参照を内包する proxy を
@@ -290,35 +290,35 @@ size(const T (&array)[N]) noexcept
     return N;
 }
 
-template <class TUPLE,
-	  std::enable_if_t<is_tuple<TUPLE>::value>* = nullptr> inline auto
+template <class TUPLE, std::enable_if_t<is_tuple<TUPLE>::value>* = nullptr>
+inline auto
 begin(TUPLE&& t)
 {
     return TU::make_zip_iterator(tuple_transform(
 				     [](auto&& x)
-				 { using std::begin; return begin(x); },
-				 std::forward<TUPLE>(t)));
+				     { using std::begin; return begin(x); },
+				     std::forward<TUPLE>(t)));
 }
 
-template <class TUPLE,
-	  std::enable_if_t<is_tuple<TUPLE>::value>* = nullptr> inline auto
+template <class TUPLE, std::enable_if_t<is_tuple<TUPLE>::value>* = nullptr>
+inline auto
 end(TUPLE&& t)
 {
     return TU::make_zip_iterator(tuple_transform(
-				 [](auto&& x)
-				 { using std::end; return end(x); },
-				 std::forward<TUPLE>(t)));
+				     [](auto&& x)
+				     { using std::end; return end(x); },
+				     std::forward<TUPLE>(t)));
 }
 
-template <class TUPLE,
-	  std::enable_if_t<is_tuple<TUPLE>::value>* = nullptr> inline auto
+template <class TUPLE, std::enable_if_t<is_tuple<TUPLE>::value>* = nullptr>
+inline auto
 rbegin(TUPLE&& t)
 {
     return std::make_reverse_iterator(end(std::forward<TUPLE>(t)));
 }
 
-template <class TUPLE,
-	  std::enable_if_t<is_tuple<TUPLE>::value>* = nullptr> inline auto
+template <class TUPLE, std::enable_if_t<is_tuple<TUPLE>::value>* = nullptr>
+inline auto
 rend(TUPLE&& t)
 {
     return std::make_reverse_iterator(begin(std::forward<TUPLE>(t)));

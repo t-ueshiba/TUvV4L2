@@ -6,28 +6,10 @@
 #ifndef TU_FUNCTIONAL_H
 #define TU_FUNCTIONAL_H
 
-#include <type_traits>				// std::integral_constant
+#include <functional>
 
 namespace TU
 {
-/************************************************************************
-*  struct is_convertible<T, C<ARGS...> >				*
-************************************************************************/
-namespace detail
-{
-  template <template <class...> class C>
-  struct is_convertible
-  {
-      template <class... ARGS_>
-      static std::true_type	check(C<ARGS_...>)			;
-      static std::false_type	check(...)				;
-  };
-}	// namespace detail
-
-template <class T, template <class...> class C>
-struct is_convertible
-    : decltype(detail::is_convertible<C>::check(std::declval<T>()))	{};
-	
 /************************************************************************
 *  struct identity							*
 ************************************************************************/

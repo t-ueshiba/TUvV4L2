@@ -4,6 +4,7 @@
 #if !defined(TU_SIMD_ARM_ARITHMETIC_H)
 #define TU_SIMD_ARM_ARITHMETIC_H
 
+#include "TU/simd/zero.h"
 #include "TU/simd/insert_extract.h"
 
 namespace TU
@@ -13,14 +14,26 @@ namespace simd
 /************************************************************************
 *  Arithmetic operators							*
 ************************************************************************/
-#define SIMD_ADD_SUB(type)						\
-    SIMD_BINARY_FUNC(operator +, addq, type)				\
+template <class T> inline vec<signed_type<T> >
+operator -(vec<T> x)
+{
+    return zero<T>() - x;
+}
+
+#define SIMD_SAT_ADD(type)						\
+    SIMD_BINARY_FUNC(operator +, qaddq, type)
+
+#define SIMD_ADD(type)							\
+    SIMD_BINARY_FUNC(operator +, addq, type)
+
+#define SIMD_SAT_SUB(type)						\
+    SIMD_BINARY_FUNC(operator -, qsubq, type)
+
+#define SIMD_SUB(type)							\
     SIMD_BINARY_FUNC(operator -, subq, type)
 
-// 8/16bit整数は，飽和演算によって operator [+|-] を定義する．
-#define SIMD_SAT_ADD_SUB(type)						\
-    SIMD_BINARY_FUNC(operator +, qaddq, type)				\
-    SIMD_BINARY_FUNC(operator -, qsubq, type)
+#define SIMD_SUBS(type)							\
+    SIMD_BINARY_FUNC(subs, qsubq, type)
 
 #define SIMD_MUL(type)							\
     SIMD_BINARY_FUNC(operator *, mulq, type)
@@ -36,16 +49,23 @@ namespace simd
     SIMD_UNARY_FUNC(rcp, recpeq, type)					\
     SIMD_UNARY_FUNC(rsqrt, rsqrteq, type)
 
-  // 加減算
-SIMD_SAT_ADD_SUB(int8_t)
-SIMD_SAT_ADD_SUB(int16_t)
-SIMD_ADD_SUB(int32_t)
-SIMD_ADD_SUB(int64_t)
-SIMD_SAT_ADD_SUB(uint8_t)
-SIMD_SAT_ADD_SUB(uint16_t)
-SIMD_ADD_SUB(uint32_t)
-SIMD_ADD_SUB(uint64_t)
-SIMD_ADD_SUB(float)
+// 加算
+SIMD_SAT_ADD(int8_t)
+SIMD_SAT_ADD(int16_t)
+SIMD_ADD(int32_t)
+SIMD_ADD(int64_t)
+SIMD_SAT_ADD(uint8_t)
+SIMD_SAT_ADD(uint16_t)
+SIMD_ADD(float)
+
+// 減算
+SIMD_SAT_SUB(int8_t)
+SIMD_SAT_SUB(int16_t)
+SIMD_SUB(int32_t)
+SIMD_SUB(int64_t)
+SIMD_SUBS(uint8_t)
+SIMD_SUBS(uint16_t)
+SIMD_SUB(float)
 
 // 乗算
 SIMD_MUL(int8_t)

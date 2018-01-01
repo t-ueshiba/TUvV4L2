@@ -7,6 +7,7 @@
 #include "TU/simd/x86/unpack.h"
 #include "TU/simd/zero.h"
 #include "TU/simd/insert_extract.h"
+#include "TU/simd/select.h"
 
 namespace TU
 {
@@ -15,6 +16,12 @@ namespace simd
 /************************************************************************
 *  Arithmetic and max/min operators					*
 ************************************************************************/
+template <class T> inline vec<T>
+operator -(vec<T> x)
+{
+    return zero<T>() - x;
+}
+
 template <class T> inline vec<T>
 min(vec<T> x, vec<T> y)
 {
@@ -27,32 +34,40 @@ max(vec<T> x, vec<T> y)
     return select(x > y, x, y);
 }
 
-template <class T> inline vec<T>
-operator -(vec<T> x)
-{
-    return zero<T>() - x;
-}
+#define SIMD_SAT_ADD(type)						\
+    SIMD_BINARY_FUNC(operator +, adds, type)
 
-#define SIMD_ADD_SUB(type)						\
-    SIMD_BINARY_FUNC(operator +, add, type)				\
+#define SIMD_ADD(type)							\
+    SIMD_BINARY_FUNC(operator +, add, type)
+
+#define SIMD_SAT_SUB(type)						\
+    SIMD_BINARY_FUNC(operator -, subs, type)
+
+#define SIMD_SUB(type)							\
     SIMD_BINARY_FUNC(operator -, sub, type)
 
-// 8/16bit整数は，飽和演算によって operator [+|-] を定義する．
-#define SIMD_SAT_ADD_SUB(type)						\
-    SIMD_BINARY_FUNC(operator +, adds, type)				\
-    SIMD_BINARY_FUNC(operator -, subs, type)
+#define SIMD_SUBS(type)							\
+    SIMD_BINARY_FUNC(subs, subs, type)
 
 #define SIMD_MIN_MAX(type)						\
     SIMD_BINARY_FUNC(min, min, type)					\
     SIMD_BINARY_FUNC(max, max, type)
 
-// 加減算
-SIMD_SAT_ADD_SUB(int8_t)
-SIMD_SAT_ADD_SUB(int16_t)
-SIMD_ADD_SUB(int32_t)
-SIMD_ADD_SUB(int64_t)
-SIMD_SAT_ADD_SUB(uint8_t)
-SIMD_SAT_ADD_SUB(uint16_t)
+// 加算
+SIMD_SAT_ADD(int8_t)
+SIMD_SAT_ADD(int16_t)
+SIMD_ADD(int32_t)
+SIMD_ADD(int64_t)
+SIMD_SAT_ADD(uint8_t)
+SIMD_SAT_ADD(uint16_t)
+
+// 減算
+SIMD_SAT_SUB(int8_t)
+SIMD_SAT_SUB(int16_t)
+SIMD_SUB(int32_t)
+SIMD_SUB(int64_t)
+SIMD_SUBS(uint8_t)
+SIMD_SUBS(uint16_t)
 
 // 乗算
 SIMD_BINARY_FUNC(operator *, mullo, int16_t)
@@ -60,7 +75,8 @@ SIMD_BINARY_FUNC(mulhi,      mulhi, int16_t)
 
 #if defined(SSE)
   // 加減算
-  SIMD_ADD_SUB(float)
+  SIMD_ADD(float)
+  SIMD_SUB(float)
 
   // 乗除算
   SIMD_BINARY_FUNC(operator *, mul, float)
@@ -79,7 +95,8 @@ SIMD_BINARY_FUNC(mulhi,      mulhi, int16_t)
 
 #if defined(SSE2)
   // 加減算
-  SIMD_ADD_SUB(double)
+  SIMD_ADD(double)
+  SIMD_SUB(double)
 
   // 乗除算
   SIMD_BINARY_FUNC(operator *, mul, uint32_t)
@@ -104,8 +121,11 @@ SIMD_BINARY_FUNC(mulhi,      mulhi, int16_t)
   SIMD_MIN_MAX(uint32_t)
 #endif
 
-#undef SIMD_ADD_SUB
-#undef SIMD_SAT_ADD_SUB
+#undef SIMD_SAT_ADD
+#undef SIMD_ADD
+#undef SIMD_SAT_SUB
+#undef SIMD_SUB
+#undef SIMD_SUBS
 #undef SIMD_MIN_MAX
 
 template <bool HI, class T> inline vec<upper_type<T> >
@@ -119,7 +139,7 @@ mul(vec<T> x, vec<T> y)
 ************************************************************************/
 template <class T> inline vec<T>
 avg(vec<T> x, vec<T> y)			{return (x + y) >> 1;}
-template <class T> inline vec<T>
+template <class T> inline vec<signed_type<T> >
 sub_avg(vec<T> x, vec<T> y)		{return (x - y) >> 1;}
 
 #if defined(SSE)
@@ -155,9 +175,9 @@ abs(vec<T> x)				{return max(x, -x);}
 template <class T> inline vec<T>
 diff(vec<T> x, vec<T> y)		{return select(x > y, x - y, y - x);}
 template <> inline Iu8vec
-diff(Iu8vec x, Iu8vec y)		{return (x - y) | (y - x);}
+diff(Iu8vec x, Iu8vec y)		{return subs(x, y) | subs(y, x);}
 template <> inline Iu16vec
-diff(Iu16vec x, Iu16vec y)		{return (x - y) | (y - x);}
+diff(Iu16vec x, Iu16vec y)		{return subs(x, y) | subs(y, x);}
   
 /************************************************************************
 *  Fused multiply-add							*
