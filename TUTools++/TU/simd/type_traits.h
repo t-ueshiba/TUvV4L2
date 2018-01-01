@@ -20,89 +20,79 @@ template <class T>	struct type_traits_base;
 template <>
 struct type_traits_base<int8_t>
 {
-    typedef int8_t		signed_type;
-    typedef void		lower_type;
-    typedef int16_t		upper_type;
-    typedef uint8_t		mask_type;
+    using lower_type	= void;
+    using upper_type	= int16_t;
+    using mask_type	= uint8_t;
 };
     
 template <>
 struct type_traits_base<int16_t>
 {
-    typedef int16_t		signed_type;
-    typedef int8_t		lower_type;
-    typedef int32_t		upper_type;
-    typedef uint16_t		mask_type;
+    using lower_type	= int8_t;
+    using upper_type	= int32_t;
+    using mask_type	= uint16_t;
 };
     
 template <>
 struct type_traits_base<int32_t>
 {
-    typedef int32_t		signed_type;
-    typedef int16_t		lower_type;
-    typedef int64_t		upper_type;
-    typedef uint32_t		mask_type;
+    using lower_type	= int16_t;
+    using upper_type	= int64_t;
+    using mask_type	= uint32_t;
 };
     
 template <>
 struct type_traits_base<int64_t>
 {
-    typedef int64_t		signed_type;
-    typedef int32_t		lower_type;
-    typedef void		upper_type;
-    typedef uint64_t		mask_type;
+    using lower_type	= int32_t;
+    using upper_type	= void;
+    using mask_type	= uint64_t;
 };
     
 template <>
 struct type_traits_base<uint8_t>
 {
-    typedef int8_t		signed_type;
-    typedef void		lower_type;
-    typedef uint16_t		upper_type;
-    typedef uint8_t		mask_type;
+    using lower_type	= void;
+    using upper_type	= uint16_t;
+    using mask_type	= uint8_t;
 };
     
 template <>
 struct type_traits_base<uint16_t>
 {
-    typedef int16_t		signed_type;
-    typedef uint8_t		lower_type;
-    typedef uint32_t		upper_type;
-    typedef uint16_t		mask_type;
+    using lower_type	= uint8_t;
+    using upper_type	= uint32_t;
+    using mask_type	= uint16_t;
 };
     
 template <>
 struct type_traits_base<uint32_t>
 {
-    typedef int32_t		signed_type;
-    typedef uint16_t		lower_type;
-    typedef uint64_t		upper_type;
-    typedef uint32_t		mask_type;
+    using lower_type	= uint16_t;
+    using upper_type	= uint64_t;
+    using mask_type	= uint32_t;
 };
     
 template <>
 struct type_traits_base<uint64_t>
 {
-    typedef int64_t		signed_type;
-    typedef uint32_t		lower_type;
-    typedef void		upper_type;
-    typedef uint64_t		mask_type;
+    using lower_type	= uint32_t;
+    using upper_type	= void;
+    using mask_type	= uint64_t;
 };
 
 template <>
 struct type_traits_base<float>
 {
-    typedef float		signed_type;
-    typedef void		lower_type;
-    typedef double		upper_type;
+    using lower_type	= void;
+    using upper_type	= double;
 };
 
 template <>
 struct type_traits_base<double>
 {
-    typedef double		signed_type;
-    typedef float		lower_type;
-    typedef void		upper_type;
+    using lower_type	= float;
+    using upper_type	= void;
 };
 
 }	// namespace simd
@@ -118,16 +108,22 @@ namespace TU
 {
 namespace simd
 {
+namespace detail
+{
+  template <class T> struct identity	{ using type = T; };
+}	// namespace detail
+    
 template <class T>
-using signed_type		= typename type_traits<T>::signed_type;
+using signed_type		= typename std::conditional_t<
+						std::is_integral<T>::value,
+						std::make_signed<T>,
+						detail::identity<T> >::type;
 template <class T>
 using lower_type		= typename type_traits<T>::lower_type;
 template <class T>
 using upper_type		= typename type_traits<T>::upper_type;
 template <class T>
 using mask_type			= typename type_traits<T>::mask_type;
-template <class T>
-using unsigned_type		= mask_type<T>;
 template <class T>
 using complementary_type	= typename type_traits<T>::complementary_type;
 template <class T>
@@ -136,9 +132,9 @@ using complementary_mask_type	= typename
 template <class T>
 using base_type			= typename type_traits<T>::base_type;
 template <class T>
-using integral_type		= typename std::conditional<
+using integral_type		= std::conditional_t<
 				      std::is_integral<T>::value,
-				      T, complementary_type<T> >::type;
+				      T, complementary_type<T> >;
 }	// namespace simd
 }	// namespace TU
 	

@@ -53,6 +53,7 @@ EXTHDRS		= ../../../TU/functional.h \
 		../../../TU/simd/arm/insert_extract.h \
 		../../../TU/simd/arm/load_store.h \
 		../../../TU/simd/arm/logical.h \
+		../../../TU/simd/arm/select.h \
 		../../../TU/simd/arm/shift.h \
 		../../../TU/simd/arm/type_traits.h \
 		../../../TU/simd/arm/vec.h \
@@ -66,6 +67,7 @@ EXTHDRS		= ../../../TU/functional.h \
 		../../../TU/simd/load_store_iterator.h \
 		../../../TU/simd/logical.h \
 		../../../TU/simd/pack.h \
+		../../../TU/simd/select.h \
 		../../../TU/simd/shift.h \
 		../../../TU/simd/transform.h \
 		../../../TU/simd/type_traits.h \
@@ -79,13 +81,15 @@ EXTHDRS		= ../../../TU/functional.h \
 		../../../TU/simd/x86/load_store.h \
 		../../../TU/simd/x86/logical.h \
 		../../../TU/simd/x86/logical_base.h \
+		../../../TU/simd/x86/select.h \
 		../../../TU/simd/x86/shift.h \
 		../../../TU/simd/x86/type_traits.h \
 		../../../TU/simd/x86/unpack.h \
 		../../../TU/simd/x86/vec.h \
 		../../../TU/simd/x86/zero.h \
 		../../../TU/simd/zero.h \
-		../../../TU/tuple.h
+		../../../TU/tuple.h \
+		../../../TU/type_traits.h
 HDRS		=
 SRCS		= main.cc
 OBJS		= main.o
@@ -97,7 +101,8 @@ OBJS		= main.o
 include $(PROJECT)/lib/common.mk
 ###
 main.o: ../../../TU/simd/transform.h ../../../TU/iterator.h \
-	../../../TU/tuple.h ../../../TU/functional.h ../../../TU/simd/cvt.h \
+	../../../TU/tuple.h ../../../TU/type_traits.h \
+	../../../TU/functional.h ../../../TU/simd/cvt.h \
 	../../../TU/simd/zero.h ../../../TU/simd/vec.h \
 	../../../TU/simd/config.h ../../../TU/simd/type_traits.h \
 	../../../TU/simd/x86/type_traits.h ../../../TU/simd/arm/type_traits.h \
@@ -118,5 +123,6 @@ main.o: ../../../TU/simd/transform.h ../../../TU/iterator.h \
 	../../../TU/simd/arm/logical.h ../../../TU/simd/x86/arithmetic.h \
 	../../../TU/simd/insert_extract.h \
 	../../../TU/simd/x86/insert_extract.h \
-	../../../TU/simd/arm/insert_extract.h \
+	../../../TU/simd/arm/insert_extract.h ../../../TU/simd/select.h \
+	../../../TU/simd/x86/select.h ../../../TU/simd/arm/select.h \
 	../../../TU/simd/arm/arithmetic.h

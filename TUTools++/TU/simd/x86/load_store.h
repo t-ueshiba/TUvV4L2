@@ -37,12 +37,12 @@ namespace simd
   template <bool ALIGNED, class T> inline vec<T>
   load(const T* p)
   {
-      return *((const typename vec<T>::base_type*)p);
+      return *reinterpret_cast<const typename vec<T>::base_type*>(p);
   }
   template <bool ALIGNED, class T> inline void
   store(T* p, vec<T> x)
   {
-      *((typename vec<T>::base_type*)p) = x;
+      *reinterpret_cast<typename vec<T>::base_type*>(p) = x;
   }
 #endif
 

@@ -563,7 +563,7 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
     template <class... SIZES_,
 	      std::enable_if_t<
 		  sizeof...(SIZES_) == rank() &&
-		  all<std::is_integral, std::tuple<SIZES_...> >::value>*
+		  all<std::is_integral, SIZES_...>::value>*
 	      = nullptr>
     explicit	array(SIZES_... sizes)
 		    :super({to_size(sizes)...}, super::Alignment)
@@ -571,7 +571,7 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 		}
     template <class... SIZES_>
     std::enable_if_t<sizeof...(SIZES_) == rank() &&
-		     all<std::is_integral, std::tuple<SIZES_...> >::value, bool>
+		     all<std::is_integral, SIZES_...>::value, bool>
 		resize(SIZES_... sizes)
 		{
 		    return super::resize({to_size(sizes)...}, super::Alignment);
@@ -580,7 +580,7 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
     template <class... SIZES_,
 	      std::enable_if_t<
 		  sizeof...(SIZES_) == rank() &&
-		  all<std::is_integral, std::tuple<SIZES_...> >::value>*
+		  all<std::is_integral, SIZES_...>::value>*
 	      = nullptr>
     explicit	array(size_t alignment, SIZES_... sizes)
 		    :super({to_size(sizes)...}, alignment)
@@ -588,7 +588,7 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 		}
     template <class... SIZES_>
     std::enable_if_t<sizeof...(SIZES_) == rank() &&
-		     all<std::is_integral, std::tuple<SIZES_...> >::value, bool>
+		     all<std::is_integral, SIZES_...>::value, bool>
 		resize(size_t alignment, SIZES_... sizes)
 		{
 		    return super::resize({to_size(sizes)...}, alignment);
@@ -639,7 +639,7 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
     template <class... SIZES_,
 	      std::enable_if_t<
 		  sizeof...(SIZES_) == rank() &&
-		  all<std::is_integral, std::tuple<SIZES_...> >::value>*
+		  all<std::is_integral, SIZES_...>::value>*
 	      = nullptr>
     explicit	array(pointer p, SIZES_... sizes)
 		    :super(p, {to_size(sizes)...}, super::Alignment)
@@ -647,7 +647,7 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 		}
     template <class... SIZES_>
     std::enable_if_t<sizeof...(SIZES_) == rank() &&
-		     all<std::is_integral, std::tuple<SIZES_...> >::value>
+		     all<std::is_integral, SIZES_...>::value>
 		resize(pointer p, SIZES_... sizes)
 		{
 		    super::resize(p, {to_size(sizes)...}, super::Alignment);
@@ -656,7 +656,7 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
     template <class... SIZES_,
 	      std::enable_if_t<
 		  sizeof...(SIZES_) == rank() &&
-		  all<std::is_integral, std::tuple<SIZES_...> >::value>*
+		  all<std::is_integral, SIZES_...>::value>*
 	      = nullptr>
     explicit	array(pointer p, size_t alignment, SIZES_... sizes)
 		    :super(p, {to_size(sizes)...}, alignment)
@@ -664,7 +664,7 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 		}
     template <class... SIZES_>
     std::enable_if_t<sizeof...(SIZES_) == rank() &&
-		     all<std::is_integral, std::tuple<SIZES_...> >::value>
+		     all<std::is_integral, SIZES_...>::value>
 		resize(pointer p, size_t alignment, SIZES_... sizes)
 		{
 		    super::resize(p, {to_size(sizes)...}, alignment);
@@ -1158,9 +1158,9 @@ namespace detail
 			auto	a = std::cbegin(_l);
 			auto	b = std::cbegin(_r);
 			_cache = *a * *b;
-			for_each<N>(++a, TU::size(_l) - 1, ++b,
-				    [this](const auto& x, const auto& y)
-				    { _cache += x * y; });
+			for_each<N>([this](const auto& x, const auto& y)
+				    { _cache += x * y; },
+				    TU::size(_l) - 1, ++a, ++b);
 			_valid = true;
 		    }
 

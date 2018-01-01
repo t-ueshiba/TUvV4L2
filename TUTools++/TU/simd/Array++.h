@@ -6,15 +6,13 @@
 #if !defined(TU_SIMD_ARRAYPP_H)
 #define TU_SIMD_ARRAYPP_H
 
-#include "TU/simd/simd.h"	// import before TU/Array++.h
-#if defined(SIMD)
-#  include "TU/simd/arithmetic.h"
-#  include "TU/simd/load_store_iterator.h"
-#  include "TU/algorithm.h"
-#  ifdef TU_DEBUG
-#    include <boost/core/demangle.hpp>
-#  endif
+#include "TU/simd/simd.h"
+#include "TU/Array++.h"
+#ifdef TU_DEBUG
+#  include <boost/core/demangle.hpp>
+#endif
 
+#if defined(SIMD)
 namespace TU
 {
 namespace simd
@@ -109,18 +107,6 @@ make_terminator(size_t n)
     return (n ? (n - 1)/detail::vsize<ITER>::value + 1 : 0);
 }
     
-}	// namespace simd
-
-namespace detail
-{
-  template <class ITER>	struct const_iterator_t;
-  template <class T, bool ALIGNED>
-  struct const_iterator_t<simd::iterator_wrapper<T*, ALIGNED> >
-  {
-      using type = simd::iterator_wrapper<const T*, ALIGNED>;
-  };
-}	// namespace detail
-    
 /************************************************************************
 *  algorithms overloaded for simd::iterator_wrapper<ITER, ALIGNED>	*
 ************************************************************************/
@@ -132,7 +118,7 @@ namespace detail
       using type	= T;
   };
   template <class T>
-  struct vec_element_t<simd::vec<T> >
+  struct vec_element_t<vec<T> >
   {
       using type	= T;
   };
@@ -140,100 +126,98 @@ namespace detail
     
 //! 指定された範囲の各要素に関数を適用する
 /*!
-  N != 0 の場合，Nで指定した要素数だけ適用し，argは無視．
-  N = 0 の場合，ARG = ITERなら範囲の末尾の次を，ARG = size_tなら要素数をargで指定，
-  \param begin	適用範囲の先頭を指す反復子
-  \param arg	適用範囲の末尾の次を指す反復子または適用要素数
+  N != 0 の場合，Nで指定した要素数だけ適用し，nは無視．
+  N = 0 の場合，要素数をnで指定，
   \param func	適用する関数
+  \param n	適用要素数
+  \param begin	適用範囲の先頭を指す反復子
 */
-template <size_t N, class ITER, bool ALIGNED, class ARG, class FUNC> inline FUNC
-for_each(simd::iterator_wrapper<ITER, ALIGNED> begin, ARG arg, FUNC func)
+template <size_t N, class FUNC, class ITER, bool ALIGNED> inline FUNC
+for_each(FUNC func, size_t n, iterator_wrapper<ITER, ALIGNED> iter)
 {
-    constexpr auto	M = simd::make_terminator<ITER>(N);
+    constexpr auto	M = make_terminator<ITER>(N);
     
-    return for_each<M>(simd::make_accessor(begin),
-		       simd::make_terminator<ITER>(arg), func);
+    return TU::for_each<M>(func, make_terminator<ITER>(n),
+			   make_accessor(iter));
 }
 
 //! 指定された2つの範囲の各要素に2変数関数を適用する
 /*!
-  N != 0 の場合，Nで指定した要素数だけ適用し，argは無視．
-  N = 0 の場合，ARG = ITER0なら範囲の末尾の次を，ARG = size_tなら要素数をargで指定，
+  N != 0 の場合，Nで指定した要素数だけ適用し，nは無視．
+  N = 0 の場合，要素数をnで指定，
   \param begin0	第1の適用範囲の先頭を指す反復子
-  \param arg	適用範囲の末尾の次を指す反復子または適用要素数
+  \param n	適用要素数
   \param begin1	第2の適用範囲の先頭を指す反復子
   \param func	適用する関数
 */
-template <size_t N,  class ITER0, bool ALIGNED0,
-	  class ARG, class ITER1, bool ALIGNED1, class FUNC> inline FUNC
-for_each(simd::iterator_wrapper<ITER0, ALIGNED0> begin0, ARG arg,
-	 simd::iterator_wrapper<ITER1, ALIGNED1> begin1, FUNC func)
+template <size_t N, class FUNC,
+	  class ITER0, bool ALIGNED0, class ITER1, bool ALIGNED1> inline FUNC
+for_each(FUNC func, size_t n,
+	 iterator_wrapper<ITER0, ALIGNED0> begin0, 
+	 iterator_wrapper<ITER1, ALIGNED1> begin1)
 {
 #ifdef TU_DEBUG
     std::cout << "(simd)for_each<" << N << "> ["
-	      << print_sizes(range<simd::iterator_wrapper<ITER0, ALIGNED0>, N>(
-				 begin0, arg))
+	      << print_sizes(range<iterator_wrapper<ITER0, ALIGNED0>, N>(
+				 begin0, n))
 	      << ']' << std::endl;
 #endif
     using T0	= typename detail::vec_element_t<iterator_value<ITER0> >::type;
     using T1	= typename detail::vec_element_t<iterator_value<ITER1> >::type;
-    using CVTR  = std::conditional_t<
-			(simd::vec<T0>::size > simd::vec<T1>::size),
-			decltype(simd::make_converter<T1>(begin0)),
-			decltype(simd::make_converter<T0>(begin1))>;
+    using CVTR  = std::conditional_t<(vec<T0>::size > vec<T1>::size),
+				     decltype(make_converter<T1>(begin0)),
+				     decltype(make_converter<T0>(begin1))>;
     
-    constexpr auto	M = simd::make_terminator<CVTR>(N);
+    constexpr auto	M = make_terminator<CVTR>(N);
     
-    return for_each<M>(simd::make_converter<T1>(begin0),
-		       simd::make_terminator<CVTR>(arg),
-		       simd::make_converter<T0>(begin1),
-		       func);
+    return TU::for_each<M>(func, make_terminator<CVTR>(n),
+			   make_converter<T1>(begin0),
+			   make_converter<T0>(begin1));
 }
     
 //! 指定された範囲の内積の値を返す
 /*!
-  N != 0 の場合，Nで指定した要素数の範囲の内積を求め，argは無視．
-  N = 0 の場合，ARG = ITER0なら範囲の末尾の次を，ARG = size_tなら要素数をargで指定，
+  N != 0 の場合，Nで指定した要素数の範囲の内積を求め，nは無視．
+  N = 0 の場合，要素数をnで指定，
   \param begin0	適用範囲の第1変数の先頭を指す反復子
-  \param arg	適用範囲の第1変数の末尾の次を指す反復子または要素数
+  \param n	要素数
   \param begin1	適用範囲の第2変数の先頭を指す反復子
   \param init	初期値
   \return	内積の値
 */
-template <size_t N,  class ITER0, bool ALIGNED0,
-	  class ARG, class ITER1, bool ALIGNED1, class T> inline T
-inner_product(simd::iterator_wrapper<ITER0, ALIGNED0> begin0, ARG arg,
-	      simd::iterator_wrapper<ITER1, ALIGNED1> begin1, T init)
+template <size_t N, class ITER0, bool ALIGNED0,
+		    class ITER1, bool ALIGNED1, class T> inline T
+inner_product(iterator_wrapper<ITER0, ALIGNED0> begin0, size_t n,
+	      iterator_wrapper<ITER1, ALIGNED1> begin1, T init)
 {
 #ifdef TU_DEBUG
     std::cout << "(simd)inner_product<" << N << "> ["
-	      << print_sizes(range<simd::iterator_wrapper<ITER0, ALIGNED0>, N>(
-				 begin0, arg))
+	      << print_sizes(range<iterator_wrapper<ITER0, ALIGNED0>, N>(
+				 begin0, n))
 	      << "]" << std::endl;
 #endif
-    constexpr auto	M = simd::make_terminator<ITER0>(N);
+    constexpr auto	M = make_terminator<ITER0>(N);
     
-    return simd::hadd(inner_product<M>(simd::make_accessor(begin0),
-				       simd::make_terminator<ITER0>(arg),
-				       simd::make_accessor(begin1),
-				       simd::vec<T>(init)));
+    return hadd(TU::inner_product<M>(make_accessor(begin0),
+				     make_terminator<ITER0>(n),
+				     make_accessor(begin1),
+				     vec<T>(init)));
 }
     
 //! 指定された範囲にある要素の2乗和を返す
 /*!
-  N != 0 の場合，Nで指定した要素数の範囲の2乗和を求め，argは無視．
-  N = 0 の場合，ARG = ITERなら範囲の末尾の次を，ARG = size_tなら要素数をargで指定，
+  N != 0 の場合，Nで指定した要素数の範囲の2乗和を求め，nは無視．
+  N = 0 の場合，要素数をnで指定，
   \param begin	適用範囲の先頭を指す反復子
-  \param arg	適用範囲の末尾の次を指す反復子または要素数
+  \param n	要素数
   \return	2乗和の値
 */
-template <size_t N, class ITER, bool ALIGNED, class ARG> inline auto
-square(simd::iterator_wrapper<ITER, ALIGNED> iter, ARG arg)
+template <size_t N, class ITER, bool ALIGNED> inline auto
+square(iterator_wrapper<ITER, ALIGNED> iter, size_t n)
 {
-    constexpr auto	M = simd::make_terminator<ITER>(N);
+    constexpr auto	M = make_terminator<ITER>(N);
     
-    return simd::hadd(square<M>(simd::make_accessor(iter),
-				simd::make_terminator<ITER>(arg)));
+    return hadd(square<M>(make_accessor(iter), make_terminator<ITER>(n)));
 }
 
 #ifdef TU_DEBUG
@@ -254,20 +238,30 @@ namespace detail
 #endif
     
 template <class FUNC, class... ITER, bool... ALIGNED> inline auto
-make_map_iterator(FUNC func, simd::iterator_wrapper<ITER, ALIGNED>... iter)
+make_map_iterator(FUNC func, iterator_wrapper<ITER, ALIGNED>... iter)
 {
 #ifdef TU_DEBUG
     std::cout << "(simd)make_map_iterator:\n";
     detail::print_types<ITER...>(std::cout);
 #endif		  
-    return wrap_iterator(make_map_iterator(func, simd::make_accessor(iter)...));
+    return wrap_iterator(TU::make_map_iterator(func, make_accessor(iter)...));
 }
 
+}	// namespace simd
+    
+namespace detail
+{
+  template <class ITER>	struct const_iterator_t;
+  template <class T, bool ALIGNED>
+  struct const_iterator_t<simd::iterator_wrapper<T*, ALIGNED> >
+  {
+      using type = simd::iterator_wrapper<const T*, ALIGNED>;
+  };
+}	// namespace detail
+    
 /************************************************************************
 *  traits for Buf<T, ALLOC, SIZE, SIZES...>				*
 ************************************************************************/
-template <class T, class ALLOC>	class BufTraits;
-
 template <class T, class ALLOC>
 class BufTraits<simd::vec<T>, ALLOC>
     : public std::allocator_traits<simd::allocator<simd::vec<T> > >
@@ -290,8 +284,5 @@ class BufTraits<simd::vec<T>, ALLOC>
 };
 
 }	// namespace TU
-#endif	// defined(SIMD)
-
-#include "TU/Array++.h"
-
+#endif	// SIMD
 #endif	// !TU_SIMD_ARRAYPP_H

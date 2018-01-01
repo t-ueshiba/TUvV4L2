@@ -46,6 +46,7 @@ HDRSDIR		= $(PREFIX)/include
 SUFFIX		= .cc:sC .cpp:sC .cu:sC
 EXTHDRS		= ../../TU/Array++.h \
 		../../TU/Bezier++.h \
+		../../TU/Camera++.h \
 		../../TU/Geometry++.h \
 		../../TU/Image++.h \
 		../../TU/List.h \
@@ -57,6 +58,7 @@ EXTHDRS		= ../../TU/Array++.h \
 		../../TU/pair.h \
 		../../TU/range.h \
 		../../TU/tuple.h \
+		../../TU/type_traits.h \
 		/usr/local/include/TU/v/App.h \
 		/usr/local/include/TU/v/CanvasPane.h \
 		/usr/local/include/TU/v/CanvasPaneDC.h \
@@ -87,8 +89,9 @@ draw.o: draw.h /usr/local/include/TU/v/OglDC.h \
 	/usr/local/include/TU/v/DC.h ../../TU/Geometry++.h \
 	../../TU/Minimize.h ../../TU/Vector++.h ../../TU/Array++.h \
 	../../TU/range.h ../../TU/iterator.h ../../TU/tuple.h \
-	../../TU/algorithm.h ../../TU/Image++.h ../../TU/pair.h \
-	../../TU/Manip.h /usr/local/include/TU/v/Colormap.h \
+	../../TU/type_traits.h ../../TU/algorithm.h ../../TU/Image++.h \
+	../../TU/pair.h ../../TU/Manip.h ../../TU/Camera++.h \
+	/usr/local/include/TU/v/Colormap.h \
 	/usr/local/include/TU/v/CanvasPane.h /usr/local/include/TU/v/TUv++.h \
 	../../TU/List.h /usr/local/include/TU/v/Widget-Xaw.h \
 	/usr/local/include/TU/v/Menu.h /usr/local/include/TU/v/DC3.h \
@@ -96,14 +99,14 @@ draw.o: draw.h /usr/local/include/TU/v/OglDC.h \
 main.o: /usr/local/include/TU/v/App.h /usr/local/include/TU/v/TUv++.h \
 	../../TU/List.h ../../TU/Geometry++.h ../../TU/Minimize.h \
 	../../TU/Vector++.h ../../TU/Array++.h ../../TU/range.h \
-	../../TU/iterator.h ../../TU/tuple.h ../../TU/algorithm.h \
-	/usr/local/include/TU/v/Widget-Xaw.h \
+	../../TU/iterator.h ../../TU/tuple.h ../../TU/type_traits.h \
+	../../TU/algorithm.h /usr/local/include/TU/v/Widget-Xaw.h \
 	/usr/local/include/TU/v/Colormap.h ../../TU/Image++.h ../../TU/pair.h \
+	../../TU/Manip.h ../../TU/Camera++.h \
 	/usr/local/include/TU/v/CmdWindow.h \
 	/usr/local/include/TU/v/CanvasPane.h draw.h \
 	/usr/local/include/TU/v/OglDC.h \
 	/usr/local/include/TU/v/CanvasPaneDC3.h \
 	/usr/local/include/TU/v/CanvasPaneDC.h /usr/local/include/TU/v/XDC.h \
-	/usr/local/include/TU/v/DC.h ../../TU/Manip.h \
-	/usr/local/include/TU/v/Menu.h /usr/local/include/TU/v/DC3.h \
-	../../TU/Bezier++.h
+	/usr/local/include/TU/v/DC.h /usr/local/include/TU/v/Menu.h \
+	/usr/local/include/TU/v/DC3.h ../../TU/Bezier++.h

@@ -401,9 +401,9 @@ inline std::enable_if_t<rank<E>() == 2 && rank<F>() == 2, F&>
 solve(const E& A, F&& B)
 {
     LUDecomposition<element_t<E>, size0<E>()>	lu(A);
-    for_each<size0<F>()>(TU::begin(B), TU::size(B),
-			 [&lu](auto&& b)
-			 { lu.substitute(std::forward<decltype(b)>(b)); });
+    for_each<size0<F>()>([&lu](auto&& b)
+			 { lu.substitute(std::forward<decltype(b)>(b)); },
+			 TU::size(B), TU::begin(B));
     return B;
 }
     
