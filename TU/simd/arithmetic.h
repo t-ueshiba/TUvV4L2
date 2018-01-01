@@ -10,6 +10,7 @@
 #include "TU/simd/vec.h"
 #include "TU/simd/cast.h"
 #include "TU/simd/logical.h"
+#include "TU/simd/zero.h"
 
 namespace TU
 {
@@ -37,6 +38,12 @@ operator -(vec<T> x, vec<T> y)
     const vec<T>	mask(1 << (8*sizeof(T) - 1));
     
     return cast<signed_type<T> >(mask ^ x) - cast<signed_type<T> >(mask ^ y);
+}
+
+template <class T> inline vec<T>
+operator -(vec<T> x)
+{
+    return zero<T>() - x;
 }
 
 template <class T> inline vec<T>

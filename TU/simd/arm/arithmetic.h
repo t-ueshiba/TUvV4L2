@@ -14,12 +14,6 @@ namespace simd
 /************************************************************************
 *  Arithmetic operators							*
 ************************************************************************/
-template <class T> inline vec<signed_type<T> >
-operator -(vec<T> x)
-{
-    return zero<T>() - x;
-}
-
 #define SIMD_SAT_ADD(type)						\
     SIMD_BINARY_FUNC(operator +, qaddq, type)
 
