@@ -23,7 +23,6 @@ template <class T> vec<T>		operator +(vec<T> x, vec<T> y)	;
 template <class T> vec<T>		operator *(vec<T> x, vec<T> y)	;
 template <class T> vec<T>		operator /(vec<T> x, vec<T> y)	;
 template <class T> vec<T>		operator %(vec<T> x, vec<T> y)	;
-template <class T> vec<signed_type<T> >	operator -(vec<T> x)		;
 template <class T> vec<T>		subs(vec<T> x, vec<T> y)	;
 template <class T> vec<T>		mulhi(vec<T> x, vec<T> y)	;
 template <class T> vec<T>		min(vec<T> x, vec<T> y)		;
@@ -40,7 +39,7 @@ operator -(vec<T> x, vec<T> y)
     return cast<signed_type<T> >(mask ^ x) - cast<signed_type<T> >(mask ^ y);
 }
 
-template <class T> inline vec<T>
+template <class T> inline vec<signed_type<T> >
 operator -(vec<T> x)
 {
     return zero<T>() - x;
