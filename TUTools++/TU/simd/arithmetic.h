@@ -19,17 +19,17 @@ namespace simd
 /************************************************************************
 *  Arithmetic operators							*
 ************************************************************************/
-template <class T> vec<T>		operator +(vec<T> x, vec<T> y)	;
-template <class T> vec<T>		operator *(vec<T> x, vec<T> y)	;
-template <class T> vec<T>		operator /(vec<T> x, vec<T> y)	;
-template <class T> vec<T>		operator %(vec<T> x, vec<T> y)	;
-template <class T> vec<T>		subs(vec<T> x, vec<T> y)	;
-template <class T> vec<T>		mulhi(vec<T> x, vec<T> y)	;
-template <class T> vec<T>		min(vec<T> x, vec<T> y)		;
-template <class T> vec<T>		max(vec<T> x, vec<T> y)		;
-template <class T> vec<T>		rcp(vec<T> x)			;
-template <class T> vec<T>		sqrt(vec<T> x)			;
-template <class T> vec<T>		rsqrt(vec<T> x)			;
+template <class T> vec<T>	operator +(vec<T> x, vec<T> y)		;
+template <class T> vec<T>	operator *(vec<T> x, vec<T> y)		;
+template <class T> vec<T>	operator /(vec<T> x, vec<T> y)		;
+template <class T> vec<T>	operator %(vec<T> x, vec<T> y)		;
+template <class T> vec<T>	subs(vec<T> x, vec<T> y)		;
+template <class T> vec<T>	mulhi(vec<T> x, vec<T> y)		;
+template <class T> vec<T>	min(vec<T> x, vec<T> y)			;
+template <class T> vec<T>	max(vec<T> x, vec<T> y)			;
+template <class T> vec<T>	rcp(vec<T> x)				;
+template <class T> vec<T>	sqrt(vec<T> x)				;
+template <class T> vec<T>	rsqrt(vec<T> x)				;
 
 template <class T> inline vec<signed_type<T> >
 operator -(vec<T> x, vec<T> y)
