@@ -6,7 +6,7 @@
 #if !defined(TU_SIMD_CVT_H)
 #define	TU_SIMD_CVT_H
 
-#include "TU/tuple.h"
+#include "TU/iterator.h"
 #include "TU/simd/zero.h"
 #include "TU/simd/cast.h"
 #include "TU/simd/shift.h"
@@ -19,9 +19,10 @@ namespace simd
 /************************************************************************
 *  Converting vecs							*
 ************************************************************************/
-//! S型ベクトルの上位または下位半分を1つ上位のT型ベクトル(要素数が半分)に型変換する．
+//! S型ベクトルの上位または下位半分を1つ上位(要素数が半分)のT型ベクトルに型変換する．
 /*!
   S, Tは符号付き／符号なしのいずれでも良いが，符号付き -> 符号なしの変換はできない．
+  \param T	変換先のベクトルの要素型
   \param HI	falseならば下位，trueならば上位を変換
   \param x	変換されるベクトル
   \return	変換されたベクトル
@@ -29,9 +30,12 @@ namespace simd
 template <class T, bool HI=false, bool MASK=false, class S>
 vec<T>	cvt(vec<S> x)							;
 	
-//! 2つのS型ベクトルを1つ下位のT型ベクトル(要素数が2倍)に型変換する．
+//! 2つのS型ベクトルを1つ下位(要素数が2倍)のT型ベクトルに型変換する．
 /*!
   Sが符号付き／符号なしのいずれの場合も飽和処理が行われる．
+  \param T	変換先のベクトルの要素型
+  \param MASK	falseならば数値ベクトルとして，
+		trueならばマスクベクトルとして変換，
   \param x	変換されるベクトル
   \param y	変換されるベクトル
   \return	xが変換されたものを下位，yが変換されたものを上位に
@@ -48,14 +52,14 @@ cvt(const std::tuple<S...>& t)
 {
     return tuple_transform([](auto x){ return cvt<T, HI, MASK>(x); }, t);
 }
-    
+
 template <class T, bool MASK=false, class... S> inline auto
 cvt(const std::tuple<S...>& l, const std::tuple<S...>& r)
 {
     return tuple_transform([](auto x, auto y){ return cvt<T, MASK>(x, y); },
 			   l, r);
 }
-    
+
 /************************************************************************
 *  Adjacent target types of conversions					*
 ************************************************************************/
@@ -104,8 +108,12 @@ namespace detail
 //! より上位の要素を持つベクトルへの多段変換において直後の変換先の要素型を返す.
 /*!
   vec<S> を vec<T> に変換する過程で vec<S> の直後の変換先の要素型を返す.
-  \param S	変換されるベクトルの要素型
   \param T	最終的な変換先のベクトルの要素型
+  \param S	変換されるベクトルの要素型
+  \param MASK	falseならば数値ベクトルとして，
+		trueならばマスクベクトルとして変換，
+  \param MASK	trueならばマスクベクトルとして変換，
+		falseならば数値ベクトルとして変換
   \return	直後の変換先のベクトルの要素型
 */
 template <class T, class S, bool MASK>
@@ -114,8 +122,10 @@ using cvt_upper_type = typename detail::cvt_adjacent_type<T, S, MASK>::U;
 //! より下位の要素を持つベクトルへの多段変換において直後の変換先の要素型を返す.
 /*!
   vec<S> を vec<T> に変換する過程で vec<S> の直後の変換先の要素型を返す.
-  \param S	変換されるベクトルの要素型
   \param T	最終的な変換先のベクトルの要素型
+  \param S	変換されるベクトルの要素型
+  \param MASK	falseならば数値ベクトルとして，
+		trueならばマスクベクトルとして変換，
   \return	直後の変換先のベクトルの要素型
 */
 template <class T, class S, bool MASK>
@@ -124,12 +134,120 @@ using cvt_lower_type = typename detail::cvt_adjacent_type<T, S, MASK>::L;
 //! より下位の要素を持つベクトルへの多段変換において最終的な変換先の直上の要素型を返す.
 /*!
   vec<S> を vec<T> に変換する過程で vec<T> に達する直前のベクトルの要素型を返す.
-  \param S	変換されるベクトルの要素型
   \param T	最終的な変換先のベクトルの要素型
+  \param S	変換されるベクトルの要素型
+  \param MASK	falseならば数値ベクトルとして，
+		trueならばマスクベクトルとして変換，
   \return	最終的な変換先の直上のベクトルの要素型
 */
 template <class T, class S, bool MASK>
 using cvt_above_type = typename detail::cvt_adjacent_type<T, S, MASK>::A;
+    
+/************************************************************************
+*  Converting vecs or vec tuples to upper adjacent types		*
+************************************************************************/
+//! S型ベクトルの上位または下位半分を直上位または同位の隣接ベクトルに型変換する．
+/*!
+  S型ベクトルをT型ベクトルへ多段変換する過程の1ステップとして，
+  S型ベクトルを直上位または同位の隣接ベクトルに変換する．
+  \param T	最終的な変換先のベクトルの要素型
+  \param HI	falseならば下位，trueならば上位を変換
+  \param MASK	falseならば数値ベクトルとして，
+		trueならばマスクベクトルとして変換，
+  \param x	変換されるベクトル
+  \return	変換されたベクトル
+*/
+template <class T, bool HI=false, bool MASK=false, size_t=0, class S>
+inline auto
+cvtup(vec<S> x)
+{
+    using U = cvt_upper_type<T, S, MASK>;
+    using A = std::conditional_t<vec<T>::size == vec<S>::size, T, U>;
+		    
+    return cvt<A, HI, MASK>(x);
+}
+
+template <class T, bool HI, bool MASK, size_t N, class ITER>
+inline std::enable_if_t<iterator_value<ITER>::size == N, iterator_value<ITER> >
+cvtup(ITER& iter)
+{
+    return *iter++;
+}
+
+template <class T, bool HI, bool MASK, size_t N, class ITER>
+inline std::enable_if_t<iterator_value<ITER>::size != N, ITER&>
+cvtup(ITER& iter)
+{
+    return iter;
+}
+
+template <class T, bool HI=false, bool MASK=false, size_t N=0, class TUPLE,
+	  std::enable_if_t<is_tuple<TUPLE>::value>* = nullptr> inline auto
+cvtup(TUPLE&& t)
+{
+    return tuple_transform([](auto&& x)
+			   { return cvtup<T, HI, MASK, N>(
+					std::forward<decltype(x)>(x)); },
+			   t);
+}
+
+/************************************************************************
+*  Converting vecs or vec tuples to lower adjacent types		*
+************************************************************************/
+//! S型ベクトルを直下位または同位の隣接ベクトルに型変換する．
+/*!
+  S型ベクトルをT型ベクトルへ多段変換する過程の1ステップとして，
+  S型ベクトルを直下位または同位の隣接ベクトルに変換する．
+  \param T	最終的な変換先のベクトルの要素型
+  \param MASK	trueならばマスクベクトルとして変換，
+		falseならば数値ベクトルとして変換
+  \param x	変換されるベクトル
+  \return	変換されたベクトル
+*/
+template <class T, bool MASK=false, class S> inline auto
+cvtdown(vec<S> x)
+{
+    using L = cvt_lower_type<T, S, MASK>;
+    using A = std::conditional_t<vec<L>::size == vec<S>::size, L, S>;
+
+    return cvt<A, false, MASK>(x);
+}
+
+template <class T, bool MASK=false, class TUPLE,
+	  std::enable_if_t<is_tuple<TUPLE>::value>* = nullptr> inline auto
+cvtdown(TUPLE&& t)
+{
+    return tuple_transform([](auto&& x){ return cvtdown<T, MASK>(x); }, t);
+}
+
+/*!
+  S型ベクトルをT型ベクトルへ多段変換する過程の1ステップとして，
+  2つのS型ベクトルを1つの直下位の隣接ベクトルに変換する．
+  \param T	最終的な変換先のベクトルの要素型
+  \param MASK	trueならばマスクベクトルとして変換，
+		falseならば数値ベクトルとして変換
+  \param x	変換されるベクトル
+  \param y	変換されるベクトル
+  \return	xが変換されたものを下位，yが変換されたものを上位に
+		配したベクトル
+*/
+template <class T, bool MASK=false, class S> inline auto
+cvtdown(vec<S> x, vec<S> y)
+{
+    return cvt<cvt_lower_type<T, S, MASK>, MASK>(x, y);
+}
+
+template <class T, bool MASK=false, class TUPLE0, class TUPLE1,
+	  std::enable_if_t<all<is_tuple, TUPLE0, TUPLE1>::value>* = nullptr>
+inline auto
+cvtdown(TUPLE0&& s, TUPLE1&& t)
+{
+    return tuple_transform([](auto&& x, auto&& y)
+			   { return cvtdown<T, MASK>(
+					std::forward<decltype(x)>(x),
+					std::forward<decltype(y)>(y)); },
+			   s, t);
+}
     
 }	// namespace simd
 }	// namespace TU

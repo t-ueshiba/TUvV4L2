@@ -230,20 +230,6 @@ make_accessor(T* p)
     return {p};
 }
 
-//! zip_iterator中の各反復子からSIMDベクトルを読み書きする反復子を生成し，それを再度zip_iteratorにまとめる
-/*!
-  \param zip_iter	SIMDベクトルを読み込み元/書き込み先を指す反復子を束ねた
-			zip_iterator
-  \return		SIMDベクトルを読み書きする反復子を束ねたzip_iterator
-*/
-template <class ITER_TUPLE> inline auto
-make_accessor(zip_iterator<ITER_TUPLE> zip_iter)
-{
-    return make_zip_iterator(tuple_transform([](auto iter)
-					     { return make_accessor(iter); },
-					     zip_iter.get_iterator_tuple()));
-}
-
 }	// namespace simd
 }	// namespace TU
 #endif	// !TU_SIMD_LOAD_STORE_ITERATOR_H
