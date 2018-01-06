@@ -21,7 +21,24 @@ cvt(vec<S> x)
 ************************************************************************/
 // [1] 整数ベクトル間の変換
 #if defined(SSE4)
-#  if defined(AVX2)
+#  if defined(AVX512)
+#    define SIMD_CVTUP0(from, to)					\
+      template <> inline vec<to>					\
+      cvt<to, false>(vec<from> x)					\
+      {									\
+	  return SIMD_MNEMONIC(cvt, _mm512_, SIMD_SUFFIX(from),		\
+			       SIMD_SIGNED(to))				\
+	      (_mm256_castsi512_si256(x));				\
+      }
+#    define SIMD_CVTUP1(from, to)					\
+      template <> inline vec<to>					\
+      cvt<to, true>(vec<from> x)					\
+      {									\
+	  return SIMD_MNEMONIC(cvt, _mm256_, SIMD_SUFFIX(from),		\
+			       SIMD_SIGNED(to))				\
+	      (_mm256_extractf128_si256(x, 0x1));			\
+      }
+#  elif defined(AVX2)
 #    define SIMD_CVTUP0(from, to)					\
       template <> inline vec<to>					\
       cvt<to, false>(vec<from> x)					\
@@ -176,7 +193,30 @@ SIMD_CVTDOWN_UI(int16_t, uint8_t)	// short -> u_char
   SIMD_CVT(type1, type0)
 
 #if defined(AVX)
-#  if defined(AVX2)
+#  if defined(AVX512)
+    SIMD_CVT_2(int32_t, float)		// int   <-> float
+
+    template <> inline F64vec		// int    -> double
+    cvt<double, false>(Is32vec x)
+    {
+	return _mm512_cvtepi32_pd(_mm512_castsi512_si256(x));
+    }
+
+    template <> inline F64vec		// int    -> double
+    cvt<double, true>(Is32vec x)
+    {
+	return _mm512_cvtepi32_pd(_mm512_extracti64x4_epi64(x, 0x1));
+    }
+
+    template <> inline Is32vec		// double -> int
+    cvt<int32_t>(F64vec x, F64vec y)
+    {
+	return _mm512_inserti64x4(_mm512_castsi256_si512(
+					   _mm512_cvtpd_epi32(x)),
+				  _mm512_cvtpd_epi32(y), 0x1);
+    }
+
+#  elif defined(AVX2)
     SIMD_CVT_2(int32_t, float)		// int   <-> float
 
     template <> inline F64vec		// int    -> double
@@ -347,7 +387,31 @@ SIMD_CVTDOWN_UI(int16_t, uint8_t)	// short -> u_char
 #endif
   
 // [3] 浮動小数点数ベクトル間の変換
-#if defined(AVX)
+#if defined(AVX512)
+  template <> inline F64vec
+  cvt<double, false>(F32vec x)		// float -> double
+  {
+      return _mm512_cvtps_pd(_mm512_castps512_ps256(x));
+  }
+  template <> inline F64vec
+  cvt<double, true>(F32vec x)		// float -> double
+  {
+      return _mm512_cvtps_pd(_mm256_insertf128_ps(
+				 _mm256_castps128_ps256(
+				     _mm512_extractf32x4_ps(x, 0x2)),
+				 _mm512_extractf32x4_ps(x, 0x3), 0x1));
+  }
+
+  template <> inline F32vec		// double -> float
+  cvt<float>(F64vec x, F64vec y)
+  {
+      const auto	z = _mm512_cvtpd_ps(y);
+      return _mm512_insertf32x4(_mm512_insertf32x4(
+				    _mm512_castps256_ps512(_mm512_cvtpd_ps(x)),
+				    _mm256_extractf128_ps(z, 0x0), 0x2),
+				_mm256_extractf128_ps(z, 0x1), 0x3);
+  }
+#elif defined(AVX)
   template <> inline F64vec
   cvt<double, false>(F32vec x)		// float -> double
   {
@@ -356,14 +420,14 @@ SIMD_CVTDOWN_UI(int16_t, uint8_t)	// short -> u_char
   template <> inline F64vec
   cvt<double, true>(F32vec x)		// float -> double
   {
-      return _mm256_cvtps_pd(_mm256_extractf128_ps(x, 1));
+      return _mm256_cvtps_pd(_mm256_extractf128_ps(x, 0x1));
   }
 
   template <> inline F32vec		// double -> float
   cvt<float>(F64vec x, F64vec y)
   {
       return _mm256_insertf128_ps(_mm256_castps128_ps256(_mm256_cvtpd_ps(x)),
-				  _mm256_cvtpd_ps(y), 1);
+				  _mm256_cvtpd_ps(y), 0x1);
   }
 #elif defined(SSE2)
   template <> inline F64vec
@@ -416,7 +480,7 @@ SIMD_CVTDOWN_UI(int16_t, uint8_t)	// short -> u_char
 	    _mm256_permute2f128_si256(x, y, 0x20),			\
 	    _mm256_permute2f128_si256(x, y, 0x31));			\
     }
-#else
+#else	// !AVX2
 #  define SIMD_CVTUP_MASK(from, to)					\
     template <> inline vec<to>						\
     cvt<to, false, true>(vec<from> x)					\

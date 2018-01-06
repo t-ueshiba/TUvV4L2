@@ -33,8 +33,6 @@ class cvtdown_iterator
 {
   private:
     using src_type	= iterator_value<ITER>;
-    
-    using S		= typename tuple_head<src_type>::element_type;
     using super		= boost::iterator_adaptor<
 				cvtdown_iterator,
 				ITER,
@@ -42,6 +40,8 @@ class cvtdown_iterator
 				boost::single_pass_traversal_tag,
 				replace_element<src_type, vec<T> > >;
 
+    constexpr static size_t	N = tuple_head<src_type>::size;
+    
   public:
     using	typename super::difference_type;
     using	typename super::reference;
@@ -52,30 +52,24 @@ class cvtdown_iterator
 		cvtdown_iterator(const ITER& iter)	:super(iter)	{}
 
   private:
-    template <class T_>
-    std::enable_if_t<(vec<T_>::size == vec<S>::size),
-		     replace_element<src_type, vec<T_> > >
-		cvtdown()
+    template <size_t N_, std::enable_if_t<N_ == N>* = nullptr>
+    auto	exec()
 		{
-		    auto	x = *super::base();
-		    ++super::base_reference();
-		    return cvt<T_, false, MASK>(x);
+		    return cvtdown<T, MASK>(*super::base_reference()++);
 		}
-    template <class T_>
-    std::enable_if_t<(vec<T_>::size > vec<S>::size),
-		     replace_element<src_type, vec<T_> > >
-		cvtdown()
+    template <size_t N_, std::enable_if_t<(N_ > N)>* = nullptr>
+    auto	exec()
 		{
-		    using A = cvt_above_type<T_, S, MASK>;
-	  
-		    auto	x = cvtdown<A>();
-		    auto	y = cvtdown<A>();
-		    return cvt<T_, MASK>(x, y);
+		    const auto	x = exec<N_/2>();
+		    const auto	y = exec<N_/2>();
+
+		    return cvtdown<T, MASK>(x, y);
 		}
 
     reference	dereference() const
-		{		    
-		    return const_cast<cvtdown_iterator*>(this)->cvtdown<T>();
+		{
+		    return const_cast<cvtdown_iterator*>(this)
+				->exec<vec<T>::size>();
 		}
     void	advance(difference_type)				{}
     void	increment()						{}

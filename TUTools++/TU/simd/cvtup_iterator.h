@@ -31,21 +31,16 @@ namespace detail
     private:
       template <class VEC_, class OP_>
       std::enable_if_t<(vec<T>::size == tuple_head<VEC_>::size)>
-		cvtup(const VEC_& x, OP_ op)
+		exec(const VEC_& x, OP_ op)
 		{
-		    op(*_iter, cvt<T, false, MASK>(x));
-		    ++_iter;
+		    op(*_iter++, cvtup<T, false, MASK>(x));
 		}
       template <class VEC_, class OP_>
       std::enable_if_t<(vec<T>::size < tuple_head<VEC_>::size)>
-		cvtup(const VEC_& x, OP_ op)
+		exec(const VEC_& x, OP_ op)
 		{
-		    using U = cvt_upper_type<
-				 T, typename tuple_head<VEC_>::element_type,
-				 MASK>;
-		    
-		    cvtup(cvt<U, false, MASK>(x), op);
-		    cvtup(cvt<U, true,  MASK>(x), op);
+		    exec(cvtup<T, false, MASK>(x), op);
+		    exec(cvtup<T, true,  MASK>(x), op);
 		}
 
     public:
@@ -54,55 +49,55 @@ namespace detail
       template <class VEC_>
       self&	operator =(const VEC_& x)
 		{
-		    cvtup(x, [](auto&& t, const auto& s){ t = s; });
+		    exec(x, [](auto&& t, const auto& s){ t = s; });
 		    return *this;
 		}
       template <class VEC_>
       self&	operator +=(const VEC_& x)
 		{
-		    cvtup(x, [](auto&& t, const auto& s){ t += s; });
+		    exec(x, [](auto&& t, const auto& s){ t += s; });
 		    return *this;
 		}
       template <class VEC_>
       self&	operator -=(const VEC_& x)
 		{
-		    cvtup(x, [](auto&& t, const auto& s){ t -= s; });
+		    exec(x, [](auto&& t, const auto& s){ t -= s; });
 		    return *this;
 		}
       template <class VEC_>
       self&	operator *=(const VEC_& x)
 		{
-		    cvtup(x, [](auto&& t, const auto& s){ t *= s; });
+		    exec(x, [](auto&& t, const auto& s){ t *= s; });
 		    return *this;
 		}
       template <class VEC_>
       self&	operator /=(const VEC_& x)
 		{
-		    cvtup(x, [](auto&& t, const auto& s){ t /= s; });
+		    exec(x, [](auto&& t, const auto& s){ t /= s; });
 		    return *this;
 		}
       template <class VEC_>
       self&	operator %=(const VEC_& x)
 		{
-		    cvtup(x, [](auto&& t, const auto& s){ t %= s; });
+		    exec(x, [](auto&& t, const auto& s){ t %= s; });
 		    return *this;
 		}
       template <class VEC_>
       self&	operator &=(const VEC_& x)
 		{
-		    cvtup(x, [](auto&& t, const auto& s){ t &= s; });
+		    exec(x, [](auto&& t, const auto& s){ t &= s; });
 		    return *this;
 		}
       template <class VEC_>
       self&	operator |=(const VEC_& x)
 		{
-		    cvtup(x, [](auto&& t, const auto& s){ t |= s; });
+		    exec(x, [](auto&& t, const auto& s){ t |= s; });
 		    return *this;
 		}
       template <class VEC_>
       self&	operator ^=(const VEC_& x)
 		{
-		    cvtup(x, [](auto&& t, const auto& s){ t ^= s; });
+		    exec(x, [](auto&& t, const auto& s){ t ^= s; });
 		    return *this;
 		}
 	

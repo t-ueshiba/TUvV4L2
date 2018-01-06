@@ -232,7 +232,7 @@ namespace detail
 		    return cvt<cvt_lower_type<O, S, MASK>, MASK>(y, z);
 		}
 
-    // vec<O> と同位に達した入力をさらに vec<I> にconvert upして _funcを適用し，
+    // vec<I> と同位に達した入力に _funcを適用し，
     // その結果をさらに vec<O> にconvert upしてstoreする．
       template <class TUPLE_>
       std::enable_if_t<(max_size<TUPLE_>::value == vec<I>::size &&
@@ -242,7 +242,7 @@ namespace detail
 		    upResult_store(_func(cvtdown()(x)));
 		}
 
-    // vec<O> と同位に到達した入力をさらに vec<I> にconvert upして _func を
+    // vec<O> と同位に達した入力をさらに vec<I> にconvert upして _func を
     // 適用し，その結果を vec<O> にconvert downしてstoreする．
       template <class TUPLE_>
       std::enable_if_t<(max_size<TUPLE_>::value == vec<O>::size)>

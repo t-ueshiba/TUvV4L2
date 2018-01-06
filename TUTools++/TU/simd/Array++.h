@@ -49,7 +49,7 @@ make_accessor(iterator_wrapper<const T*, ALIGNED> p)
 {
     return {p.base()};
 }
-    
+
 //! ラップされたポインタからSIMDベクトルを書き込む反復子を生成する
 /*!
   ラップされたポインタは sizeof(vec<T>) にalignされていなければならない．
@@ -60,6 +60,20 @@ template <class T, bool ALIGNED> inline store_iterator<T, ALIGNED>
 make_accessor(iterator_wrapper<T*, ALIGNED> p)
 {
     return {p.base()};
+}
+
+//! zip_iterator中の各反復子からSIMDベクトルを読み書きする反復子を生成し，それを再度zip_iteratorにまとめる
+/*!
+  \param zip_iter	SIMDベクトルを読み込み元/書き込み先を指す反復子を束ねた
+			zip_iterator
+  \return		SIMDベクトルを読み書きする反復子を束ねたzip_iterator
+*/
+template <class ITER_TUPLE> inline auto
+make_accessor(zip_iterator<ITER_TUPLE> zip_iter)
+{
+    return make_zip_iterator(tuple_transform([](auto iter)
+					     { return make_accessor(iter); },
+					     zip_iter.get_iterator_tuple()));
 }
 
 template <class T, class ITER, bool ALIGNED> inline auto
@@ -95,7 +109,7 @@ namespace detail
 
 //! ある要素型を指定された個数だけカバーするために必要なSIMDベクトルの個数を調べる
 /*!
-  T を value_type<ITER> がSIMDベクトル型となる場合はその要素型，ITER がポインタの
+  T を iterator_value<ITER> がSIMDベクトル型となる場合はその要素型，ITER がポインタの
   場合はそれが指す要素の型としたとき，指定された個数のT型要素をカバーするために
   必要な vec<T> 型SIMDベクトルの最小個数を返す．
   \param n	要素の個数
@@ -107,6 +121,33 @@ make_terminator(size_t n)
     return (n ? (n - 1)/detail::vsize<ITER>::value + 1 : 0);
 }
     
+#ifdef TU_DEBUG
+namespace detail
+{
+  template <class T> inline void
+  print_types(std::ostream& out)
+  {
+      out << '\t' << boost::core::demangle(typeid(T).name()) << std::endl;
+  }
+  template <class S, class... T> inline std::enable_if_t<sizeof...(T) != 0>
+  print_types(std::ostream& out)
+  {
+      out << '\t' << boost::core::demangle(typeid(S).name()) << std::endl;
+      print_types<T...>(out);
+  }
+}	// namespace detail
+#endif
+    
+template <class FUNC, class... ITER, bool... ALIGNED> inline auto
+make_map_iterator(FUNC func, iterator_wrapper<ITER, ALIGNED>... iter)
+{
+#ifdef TU_DEBUG
+    std::cout << "(simd)make_map_iterator:\n";
+    detail::print_types<ITER...>(std::cout);
+#endif		  
+    return wrap_iterator(TU::make_map_iterator(func, make_accessor(iter)...));
+}
+
 /************************************************************************
 *  algorithms overloaded for simd::iterator_wrapper<ITER, ALIGNED>	*
 ************************************************************************/
@@ -220,38 +261,10 @@ square(iterator_wrapper<ITER, ALIGNED> iter, size_t n)
     return hadd(square<M>(make_accessor(iter), make_terminator<ITER>(n)));
 }
 
-#ifdef TU_DEBUG
-namespace detail
-{
-  template <class T> inline void
-  print_types(std::ostream& out)
-  {
-      out << '\t' << boost::core::demangle(typeid(T).name()) << std::endl;
-  }
-  template <class S, class... T> inline std::enable_if_t<sizeof...(T) != 0>
-  print_types(std::ostream& out)
-  {
-      out << '\t' << boost::core::demangle(typeid(S).name()) << std::endl;
-      print_types<T...>(out);
-  }
-}	// namespace detail
-#endif
-    
-template <class FUNC, class... ITER, bool... ALIGNED> inline auto
-make_map_iterator(FUNC func, iterator_wrapper<ITER, ALIGNED>... iter)
-{
-#ifdef TU_DEBUG
-    std::cout << "(simd)make_map_iterator:\n";
-    detail::print_types<ITER...>(std::cout);
-#endif		  
-    return wrap_iterator(TU::make_map_iterator(func, make_accessor(iter)...));
-}
-
 }	// namespace simd
     
 namespace detail
 {
-  template <class ITER>	struct const_iterator_t;
   template <class T, bool ALIGNED>
   struct const_iterator_t<simd::iterator_wrapper<T*, ALIGNED> >
   {

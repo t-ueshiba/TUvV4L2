@@ -34,28 +34,18 @@ using subiterator = iterator_t<decayed_iterator_value<ITER> >;
 *  struct Diff<T>							*
 ************************************************************************/
 template <class T>
-struct Diff
+class Diff
 {
+  public:
     Diff(T x, T thresh)	:_x(x), _thresh(thresh)		{}
 
-#if defined(SIMD)
-    auto	operator ()(simd::vec<T> y) const
+    template <class T_>
+    auto	operator ()(T_ y) const
 		{
-		    using signed_type
-			= typename std::conditional_t<
-				std::is_integral<T>::value,
-				std::make_signed<T>,
-				detail::identity<T> >::type;
-		    using namespace	simd;
-
-		    return cast<signed_type>(min(diff(_x, y), _thresh));
+		    using	std::min;
+		    
+		    return min(diff(T_(_x), y), T_(_thresh));
 		}
-#else
-    auto	operator ()(T y) const
-		{
-		    return std::min(diff(_x, y), _thresh);
-		}
-#endif
     template <class T_>
     auto	operator ()(T_ y, T_ z) const
 		{
@@ -66,15 +56,10 @@ struct Diff
 		{
 		    return (*this)(std::get<0>(y)) + (*this)(std::get<1>(y));
 		}
-    
+
   private:
-#if defined(SIMD)
-    const simd::vec<T>	_x;
-    const simd::vec<T>	_thresh;
-#else
-    const T		_x;
-    const T		_thresh;
-#endif
+    const T	_x;
+    const T	_thresh;
 };
 
 /************************************************************************
@@ -87,16 +72,6 @@ struct Minus
 		{
 		    return x - y;
 		}
-#if defined(SIMD)
-    template <class T>
-    auto	operator ()(simd::vec<T> x, simd::vec<T> y) const
-		{
-		    using signed_type	= std::make_signed_t<T>;
-		    
-		    return simd::cast<signed_type>(x) -
-			   simd::cast<signed_type>(y);
-		}
-#endif
     template <class... T>
     auto	operator ()(std::tuple<T...> x, std::tuple<T...> y) const
 		{
