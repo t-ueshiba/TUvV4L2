@@ -185,7 +185,7 @@ template <class T, bool HI=false, bool MASK=false, size_t N=0, class TUPLE,
 	  std::enable_if_t<is_tuple<TUPLE>::value>* = nullptr> inline auto
 cvtup(TUPLE&& t)
 {
-    return tuple_transform([](auto&& x)
+    return tuple_transform([](auto&& x) -> decltype(auto)
 			   { return cvtup<T, HI, MASK, N>(
 					std::forward<decltype(x)>(x)); },
 			   t);
@@ -217,7 +217,8 @@ template <class T, bool MASK=false, class TUPLE,
 	  std::enable_if_t<is_tuple<TUPLE>::value>* = nullptr> inline auto
 cvtdown(TUPLE&& t)
 {
-    return tuple_transform([](auto&& x){ return cvtdown<T, MASK>(x); }, t);
+    return tuple_transform([](auto&& x) -> decltype(auto)
+			   { return cvtdown<T, MASK>(x); }, t);
 }
 
 /*!
@@ -242,7 +243,7 @@ template <class T, bool MASK=false, class TUPLE0, class TUPLE1,
 inline auto
 cvtdown(TUPLE0&& s, TUPLE1&& t)
 {
-    return tuple_transform([](auto&& x, auto&& y)
+    return tuple_transform([](auto&& x, auto&& y) -> decltype(auto)
 			   { return cvtdown<T, MASK>(
 					std::forward<decltype(x)>(x),
 					std::forward<decltype(y)>(y)); },
