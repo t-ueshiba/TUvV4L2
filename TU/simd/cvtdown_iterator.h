@@ -40,7 +40,8 @@ class cvtdown_iterator
 				boost::single_pass_traversal_tag,
 				replace_element<src_type, vec<T> > >;
 
-    constexpr static size_t	N = tuple_head<src_type>::size;
+  // 変換元のベクトルの成分数
+    constexpr static size_t	M = tuple_head<src_type>::size;
     
   public:
     using	typename super::difference_type;
@@ -52,24 +53,10 @@ class cvtdown_iterator
 		cvtdown_iterator(const ITER& iter)	:super(iter)	{}
 
   private:
-    template <size_t N_, std::enable_if_t<N_ == N>* = nullptr>
-    auto	exec()
-		{
-		    return cvtdown<T, MASK>(*super::base_reference()++);
-		}
-    template <size_t N_, std::enable_if_t<(N_ > N)>* = nullptr>
-    auto	exec()
-		{
-		    const auto	x = exec<N_/2>();
-		    const auto	y = exec<N_/2>();
-
-		    return cvtdown<T, MASK>(x, y);
-		}
-
     reference	dereference() const
 		{
-		    return const_cast<cvtdown_iterator*>(this)
-				->exec<vec<T>::size>();
+		    return cvtdown<T, MASK>(const_cast<cvtdown_iterator*>(this)
+					    ->base_reference());
 		}
     void	advance(difference_type)				{}
     void	increment()						{}

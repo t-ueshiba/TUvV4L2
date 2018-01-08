@@ -43,7 +43,6 @@ INCDIR		= $(PREFIX)/include
 SUFFIX		= .cc:sC .cpp:sC .cu:sC
 EXTHDRS		= ../../../TU/functional.h \
 		../../../TU/iterator.h \
-		../../../TU/pair.h \
 		../../../TU/simd/arithmetic.h \
 		../../../TU/simd/arm/arch.h \
 		../../../TU/simd/arm/arithmetic.h \
@@ -66,7 +65,6 @@ EXTHDRS		= ../../../TU/functional.h \
 		../../../TU/simd/load_store.h \
 		../../../TU/simd/load_store_iterator.h \
 		../../../TU/simd/logical.h \
-		../../../TU/simd/pack.h \
 		../../../TU/simd/select.h \
 		../../../TU/simd/shift.h \
 		../../../TU/simd/transform.h \
@@ -116,13 +114,12 @@ main.o: ../../../TU/simd/transform.h ../../../TU/iterator.h \
 	../../../TU/simd/arm/bit_shift.h ../../../TU/simd/x86/cvt.h \
 	../../../TU/simd/x86/unpack.h ../../../TU/simd/arm/cvt.h \
 	../../../TU/simd/load_store_iterator.h ../../../TU/simd/load_store.h \
-	../../../TU/simd/pack.h ../../../TU/pair.h \
 	../../../TU/simd/x86/load_store.h ../../../TU/simd/arm/load_store.h \
 	../../../TU/simd/arithmetic.h ../../../TU/simd/logical.h \
 	../../../TU/simd/x86/logical.h ../../../TU/simd/x86/logical_base.h \
 	../../../TU/simd/arm/logical.h ../../../TU/simd/x86/arithmetic.h \
-	../../../TU/simd/insert_extract.h \
+	../../../TU/simd/select.h ../../../TU/simd/x86/select.h \
+	../../../TU/simd/arm/select.h ../../../TU/simd/insert_extract.h \
 	../../../TU/simd/x86/insert_extract.h \
-	../../../TU/simd/arm/insert_extract.h ../../../TU/simd/select.h \
-	../../../TU/simd/x86/select.h ../../../TU/simd/arm/select.h \
+	../../../TU/simd/arm/insert_extract.h \
 	../../../TU/simd/arm/arithmetic.h
