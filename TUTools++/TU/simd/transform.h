@@ -53,199 +53,98 @@ namespace detail
     //! 変換関数に入力するSIMDベクトルの要素型
       using I = std::conditional_t<std::is_void<T>::value, O, T>;
 
-    //! tuple中のベクトルおよび反復子が指すベクトルのうちの最大要素数
+    //! tuple中のベクトルおよび反復子が指すベクトルのうちの最大/最小要素数
       template <class ITER_>
-      struct max_size_impl
+      struct vsize_impl
       {
-	  constexpr static auto
-		value = max_size_impl<iterator_value<ITER_> >::value;
+	  constexpr static auto	min = vsize_impl<iterator_value<ITER_> >::min;
+	  constexpr static auto	max = vsize_impl<iterator_value<ITER_> >::max;
       };
       template <class T_>
-      struct max_size_impl<vec<T_> >
+      struct vsize_impl<vec<T_> >
       {
-	  constexpr static auto	value = vec<T_>::size;
+	  constexpr static auto	min = vec<T_>::size;
+	  constexpr static auto	max = vec<T_>::size;
       };
       template <class VEC_>
-      struct max_size_impl<std::tuple<VEC_> >
+      struct vsize_impl<std::tuple<VEC_> >
       {
-	  constexpr static auto	value = max_size_impl<
-					    std::decay_t<VEC_> >::value;
+	  constexpr static auto	min = vsize_impl<std::decay_t<VEC_> >::min;
+	  constexpr static auto	max = vsize_impl<std::decay_t<VEC_> >::max;
       };
       template <class VEC_, class... VECS_>
-      struct max_size_impl<std::tuple<VEC_, VECS_...> >
+      struct vsize_impl<std::tuple<VEC_, VECS_...> >
       {
 	private:
-	  constexpr static auto	max0  = max_size_impl<
-					    std::decay_t<VEC_> >::value;
-	  constexpr static auto	max1  = max_size_impl<
-					    std::tuple<VECS_...> >::value;
+	  constexpr static auto	min0 = vsize_impl<std::decay_t<VEC_>   >::min;
+	  constexpr static auto	max0 = vsize_impl<std::decay_t<VEC_>   >::max;
+	  constexpr static auto	min1 = vsize_impl<std::tuple<VECS_...> >::min;
+	  constexpr static auto	max1 = vsize_impl<std::tuple<VECS_...> >::max;
+
 	public:
-	  constexpr static auto	value = (max0 > max1 ? max0 : max1);
+	  constexpr static auto	min = (min0 < min1 ? min0 : min1);
+	  constexpr static auto	max = (max0 > max1 ? max0 : max1);
       };
 
       template <class VECS_>
-      using max_size = max_size_impl<std::decay_t<VECS_> >;
+      using vsize = vsize_impl<std::decay_t<VECS_> >;
       
-    //! vec<I> よりも上位の複数のベクトルを vec<I> にconvert down して返す
-    /*!
-      - 引数として反復子が与えられた場合は，それが指す上位のベクトルを
-        複数読み込み，vec<I> にconvert downして返す．
-      - 引数として vec<I> と同サイズのベクトルが与えられた場合は，
-        それを vec<I> に変換して返す．
-     */
-      struct cvtdown
-      {
-	//! iter が指す vec<T_> と同サイズのベクトルを vec<T_> に変換
-	  template <class T_=I, class ITER_>
-	  std::enable_if_t<(iterator_value<ITER_>::size == vec<T_>::size),
-			   vec<T_> >
-		operator ()(ITER_& iter) const
-		{
-		    return cvt<T_, false, MASK>(*iter++);
-		}
-
-	//! iter の位置を先頭とする vec<T_> より上位の複数のベクトルを vec<T_> に変換
-	  template <class T_=I, class ITER_>
-	  std::enable_if_t<(iterator_value<ITER_>::size < vec<T_>::size),
-			   vec<T_> >
-		operator ()(ITER_& iter) const
-		{
-		    using S = typename iterator_value<ITER_>::element_type;
-		    using A = cvt_above_type<T_, S, MASK>;
-
-		  // iterの位置を先頭とする複数の vec<S> を
-		  // vec<T_> の直上型 vec<A> に再帰的に変換
-		    const auto	x = operator ()<A>(iter);
-		    const auto	y = operator ()<A>(iter);
-		    return cvt<T_, MASK>(x, y);
-		}
-
-	//! vec<T> と同サイズの vec<S_> を vec<I> に変換
-	  template <class S_>
-	  auto	operator ()(vec<S_> x) const
-		{
-		    return cvt<I, false, MASK>(x);
-		}
-
-	//! vec<I> と同サイズのベクトルまたは上位の反復子を vec<I> のtupleに変換
-	  template <class... VECS>
-	  auto	operator ()(const std::tuple<VECS...>& x) const
-		{
-		    return tuple_transform(*this, x);
-		}
-      };
-      
-    //! vec<I> よりも下位のベクトルを，一段上位のベクトルにconvert up
-    /*!
-      サイズ N_ のベクトルを指す反復子はdereference & incrementし，
-      そうでない反復子は何もしない．convert upしてサイズ N_ になる
-      ベクトルは HI_ に従って上半または下半をconvert upする．
-      \param N_		convert upされたベクトルのサイズ
-      \param HI_	trueならば入力ベクトルの上半を，falseならば下半を変換
-    */
-      template <size_t N_, bool HI_>
-      struct cvtup
-      {
-	//! 反復子が指すサイズ N_ のベクトルを読み込んで返し，反復子を進める
-	  template <class ITER_>
-	  std::enable_if_t<iterator_value<ITER_>::size == N_,
-			   iterator_value<ITER_> >
-	  	operator ()(ITER_& iter) const
-		{
-		    return *iter++;
-		}
-
-	//! サイズが N_ でないベクトルを指す反復子は，それへの参照をそのまま返す
-	  template <class ITER_>
-	  std::enable_if_t<iterator_value<ITER_>::size != N_, ITER_&>
-		operator ()(ITER_& iter) const
-		{
-		    return iter;
-		}
-
-	//! サイズ N_ のベクトルに一段convert up
-	  template <class S_>
-	  auto	operator ()(vec<S_> x) const
-		{
-		    return cvt<cvt_upper_type<I, S_, MASK>, HI_, MASK>(x);
-		}
-
-	//! ベクトルまたは反復子のtupleをサイズ N_ のベクトルまたは反復子のtupleに変換
-	  template <class... VEC_>
-	  auto	operator ()(std::tuple<VEC_...>& x) const
-		{
-		    return tuple_transform(*this, x);
-		}
-      };
-
     private:
     // _funcの適用結果を vec<O> にconvert upしてstoreする
       template <class TUPLE_>
       std::enable_if_t<(vec<O>::size == tuple_head<TUPLE_>::size)>
 		upResult_store(const TUPLE_& x)
 		{
-		    ASSIGN()(*_out, cvt<O, false, MASK>(x));
+		    ASSIGN()(*_out, cvtup<O, false, MASK>(x));
 		    ++_out;
 		}
       template <class TUPLE_>
       std::enable_if_t<(vec<O>::size < tuple_head<TUPLE_>::size)>
 		upResult_store(const TUPLE_& x)
 		{
-		    using U = cvt_upper_type<
-				  O, typename tuple_head<TUPLE_>::element_type,
-				  MASK>;
-		    
-		    upResult_store(cvt<U, false, MASK>(x));
-		    upResult_store(cvt<U, true,  MASK>(x));
+		    upResult_store(cvtup<O, false, MASK>(x));
+		    upResult_store(cvtup<O, true,  MASK>(x));
 		}
-	  
+
     // 既に vec<O> と同位に到達している入力をさらに vec<I> にconvert upして
     // _funcを適用し，その結果を vec<O> までconvert downして返す
       template <class TUPLE_,
-		std::enable_if_t<(max_size<TUPLE_>::value == vec<I>::size)>*
+		std::enable_if_t<(vsize<TUPLE_>::max == vec<I>::size)>*
 		= nullptr>
       auto	upArg_downResult(TUPLE_&& x)
 		{
-		    const auto	y = _func(cvtdown()(x));
-
-		    using S = typename tuple_head<decltype(y)>::element_type;
-		    using L = std::conditional_t<
-				  (vec<cvt_lower_type<O, S, MASK> >::size >
-				   vec<S>::size),
-				  S, cvt_lower_type<O, S, MASK> >;
-		    
-		    return cvt<L, false, MASK>(y);
+		    return cvtdown<O, MASK>(_func(cvtdown<I, MASK>(x)));
 		}
       template <class TUPLE_,
-		std::enable_if_t<(max_size<TUPLE_>::value > vec<I>::size)>*
+		std::enable_if_t<(vsize<TUPLE_>::max > vec<I>::size)>*
 		= nullptr>
       auto	upArg_downResult(TUPLE_&& x)
 		{
-		    constexpr auto	N = max_size<TUPLE_>::value;
+		    constexpr auto	N = vsize<TUPLE_>::max;
 
-		    const auto	y = upArg_downResult(cvtup<N/2, false>()(x));
-		    const auto	z = upArg_downResult(cvtup<N/2, true >()(x));
-
-		    using S = typename tuple_head<decltype(y)>::element_type;
+		    const auto	y = upArg_downResult(
+					cvtup<I, false, MASK, N/2>(x));
+		    const auto	z = upArg_downResult(
+					cvtup<I, true,  MASK, N/2>(x));
 
 		  // 戻り値のベクトルは TUPLE_ と同位
-		    return cvt<cvt_lower_type<O, S, MASK>, MASK>(y, z);
+		    return cvtdown<O, MASK>(y, z);
 		}
 
-    // vec<I> と同位に達した入力に _funcを適用し，
+    // vec<I> と同位に達した入力に _func を適用し，
     // その結果をさらに vec<O> にconvert upしてstoreする．
       template <class TUPLE_>
-      std::enable_if_t<(max_size<TUPLE_>::value == vec<I>::size &&
-			max_size<TUPLE_>::value >  vec<O>::size)>
+      std::enable_if_t<(vsize<TUPLE_>::max == vec<I>::size &&
+			vsize<TUPLE_>::max >  vec<O>::size)>
 		exec(TUPLE_&& x)
 		{
-		    upResult_store(_func(cvtdown()(x)));
+		    upResult_store(_func(cvtdown<I, MASK>(x)));
 		}
 
     // vec<O> と同位に達した入力をさらに vec<I> にconvert upして _func を
     // 適用し，その結果を vec<O> にconvert downしてstoreする．
       template <class TUPLE_>
-      std::enable_if_t<(max_size<TUPLE_>::value == vec<O>::size)>
+      std::enable_if_t<(vsize<TUPLE_>::max == vec<O>::size)>
 		exec(TUPLE_&& x)
 		{
 		    ASSIGN()(*_out, upArg_downResult(x));
@@ -254,14 +153,14 @@ namespace detail
 
     // x の中に vec<O> より下位のベクトルがあれば読み込んでconvert upする．
       template <class TUPLE_>
-      std::enable_if_t<(max_size<TUPLE_>::value > vec<I>::size &&
-			max_size<TUPLE_>::value > vec<O>::size)>
+      std::enable_if_t<(vsize<TUPLE_>::max > vec<I>::size &&
+			vsize<TUPLE_>::max > vec<O>::size)>
 		exec(TUPLE_&& x)
 		{
-		    constexpr auto	N = max_size<TUPLE_>::value;
+		    constexpr auto	N = vsize<TUPLE_>::max;
 		    
-		    exec(cvtup<N/2, false>()(x));
-		    exec(cvtup<N/2, true >()(x));
+		    exec(cvtup<I, false, MASK, N/2>(x));
+		    exec(cvtup<I, true,  MASK, N/2>(x));
 		}
 
     public:
@@ -274,10 +173,10 @@ namespace detail
 		    {
 		      // 入力ベクトルと出力ベクトルの中で最下位のベクトルの要素数
 			constexpr auto
-			    N = (max_size<ITER_TUPLE>::value > vec<O>::size ?
-				 max_size<ITER_TUPLE>::value : vec<O>::size);
+			    N = (vsize<ITER_TUPLE>::max > vec<O>::size ?
+				 vsize<ITER_TUPLE>::max : vec<O>::size);
 
-			exec(cvtup<N, false>()(_t));
+			exec(cvtup<I, false, MASK, N>(_t));
 		    }
 		    return _out;
 		}

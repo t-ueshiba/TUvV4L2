@@ -38,7 +38,6 @@ INCDIR		= $(PREFIX)/include
 SUFFIX		= .cc:sC .cpp:sC .cu:sC
 EXTHDRS		= ../../../TU/functional.h \
 		../../../TU/iterator.h \
-		../../../TU/pair.h \
 		../../../TU/simd/arm/arch.h \
 		../../../TU/simd/arm/bit_shift.h \
 		../../../TU/simd/arm/cast.h \
@@ -56,7 +55,6 @@ EXTHDRS		= ../../../TU/functional.h \
 		../../../TU/simd/cvtup_iterator.h \
 		../../../TU/simd/load_store.h \
 		../../../TU/simd/load_store_iterator.h \
-		../../../TU/simd/pack.h \
 		../../../TU/simd/shift.h \
 		../../../TU/simd/type_traits.h \
 		../../../TU/simd/vec.h \
@@ -100,5 +98,4 @@ main.o: ../../../TU/simd/cvtdown_iterator.h ../../../TU/iterator.h \
 	../../../TU/simd/x86/unpack.h ../../../TU/simd/arm/cvt.h \
 	../../../TU/simd/cvtup_iterator.h \
 	../../../TU/simd/load_store_iterator.h ../../../TU/simd/load_store.h \
-	../../../TU/simd/pack.h ../../../TU/pair.h \
 	../../../TU/simd/x86/load_store.h ../../../TU/simd/arm/load_store.h

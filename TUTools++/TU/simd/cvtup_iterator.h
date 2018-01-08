@@ -30,13 +30,13 @@ namespace detail
 
     private:
       template <class VEC_, class OP_>
-      std::enable_if_t<(vec<T>::size == tuple_head<VEC_>::size)>
+      std::enable_if_t<(tuple_head<VEC_>::size == vec<T>::size)>
 		exec(const VEC_& x, OP_ op)
 		{
 		    op(*_iter++, cvtup<T, false, MASK>(x));
 		}
       template <class VEC_, class OP_>
-      std::enable_if_t<(vec<T>::size < tuple_head<VEC_>::size)>
+      std::enable_if_t<(tuple_head<VEC_>::size > vec<T>::size)>
 		exec(const VEC_& x, OP_ op)
 		{
 		    exec(cvtup<T, false, MASK>(x), op);

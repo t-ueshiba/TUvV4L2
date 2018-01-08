@@ -52,14 +52,13 @@ doJob()
 		  make_accessor(std::cbegin(y)),
 		  make_accessor(std::cbegin(z)));
     std::cout << std::endl;
-    
+
     simd::transform<T>(sum(),
 		       make_accessor(std::begin(w)),
 		       make_accessor(std::cbegin(x)),
 		       make_accessor(std::cend(x)),
 		       make_accessor(std::cbegin(y)),
 		       make_accessor(std::cbegin(z)));
-		       
     std::copy(make_accessor(std::cbegin(w)),
 	      make_accessor(std::cend(w)),
 	      std::ostream_iterator<vec<O> >(std::cout, "\n"));

@@ -47,14 +47,14 @@ vec<T>	cvt(vec<S> x, vec<S> y)						;
 /************************************************************************
 *  Converting vec tuples						*
 ************************************************************************/
-template <class T, bool HI=false, bool MASK=false, class... S> inline auto
-cvt(const std::tuple<S...>& t)
+template <class T, bool HI=false, bool MASK=false, class... VEC> inline auto
+cvt(const std::tuple<VEC...>& t)
 {
     return tuple_transform([](auto x){ return cvt<T, HI, MASK>(x); }, t);
 }
 
-template <class T, bool MASK=false, class... S> inline auto
-cvt(const std::tuple<S...>& l, const std::tuple<S...>& r)
+template <class T, bool MASK=false, class... VEC> inline auto
+cvt(const std::tuple<VEC...>& l, const std::tuple<VEC...>& r)
 {
     return tuple_transform([](auto x, auto y){ return cvt<T, MASK>(x, y); },
 			   l, r);
@@ -161,14 +161,12 @@ template <class T, bool HI=false, bool MASK=false, size_t=0, class S>
 inline auto
 cvtup(vec<S> x)
 {
-    using U = cvt_upper_type<T, S, MASK>;
-    using A = std::conditional_t<vec<T>::size == vec<S>::size, T, U>;
-		    
-    return cvt<A, HI, MASK>(x);
+    return cvt<cvt_upper_type<T, S, MASK>, HI, MASK>(x);
 }
 
-template <class T, bool HI, bool MASK, size_t N, class ITER>
-inline std::enable_if_t<iterator_value<ITER>::size == N, iterator_value<ITER> >
+template <class T, bool HI, bool MASK, size_t N, class ITER,
+	  std::enable_if_t<iterator_value<ITER>::size == N>* = nullptr>
+inline auto
 cvtup(ITER& iter)
 {
     return *iter++;
@@ -194,33 +192,27 @@ cvtup(TUPLE&& t)
 /************************************************************************
 *  Converting vecs or vec tuples to lower adjacent types		*
 ************************************************************************/
-//! S型ベクトルを直下位または同位の隣接ベクトルに型変換する．
+//! S型ベクトルを要素数が等しい直下位ベクトルに変換する．
 /*!
   S型ベクトルをT型ベクトルへ多段変換する過程の1ステップとして，
-  S型ベクトルを直下位または同位の隣接ベクトルに変換する．
+  vec<S> とその直下位ベクトル vec<L> の要素数が等しければ
+  vec<L> に変換する．そうでなければ変換せずに vec<S> のまま返す．
   \param T	最終的な変換先のベクトルの要素型
   \param MASK	trueならばマスクベクトルとして変換，
 		falseならば数値ベクトルとして変換
   \param x	変換されるベクトル
   \return	変換されたベクトル
 */
-template <class T, bool MASK=false, class S> inline auto
+template <class T, bool MASK=false, size_t=vec<T>::size, class S> inline auto
 cvtdown(vec<S> x)
 {
-    using L = cvt_lower_type<T, S, MASK>;
+    using L = cvt_lower_type<T, S, MASK>;	// Sの直下位の要素型
     using A = std::conditional_t<vec<L>::size == vec<S>::size, L, S>;
 
     return cvt<A, false, MASK>(x);
 }
 
-template <class T, bool MASK=false, class TUPLE,
-	  std::enable_if_t<is_tuple<TUPLE>::value>* = nullptr> inline auto
-cvtdown(TUPLE&& t)
-{
-    return tuple_transform([](auto&& x) -> decltype(auto)
-			   { return cvtdown<T, MASK>(x); }, t);
-}
-
+//! 2つのS型ベクトルを要素数が2倍の直下位ベクトルに変換する．
 /*!
   S型ベクトルをT型ベクトルへ多段変換する過程の1ステップとして，
   2つのS型ベクトルを1つの直下位の隣接ベクトルに変換する．
@@ -238,15 +230,40 @@ cvtdown(vec<S> x, vec<S> y)
     return cvt<cvt_lower_type<T, S, MASK>, MASK>(x, y);
 }
 
-template <class T, bool MASK=false, class TUPLE0, class TUPLE1,
-	  std::enable_if_t<all<is_tuple, TUPLE0, TUPLE1>::value>* = nullptr>
+template <class T, bool MASK, size_t N=vec<T>::size, class ITER,
+	  std::enable_if_t<iterator_value<ITER>::size == N>* = nullptr>
 inline auto
-cvtdown(TUPLE0&& s, TUPLE1&& t)
+cvtdown(ITER& iter)
 {
-    return tuple_transform([](auto&& x, auto&& y) -> decltype(auto)
-			   { return cvtdown<T, MASK>(
-					std::forward<decltype(x)>(x),
-					std::forward<decltype(y)>(y)); },
+    return cvtdown<T, MASK>(*iter++);
+}
+
+template <class T, bool MASK, size_t N=vec<T>::size, class ITER,
+	  std::enable_if_t<(iterator_value<ITER>::size < N)>* = nullptr>
+inline auto
+cvtdown(ITER& iter)
+{
+    const auto	x = cvtdown<T, MASK, N/2>(iter);
+    const auto	y = cvtdown<T, MASK, N/2>(iter);
+    
+    return cvtdown<T, MASK>(x, y);
+}
+
+template <class T, bool MASK=false, class TUPLE,
+	  std::enable_if_t<is_tuple<TUPLE>::value>* = nullptr> inline auto
+cvtdown(TUPLE&& t)
+{
+    return tuple_transform([](auto&& x) -> decltype(auto)
+			   { return cvtdown<T, MASK, vec<T>::size>(
+					std::forward<decltype(x)>(x)); },
+			   t);
+}
+
+template <class T, bool MASK=false, class... VEC> inline auto
+cvtdown(const std::tuple<VEC...>& s, const std::tuple<VEC...>& t)
+{
+    return tuple_transform([](auto x, auto y)
+			   { return cvtdown<T, MASK>(x, y); },
 			   s, t);
 }
     
