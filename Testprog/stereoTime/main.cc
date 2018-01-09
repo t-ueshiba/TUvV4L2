@@ -191,7 +191,7 @@ main(int argc, char* argv[])
     {
 	ifstream	in;
 	openFile(in, paramFile, configDirs, ".params");
-
+      /*
 	if (gfstereo)
 	{
 	    GFStereoType::Parameters	params;
@@ -211,6 +211,7 @@ main(int argc, char* argv[])
 	    doJob<GFStereoType, u_char>(in, params, scale, binocular, ntrials);
 	}
 	else
+      */
 	{
 	    SADStereoType::Parameters	params;
 	    params.get(in);

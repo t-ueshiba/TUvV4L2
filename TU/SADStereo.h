@@ -512,53 +512,42 @@ SADStereo<SCORE, DISP>::computeDisparities(const_reverse_col_siterator colQ,
 	 boxR != boxRe; ++boxR)
     {
 #if defined(SIMD)
-	using mask_type	= simd::mask_type<Disparity>;
-#  if defined(WITHOUT_CVTDOWN)
 	using miterator	= simd::cvtdown_mask_iterator<
-			      mask_type,
+			      simd::mask_type<Disparity>,
 			      simd::mask_iterator<
 				  subiterator<const_col_siterator>,
 				  subiterator<RMIN_RV> > >;
-#  else
-	using miterator	= simd::mask_iterator<
-			      mask_type,
-			      subiterator<const_col_siterator>,
-			      subiterator<RMIN_RV> >;
-#  endif
 #else
 	using miterator	= mask_iterator<subiterator<const_col_siterator>,
 					subiterator<RMIN_RV> >;
 #endif
 	Idx<DisparityVec>	index;
 	auto			dminRVt = make_col_accessor(--dminRV);
-#if defined(SIMD) && defined(WITHOUT_CVTDOWN)
+#if defined(SIMD)
 	miterator	maskRV(make_mask_iterator(boxR->cbegin(),
-						  TU::begin(*RminRV)));
+						  begin(*RminRV)));
 	for (miterator maskRVe(make_mask_iterator(boxR->cend(),
-						  TU::begin(*RminRV)));
+						  begin(*RminRV)));
 	     maskRV != maskRVe; ++maskRV)
 #else
-	    miterator	maskRV(boxR->cbegin(), TU::begin(*RminRV));
-	for (miterator maskRVe(boxR->cend(),   TU::begin(*RminRV));
+	    miterator	maskRV(boxR->cbegin(), begin(*RminRV));
+	for (miterator maskRVe(boxR->cend(),   begin(*RminRV));
 	     maskRV != maskRVe; ++maskRV)
 #endif
 	{
 	    using dvalue_t = decayed_iterator_value<decltype(dminRVt)>;
 
-	  //*dminRVt = select(*maskRV, index, dvalue_t(*dminRVt));
+	    //*dminRVt = select(*maskRV, index, dvalue_t(*dminRVt));
 	    *dminRVt = fast_select(*maskRV, index, dvalue_t(*dminRVt));
 
 	    ++dminRVt;
 	    ++index;
 	}
-#if defined(SIMD) && defined(WITHOUT_CVTDOWN)
-      	const auto	dL = maskRV.base().dL();	// 左画像から見た視差
-#else
-      	const auto	dL = maskRV.dL();		// 左画像から見た視差
-#endif
 #if defined(SIMD)
+      	const auto	dL = maskRV.base().dL();	// 左画像から見た視差
 	const auto	R  = boxR->cbegin().base();
 #else
+      	const auto	dL = maskRV.dL();		// 左画像から見た視差
 	const auto	R  = boxR->cbegin();
 #endif
 	const auto	dsw1 = _params.disparitySearchWidth - 1;

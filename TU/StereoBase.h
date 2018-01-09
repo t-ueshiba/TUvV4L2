@@ -326,63 +326,49 @@ namespace simd
 #    endif
 #  endif
 
-#  if defined(WITHOUT_CVTDOWN)
   template <class ITER, class RV_ITER>
   class mask_iterator
       : public boost::iterator_adaptor<
 	    mask_iterator<ITER, RV_ITER>,
 	    ITER,
 	    replace_element<
-		decayed_iterator_value<RV_ITER>,
+		iterator_value<RV_ITER>,
 		vec<mask_type<typename tuple_head<
 				  decayed_iterator_value<
 				      RV_ITER> >::element_type> > >,
 	    boost::single_pass_traversal_tag,
 	    replace_element<
-		decayed_iterator_value<RV_ITER>,
+		iterator_value<RV_ITER>,
 		vec<mask_type<typename tuple_head<
 				  decayed_iterator_value<
 				      RV_ITER> >::element_type> > > >
-#  else
-  template <class T, class ITER, class RV_ITER>
-  class mask_iterator
-      : public boost::iterator_adaptor<
-	    mask_iterator<T, ITER, RV_ITER>,
-	    ITER,
-	    replace_element<decayed_iterator_value<RV_ITER>, vec<T> >,
-	    boost::single_pass_traversal_tag,
-	    replace_element<decayed_iterator_value<RV_ITER>, vec<T> > >
-#  endif
   {
     private:
       using score_vec	  = decayed_iterator_value<RV_ITER>;
       using score_element = typename tuple_head<score_vec>::element_type;
-      using S		  = mask_type<score_element>;
-      using mask_vec	  = replace_element<score_vec, vec<S> >;
-#  if defined(WITHOUT_CVTDOWN)
-      using T		  = S;
-#endif
-      using super	= boost::iterator_adaptor<
-			      mask_iterator,
-			      ITER,
-			      replace_element<score_vec, vec<T> >,
-			      boost::single_pass_traversal_tag,
-			      replace_element<score_vec, vec<T> > >;
+      using T		  = mask_type<score_element>;
+      using mask_vec	  = replace_element<score_vec, vec<T> >;
+      using super	  = boost::iterator_adaptor<
+				mask_iterator,
+				ITER,
+				replace_element<score_vec, vec<T> >,
+				boost::single_pass_traversal_tag,
+				replace_element<score_vec, vec<T> > >;
 
-      template <class T_, size_t I_=vec<T_>::size/2> static inline int
-		minIdx(vec<T_> d, vec<T_> x,
-		       std::integral_constant<size_t, I_>
-		       dummy=std::integral_constant<size_t, I_>())
-		{
-		    const auto	y = shift_r<I_>(x);
-		    return minIdx<T_>(select(x < y, d, shift_r<I_>(d)),
-				      min(x, y),
-				      std::integral_constant<size_t, I_/2>());
-		}
-      template <class T_> static inline int
+      template <class T_> static int
 		minIdx(vec<T_> d, vec<T_>, std::integral_constant<size_t, 0>)
 		{
 		    return extract<0>(d);
+		}
+      template <class T_, size_t I_=vec<T_>::size/2> static int
+		minIdx(vec<T_> d, vec<T_> x,
+		       std::integral_constant<size_t, I_>
+		       =std::integral_constant<size_t, I_>())
+		{
+		    const auto	y = shift_r<I_>(x);
+		    return minIdx(select(x < y, d, shift_r<I_>(d)),
+				  min(x, y),
+				  std::integral_constant<size_t, I_/2>());
 		}
       
     public:
@@ -402,16 +388,19 @@ namespace simd
 				  is_tuple<mask_vec>()))
 		{
 		}
-      int	dL()	const	{ return minIdx(_dminL, _RminL); }
+      auto	dL() const
+		{
+		    return minIdx(_dminL, _RminL);
+		}
 	
     private:
     // _nextRV の初期化
-      static vec<score_element>
+      static auto
 		init(score_element val, std::false_type)
 		{
 		    return vec<score_element>(val);
 		}
-      static std::tuple<vec<score_element>, vec<score_element> >
+      static auto
 		init(score_element val, std::true_type)
 		{
 		    return std::make_tuple(vec<score_element>(val),
@@ -419,10 +408,7 @@ namespace simd
 		}
 
     // mask と mask tuple に対するupdate
-      template <class T_>
-      std::enable_if_t<(vec<T_>::size == vec<S>::size),
-		       replace_element<mask_vec, vec<T_> > >
-		cvtdown()
+      auto	exec()
 		{
 		  // _RminRV が zip_iterator の時，std::tuple に対する
 		  // TU::operator <(const L&, const R&) を呼ぶために必要
@@ -442,24 +428,11 @@ namespace simd
 		    ++_RminRV;
 		    _nextRV  = minval;
 
-		    return cvt<T_, false, true>(R < RminRV);
+		    return cvtdown<T, true>(R < RminRV);
 		}
-#  if !defined(WITHOUT_CVTDOWN)
-      template <class T_>
-      std::enable_if_t<(vec<T_>::size > vec<S>::size),
-		       replace_element<mask_vec, vec<T_> > >
-		cvtdown()
-		{
-		    using	A = cvt_above_type<T_, S, true>;
-		    
-		    auto	x = cvtdown<A>();
-		    auto	y = cvtdown<A>();
-		    return cvt<T_, true>(x, y);
-		}
-#  endif
       reference	dereference() const
 		{
-		    return const_cast<mask_iterator*>(this)->cvtdown<T>();
+		    return const_cast<mask_iterator*>(this)->exec();
 		}
       void	advance(difference_type)				{}
       void	increment()						{}
@@ -473,13 +446,11 @@ namespace simd
       score_vec			_nextRV;
   };
 
-#  if defined(WITHOUT_CVTDOWN)
   template <class ITER, class RV_ITER> mask_iterator<ITER, RV_ITER>
   make_mask_iterator(ITER R, RV_ITER RminRV)
   {
       return mask_iterator<ITER, RV_ITER>(R, RminRV);
   }
-#  endif
 
   template <class T> inline simd::vec<T>
   fast_select(simd::vec<mask_type<T> > mask,

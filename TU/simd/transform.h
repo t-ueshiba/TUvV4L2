@@ -95,15 +95,15 @@ namespace detail
       std::enable_if_t<(vec<O>::size == tuple_head<TUPLE_>::size)>
 		upResult_store(const TUPLE_& x)
 		{
-		    ASSIGN()(*_out, cvtup<O, false, MASK>(x));
+		    ASSIGN()(*_out, simd::cvtup<O, false, MASK>(x));
 		    ++_out;
 		}
       template <class TUPLE_>
       std::enable_if_t<(vec<O>::size < tuple_head<TUPLE_>::size)>
 		upResult_store(const TUPLE_& x)
 		{
-		    upResult_store(cvtup<O, false, MASK>(x));
-		    upResult_store(cvtup<O, true,  MASK>(x));
+		    upResult_store(simd::cvtup<O, false, MASK>(x));
+		    upResult_store(simd::cvtup<O, true,  MASK>(x));
 		}
 
     // 既に vec<O> と同位に到達している入力をさらに vec<I> にconvert upして
@@ -113,7 +113,8 @@ namespace detail
 		= nullptr>
       auto	upArg_downResult(TUPLE_&& x)
 		{
-		    return cvtdown<O, MASK>(_func(cvtdown<I, MASK>(x)));
+		    return simd::cvtdown<O, MASK>(
+				_func(simd::cvtdown<I, MASK>(x)));
 		}
       template <class TUPLE_,
 		std::enable_if_t<(vsize<TUPLE_>::max > vec<I>::size)>*
@@ -123,12 +124,12 @@ namespace detail
 		    constexpr auto	N = vsize<TUPLE_>::max;
 
 		    const auto	y = upArg_downResult(
-					cvtup<I, false, MASK, N/2>(x));
+					simd::cvtup<I, false, MASK, N/2>(x));
 		    const auto	z = upArg_downResult(
-					cvtup<I, true,  MASK, N/2>(x));
+					simd::cvtup<I, true,  MASK, N/2>(x));
 
 		  // 戻り値のベクトルは TUPLE_ と同位
-		    return cvtdown<O, MASK>(y, z);
+		    return simd::cvtdown<O, MASK>(y, z);
 		}
 
     // vec<I> と同位に達した入力に _func を適用し，
@@ -138,7 +139,7 @@ namespace detail
 			vsize<TUPLE_>::max >  vec<O>::size)>
 		exec(TUPLE_&& x)
 		{
-		    upResult_store(_func(cvtdown<I, MASK>(x)));
+		    upResult_store(_func(simd::cvtdown<I, MASK>(x)));
 		}
 
     // vec<O> と同位に達した入力をさらに vec<I> にconvert upして _func を
@@ -159,8 +160,8 @@ namespace detail
 		{
 		    constexpr auto	N = vsize<TUPLE_>::max;
 		    
-		    exec(cvtup<I, false, MASK, N/2>(x));
-		    exec(cvtup<I, true,  MASK, N/2>(x));
+		    exec(simd::cvtup<I, false, MASK, N/2>(x));
+		    exec(simd::cvtup<I, true,  MASK, N/2>(x));
 		}
 
     public:
@@ -176,7 +177,7 @@ namespace detail
 			    N = (vsize<ITER_TUPLE>::max > vec<O>::size ?
 				 vsize<ITER_TUPLE>::max : vec<O>::size);
 
-			exec(cvtup<I, false, MASK, N>(_t));
+			exec(simd::cvtup<I, false, MASK, N>(_t));
 		    }
 		    return _out;
 		}
