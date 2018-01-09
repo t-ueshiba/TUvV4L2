@@ -45,22 +45,6 @@ template <class T, bool MASK=false, class S>
 vec<T>	cvt(vec<S> x, vec<S> y)						;
     
 /************************************************************************
-*  Converting vec tuples						*
-************************************************************************/
-template <class T, bool HI=false, bool MASK=false, class... VEC> inline auto
-cvt(const std::tuple<VEC...>& t)
-{
-    return tuple_transform([](auto x){ return cvt<T, HI, MASK>(x); }, t);
-}
-
-template <class T, bool MASK=false, class... VEC> inline auto
-cvt(const std::tuple<VEC...>& l, const std::tuple<VEC...>& r)
-{
-    return tuple_transform([](auto x, auto y){ return cvt<T, MASK>(x, y); },
-			   l, r);
-}
-
-/************************************************************************
 *  Adjacent target types of conversions					*
 ************************************************************************/
 namespace detail
@@ -83,9 +67,6 @@ namespace detail
 			(std::is_same<T, S>::value ||
 			 std::is_same<upper_type<signed_type<T> >, S>::value),
 			T, lower_type<S> > >;
-      using A = std::conditional_t<
-		    std::is_same<T, complementary_type<S> >::value,
-		    S, upper_type<signed_type<T> > >;
   };
   template <class T, class S>
   struct cvt_adjacent_type<T, S, true>
@@ -99,9 +80,6 @@ namespace detail
 		    complementary_mask_type<S>,
 		    std::conditional_t<std::is_same<T, S>::value,
 				       T, lower_type<S> > >;
-      using A = std::conditional_t<
-		    std::is_same<T, complementary_mask_type<S> >::value,
-		    S, upper_type<T> >;
   };
 }
     
@@ -131,18 +109,6 @@ using cvt_upper_type = typename detail::cvt_adjacent_type<T, S, MASK>::U;
 template <class T, class S, bool MASK>
 using cvt_lower_type = typename detail::cvt_adjacent_type<T, S, MASK>::L;
 
-//! より下位の要素を持つベクトルへの多段変換において最終的な変換先の直上の要素型を返す.
-/*!
-  vec<S> を vec<T> に変換する過程で vec<T> に達する直前のベクトルの要素型を返す.
-  \param T	最終的な変換先のベクトルの要素型
-  \param S	変換されるベクトルの要素型
-  \param MASK	falseならば数値ベクトルとして，
-		trueならばマスクベクトルとして変換，
-  \return	最終的な変換先の直上のベクトルの要素型
-*/
-template <class T, class S, bool MASK>
-using cvt_above_type = typename detail::cvt_adjacent_type<T, S, MASK>::A;
-    
 /************************************************************************
 *  Converting vecs or vec tuples to upper adjacent types		*
 ************************************************************************/
@@ -231,7 +197,8 @@ cvtdown(vec<S> x, vec<S> y)
 }
 
 template <class T, bool MASK, size_t N=vec<T>::size, class ITER,
-	  std::enable_if_t<iterator_value<ITER>::size == N>* = nullptr>
+	  std::enable_if_t<tuple_head<iterator_value<ITER> >::size == N>*
+	  = nullptr>
 inline auto
 cvtdown(ITER& iter)
 {
@@ -239,7 +206,8 @@ cvtdown(ITER& iter)
 }
 
 template <class T, bool MASK, size_t N=vec<T>::size, class ITER,
-	  std::enable_if_t<(iterator_value<ITER>::size < N)>* = nullptr>
+	  std::enable_if_t<(tuple_head<iterator_value<ITER> >::size < N)>*
+			   = nullptr>
 inline auto
 cvtdown(ITER& iter)
 {

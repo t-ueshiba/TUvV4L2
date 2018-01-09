@@ -751,30 +751,20 @@ GFStereo<SCORE, DISP>::computeDisparities(const_reverse_col_siterator colB,
 	++colG;
 
 #if defined(SIMD)
-	using mask_type	= simd::mask_type<Disparity>;
-#  if defined(WITHOUT_CVTDOWN)
 	using miterator = simd::cvtdown_mask_iterator<
-			      mask_type,
+			      simd::mask_type<Disparity>,
 			      simd::mask_iterator<
 				  typename ScoreVecArray::const_iterator,
 				  subiterator<RMIN_RV> > >;
-#  else
-	using miterator = simd::mask_iterator<
-			      mask_type,
-			      typename ScoreVecArray::const_iterator,
-			      subiterator<RMIN_RV> >;
-#  endif
 #else
 	using miterator = mask_iterator<typename ScoreVecArray::const_iterator,
 					subiterator<RMIN_RV> >;
 #endif
 	Idx<DisparityVec>	index;
 	auto			dminRVt = make_col_accessor(--dminRV);
-#if defined(SIMD) && defined(WITHOUT_CVTDOWN)
-	miterator	maskRV(make_mask_iterator(R.cbegin(),
-						  begin(*RminRV)));
-	for (miterator maskRVe(make_mask_iterator(R.cend(),
-						  end(*RminRV)));
+#if defined(SIMD)
+	miterator	maskRV(make_mask_iterator(R.cbegin(), begin(*RminRV)));
+	for (miterator maskRVe(make_mask_iterator(R.cend(), end(*RminRV)));
 	     maskRV != maskRVe; ++maskRV)
 #else
 	miterator	maskRV(R.cbegin(), begin(*RminRV));
@@ -790,14 +780,11 @@ GFStereo<SCORE, DISP>::computeDisparities(const_reverse_col_siterator colB,
 	    ++dminRVt;
 	    ++index;
 	}
-#if defined(SIMD) && defined(WITHOUT_CVTDOWN)
-      	const auto	dL = maskRV.base().dL();	// 左画像から見た視差
-#else
-      	const auto	dL = maskRV.dL();		// 左画像から見た視差
-#endif
 #if defined(SIMD)
+      	const auto	dL = maskRV.base().dL();	// 左画像から見た視差
 	const auto	Rb = R.cbegin().base();
 #else
+      	const auto	dL = maskRV.dL();		// 左画像から見た視差
 	const auto	Rb = R.cbegin();
 #endif
 	const auto	dsw1 = _params.disparitySearchWidth - 1;
