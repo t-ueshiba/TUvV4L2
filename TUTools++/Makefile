@@ -258,7 +258,6 @@ OTHER_HDRS	= TU/Array++.h \
 		TU/simd/compare.h \
 		TU/simd/config.h \
 		TU/simd/cvt.h \
-		TU/simd/cvt_iterator.h \
 		TU/simd/cvtdown_iterator.h \
 		TU/simd/cvtup_iterator.h \
 		TU/simd/dup.h \
@@ -268,7 +267,6 @@ OTHER_HDRS	= TU/Array++.h \
 		TU/simd/logical.h \
 		TU/simd/lookup.h \
 		TU/simd/misc.h \
-		TU/simd/pack.h \
 		TU/simd/select.h \
 		TU/simd/shift.h \
 		TU/simd/shift_iterator.h \
