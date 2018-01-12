@@ -429,7 +429,7 @@ class Buf<T, ALLOC, 0, SIZES...> : public BufTraits<T, ALLOC>
 		}
     void	free(pointer p, size_t siz)
 		{
-		    if (!_ext && !super::ptr(p))
+		    if (!_ext && super::ptr(p))
 		    {
 			for (pointer q = p, qe = q + siz; q != qe; ++q)
 			    super::destroy(_allocator, super::ptr(q));
