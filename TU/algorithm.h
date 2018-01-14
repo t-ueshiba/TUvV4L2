@@ -426,7 +426,7 @@ copy(IN in, size_t n, OUT out)
   //std::cout << "copy<" << N << "> ["
   //	      << print_sizes(range<IN, N>(in, n)) << ']' << std::endl;
 #endif
-    for_each<N>([](const auto& x, auto&& y){ y = x; }, n, in, out);
+    for_each<N>([](auto&& x, const auto& y){ x = y; }, n, out, in);
 }
 
 /************************************************************************
