@@ -69,9 +69,17 @@ unpack(vec<T> x, vec<T> y)
     return detail::unpack<HI>(x, y);
 }
 
-#if defined(AVX)
+#if defined(AVX512)
 template <bool HI, class T>
-inline typename std::enable_if<(sizeof(vec<T>) >= 32), base_type<T> >::type
+inline typename std::enable_if<(sizeof(vec<T>) == 64), base_type<T> >::type
+unpack(vec<T> x, vec<T> y)
+{
+    return detail::permute<(HI ? 0x31 : 0x20)>(detail::unpack<false>(x, y),
+					       detail::unpack<true >(x, y));
+}
+#elif defined(AVX)
+template <bool HI, class T>
+inline typename std::enable_if<(sizeof(vec<T>) == 32), base_type<T> >::type
 unpack(vec<T> x, vec<T> y)
 {
     return detail::permute<(HI ? 0x31 : 0x20)>(detail::unpack<false>(x, y),
