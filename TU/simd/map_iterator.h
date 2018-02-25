@@ -13,39 +13,63 @@ namespace TU
 namespace simd
 {
 /************************************************************************
-*  class map_iterator<ARG, T, MASK, FUNC, ITER...>			*
+*  class map_iterator<S, T, MASK, FUNC, ITER...>			*
 ************************************************************************/
 //! 入力を適切に変換してから関数を適用し，結果をconvert downする．
 /*!
-  戻り値のSIMDベクトルは，vec<ARG>と入力のうち最下位のSIMDベクトルと同位
-  \param ARG	FUNCの引数となるSIMDベクトルの要素型
+  戻り値のSIMDベクトルは，vec<S>と入力のうち最下位のSIMDベクトルと同位
+  \param S	FUNCの引数となるSIMDベクトルの要素型
   \param T	FUNCの結果のconvert down先のSIMDベクトルの要素型
   \param MASK
   \param FUNC	適用する関数
  */
-template <class ARG, class T, bool MASK, class FUNC, class... ITER>
+template <class S, class T, bool MASK, class FUNC, class... ITER>
 class map_iterator
+    : public boost::iterator_facade<
+		map_iterator<S, T, MASK, FUNC, ITER...>,
+		decltype(
+		    apply(std::declval<FUNC>(),
+			  std::declval<
+			  replace_element<std::tuple<ITER...>, vec<S> > >())),
+		boost::single_pass_traversal_tag,
+		decltype(
+		    apply(std::declval<FUNC>(),
+			  std::declval<
+			  replace_element<std::tuple<ITER...>, vec<S> > >()))>
 {
   private:
-    using	iter_tuple = std::tuple<ITER...>;
+    using iter_tuple	= std::tuple<ITER...>;
+    using ref		= decltype(
+			      apply(std::declval<FUNC>(),
+				    std::declval<
+				    replace_element<iter_tuple, vec<S> > >()));
+    using super		= boost::iterator_facade<
+				map_iterator,
+				ref, 
+				boost::single_pass_traversal_tag,
+				ref>;
+    friend	class boost::iterator_core_access;
+    
+  public:
+    using	typename super::reference;
     
   private:
     template <class IN_,
-	      std::enable_if_t<(vsize<IN_>::max <= vec<ARG>::size)>* = nullptr>
+	      std::enable_if_t<(vsize<IN_>::max <= vec<S>::size)>* = nullptr>
     auto	exec(IN_&& in) const
 		{
-		  // 戻り値のベクトルは ARG と同位
+		  // 戻り値のベクトルは S と同位
 		    return cvtdown<T, MASK>(apply(_func,
-						  cvtdown<ARG, MASK>(in)));
+						  cvtdown<S, MASK>(in)));
 		}
     template <class IN_,
-	      std::enable_if_t<(vsize<IN_>::max > vec<ARG>::size)>* = nullptr>
+	      std::enable_if_t<(vsize<IN_>::max > vec<S>::size)>* = nullptr>
     auto	exec(IN_&& in) const
 		{
 		    constexpr auto	N = vsize<IN_>::max;
 
-		    const auto	x = exec(cvtup<ARG, false, MASK, N/2>(in));
-		    const auto	y = exec(cvtup<ARG, true,  MASK, N/2>(in));
+		    const auto	x = exec(cvtup<S, false, MASK, N/2>(in));
+		    const auto	y = exec(cvtup<S, true,  MASK, N/2>(in));
 
 		  // 戻り値のベクトルは IN_ と同位
 		    return cvtdown<T, MASK>(x, y);
@@ -56,31 +80,24 @@ class map_iterator
 		    :_iter_tuple(iter...), _func(func)	{}
 
     const auto&	get_iterator_tuple()		const	{ return _iter_tuple; }
-	
-    auto	operator *() const
+
+  private:
+    reference	dereference() const
 		{
 		    constexpr auto	N = std::max(vsize<iter_tuple>::max,
-						     vec<ARG>::size);
+						     vec<S>::size);
 		    
-		    return exec(cvtup<ARG, false, MASK, N>(
-				    std::forward<iter_tuple>(_iter_tuple)));
+		    return exec(cvtup<S, false, MASK, N>(_iter_tuple));
 		}
-    auto&	operator ++()
+    void	increment()
 		{
-		    return *this;
 		}
     template <class... ITER_>
-    bool	operator ==(const map_iterator<ARG, T, MASK, FUNC, ITER_...>&
-			    iter) const
+    bool	equal(const map_iterator<S, T, MASK,
+					 FUNC, ITER_...>& iter) const
 		{
 		    return std::get<0>(_iter_tuple) ==
 			   std::get<0>(iter.get_iterator_tuple());
-		}
-    template <class... ITER_>
-    bool	operator !=(const map_iterator<ARG, T, MASK, FUNC, ITER_...>&
-			    iter) const
-		{
-		    return !(*this == iter);
 		}
     
   private:
@@ -88,8 +105,8 @@ class map_iterator
     FUNC		_func;
 };
 
-template <class ARG, class T=ARG, bool MASK=false, class FUNC, class... ITER>
-inline map_iterator<ARG, T, MASK, FUNC, ITER...>
+template <class S, class T=S, bool MASK=false, class FUNC, class... ITER>
+inline map_iterator<S, T, MASK, FUNC, ITER...>
 make_map_iterator(const FUNC& func, const ITER&... iter)
 {
     return {func, iter...};
