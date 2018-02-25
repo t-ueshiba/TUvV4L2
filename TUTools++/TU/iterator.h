@@ -185,7 +185,7 @@ class zip_iterator : public boost::iterator_facade<
 		distance_to(const zip_iterator<ITER_TUPLE_>& iter) const
 		{
 		    return std::get<0>(iter.get_iterator_tuple())
-		  	 - std::get<0>(_iter_tuple);
+			 - std::get<0>(_iter_tuple);
 		}
 
   private:
@@ -376,7 +376,6 @@ class map_iterator
     friend	class boost::iterator_core_access;
 
   public:
-    using	typename super::difference_type;
     using	typename super::reference;
 	
   public:
@@ -384,17 +383,15 @@ class map_iterator
 		    :super(std::make_tuple(iter...)), _func(func)
 		{
 		}
+    FUNC	functor() const
+		{
+		    return _func;
+		}
 	
   private:
     reference	dereference() const
 		{
-		    return dereference(
-				std::make_index_sequence<sizeof...(ITER)>());
-		}
-    template <size_t... IDX_>
-    reference	dereference(std::index_sequence<IDX_...>) const
-		{
-		    return _func(std::get<IDX_>(*super::base())...);
+		    return apply(_func, *super::base());
 		}
 	
   private:
@@ -514,6 +511,12 @@ namespace detail
       assignment_proxy&	operator /=(T_&& val)
 			{
 			    *_iter /= _func(std::forward<T_>(val));
+			    return *this;
+			}
+      template <class T_>
+      assignment_proxy&	operator %=(T_&& val)
+			{
+			    *_iter %= _func(std::forward<T_>(val));
 			    return *this;
 			}
       template <class T_>

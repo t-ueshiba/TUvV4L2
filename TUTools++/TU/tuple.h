@@ -465,6 +465,38 @@ select(const std::tuple<S...>& s, X&& x, Y&& y)
 			   s, std::forward<X>(x), std::forward<Y>(y));
 }
 
+/************************************************************************
+*  Applying a multi-input function to a tuple of arguments		*
+************************************************************************/
+namespace detail
+{
+  template <class FUNC, class TUPLE, size_t... IDX,
+	    std::enable_if_t<is_tuple<TUPLE>::value>* = nullptr>
+  inline decltype(auto)
+  apply(FUNC&& f, TUPLE&& t, std::index_sequence<IDX...>)
+  {
+      return f(std::get<IDX>(std::forward<TUPLE>(t))...);
+  }
+}
+    
+template <class FUNC, class TUPLE,
+	  std::enable_if_t<is_tuple<TUPLE>::value>* = nullptr>
+inline decltype(auto)
+apply(FUNC&& f, TUPLE&& t)
+{
+    return detail::apply(std::forward<FUNC>(f), std::forward<TUPLE>(t),
+			 std::make_index_sequence<
+			      std::tuple_size<
+				  std::remove_reference_t<TUPLE> >::value>());
+}
+template <class FUNC, class T,
+	  std::enable_if_t<!is_tuple<T>::value>* = nullptr>
+inline decltype(auto)
+apply(FUNC&& f, T&& t)
+{
+    return f(std::forward<T>(t));
+}
+    
 }	// namespace TU
 
 namespace std
