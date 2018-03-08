@@ -53,42 +53,6 @@ namespace detail
     //! 変換関数に入力するSIMDベクトルの要素型
       using I = std::conditional_t<std::is_void<T>::value, O, T>;
 
-    //! tuple中のベクトルおよび反復子が指すベクトルのうちの最大/最小要素数
-      template <class ITER_>
-      struct vsize_impl
-      {
-	  constexpr static auto	min = vsize_impl<iterator_value<ITER_> >::min;
-	  constexpr static auto	max = vsize_impl<iterator_value<ITER_> >::max;
-      };
-      template <class T_>
-      struct vsize_impl<vec<T_> >
-      {
-	  constexpr static auto	min = vec<T_>::size;
-	  constexpr static auto	max = vec<T_>::size;
-      };
-      template <class VEC_>
-      struct vsize_impl<std::tuple<VEC_> >
-      {
-	  constexpr static auto	min = vsize_impl<std::decay_t<VEC_> >::min;
-	  constexpr static auto	max = vsize_impl<std::decay_t<VEC_> >::max;
-      };
-      template <class VEC_, class... VECS_>
-      struct vsize_impl<std::tuple<VEC_, VECS_...> >
-      {
-	private:
-	  constexpr static auto	min0 = vsize_impl<std::decay_t<VEC_>   >::min;
-	  constexpr static auto	max0 = vsize_impl<std::decay_t<VEC_>   >::max;
-	  constexpr static auto	min1 = vsize_impl<std::tuple<VECS_...> >::min;
-	  constexpr static auto	max1 = vsize_impl<std::tuple<VECS_...> >::max;
-
-	public:
-	  constexpr static auto	min = (min0 < min1 ? min0 : min1);
-	  constexpr static auto	max = (max0 > max1 ? max0 : max1);
-      };
-
-      template <class VECS_>
-      using vsize = vsize_impl<std::decay_t<VECS_> >;
-      
     private:
     // _funcの適用結果を vec<O> にconvert upしてstoreする
       template <class TUPLE_>
