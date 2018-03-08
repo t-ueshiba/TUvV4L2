@@ -130,6 +130,7 @@ HDRS		= TU/Array++.h \
 		TU/simd/load_store_iterator.h \
 		TU/simd/logical.h \
 		TU/simd/lookup.h \
+		TU/simd/mapper.h \
 		TU/simd/misc.h \
 		TU/simd/select.h \
 		TU/simd/shift.h \
