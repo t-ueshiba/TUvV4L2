@@ -117,32 +117,26 @@ namespace detail
   template <class ITER>
   struct vsize_impl
   {
-      constexpr static auto	min = vsize_impl<iterator_value<ITER> >::min;
       constexpr static auto	max = vsize_impl<iterator_value<ITER> >::max;
   };
   template <class T>
   struct vsize_impl<vec<T> >
   {
-      constexpr static auto	min = vec<T>::size;
       constexpr static auto	max = vec<T>::size;
   };
   template <class VEC>
   struct vsize_impl<std::tuple<VEC> >
   {
-      constexpr static auto	min = vsize_impl<std::decay_t<VEC> >::min;
       constexpr static auto	max = vsize_impl<std::decay_t<VEC> >::max;
   };
   template <class VEC, class... VECS>
   struct vsize_impl<std::tuple<VEC, VECS...> >
   {
     private:
-      constexpr static auto	min0 = vsize_impl<std::decay_t<VEC>   >::min;
       constexpr static auto	max0 = vsize_impl<std::decay_t<VEC>   >::max;
-      constexpr static auto	min1 = vsize_impl<std::tuple<VECS...> >::min;
       constexpr static auto	max1 = vsize_impl<std::tuple<VECS...> >::max;
 
     public:
-      constexpr static auto	min = (min0 < min1 ? min0 : min1);
       constexpr static auto	max = (max0 > max1 ? max0 : max1);
   };
 }
@@ -165,7 +159,7 @@ using vsize = detail::vsize_impl<std::decay_t<VECS> >;
   \param x	変換されるベクトル
   \return	変換されたベクトル
 */
-template <class T, bool HI=false, bool MASK=false, size_t=0, class S>
+template <class T, bool HI, bool MASK, size_t=0, class S>
 inline auto
 cvtup(vec<S> x)
 {
@@ -192,8 +186,9 @@ template <class T, bool HI=false, bool MASK=false, size_t N=0, class TUPLE,
 cvtup(TUPLE&& t)
 {
     return tuple_transform([](auto&& x) -> decltype(auto)
-			   { return cvtup<T, HI, MASK, N>(x); },
-			   t);
+			   { return cvtup<T, HI, MASK, N>(
+				   std::forward<decltype(x)>(x)); },
+			   std::forward<TUPLE>(t));
 }
 
 /************************************************************************

@@ -384,7 +384,7 @@ namespace detail
   \param iter	適用範囲の先頭を指す反復子
 */
 template <size_t N, class FUNC, class... ITER> inline FUNC
-for_each(FUNC func, size_t n=N, ITER... iter)
+for_each(FUNC func, size_t n, ITER... iter)
 {
     return detail::for_each(std::integral_constant<size_t, N>(),
 			    func, n, iter...);

@@ -2229,8 +2229,7 @@ class GenericImage : public ImageBase<GenericImage>
 			{
 			    return _format.type();
 			}
-    void		resize(size_t h, size_t w,
-			       const ImageFormat& format)
+    void		resize(size_t h, size_t w, const ImageFormat& format)
 			{
 			    _format = format;
 			    w = (_format.depth()*w + 7) / 8;
