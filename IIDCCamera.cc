@@ -1686,9 +1686,10 @@ IIDCCamera::operator >>(Image<T>& image) const
 	auto	src = static_cast<const YUV444*>(_img);
 	for (auto&& line : image)
 	{
-	    std::copy_n(make_pixel_iterator(src), line.size(),
-			make_pixel_iterator(line.begin()));
-	    src += line.size();
+	    const auto	next = src + line.size();
+	    std::copy(make_pixel_iterator(src), make_pixel_iterator(next),
+		      make_pixel_iterator(line.begin()));
+	    src = next;
 	}
       }
 	break;
@@ -1697,9 +1698,10 @@ IIDCCamera::operator >>(Image<T>& image) const
 	auto	src = static_cast<const YUV422*>(_img);
 	for (auto&& line : image)
 	{
-	    std::copy_n(make_pixel_iterator(src), line.size(),
-			make_pixel_iterator(line.begin()));
-	    src += line.size();
+	    const auto	next = src + line.size();
+	    std::copy(make_pixel_iterator(src), make_pixel_iterator(next),
+		      make_pixel_iterator(line.begin()));
+	    src = next;
 	}
       }
 	break;
@@ -1708,9 +1710,10 @@ IIDCCamera::operator >>(Image<T>& image) const
 	auto	src = static_cast<const YUV411*>(_img);
 	for (auto&& line : image)
 	{
-	    std::copy_n(make_pixel_iterator(src), line.size(),
-			make_pixel_iterator(line.begin()));
-	    src += line.size();
+	    const auto	next = src + line.size()/2;
+	    std::copy(make_pixel_iterator(src), make_pixel_iterator(next),
+		      make_pixel_iterator(line.begin()));
+	    src = next;
 	}
       }
 	break;
@@ -1719,9 +1722,10 @@ IIDCCamera::operator >>(Image<T>& image) const
 	auto	src = static_cast<const RGB*>(_img);
 	for (auto&& line : image)
 	{
-	    std::copy_n(make_pixel_iterator(src), line.size(),
-			make_pixel_iterator(line.begin()));
-	    src += line.size();
+	    const auto	next = src + line.size();
+	    std::copy(make_pixel_iterator(src), make_pixel_iterator(next),
+		      make_pixel_iterator(line.begin()));
+	    src = next;
 	}
       }
 	break;
@@ -1731,9 +1735,10 @@ IIDCCamera::operator >>(Image<T>& image) const
 	auto	src = static_cast<const u_char*>(_img);
 	for (auto&& line : image)
 	{
-	    std::copy_n(make_pixel_iterator(src), line.size(),
-			make_pixel_iterator(line.begin()));
-	    src += line.size();
+	    const auto	next = src + line.size();
+	    std::copy(make_pixel_iterator(src), make_pixel_iterator(next),
+		      make_pixel_iterator(line.begin()));
+	    src = next;
 	}
       }
 	break;
@@ -1744,9 +1749,10 @@ IIDCCamera::operator >>(Image<T>& image) const
 	    auto	src = static_cast<const u_short*>(_img);
 	    for (auto&& line : image)
 	    {
-		std::copy_n(make_pixel_iterator(src), line.size(),
-			    make_pixel_iterator(line.begin()));
-		src += line.size();
+		const auto	next = src + line.size();
+		std::copy(make_pixel_iterator(src), make_pixel_iterator(next),
+			  make_pixel_iterator(line.begin()));
+		src = next;
 	    }
 	}
 	else
@@ -1754,9 +1760,10 @@ IIDCCamera::operator >>(Image<T>& image) const
 	    auto	src = static_cast<const Mono16*>(_img);
 	    for (auto&& line : image)
 	    {
-		std::copy_n(make_pixel_iterator(src), line.size(),
-			    make_pixel_iterator(line.begin()));
-		src += line.size();
+		const auto	next = src + line.size();
+		std::copy(make_pixel_iterator(src), make_pixel_iterator(next),
+			  make_pixel_iterator(line.begin()));
+		src = next;
 	    }
 	}
 	break;
@@ -1766,9 +1773,10 @@ IIDCCamera::operator >>(Image<T>& image) const
 	    auto	src = static_cast<const short*>(_img);
 	    for (auto&& line : image)
 	    {
-		std::copy_n(make_pixel_iterator(src), line.size(),
-			    make_pixel_iterator(line.begin()));
-		src += line.size();
+		const auto	next = src + line.size();
+		std::copy(make_pixel_iterator(src), make_pixel_iterator(next),
+			  make_pixel_iterator(line.begin()));
+		src = next;
 	    }
 	}
 	else
@@ -1776,9 +1784,10 @@ IIDCCamera::operator >>(Image<T>& image) const
 	    auto	src = static_cast<const Mono16*>(_img);
 	    for (auto&& line : image)
 	    {
-		std::copy_n(make_pixel_iterator(src), line.size(),
-			    make_pixel_iterator(line.begin()));
-		src += line.size();
+		const auto	next = src + line.size();
+		std::copy(make_pixel_iterator(src), make_pixel_iterator(next),
+			  make_pixel_iterator(line.begin()));
+		src = next;
 	    }
 	}
 	break;
