@@ -656,9 +656,10 @@ V4L2Camera::operator >>(Image<T>& image) const
 	auto	src = reinterpret_cast<const BGR*>(img);
 	for (auto&& line : image)
 	{
-	    std::copy_n(make_pixel_iterator(src), line.size(),
-			make_pixel_iterator(line.begin()));
-	    src += line.size();
+	    const auto	next = src + line.size();
+	    std::copy(make_pixel_iterator(src), make_pixel_iterator(next),
+		      make_pixel_iterator(line.begin()));
+	    src = next;
 	}
       }
 	break;
@@ -668,9 +669,10 @@ V4L2Camera::operator >>(Image<T>& image) const
 	auto	src = reinterpret_cast<const RGB*>(img);
 	for (auto&& line : image)
 	{
-	    std::copy_n(make_pixel_iterator(src), line.size(),
-			make_pixel_iterator(line.begin()));
-	    src += line.size();
+	    const auto	next = src + line.size();
+	    std::copy(make_pixel_iterator(src), make_pixel_iterator(next),
+		      make_pixel_iterator(line.begin()));
+	    src = next;
 	}
       }
 	break;
@@ -680,9 +682,10 @@ V4L2Camera::operator >>(Image<T>& image) const
 	auto	src = reinterpret_cast<const ABGR*>(img);
 	for (auto&& line : image)
 	{
-	    std::copy_n(make_pixel_iterator(src), line.size(),
-			make_pixel_iterator(line.begin()));
-	    src += line.size();
+	    const auto	next = src + line.size();
+	    std::copy(make_pixel_iterator(src), make_pixel_iterator(next),
+		      make_pixel_iterator(line.begin()));
+	    src = next;
 	}
       }
 	break;
@@ -692,9 +695,10 @@ V4L2Camera::operator >>(Image<T>& image) const
 	auto	src = reinterpret_cast<const RGBA*>(img);
 	for (auto&& line : image)
 	{
-	    std::copy_n(make_pixel_iterator(src), line.size(),
-			make_pixel_iterator(line.begin()));
-	    src += line.size();
+	    const auto	next = src + line.size();
+	    std::copy(make_pixel_iterator(src), make_pixel_iterator(next),
+		      make_pixel_iterator(line.begin()));
+	    src = next;
 	}
       }
 	break;
@@ -704,9 +708,10 @@ V4L2Camera::operator >>(Image<T>& image) const
 	auto	src = reinterpret_cast<const u_char*>(img);
 	for (auto&& line : image)
 	{
-	    std::copy_n(make_pixel_iterator(src), line.size(),
-			make_pixel_iterator(line.begin()));
-	    src += line.size();
+	    const auto	next = src + line.size();
+	    std::copy(make_pixel_iterator(src), make_pixel_iterator(next),
+		      make_pixel_iterator(line.begin()));
+	    src = next;
 	}
       }
 	break;
@@ -716,9 +721,10 @@ V4L2Camera::operator >>(Image<T>& image) const
 	auto	src = reinterpret_cast<const u_short*>(img);
 	for (auto&& line : image)
 	{
-	    std::copy_n(make_pixel_iterator(src), line.size(),
-			make_pixel_iterator(line.begin()));
-	    src += line.size();
+	    const auto	next = src + line.size();
+	    std::copy(make_pixel_iterator(src), make_pixel_iterator(next),
+		      make_pixel_iterator(line.begin()));
+	    src = next;
 	}
       }
 	break;
@@ -728,9 +734,10 @@ V4L2Camera::operator >>(Image<T>& image) const
 	auto	src = reinterpret_cast<const YUYV422*>(img);
 	for (auto&& line : image)
 	{
-	    std::copy_n(make_pixel_iterator(src), line.size(),
-			make_pixel_iterator(line.begin()));
-	    src += line.size();
+	    const auto	next = src + line.size();
+	    std::copy(make_pixel_iterator(src), make_pixel_iterator(next),
+		      make_pixel_iterator(line.begin()));
+	    src = next;
 	}
       }
         break;
@@ -740,9 +747,10 @@ V4L2Camera::operator >>(Image<T>& image) const
 	auto	src = reinterpret_cast<const YUV422*>(img);
 	for (auto&& line : image)
 	{
-	    std::copy_n(make_pixel_iterator(src), line.size(),
-			make_pixel_iterator(line.begin()));
-	    src += line.size();
+	    const auto	next = src + line.size();
+	    std::copy(make_pixel_iterator(src), make_pixel_iterator(next),
+		      make_pixel_iterator(line.begin()));
+	    src = next;
 	}
       }
 	break;

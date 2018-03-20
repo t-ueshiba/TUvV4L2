@@ -185,7 +185,7 @@ class zip_iterator : public boost::iterator_facade<
 		distance_to(const zip_iterator<ITER_TUPLE_>& iter) const
 		{
 		    return std::get<0>(iter.get_iterator_tuple())
-		  	 - std::get<0>(_iter_tuple);
+			 - std::get<0>(_iter_tuple);
 		}
 
   private:
@@ -197,6 +197,14 @@ inline std::enable_if_t<is_tuple<ITER_TUPLE>::value, zip_iterator<ITER_TUPLE> >
 make_zip_iterator(ITER_TUPLE iter_tuple)
 {
     return {iter_tuple};
+}
+
+template <class... ITERS>
+inline std::enable_if_t<(sizeof...(ITERS) > 1),
+			zip_iterator<std::tuple<ITERS...> > >
+make_zip_iterator(ITERS... iters)
+{
+    return {std::make_tuple(iters...)};
 }
 
 /************************************************************************
@@ -376,7 +384,6 @@ class map_iterator
     friend	class boost::iterator_core_access;
 
   public:
-    using	typename super::difference_type;
     using	typename super::reference;
 	
   public:
@@ -384,17 +391,15 @@ class map_iterator
 		    :super(std::make_tuple(iter...)), _func(func)
 		{
 		}
+    FUNC	functor() const
+		{
+		    return _func;
+		}
 	
   private:
     reference	dereference() const
 		{
-		    return dereference(
-				std::make_index_sequence<sizeof...(ITER)>());
-		}
-    template <size_t... IDX_>
-    reference	dereference(std::index_sequence<IDX_...>) const
-		{
-		    return _func(std::get<IDX_>(*super::base())...);
+		    return apply(_func, *super::base());
 		}
 	
   private:
@@ -448,34 +453,28 @@ make_second_iterator(const ITER& iter)
 }
     
 /************************************************************************
-*  class assignment_iterator<FUNC, ITER...>				*
+*  class assignment_iterator<FUNC, ITER>				*
 ************************************************************************/
 //! libTUTools++ のクラスや関数の実装の詳細を収める名前空間
 namespace detail
 {
-  template <class FUNC, class ITER, class... ITERS>
+  template <class FUNC, class ITER>
   class assignment_proxy
   {
-    public:
-      using iterator	= std::conditional_t<
-				sizeof...(ITERS),
-				zip_iterator<std::tuple<ITER, ITERS...> >,
-				ITER>;
-      
     private:
       template <class T_>
-      static auto	check_func(iterator iter, const T_& val, FUNC func)
+      static auto	check_func(ITER iter, const T_& val, FUNC func)
 			    -> decltype(func(*iter, val), std::true_type());
       template <class T_>
-      static auto	check_func(iterator iter, const T_& val, FUNC func)
+      static auto	check_func(ITER iter, const T_& val, FUNC func)
 			    -> decltype(*iter = func(val), std::false_type());
       template <class T_>
-      using is_binary_func	= decltype(check_func(std::declval<iterator>(),
+      using is_binary_func	= decltype(check_func(std::declval<ITER>(),
 						      std::declval<T_>(),
 						      std::declval<FUNC>()));
       
     public:
-      assignment_proxy(const iterator& iter, const FUNC& func)
+      assignment_proxy(const ITER& iter, const FUNC& func)
 	  :_iter(iter), _func(func)					{}
 
       template <class T_>
@@ -517,6 +516,12 @@ namespace detail
 			    return *this;
 			}
       template <class T_>
+      assignment_proxy&	operator %=(T_&& val)
+			{
+			    *_iter %= _func(std::forward<T_>(val));
+			    return *this;
+			}
+      template <class T_>
       assignment_proxy&	operator &=(T_&& val)
 			{
 			    *_iter &= _func(std::forward<T_>(val));
@@ -536,7 +541,7 @@ namespace detail
 			}
 
     private:
-      const iterator&	_iter;
+      const ITER&	_iter;
       const FUNC&	_func;
   };
 }
@@ -546,54 +551,52 @@ namespace detail
   \param FUNC	変換を行う関数オブジェクトの型
   \param ITER	変換結果の代入先を指す反復子
 */
-template <class FUNC, class... ITER>
+template <class FUNC, class ITER>
 class assignment_iterator
-    : public boost::iterator_adaptor<
-		assignment_iterator<FUNC, ITER...>,
-		typename detail::assignment_proxy<FUNC, ITER...>::iterator,
-		iterator_value<
-		    typename detail::assignment_proxy<FUNC, ITER...>::iterator>,
-		iterator_category<
-		    typename detail::assignment_proxy<FUNC, ITER...>::iterator>,
-		detail::assignment_proxy<FUNC, ITER...> >
+    : public boost::iterator_adaptor<assignment_iterator<FUNC, ITER>,
+				     ITER,
+				     iterator_value<ITER>,
+				     iterator_category<ITER>,
+				     detail::assignment_proxy<FUNC, ITER> >
 {
   private:
-    using proxy	= detail::assignment_proxy<FUNC, ITER...>;
     using super	= boost::iterator_adaptor<
-			assignment_iterator,
-			typename proxy::iterator,
-			iterator_value<typename proxy::iterator>,
-			iterator_category<typename proxy::iterator>,
-			proxy>;
+				assignment_iterator,
+				ITER,
+				iterator_value<ITER>,
+				iterator_category<ITER>,
+				detail::assignment_proxy<FUNC, ITER> >;
     friend	class boost::iterator_core_access;
 
   public:
     using	typename super::reference;
     
   public:
-    assignment_iterator(const FUNC& func, const ITER&... iter)
-	:assignment_iterator(
-	    std::integral_constant<bool, (sizeof...(ITER) > 1)>(),
-	    func, iter...)						{}
+    assignment_iterator(const FUNC& func, const ITER& iter)
+	:super(iter), _func(func)	{}
 
     const auto&	functor()	const	{ return _func; }
 
   private:
-    assignment_iterator(std::true_type,  const FUNC& func, const ITER&... iter)
-	:super(std::make_tuple(iter...)), _func(func)			{}
-    assignment_iterator(std::false_type, const FUNC& func, const ITER&... iter)
-	:super(iter...), _func(func)					{}
-
     reference	dereference()	const	{ return {super::base(), _func}; }
     
   private:
     FUNC 	_func;	// 代入を可能にするためconstは付けない
 };
     
-template <class FUNC, class... ITER> inline assignment_iterator<FUNC, ITER...>
-make_assignment_iterator(const FUNC& func, const ITER&... iter)
+template <class FUNC, class ITER> inline assignment_iterator<FUNC, ITER>
+make_assignment_iterator(const FUNC& func, const ITER& iter)
 {
-    return {func, iter...};
+    return {func, iter};
+}
+
+template <class FUNC, class... ITERS>
+inline std::enable_if_t<(sizeof...(ITERS) > 1),
+			assignment_iterator<
+			    FUNC, zip_iterator<std::tuple<ITERS...> > > >
+make_assignment_iterator(const FUNC& func, const ITERS&... iters)
+{
+    return {func, make_zip_iterator(iters...)};
 }
 
 /************************************************************************
