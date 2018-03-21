@@ -109,7 +109,7 @@ static constexpr struct
 V4L2Camera::V4L2Camera()
     :_fd(-1), _dev(), _formats(), _controls(),
      _width(0), _height(0), _pixelFormat(UNKNOWN_PIXEL_FORMAT),
-     _buffers(), _current(~0), _inContinuousShot(false), _arrivaltime(0)
+     _buffers(), _current(~0), _inContinuousShot(false), _arrivaltime()
 {
 }
     
@@ -120,7 +120,7 @@ V4L2Camera::V4L2Camera()
 V4L2Camera::V4L2Camera(const char* dev)
     :_fd(-1), _dev(), _formats(), _controls(),
      _width(0), _height(0), _pixelFormat(UNKNOWN_PIXEL_FORMAT),
-     _buffers(), _current(~0), _inContinuousShot(false), _arrivaltime(0)
+     _buffers(), _current(~0), _inContinuousShot(false), _arrivaltime()
 {
     initialize(dev);
 }
@@ -259,17 +259,17 @@ V4L2Camera::terminate()
 	close(_fd);
     }
 
-    _fd = -1;
+    _fd			= -1;
     _dev.clear();
     _formats.clear();
     _controls.clear();
-    _width = 0;
-    _height = 0;
-    _pixelFormat = UNKNOWN_PIXEL_FORMAT;
+    _width		= 0;
+    _height		= 0;
+    _pixelFormat	= UNKNOWN_PIXEL_FORMAT;
     _buffers.clear();
-    _current = ~0;
-    _inContinuousShot = false;
-    _arrivaltime = 0;
+    _current		= ~0;
+    _inContinuousShot	= false;
+    _arrivaltime	= std::chrono::steady_clock::time_point();
 }
     
 /*
@@ -1522,15 +1522,16 @@ u_int
 V4L2Camera::dequeueBuffer()
 {
     using namespace	std;
-    
+
     v4l2_buffer	buf;
     memset(&buf, 0, sizeof(buf));
     buf.type   = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     buf.memory = V4L2_MEMORY_MMAP;
     if (ioctl(VIDIOC_DQBUF, &buf))
 	throw runtime_error(string("TU::V4L2Camera::waitBuffer(): ioctl(VIDIOC_DQBUF) failed!! ") + strerror(errno));
-    _arrivaltime = uint64_t(buf.timestamp.tv_sec) * 1000000LL
-		 + uint64_t(buf.timestamp.tv_usec);
+    _arrivaltime = chrono::steady_clock::time_point(
+			chrono::microseconds(buf.timestamp.tv_sec*1000000LL +
+					     buf.timestamp.tv_usec));
 #ifdef _DEBUG
     cerr << "VIDIOC_DQBUF(" << buf.index << ")" << endl;
 #endif
