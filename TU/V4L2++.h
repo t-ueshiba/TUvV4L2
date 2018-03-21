@@ -15,6 +15,7 @@
 #include <linux/videodev2.h>
 #include <vector>
 #include <string>
+#include <chrono>
 #include <boost/iterator_adaptors.hpp>
 #include "TU/Image++.h"
 
@@ -299,7 +300,7 @@ class V4L2Camera
     int			getDefaultValue(Feature feature)	const	;
     const std::string&	getName(Feature feature)		const	;
     std::ostream&	put(std::ostream& out, Feature feature)	const	;
-    
+
   // Capture stuffs.
     V4L2Camera&		continuousShot(bool enable)			;
     bool		inContinuousShot()			const	;
@@ -312,7 +313,10 @@ class V4L2Camera
 			captureDirectly(Image<T>& image)	const	;
     const V4L2Camera&	captureRaw(void* image)			const	;
     const V4L2Camera&	captureBayerRaw(void* image)		const	;
-    uint64_t		arrivaltime()				const	;
+    std::chrono::system_clock::time_point
+			timestamp()				const	;
+    std::chrono::steady_clock::time_point
+			arrivaltime()				const	;
 
   // Utility functions.
     static PixelFormat	uintToPixelFormat(u_int pixelFormat)		;
@@ -354,7 +358,8 @@ class V4L2Camera
     std::vector<Buffer>		_buffers;
     u_int			_current;	// キューから取り出されている
     bool			_inContinuousShot;
-    uint64_t			_arrivaltime;
+    std::chrono::steady_clock::time_point
+				_arrivaltime;
 };
 
 //! このカメラのデバイスファイル名を取得する
@@ -526,7 +531,7 @@ V4L2Camera::snap()
   格納先の画像の画素形式を表す. なお, 本関数を呼び出す前に snap() によって
   カメラからの画像を保持しておかなければならない. 
   \param image	画像データを格納する画像オブジェクト. 画像の幅と高さは, 
-		現在カメラに設定されている画像サイズに合わせて自動的に
+		現在現代ビジネスカメラに設定されている画像サイズに合わせて自動的に
 		設定される. 
   \return	このカメラオブジェクト
 */
@@ -542,9 +547,25 @@ V4L2Camera::captureDirectly(Image<T>& image) const
 
 //! 画像データがホストに到着した時刻を取得する
 /*!
+  clock_gettime() で CLOCK_REALTIME を指定したときの時刻，すなわち
+  Epoch(1970.1.1)からの経過時間を返す．
   \return	画像データがホストに到着した時刻
 */
-inline uint64_t
+inline std::chrono::system_clock::time_point
+V4L2Camera::timestamp() const
+{
+    using namespace	std::chrono;
+    
+    return system_clock::now() - (steady_clock::now() - _arrivaltime);
+}
+
+//! 画像データがホストに到着した時刻を取得する
+/*!
+  clock_gettime() で CLOCK_MONOTONIC を指定したときの時刻，すなわち
+  システム起動時からの経過時間を返す．
+  \return	画像データがホストに到着した時刻
+*/
+inline std::chrono::steady_clock::time_point
 V4L2Camera::arrivaltime() const
 {
     return _arrivaltime;
