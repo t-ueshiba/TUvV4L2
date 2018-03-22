@@ -176,11 +176,13 @@ FireWireNode::flushListenBuffer()
 }
 
 uint32_t
-FireWireNode::getCycletime(uint64_t& localtime) const
+FireWireNode::getCycletime(clock_t::time_point& tm) const
 {
     uint32_t	cycletime;
+    uint64_t	localtime;
     raw1394_read_cycle_timer(_handle, &cycletime, &localtime);
-
+    tm = clock_t::time_point() + std::chrono::microseconds(localtime);
+    
     return cycletime;
 }
     

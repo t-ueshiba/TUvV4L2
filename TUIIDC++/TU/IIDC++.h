@@ -140,6 +140,7 @@
 #include <stdexcept>
 #include <sstream>
 #include <iomanip>
+#include <chrono>
 #include <netinet/in.h>
 #include "TU/Image++.h"
 
@@ -160,9 +161,10 @@ namespace TU
 class IIDCNode
 {
   public:
-    typedef uint32_t	quadlet_t;
-    typedef uint16_t	nodeid_t;
-    typedef uint64_t	nodeaddr_t;
+    typedef uint32_t			quadlet_t;
+    typedef uint16_t			nodeid_t;
+    typedef uint64_t			nodeaddr_t;
+    typedef std::chrono::system_clock	clock_t;
     
   public:
 			IIDCNode()					;
@@ -222,10 +224,10 @@ class IIDCNode
 
   //! バスのサイクルタイムとOSのローカルタイムを取得する
   /*!
-    \param localtime	OSのローカルタイムが返される.
+    \param tm		OSのローカルタイムが返される.
     \return		バスのサイクルタイム.
   */
-    virtual uint32_t	getCycletime(uint64_t& localtime)	const	= 0;
+    virtual uint32_t	getCycletime(clock_t::time_point& tm)	const	= 0;
 
   protected:
     bool		inList()				const	;
@@ -258,7 +260,8 @@ class IIDCCamera
     
   public:
     typedef IIDCNode::quadlet_t		quadlet_t;
-
+    typedef IIDCNode::clock_t		clock_t;
+    
   //! カメラのタイプ
     enum Type
     {
@@ -632,9 +635,9 @@ class IIDCCamera
     const IIDCCamera&	captureRaw(void* image)			const	;
     const IIDCCamera&	captureBayerRaw(void* image)		const	;
     IIDCCamera&		embedTimestamp(bool enable)			;
-    uint64_t		getTimestamp()				const	;
-    uint32_t		getCycletime(uint64_t& localtime)	const	;
-    uint64_t		cycletimeToLocaltime(uint32_t cycletime) const	;
+    clock_t::time_point	getTimestamp()				const	;
+    uint32_t		getCycletime(clock_t::time_point& tm)	const	;
+    clock_t::time_point	cycletimeToLocaltime(uint32_t cycletime) const	;
     
   // Utility functions.
     static Format		uintToFormat(u_int format)		;
@@ -887,23 +890,23 @@ IIDCCamera::captureDirectly(Image<T>& image) const
   予め embedTimestamp() によって画像への撮影時刻埋め込みを指示しなければならない．
   \return	サイクル時刻単位で表した画像の撮影時刻
 */
-inline uint64_t
+inline IIDCCamera::clock_t::time_point
 IIDCCamera::getTimestamp() const
 {
     return (_img ?
 	    cycletimeToLocaltime(ntohl(*static_cast<const uint32_t*>(_img))) :
-	    0);
+	    clock_t::time_point());
 }
 
 //! 同時にサイクル時刻とシステム時刻を得る．
 /*!
-  \param localtime	マイクロ秒単位でシステム時刻が返される
-  \return		サイクル時刻
+  \param tm	システム時刻が返される
+  \return	サイクル時刻
 */
 inline uint32_t
-IIDCCamera::getCycletime(uint64_t& localtime) const
+IIDCCamera::getCycletime(clock_t::time_point& tm) const
 {
-    return _node->getCycletime(localtime);
+    return _node->getCycletime(tm);
 }
 
 inline void

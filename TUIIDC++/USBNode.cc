@@ -2,7 +2,6 @@
  *  $Id: USBNode.cc 1655 2014-10-03 01:37:50Z ueshiba $
  */
 #include <iostream>
-#include <chrono>
 #include "USBNode_.h"
 
 namespace TU
@@ -209,15 +208,12 @@ USBNode::flushListenBuffer()
 }
 
 uint32_t
-USBNode::getCycletime(uint64_t& localtime) const
+USBNode::getCycletime(clock_t::time_point& tm) const
 {
-    using namespace	std::chrono;
-    
     constexpr nodeaddr_t	CMD_REG_BASE = 0xfffff0f00000ULL;
     constexpr uint32_t		CYCLE_TIME   = 0x1ea8;
     
-    localtime = duration_cast<microseconds>(
-		    high_resolution_clock::now().time_since_epoch()).count();
+    tm = clock_t::now();
     return readQuadlet(CMD_REG_BASE + CYCLE_TIME);
 }
 

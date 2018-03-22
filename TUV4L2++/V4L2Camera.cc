@@ -269,7 +269,7 @@ V4L2Camera::terminate()
     _buffers.clear();
     _current		= ~0;
     _inContinuousShot	= false;
-    _arrivaltime	= std::chrono::steady_clock::time_point();
+    _arrivaltime	= steady_clock_t::time_point();
 }
     
 /*
@@ -1529,7 +1529,7 @@ V4L2Camera::dequeueBuffer()
     buf.memory = V4L2_MEMORY_MMAP;
     if (ioctl(VIDIOC_DQBUF, &buf))
 	throw runtime_error(string("TU::V4L2Camera::waitBuffer(): ioctl(VIDIOC_DQBUF) failed!! ") + strerror(errno));
-    _arrivaltime = chrono::steady_clock::time_point(
+    _arrivaltime = steady_clock_t::time_point(
 			chrono::microseconds(buf.timestamp.tv_sec*1000000LL +
 					     buf.timestamp.tv_usec));
 #ifdef _DEBUG

@@ -328,13 +328,13 @@ getFeature(const IIDCCamera& camera, u_int id, u_int& val, float& fval)	;
   \param cameras	カメラの配列
   \param maxSkew	画像間のタイムスタンプの許容ずれ幅(nsec単位)
 */
-template <class CAMERAS> auto
-syncedSnap(CAMERAS&& cameras, uint64_t maxSkew=1000)
-    -> std::enable_if_t<
-	   std::is_convertible<value_t<CAMERAS>, IIDCCamera>::value>
+template <class CAMERAS, class REP, class PERIOD>
+std::enable_if_t<std::is_convertible<value_t<CAMERAS>, IIDCCamera>::value>
+syncedSnap(CAMERAS&& cameras, std::chrono::duration<REP, PERIOD> maxSkew)
 {
     using iterator	= decltype(std::begin(cameras));
-    using timestamp_t	= std::pair<uint64_t, iterator>;
+    using timepoint_t	= IIDCCamera::clock_t::time_point;
+    using timestamp_t	= std::pair<timepoint_t, iterator>;
     using cmp		= std::greater<timestamp_t>;
 
   // 全カメラから画像を取得
@@ -343,7 +343,7 @@ syncedSnap(CAMERAS&& cameras, uint64_t maxSkew=1000)
 
   // 全カメラのタイムスタンプとその中で最も遅いlastを得る．
     std::vector<timestamp_t>	timestamps;
-    timestamp_t			last(0, std::end(cameras));
+    timestamp_t			last(timepoint_t(), std::end(cameras));
     for (auto camera = std::begin(cameras); camera != std::end(cameras);
 	 ++camera)
     {
