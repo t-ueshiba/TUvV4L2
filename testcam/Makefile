@@ -12,7 +12,7 @@ VPATH		=
 IDLS		=
 MOCHDRS		=
 
-INCDIRS		= -I../../TUIIDC++/testcam -I$(PREFIX)/include
+INCDIRS		= -I.. -I../../TUIIDC++/testcam -I$(PREFIX)/include
 CPPFLAGS	= -DNDEBUG
 CFLAGS		= -O3
 NVCCFLAGS	= -O

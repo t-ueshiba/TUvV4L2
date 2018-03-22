@@ -191,7 +191,7 @@ class V4L2Camera
   //! メニュー項目の範囲を表す反復子のペア
     typedef std::pair<MenuItemIterator, MenuItemIterator>
 							MenuItemRange;
-    
+
   private:
     struct Format		//! 画像フォーマット
     {
@@ -249,6 +249,10 @@ class V4L2Camera
     typedef MemberIterator<Feature, Control>		FeatureIterator;
   //! 属性の範囲を表す反復子のペア
     typedef std::pair<FeatureIterator, FeatureIterator>	FeatureRange;
+  //! タイムスタンプを記述するクロック
+    typedef std::chrono::system_clock			clock_t;
+  //! 画像到着時刻を記述するクロック
+    typedef std::chrono::steady_clock			steady_clock_t;
     
   public:
 			V4L2Camera()					;
@@ -313,10 +317,9 @@ class V4L2Camera
 			captureDirectly(Image<T>& image)	const	;
     const V4L2Camera&	captureRaw(void* image)			const	;
     const V4L2Camera&	captureBayerRaw(void* image)		const	;
-    std::chrono::system_clock::time_point
-			timestamp()				const	;
-    std::chrono::steady_clock::time_point
-			arrivaltime()				const	;
+    clock_t::time_point	getTimestamp()				const	;
+    steady_clock_t::time_point
+			getArrivaltime()			const	;
 
   // Utility functions.
     static PixelFormat	uintToPixelFormat(u_int pixelFormat)		;
@@ -358,8 +361,7 @@ class V4L2Camera
     std::vector<Buffer>		_buffers;
     u_int			_current;	// キューから取り出されている
     bool			_inContinuousShot;
-    std::chrono::steady_clock::time_point
-				_arrivaltime;
+    steady_clock_t::time_point	_arrivaltime;
 };
 
 //! このカメラのデバイスファイル名を取得する
@@ -545,28 +547,26 @@ V4L2Camera::captureDirectly(Image<T>& image) const
     return *this;
 }
 
-//! 画像データがホストに到着した時刻を取得する
+//! 画像データのタイムスタンプを取得する
 /*!
-  clock_gettime() で CLOCK_REALTIME を指定したときの時刻，すなわち
-  Epoch(1970.1.1)からの経過時間を返す．
-  \return	画像データがホストに到着した時刻
+  std::chrono::system_clock で表される時刻，すなわち
+  Epoch(1970.1.1) からの経過時間を返す．
+  \return	画像データのタイムスタンプ
 */
-inline std::chrono::system_clock::time_point
-V4L2Camera::timestamp() const
+inline V4L2Camera::clock_t::time_point
+V4L2Camera::getTimestamp() const
 {
-    using namespace	std::chrono;
-    
-    return system_clock::now() - (steady_clock::now() - _arrivaltime);
+    return clock_t::now() - (steady_clock_t::now() - _arrivaltime);
 }
 
 //! 画像データがホストに到着した時刻を取得する
 /*!
-  clock_gettime() で CLOCK_MONOTONIC を指定したときの時刻，すなわち
+  std::chrono::steady_clock で表される時刻，すなわち
   システム起動時からの経過時間を返す．
   \return	画像データがホストに到着した時刻
 */
-inline std::chrono::steady_clock::time_point
-V4L2Camera::arrivaltime() const
+inline V4L2Camera::steady_clock_t::time_point
+V4L2Camera::getArrivaltime() const
 {
     return _arrivaltime;
 }
