@@ -121,7 +121,7 @@ class USBNode : public IIDCNode
     virtual const void*	waitListenBuffer()				;
     virtual void	requeueListenBuffer()				;
     virtual void	flushListenBuffer()				;
-    virtual uint32_t	getCycletime(uint64_t& localtime)	const	;
+    virtual uint32_t	getCycletime(clock_t::time_point& tm)	const	;
     
   private:
     void		setHandle(uint32_t unit_spec_ID,
