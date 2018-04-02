@@ -580,7 +580,8 @@ NDTree<T, D>::Iterator<S>::operator ->() const
 /*!
   \return	インクリメント後のこの反復子
 */
-template <class T, size_t D> template <class S> NDTree<T, D>::Iterator<S>&
+template <class T, size_t D> template <class S>
+typename NDTree<T, D>::template Iterator<S>&
 NDTree<T, D>::Iterator<S>::operator ++()
 {
   // 1. _leaf != 0			反復子が空でない葉を指している状態
@@ -615,7 +616,8 @@ NDTree<T, D>::Iterator<S>::operator ++()
 /*!
   \return	インクリメント前の反復子
 */
-template <class T, size_t D> template <class S> inline NDTree<T, D>::Iterator<S>
+template <class T, size_t D> template <class S>
+inline typename NDTree<T, D>::template Iterator<S>
 NDTree<T, D>::Iterator<S>::operator ++(int)
 {
     Iterator	tmp = *this;

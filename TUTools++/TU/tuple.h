@@ -470,9 +470,7 @@ select(const std::tuple<S...>& s, X&& x, Y&& y)
 ************************************************************************/
 namespace detail
 {
-  template <class FUNC, class TUPLE, size_t... IDX,
-	    std::enable_if_t<is_tuple<TUPLE>::value>* = nullptr>
-  inline decltype(auto)
+  template <class FUNC, class TUPLE, size_t... IDX> inline decltype(auto)
   apply(FUNC&& f, TUPLE&& t, std::index_sequence<IDX...>)
   {
       return f(std::get<IDX>(std::forward<TUPLE>(t))...);
@@ -486,8 +484,7 @@ apply(FUNC&& f, TUPLE&& t)
 {
     return detail::apply(std::forward<FUNC>(f), std::forward<TUPLE>(t),
 			 std::make_index_sequence<
-			      std::tuple_size<
-				  std::remove_reference_t<TUPLE> >::value>());
+			     std::tuple_size<std::decay_t<TUPLE> >::value>());
 }
 template <class FUNC, class T,
 	  std::enable_if_t<!is_tuple<T>::value>* = nullptr>

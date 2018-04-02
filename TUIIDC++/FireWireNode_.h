@@ -104,7 +104,7 @@ class FireWireNode : public IIDCNode
     virtual const void*	waitListenBuffer()				;
     virtual void	requeueListenBuffer()				;
     virtual void	flushListenBuffer()				;
-    virtual uint32_t	getCycletime(uint64_t& localtime)	const	;
+    virtual uint32_t	getCycletime(clock_t::time_point& tm)	const	;
     
   private:
     static raw1394_iso_disposition

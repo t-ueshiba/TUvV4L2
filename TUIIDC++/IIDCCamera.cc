@@ -1686,9 +1686,10 @@ IIDCCamera::operator >>(Image<T>& image) const
 	auto	src = static_cast<const YUV444*>(_img);
 	for (auto&& line : image)
 	{
-	    std::copy_n(make_pixel_iterator(src), line.size(),
-			make_pixel_iterator(line.begin()));
-	    src += line.size();
+	    const auto	next = src + line.size();
+	    std::copy(make_pixel_iterator(src), make_pixel_iterator(next),
+		      make_pixel_iterator(line.begin()));
+	    src = next;
 	}
       }
 	break;
@@ -1697,9 +1698,10 @@ IIDCCamera::operator >>(Image<T>& image) const
 	auto	src = static_cast<const YUV422*>(_img);
 	for (auto&& line : image)
 	{
-	    std::copy_n(make_pixel_iterator(src), line.size(),
-			make_pixel_iterator(line.begin()));
-	    src += line.size();
+	    const auto	next = src + line.size();
+	    std::copy(make_pixel_iterator(src), make_pixel_iterator(next),
+		      make_pixel_iterator(line.begin()));
+	    src = next;
 	}
       }
 	break;
@@ -1708,9 +1710,10 @@ IIDCCamera::operator >>(Image<T>& image) const
 	auto	src = static_cast<const YUV411*>(_img);
 	for (auto&& line : image)
 	{
-	    std::copy_n(make_pixel_iterator(src), line.size(),
-			make_pixel_iterator(line.begin()));
-	    src += line.size();
+	    const auto	next = src + line.size()/2;
+	    std::copy(make_pixel_iterator(src), make_pixel_iterator(next),
+		      make_pixel_iterator(line.begin()));
+	    src = next;
 	}
       }
 	break;
@@ -1719,9 +1722,10 @@ IIDCCamera::operator >>(Image<T>& image) const
 	auto	src = static_cast<const RGB*>(_img);
 	for (auto&& line : image)
 	{
-	    std::copy_n(make_pixel_iterator(src), line.size(),
-			make_pixel_iterator(line.begin()));
-	    src += line.size();
+	    const auto	next = src + line.size();
+	    std::copy(make_pixel_iterator(src), make_pixel_iterator(next),
+		      make_pixel_iterator(line.begin()));
+	    src = next;
 	}
       }
 	break;
@@ -1731,9 +1735,10 @@ IIDCCamera::operator >>(Image<T>& image) const
 	auto	src = static_cast<const u_char*>(_img);
 	for (auto&& line : image)
 	{
-	    std::copy_n(make_pixel_iterator(src), line.size(),
-			make_pixel_iterator(line.begin()));
-	    src += line.size();
+	    const auto	next = src + line.size();
+	    std::copy(make_pixel_iterator(src), make_pixel_iterator(next),
+		      make_pixel_iterator(line.begin()));
+	    src = next;
 	}
       }
 	break;
@@ -1744,9 +1749,10 @@ IIDCCamera::operator >>(Image<T>& image) const
 	    auto	src = static_cast<const u_short*>(_img);
 	    for (auto&& line : image)
 	    {
-		std::copy_n(make_pixel_iterator(src), line.size(),
-			    make_pixel_iterator(line.begin()));
-		src += line.size();
+		const auto	next = src + line.size();
+		std::copy(make_pixel_iterator(src), make_pixel_iterator(next),
+			  make_pixel_iterator(line.begin()));
+		src = next;
 	    }
 	}
 	else
@@ -1754,9 +1760,10 @@ IIDCCamera::operator >>(Image<T>& image) const
 	    auto	src = static_cast<const Mono16*>(_img);
 	    for (auto&& line : image)
 	    {
-		std::copy_n(make_pixel_iterator(src), line.size(),
-			    make_pixel_iterator(line.begin()));
-		src += line.size();
+		const auto	next = src + line.size();
+		std::copy(make_pixel_iterator(src), make_pixel_iterator(next),
+			  make_pixel_iterator(line.begin()));
+		src = next;
 	    }
 	}
 	break;
@@ -1766,9 +1773,10 @@ IIDCCamera::operator >>(Image<T>& image) const
 	    auto	src = static_cast<const short*>(_img);
 	    for (auto&& line : image)
 	    {
-		std::copy_n(make_pixel_iterator(src), line.size(),
-			    make_pixel_iterator(line.begin()));
-		src += line.size();
+		const auto	next = src + line.size();
+		std::copy(make_pixel_iterator(src), make_pixel_iterator(next),
+			  make_pixel_iterator(line.begin()));
+		src = next;
 	    }
 	}
 	else
@@ -1776,9 +1784,10 @@ IIDCCamera::operator >>(Image<T>& image) const
 	    auto	src = static_cast<const Mono16*>(_img);
 	    for (auto&& line : image)
 	    {
-		std::copy_n(make_pixel_iterator(src), line.size(),
-			    make_pixel_iterator(line.begin()));
-		src += line.size();
+		const auto	next = src + line.size();
+		std::copy(make_pixel_iterator(src), make_pixel_iterator(next),
+			  make_pixel_iterator(line.begin()));
+		src = next;
 	    }
 	}
 	break;
@@ -2122,12 +2131,12 @@ IIDCCamera::embedTimestamp(bool enable)
     return *this;
 }
 
-uint64_t
+IIDCCamera::clock_t::time_point
 IIDCCamera::cycletimeToLocaltime(uint32_t cycletime) const
 {
   // 現在のcycletimeとlocaltimeを獲得する.
-    uint64_t	localtime0;
-    const auto	cycletime0 = getCycletime(localtime0);
+    clock_t::time_point	localtime0;
+    const auto		cycletime0 = getCycletime(localtime0);
 
   // 現時刻と指定された時刻のサイクル時刻をサブサイクル値に直し，
   // 両者のずれを求める.
@@ -2136,7 +2145,7 @@ IIDCCamera::cycletimeToLocaltime(uint32_t cycletime) const
     const auto	diff   = (cycle0 + (128LL*8000LL) - cycle) % (128LL*8000LL);
 
   // ずれをmicro sec単位に直して(1 cycle = 125 usec)現在時刻から差し引く.
-    return localtime0 - 125LL*diff;
+    return localtime0 - std::chrono::microseconds(125LL*diff);
 }
     
 //! unsinged intの値を同じビットパターンを持つ #Format に直す

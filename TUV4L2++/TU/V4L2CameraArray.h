@@ -151,50 +151,50 @@ getFeature(const V4L2Camera& camera, u_int id, int& val)
   \param cameras	カメラの配列
   \param maxSkew	画像間のタイムスタンプの許容ずれ幅(nsec単位)
 */
-template <class CAMERAS> auto
-syncedSnap(CAMERAS&& cameras, uint64_t maxSkew=1000)
-    -> std::enable_if_t<
-	   std::is_convertible<value_t<CAMERAS>, V4L2Camera>::value>
+template <class CAMERAS, class REP, class PERIOD>
+std::enable_if_t<std::is_convertible<value_t<CAMERAS>, V4L2Camera>::value>
+syncedSnap(CAMERAS&& cameras, std::chrono::duration<REP, PERIOD> maxSkew)
 {
     using iterator	= decltype(std::begin(cameras));
-    using timestamp_t	= std::pair<uint64_t, iterator>;
-    using cmp		= std::greater<timestamp_t>;
+    using timepoint_t	= V4L2Camera::steady_clock_t::time_point;
+    using arrivaltime_t	= std::pair<timepoint_t, iterator>;
+    using cmp		= std::greater<arrivaltime_t>;
 
   // 全カメラから画像を取得
     std::for_each(std::begin(cameras), std::end(cameras),
 		  std::bind(&V4L2Camera::snap, std::placeholders::_1));
 
   // 全カメラのタイムスタンプとその中で最も遅いlastを得る．
-    std::vector<timestamp_t>	timestamps;
-    timestamp_t			last(0, std::end(cameras));
+    std::vector<arrivaltime_t>	arrivaltimes;
+    arrivaltime_t		last(timepoint_t(), std::end(cameras));
     for (auto camera = std::begin(cameras); camera != std::end(cameras);
 	 ++camera)
     {
-	timestamps.push_back({camera->arrivaltime(), camera});
-	if (timestamps.back() > last)
-	    last = timestamps.back();
+	arrivaltimes.push_back({camera->getArrivaltime(), camera});
+	if (arrivaltimes.back() > last)
+	    last = arrivaltimes.back();
     }
 
-  // timestampsを最も早いタイムスタンプを先頭要素とするヒープにする．
-    std::make_heap(timestamps.begin(), timestamps.end(), cmp());
+  // arrivaltimesを，最も早いタイムスタンプを先頭要素とするヒープにする．
+    std::make_heap(arrivaltimes.begin(), arrivaltimes.end(), cmp());
     
   // 最も早いタイムスタンプと最も遅いタイムスタンプの差がmaxSkewを越えなくなるまで
   // 前者に対応するカメラから画像を取得する．
-    while (last.first > timestamps.front().first + maxSkew)
+    while (last.first > arrivaltimes.front().first + maxSkew)
     {
       // 最も早いタイムスタンプを末尾にもってきてヒープから取り除く．
-	std::pop_heap(timestamps.begin(), timestamps.end(), cmp());
+	std::pop_heap(arrivaltimes.begin(), arrivaltimes.end(), cmp());
 
       // ヒープから取り除いたタイムスタンプに対応するカメラから画像を取得して
       // 新たなタイムスタンプを得る．
-	auto&	back = timestamps.back();
-	back.first = back.second->snap().arrivaltime();
+	auto&	back = arrivaltimes.back();
+	back.first = back.second->snap().getArrivaltime();
 
       // これが最も遅いタイムスタンプになるので，lastに記録する．
 	last = back;
 
       // このタイムスタンプを再度ヒープに追加する．
-	std::push_heap(timestamps.begin(), timestamps.end(), cmp());
+	std::push_heap(arrivaltimes.begin(), arrivaltimes.end(), cmp());
     }
 }
     

@@ -183,7 +183,7 @@ MyCmdWindow<CAMERAS, PIXEL>::tick()
     if (!_captureCmd.getValue(c_PlayMovie))
     {
 	if (_maxSkew)
-	    syncedSnap(_cameras, _maxSkew);
+	    syncedSnap(_cameras, std::chrono::nanoseconds(_maxSkew));
 	else
 	    for (auto& camera : _cameras)
 		camera.snap();
