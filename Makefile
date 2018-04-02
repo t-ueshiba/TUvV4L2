@@ -134,7 +134,6 @@ HDRS		= TU/Array++.h \
 		TU/simd/lookup.h \
 		TU/simd/map_iterator.h \
 		TU/simd/misc.h \
-		TU/simd/pipe.h \
 		TU/simd/select.h \
 		TU/simd/shift.h \
 		TU/simd/shift_iterator.h \
