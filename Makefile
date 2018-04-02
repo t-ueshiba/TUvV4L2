@@ -38,14 +38,21 @@ INCDIR		= $(PREFIX)/include
 #########################
 SUFFIX		= .cc:sC .cpp:sC .cu:sC
 EXTHDRS		= /usr/local/include/TU/Array++.h \
+		/usr/local/include/TU/Camera++.h \
+		/usr/local/include/TU/Geometry++.h \
 		/usr/local/include/TU/Image++.h \
+		/usr/local/include/TU/Manip.h \
+		/usr/local/include/TU/Minimize.h \
 		/usr/local/include/TU/Vector++.h \
 		/usr/local/include/TU/algorithm.h \
+		/usr/local/include/TU/cuda/iterator.h \
+		/usr/local/include/TU/cuda/tuple.h \
 		/usr/local/include/TU/io.h \
 		/usr/local/include/TU/iterator.h \
 		/usr/local/include/TU/pair.h \
 		/usr/local/include/TU/range.h \
-		/usr/local/include/TU/tuple.h
+		/usr/local/include/TU/tuple.h \
+		/usr/local/include/TU/type_traits.h
 HDRS		= TU/V4L2++.h \
 		TU/V4L2CameraArray.h
 SRCS		= V4L2Camera.cc \
@@ -60,13 +67,20 @@ include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
 V4L2Camera.o: TU/V4L2++.h /usr/local/include/TU/Image++.h \
-	/usr/local/include/TU/pair.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/range.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
-	/usr/local/include/TU/algorithm.h
-V4L2CameraArray.o: TU/V4L2CameraArray.h TU/V4L2++.h \
-	/usr/local/include/TU/Image++.h /usr/local/include/TU/pair.h \
+	/usr/local/include/TU/pair.h /usr/local/include/TU/type_traits.h \
+	/usr/local/include/TU/Manip.h /usr/local/include/TU/Camera++.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Minimize.h \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
 	/usr/local/include/TU/range.h /usr/local/include/TU/iterator.h \
 	/usr/local/include/TU/tuple.h /usr/local/include/TU/algorithm.h \
-	/usr/local/include/TU/io.h
+	/usr/local/include/TU/cuda/tuple.h \
+	/usr/local/include/TU/cuda/iterator.h
+V4L2CameraArray.o: TU/V4L2CameraArray.h TU/V4L2++.h \
+	/usr/local/include/TU/Image++.h /usr/local/include/TU/pair.h \
+	/usr/local/include/TU/type_traits.h /usr/local/include/TU/Manip.h \
+	/usr/local/include/TU/Camera++.h /usr/local/include/TU/Geometry++.h \
+	/usr/local/include/TU/Minimize.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/range.h \
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
+	/usr/local/include/TU/algorithm.h /usr/local/include/TU/cuda/tuple.h \
+	/usr/local/include/TU/cuda/iterator.h /usr/local/include/TU/io.h
