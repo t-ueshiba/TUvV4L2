@@ -32,6 +32,7 @@
 #  include "TU/simd/cvtdown_iterator.h"
 #  include "TU/simd/cvtup_iterator.h"
 #  include "TU/simd/shift_iterator.h"
+#  include "TU/simd/map_iterator.h"
 #endif
 
 #endif	// !TU_SIMD_SIMD_H

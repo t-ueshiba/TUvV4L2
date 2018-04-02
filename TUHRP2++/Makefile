@@ -10,8 +10,8 @@ LIBRARY		= lib$(shell basename $(PWD))
 VPATH		=
 
 IDLS		= ForwardKinematicsService.idl ReachingService.idl \
-		  SequencePlayerService.idl 
-		 #WalkGeneratorService.idl
+		  SequencePlayerService.idl \
+		  WalkGeneratorService.idl
 MOCHDRS		=
 
 INCDIRS		= -I. -I$(PREFIX)/include
