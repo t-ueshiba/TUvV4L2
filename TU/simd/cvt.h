@@ -114,43 +114,37 @@ using cvt_lower_type = typename detail::cvt_adjacent_type<T, S, MASK>::L;
 ************************************************************************/
 namespace detail
 {
-  template <class ITER_>
+  template <class ITER>
   struct vsize_impl
   {
-      constexpr static auto	min = vsize_impl<iterator_value<ITER_> >::min;
-      constexpr static auto	max = vsize_impl<iterator_value<ITER_> >::max;
+      constexpr static auto	max = vsize_impl<iterator_value<ITER> >::max;
   };
-  template <class T_>
-  struct vsize_impl<vec<T_> >
+  template <class T>
+  struct vsize_impl<vec<T> >
   {
-      constexpr static auto	min = vec<T_>::size;
-      constexpr static auto	max = vec<T_>::size;
+      constexpr static auto	max = vec<T>::size;
   };
-  template <class VEC_>
-  struct vsize_impl<std::tuple<VEC_> >
+  template <class VEC>
+  struct vsize_impl<std::tuple<VEC> >
   {
-      constexpr static auto	min = vsize_impl<std::decay_t<VEC_> >::min;
-      constexpr static auto	max = vsize_impl<std::decay_t<VEC_> >::max;
+      constexpr static auto	max = vsize_impl<std::decay_t<VEC> >::max;
   };
-  template <class VEC_, class... VECS_>
-  struct vsize_impl<std::tuple<VEC_, VECS_...> >
+  template <class VEC, class... VECS>
+  struct vsize_impl<std::tuple<VEC, VECS...> >
   {
     private:
-      constexpr static auto	min0 = vsize_impl<std::decay_t<VEC_>   >::min;
-      constexpr static auto	max0 = vsize_impl<std::decay_t<VEC_>   >::max;
-      constexpr static auto	min1 = vsize_impl<std::tuple<VECS_...> >::min;
-      constexpr static auto	max1 = vsize_impl<std::tuple<VECS_...> >::max;
+      constexpr static auto	max0 = vsize_impl<std::decay_t<VEC>   >::max;
+      constexpr static auto	max1 = vsize_impl<std::tuple<VECS...> >::max;
 
     public:
-      constexpr static auto	min = (min0 < min1 ? min0 : min1);
       constexpr static auto	max = (max0 > max1 ? max0 : max1);
   };
 }
 
 //! tuple中のベクトルおよび反復子が指すベクトルのうちの最大/最小要素数
-template <class VECS_>
-using vsize = detail::vsize_impl<std::decay_t<VECS_> >;
-    
+template <class VECS>
+using vsize = detail::vsize_impl<std::decay_t<VECS> >;
+
 /************************************************************************
 *  Converting vecs or vec tuples to upper adjacent types		*
 ************************************************************************/
@@ -165,7 +159,7 @@ using vsize = detail::vsize_impl<std::decay_t<VECS_> >;
   \param x	変換されるベクトル
   \return	変換されたベクトル
 */
-template <class T, bool HI=false, bool MASK=false, size_t=0, class S>
+template <class T, bool HI, bool MASK, size_t=0, class S>
 inline auto
 cvtup(vec<S> x)
 {
@@ -193,8 +187,8 @@ cvtup(TUPLE&& t)
 {
     return tuple_transform([](auto&& x) -> decltype(auto)
 			   { return cvtup<T, HI, MASK, N>(
-					std::forward<decltype(x)>(x)); },
-			   t);
+				   std::forward<decltype(x)>(x)); },
+			   std::forward<TUPLE>(t));
 }
 
 /************************************************************************
