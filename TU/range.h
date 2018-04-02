@@ -1189,8 +1189,9 @@ namespace detail
   class unary_opnode : public opnode
   {
     public:
-		unary_opnode(E&& expr, OP op)
-		    :_expr(std::forward<E>(expr)), _op(op)	{}
+		unary_opnode(E&& expr, OP&& op)
+		    :_expr(std::forward<E>(expr)),
+		     _op(std::forward<OP>(op))				{}
 
       constexpr static auto
 		size0()
@@ -1222,11 +1223,11 @@ namespace detail
   };
     
   template <class OP, class E> inline auto
-  make_unary_opnode(E&& expr, OP op)
+  make_unary_opnode(E&& expr, OP&& op)
   {
     // exprの実引数がX&&型(X型の一時オブジェクト)ならば E = X,
     // そうでなければ E = X& または E = const X& となる．
-      return unary_opnode<OP, E>(std::forward<E>(expr), op);
+      return unary_opnode<OP, E>(std::forward<E>(expr), std::forward<OP>(op));
   }
 
   /**********************************************************************
@@ -1245,8 +1246,9 @@ namespace detail
   struct binary_opnode : public opnode
   {
     public:
-		binary_opnode(L&& l, R&& r, OP op)
-		    :_l(std::forward<L>(l)), _r(std::forward<R>(r)), _op(op)
+		binary_opnode(L&& l, R&& r, OP&& op)
+		    :_l(std::forward<L>(l)), _r(std::forward<R>(r)),
+		     _op(std::forward<OP>(op))
 		{
 		    assert(TU::size(_l) == TU::size(_r));
 		}
@@ -1280,12 +1282,12 @@ namespace detail
   };
     
   template <class OP, class L, class R> inline auto
-  make_binary_opnode(L&& l, R&& r, OP op)
+  make_binary_opnode(L&& l, R&& r, OP&& op)
   {
     // l(r)の実引数がX&&型(Y&&型)ならば L = X (R = Y), そうでなければ
     // L = X& (R = Y&) または L = const X& (R = const Y&) となる．
       return binary_opnode<OP, L, R>(std::forward<L>(l),
-				     std::forward<R>(r), op);
+				     std::forward<R>(r), std::forward<OP>(op));
   }
 
 }	// namespace detail
@@ -1312,9 +1314,9 @@ operator -(E&& expr)
 template <class E, std::enable_if_t<rank<E>() != 0>* = nullptr> inline auto
 operator *(E&& expr, element_t<E> c)
 {
-    return detail::make_unary_opnode(std::forward<E>(expr),
-				     [c](auto&& x)
-				     { return std::forward<decltype(x)>(x)*c; });
+    return detail::make_unary_opnode(
+		std::forward<E>(expr),
+		[c](auto&& x){ return std::forward<decltype(x)>(x)*c; });
 }
 
 //! 与えられた式の各要素に定数を掛ける.
@@ -1326,9 +1328,9 @@ operator *(E&& expr, element_t<E> c)
 template <class E, std::enable_if_t<rank<E>() != 0>* = nullptr> inline auto
 operator *(element_t<E> c, E&& expr)
 {
-    return detail::make_unary_opnode(std::forward<E>(expr),
-				     [c](auto&& x)
-				     { return c*std::forward<decltype(x)>(x); });
+    return detail::make_unary_opnode(
+		std::forward<E>(expr),
+		[c](auto&& x){ return c*std::forward<decltype(x)>(x); });
 }
 
 //! 与えられた式の各要素を定数で割る.
@@ -1340,9 +1342,9 @@ operator *(element_t<E> c, E&& expr)
 template <class E, std::enable_if_t<rank<E>() != 0>* = nullptr> inline auto
 operator /(E&& expr, element_t<E> c)
 {
-    return detail::make_unary_opnode(std::forward<E>(expr),
-				     [c](auto&& x)
-				     { return std::forward<decltype(x)>(x)/c; });
+    return detail::make_unary_opnode(
+		std::forward<E>(expr),
+		[c](auto&& x){ return std::forward<decltype(x)>(x)/c; });
 }
 
 //! 与えられた式の各要素に定数を掛ける.

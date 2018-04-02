@@ -7,61 +7,13 @@
 #define TU_SIMD_ALLOCATOR_H
 
 #include <new>			// for std::bad_alloc()
-#include <type_traits>
-#include <stdlib.h>
-#include <boost/iterator/iterator_adaptor.hpp>
-#include "TU/simd/vec.h"
+#include <cstdlib>
+#include "TU/simd/iterator_wrapper.h"
 
 namespace TU
 {
 namespace simd
 {
-/************************************************************************
-*  iterator_wrapper<ITER, ALIGNED>					*
-************************************************************************/
-//! 反復子をラップして名前空間 TU::simd に取り込むためのクラス
-/*!
-  本クラスの目的は，以下の2つである．
-    (1)	iterator_value<ITER> がSIMDベクトル型となるあらゆる反復子を
-	その機能を保持したまま名前を変更することにより，TU/algorithm.h にある
-	関数のオーバーロード版を呼び出せるようにすること．
-    (2)	ITER が const T* 型または T* 型のとき，それぞれ load_iterator<T, true>
-	store_iterator<T, true> を生成できるようにすること．本クラスでラップ
-	されたポインタが指すアドレスは sizeof(vec<T>) にalignされているものと
-	みなされる．
-	
-  \param ITER	ラップする反復子の型
-*/ 
-template <class ITER, bool ALIGNED>
-class iterator_wrapper
-    : public boost::iterator_adaptor<iterator_wrapper<ITER, ALIGNED>, ITER>
-{
-  public:
-    using element_type	= typename std::iterator_traits<ITER>::value_type;
-    template <class U_>
-    struct rebind
-    {
-	using type	= iterator_wrapper<U_*, ALIGNED>;
-    };
-    
-  private:
-    using super		= boost::iterator_adaptor<iterator_wrapper, ITER>;
-
-  public:
-    iterator_wrapper(ITER iter)	:super(iter)	{}
-    template <class ITER_,
-	      std::enable_if_t<std::is_convertible<ITER_, ITER>::value>*
-	      = nullptr>
-    iterator_wrapper(ITER_ iter) :super(iter)	{}
-    template <class ITER_,
-	      std::enable_if_t<std::is_convertible<ITER_, ITER>::value>*
-	      = nullptr>
-    iterator_wrapper(iterator_wrapper<ITER_, ALIGNED> iter)
-	:super(iter.base())			{}
-
-    operator ITER()			const	{ return super::base(); }
-};
-
 /************************************************************************
 *  class allocator<T>							*
 ************************************************************************/
