@@ -41,14 +41,21 @@ OTHER_DIR	= $(HOME)/projects/HRP-5P/hrp5p-calib/libraries/TUIIDC++
 #########################
 SUFFIX		= .cc:sC .cpp:sC .cu:sC
 EXTHDRS		= /usr/local/include/TU/Array++.h \
+		/usr/local/include/TU/Camera++.h \
+		/usr/local/include/TU/Geometry++.h \
 		/usr/local/include/TU/Image++.h \
+		/usr/local/include/TU/Manip.h \
+		/usr/local/include/TU/Minimize.h \
 		/usr/local/include/TU/Vector++.h \
 		/usr/local/include/TU/algorithm.h \
+		/usr/local/include/TU/cuda/iterator.h \
+		/usr/local/include/TU/cuda/tuple.h \
 		/usr/local/include/TU/io.h \
 		/usr/local/include/TU/iterator.h \
 		/usr/local/include/TU/pair.h \
 		/usr/local/include/TU/range.h \
-		/usr/local/include/TU/tuple.h
+		/usr/local/include/TU/tuple.h \
+		/usr/local/include/TU/type_traits.h
 HDRS		= FireWireNode_.h \
 		TU/IIDC++.h \
 		TU/IIDCCameraArray.h \
@@ -76,27 +83,46 @@ include $(PROJECT)/lib/other.mk
 ###
 FireWireNode.o: FireWireNode_.h TU/IIDC++.h \
 	/usr/local/include/TU/Image++.h /usr/local/include/TU/pair.h \
-	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
-	/usr/local/include/TU/range.h /usr/local/include/TU/iterator.h \
-	/usr/local/include/TU/tuple.h /usr/local/include/TU/algorithm.h
-IIDCCamera.o: FireWireNode_.h TU/IIDC++.h /usr/local/include/TU/Image++.h \
-	/usr/local/include/TU/pair.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/type_traits.h /usr/local/include/TU/Manip.h \
+	/usr/local/include/TU/Camera++.h /usr/local/include/TU/Geometry++.h \
+	/usr/local/include/TU/Minimize.h /usr/local/include/TU/Vector++.h \
 	/usr/local/include/TU/Array++.h /usr/local/include/TU/range.h \
 	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
-	/usr/local/include/TU/algorithm.h USBNode_.h
-IIDCCameraArray.o: TU/IIDCCameraArray.h TU/IIDC++.h \
-	/usr/local/include/TU/Image++.h /usr/local/include/TU/pair.h \
+	/usr/local/include/TU/algorithm.h /usr/local/include/TU/cuda/tuple.h \
+	/usr/local/include/TU/cuda/iterator.h
+IIDCCamera.o: FireWireNode_.h TU/IIDC++.h /usr/local/include/TU/Image++.h \
+	/usr/local/include/TU/pair.h /usr/local/include/TU/type_traits.h \
+	/usr/local/include/TU/Manip.h /usr/local/include/TU/Camera++.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Minimize.h \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
 	/usr/local/include/TU/range.h /usr/local/include/TU/iterator.h \
 	/usr/local/include/TU/tuple.h /usr/local/include/TU/algorithm.h \
-	/usr/local/include/TU/io.h
+	/usr/local/include/TU/cuda/tuple.h \
+	/usr/local/include/TU/cuda/iterator.h USBNode_.h
+IIDCCameraArray.o: TU/IIDCCameraArray.h TU/IIDC++.h \
+	/usr/local/include/TU/Image++.h /usr/local/include/TU/pair.h \
+	/usr/local/include/TU/type_traits.h /usr/local/include/TU/Manip.h \
+	/usr/local/include/TU/Camera++.h /usr/local/include/TU/Geometry++.h \
+	/usr/local/include/TU/Minimize.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/range.h \
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
+	/usr/local/include/TU/algorithm.h /usr/local/include/TU/cuda/tuple.h \
+	/usr/local/include/TU/cuda/iterator.h /usr/local/include/TU/io.h
 IIDCNode.o: TU/IIDC++.h /usr/local/include/TU/Image++.h \
-	/usr/local/include/TU/pair.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/range.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
-	/usr/local/include/TU/algorithm.h
+	/usr/local/include/TU/pair.h /usr/local/include/TU/type_traits.h \
+	/usr/local/include/TU/Manip.h /usr/local/include/TU/Camera++.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Minimize.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/range.h /usr/local/include/TU/iterator.h \
+	/usr/local/include/TU/tuple.h /usr/local/include/TU/algorithm.h \
+	/usr/local/include/TU/cuda/tuple.h \
+	/usr/local/include/TU/cuda/iterator.h
 USBNode.o: USBNode_.h TU/IIDC++.h /usr/local/include/TU/Image++.h \
-	/usr/local/include/TU/pair.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/range.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
-	/usr/local/include/TU/algorithm.h
+	/usr/local/include/TU/pair.h /usr/local/include/TU/type_traits.h \
+	/usr/local/include/TU/Manip.h /usr/local/include/TU/Camera++.h \
+	/usr/local/include/TU/Geometry++.h /usr/local/include/TU/Minimize.h \
+	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
+	/usr/local/include/TU/range.h /usr/local/include/TU/iterator.h \
+	/usr/local/include/TU/tuple.h /usr/local/include/TU/algorithm.h \
+	/usr/local/include/TU/cuda/tuple.h \
+	/usr/local/include/TU/cuda/iterator.h
