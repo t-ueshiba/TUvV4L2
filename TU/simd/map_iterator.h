@@ -402,31 +402,18 @@ namespace detail
     public:
       mapped_tag(FUNC&& func)	:_func(std::forward<FUNC>(func))	{}
 
-      FUNC	functor()	const	{ return _func; }
+      const auto&	functor()	const	{ return _func; }
 
     private:
       FUNC	_func;
   };
 }	// namespace detail
 
-template <class ARG0, class ARG1,
-	  std::enable_if_t<detail::has_stdbegin<ARG0>::value &&
-			   detail::has_stdbegin<ARG1>::value>* = nullptr>
-inline auto
-operator &(const ARG0& x, const ARG1& y)
+template <class... ARG> inline auto
+zip(const ARG&... x)
 {
-    return detail::make_mapped_args(std::make_tuple(cbegin(x), cbegin(y)),
-				    std::min(size(x), size(y)));
-}
-    
-template <class ITERS, class ARG,
-	  std::enable_if_t<detail::has_stdbegin<ARG>::value>* = nullptr>
-inline auto
-operator &(const detail::mapped_args<ITERS>& x, const ARG& y)
-{
-    return detail::make_mapped_args(std::tuple_cat(cbegin(x),
-						   std::make_tuple(cbegin(y))),
-				    std::min(size(x), size(y)));
+    return detail::make_mapped_args(std::make_tuple(std::begin(x)...),
+				    std::min({size(x)...}));
 }
     
 template <class T=void, bool MASK=false, class FUNC>

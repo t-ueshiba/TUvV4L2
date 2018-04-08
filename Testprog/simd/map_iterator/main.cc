@@ -44,7 +44,7 @@ test_single_stage()
 	   16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31});
     Array<OUT, 0, simd::allocator<OUT> >	w;
 
-    w = (x & y) | mapped<T>(std::plus<>());
+    w = zip(x, y) | mapped<T>(std::plus<>());
 
     std::copy(cbegin(w), cend(w), std::ostream_iterator<int>(std::cout, " "));
     std::cout << std::endl;
@@ -64,13 +64,13 @@ test_two_stages()
 	   16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31});
     Array<OUT, 0, simd::allocator<OUT> >	w;
 
-    w = (((x & y) | mapped<T>(std::plus<>())) & z)
+    w = zip(zip(x, y) | mapped<T>(std::plus<>()), z)
 	| mapped<OUT>(std::multiplies<>());
     
     std::copy(cbegin(w), cend(w), std::ostream_iterator<int>(std::cout, " "));
     std::cout << std::endl;
 
-    w += (x & y & z) | mapped<T>(sum());
+    w += zip(x, y, z) | mapped<T>(sum());
     
     std::copy(cbegin(w), cend(w), std::ostream_iterator<int>(std::cout, " "));
     std::cout << std::endl;

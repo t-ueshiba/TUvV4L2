@@ -1042,13 +1042,12 @@ namespace detail
 	public:
 	  template <class R_,
 		    std::enable_if_t<!is_transposed<R_>::value>* = nullptr>
-		binder2nd(OP&& op, R_&& r)
-		    :_r(std::forward<R_>(r)), _op(std::forward<OP>(op))	{}
+		binder2nd(OP op, R_&& r)
+		    :_r(std::forward<R_>(r)), _op(op)			{}
 	  template <class R_,
 		    std::enable_if_t<is_transposed<R_>::value>* = nullptr>
-		binder2nd(OP&& op, R_&& r)
-		    :_r(transpose(std::forward<R_>(r))),
-		     _op(std::forward<OP>(op))				{}
+		binder2nd(OP op, R_&& r)
+		    :_r(transpose(std::forward<R_>(r))), _op(op)	{}
 
 	  template <class T_>
 	  auto	operator ()(T_&& arg) const
@@ -1062,9 +1061,10 @@ namespace detail
       };
 
     public:
-		product_opnode(L&& l, R&& r, OP&& op)
-		    :_l(std::forward<L>(l)),
-		     _binder(std::forward<OP>(op), std::forward<R>(r))	{}
+		product_opnode(L&& l, R&& r, OP op)
+		    :_l(std::forward<L>(l)), _binder(op, std::forward<R>(r))
+		{
+		}
 
       constexpr static auto
 		size0()
@@ -1099,10 +1099,10 @@ namespace detail
   };
 
   template <class OP, class L, class R> inline auto
-  make_product_opnode(L&& l, R&& r, OP&& op)
+  make_product_opnode(L&& l, R&& r, OP op)
   {
       return product_opnode<OP, L, R>(std::forward<L>(l),
-				      std::forward<R>(r), std::forward<OP>(op));
+				      std::forward<R>(r), op);
   }
 
   template <class L, class R>

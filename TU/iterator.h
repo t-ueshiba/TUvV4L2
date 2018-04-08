@@ -387,11 +387,12 @@ class map_iterator
     using	typename super::reference;
 	
   public:
-		map_iterator(const FUNC& func, const ITER&... iter)
-		    :super(std::make_tuple(iter...)), _func(func)
+		map_iterator(FUNC&& func,
+			     const std::tuple<ITER...>& iter_tuple)
+		    :super(iter_tuple), _func(std::forward<FUNC>(func))
 		{
 		}
-    FUNC	functor() const
+    const auto&	functor() const
 		{
 		    return _func;
 		}
@@ -407,9 +408,15 @@ class map_iterator
 };
 
 template <class FUNC, class... ITER> inline map_iterator<FUNC, ITER...>
-make_map_iterator(const FUNC& func, const ITER&... iter)
+make_map_iterator(FUNC&& func, const ITER&... iter)
 {
-    return {func, iter...};
+    return {std::forward<FUNC>(func), std::make_tuple(iter...)};
+}
+    
+template <class FUNC, class... ITER> inline map_iterator<FUNC, ITER...>
+make_map_iterator(FUNC&& func, const std::tuple<ITER...>& iter_tuple)
+{
+    return {std::forward<FUNC>(func), iter_tuple};
 }
     
 /************************************************************************

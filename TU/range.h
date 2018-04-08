@@ -1175,9 +1175,9 @@ namespace detail
   using is_opnode = std::is_convertible<E, opnode>;
     
   /**********************************************************************
-  *  class unary_opnode<OP, E>						*
+  *  class generic_opnode<OP, E...>					*
   **********************************************************************/
-  //! 配列式に対する単項演算子を表すクラス
+  //! 配列式に対する演算子を表すクラス
   /*!
     与えられた配列式が一時オブジェクトの場合は，その内容を本クラスオブジェクト
     内に保持した実体にmoveする．そうでない場合は，それへの参照を本クラスオブ
@@ -1185,30 +1185,38 @@ namespace detail
     \param OP	各成分に適用される単項演算子の型
     \param E	単項演算子の引数となる式または式への参照の型
   */
-  template <class OP, class E>
-  class unary_opnode : public opnode
+  template <class OP, class... E>
+  class generic_opnode : public opnode
   {
     public:
-		unary_opnode(E&& expr, OP&& op)
-		    :_expr(std::forward<E>(expr)),
-		     _op(std::forward<OP>(op))				{}
+		generic_opnode(OP&& op, E&&... expr)
+		    :_op(std::forward<OP>(op)), _expr(std::forward<E>(expr)...)
+		{}
 
       constexpr static auto
 		size0()
 		{
-		    return TU::size0<E>();
+		    return max<TU::size0<E>()...>::value;
 		}
       auto	begin()	const
 		{
-		    return make_map_iterator(_op, std::cbegin(_expr));
+		    return make_map_iterator(
+				_op,
+				tuple_transform(
+				    [](auto&& x){ return std::cbegin(x); },
+				    _expr));
 		}
       auto	end() const
 		{
-		    return make_map_iterator(_op, std::cend(_expr));
+		    return make_map_iterator(
+				_op,
+				tuple_transform(
+				    [](auto&& x){ return std::cend(x); },
+				    _expr));
 		}
       auto	size() const
 		{
-		    return TU::size(_expr);
+		    return TU::size(std::get<0>(_expr));
 		}
       decltype(auto)
 		operator [](size_t i) const
@@ -1218,76 +1226,17 @@ namespace detail
 		}
       
     private:
-      const E	_expr;
-      const OP	_op;
+      const OP			_op;
+      const std::tuple<E...>	_expr;
   };
     
-  template <class OP, class E> inline auto
-  make_unary_opnode(E&& expr, OP&& op)
+  template <class OP, class... E> inline auto
+  make_generic_opnode(OP&& op, E&&... expr)
   {
     // exprの実引数がX&&型(X型の一時オブジェクト)ならば E = X,
     // そうでなければ E = X& または E = const X& となる．
-      return unary_opnode<OP, E>(std::forward<E>(expr), std::forward<OP>(op));
-  }
-
-  /**********************************************************************
-  *  class binary_opnode<OP, L, R>					*
-  **********************************************************************/
-  //! 配列式に対する2項演算子を表すクラス
-  /*!
-    与えられた配列式が一時オブジェクトの場合は，その内容を本クラスオブジェクト
-    内に保持した実体にmoveする．そうでない場合は，それへの参照を本クラスオブ
-    ジェクト内に保持する．
-    \param OP	各成分に適用される2項演算子の型
-    \param L	2項演算子の第1引数となる式または式への参照の型
-    \param R	2項演算子の第2引数となる式または式への参照の型
-  */
-  template <class OP, class L, class R>
-  struct binary_opnode : public opnode
-  {
-    public:
-		binary_opnode(L&& l, R&& r, OP&& op)
-		    :_l(std::forward<L>(l)), _r(std::forward<R>(r)),
-		     _op(std::forward<OP>(op))
-		{
-		    assert(TU::size(_l) == TU::size(_r));
-		}
-
-      constexpr static auto
-		size0()
-	  	{
-		    return max<TU::size0<L>(), TU::size0<R>()>::value;
-		}
-      auto	begin()	const
-		{
-		    return make_map_iterator(_op,
-					     std::cbegin(_l), std::cbegin(_r));
-		}
-      auto	end() const
-		{
-		    return make_map_iterator(_op, std::cend(_l), std::cend(_r));
-		}
-      auto	size()	const	{ return TU::size(_l); }
-      decltype(auto)
-		operator [](size_t i) const
-		{
-		    assert(i < size());
-		    return *(begin() + i);
-		}
-
-    private:
-      const L	_l;
-      const R	_r;
-      const OP	_op;
-  };
-    
-  template <class OP, class L, class R> inline auto
-  make_binary_opnode(L&& l, R&& r, OP&& op)
-  {
-    // l(r)の実引数がX&&型(Y&&型)ならば L = X (R = Y), そうでなければ
-    // L = X& (R = Y&) または L = const X& (R = const Y&) となる．
-      return binary_opnode<OP, L, R>(std::forward<L>(l),
-				     std::forward<R>(r), std::forward<OP>(op));
+      return generic_opnode<OP, E...>(std::forward<OP>(op),
+				      std::forward<E>(expr)...);
   }
 
 }	// namespace detail
@@ -1300,9 +1249,9 @@ namespace detail
 template <class E, std::enable_if_t<rank<E>() != 0>* = nullptr> inline auto
 operator -(E&& expr)
 {
-    return detail::make_unary_opnode(std::forward<E>(expr),
-				     [](auto&& x)
-				     { return -std::forward<decltype(x)>(x); });
+    return detail::make_generic_opnode(
+		[](auto&& x){ return -std::forward<decltype(x)>(x); },
+		std::forward<E>(expr));
 }
 
 //! 与えられた式の各要素に定数を掛ける.
@@ -1314,9 +1263,9 @@ operator -(E&& expr)
 template <class E, std::enable_if_t<rank<E>() != 0>* = nullptr> inline auto
 operator *(E&& expr, element_t<E> c)
 {
-    return detail::make_unary_opnode(
-		std::forward<E>(expr),
-		[c](auto&& x){ return std::forward<decltype(x)>(x)*c; });
+    return detail::make_generic_opnode(
+		[c](auto&& x){ return std::forward<decltype(x)>(x)*c; },
+		std::forward<E>(expr));
 }
 
 //! 与えられた式の各要素に定数を掛ける.
@@ -1328,9 +1277,9 @@ operator *(E&& expr, element_t<E> c)
 template <class E, std::enable_if_t<rank<E>() != 0>* = nullptr> inline auto
 operator *(element_t<E> c, E&& expr)
 {
-    return detail::make_unary_opnode(
-		std::forward<E>(expr),
-		[c](auto&& x){ return c*std::forward<decltype(x)>(x); });
+    return detail::make_generic_opnode(
+		[c](auto&& x){ return c*std::forward<decltype(x)>(x); },
+		std::forward<E>(expr));
 }
 
 //! 与えられた式の各要素を定数で割る.
@@ -1342,9 +1291,9 @@ operator *(element_t<E> c, E&& expr)
 template <class E, std::enable_if_t<rank<E>() != 0>* = nullptr> inline auto
 operator /(E&& expr, element_t<E> c)
 {
-    return detail::make_unary_opnode(
-		std::forward<E>(expr),
-		[c](auto&& x){ return std::forward<decltype(x)>(x)/c; });
+    return detail::make_generic_opnode(
+		[c](auto&& x){ return std::forward<decltype(x)>(x)/c; },
+		std::forward<E>(expr));
 }
 
 //! 与えられた式の各要素に定数を掛ける.
@@ -1390,10 +1339,10 @@ template <class L, class R,
 inline auto
 operator +(L&& l, R&& r)
 {
-    return detail::make_binary_opnode(std::forward<L>(l), std::forward<R>(r),
-				      [](auto&& x, auto&& y)
-				      { return std::forward<decltype(x)>(x)
-					     + std::forward<decltype(y)>(y); });
+    return detail::make_generic_opnode(
+		[](auto&& x, auto&& y){ return std::forward<decltype(x)>(x)
+					     + std::forward<decltype(y)>(y); },
+		std::forward<L>(l), std::forward<R>(r));
 }
 
 //! 与えられた2つの式の各要素の差をとる.
@@ -1407,10 +1356,10 @@ template <class L, class R,
 inline auto
 operator -(L&& l, R&& r)
 {
-    return detail::make_binary_opnode(std::forward<L>(l), std::forward<R>(r),
-				      [](auto&& x, auto&& y)
-				      { return std::forward<decltype(x)>(x)
-					     - std::forward<decltype(y)>(y); });
+    return detail::make_generic_opnode(
+		[](auto&& x, auto&& y){ return std::forward<decltype(x)>(x)
+					     - std::forward<decltype(y)>(y); },
+		std::forward<L>(l), std::forward<R>(r));
 }
 
 //! 与えられた左辺の式の各要素に右辺の式の各要素を加える.
