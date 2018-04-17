@@ -1182,8 +1182,8 @@ namespace detail
     与えられた配列式が一時オブジェクトの場合は，その内容を本クラスオブジェクト
     内に保持した実体にmoveする．そうでない場合は，それへの参照を本クラスオブ
     ジェクト内に保持する．
-    \param OP	各成分に適用される単項演算子の型
-    \param E	単項演算子の引数となる式または式への参照の型
+    \param OP	各成分に適用される演算子の型
+    \param E	演算子の引数となる式または式への参照の型
   */
   template <class OP, class... E>
   class generic_opnode : public opnode
