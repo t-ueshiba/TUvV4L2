@@ -85,11 +85,6 @@ set(headers
 
 add_library(TUv++ SHARED ${sources})
 
-set(serial "1.0.0")
-set(soserial "1")
-set_target_properties(TUv++	PROPERTIES
-		      VERSION	${serial}
-		      SOVERSION ${soserial})
 target_link_libraries(
     TUv++
     TUTools++
