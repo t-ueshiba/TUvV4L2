@@ -1,18 +1,18 @@
-#
-#
-#
 cmake_minimum_required(VERSION 2.4)
+project(TUv++)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
-
+set(CMAKE_MODULE_PATH		${PROJECT_SOURCE_DIR}/cmake_modules)
 find_package(X11 REQUIRED)
-#find_package(X11_Xaw3d REQUIRED)
+find_package(X11_Xaw3d REQUIRED)
 
-include_directories(
-    .
-    ../TUTools++
-    ${X11_INCLUDE_DIRS}
-    ${Xaw3d_INCLUDE_DIRS})
+set(CMAKE_CXX_FLAGS		"${CMAKE_CXX_FLAGS} -msse4 -std=c++14")
+set(CMAKE_CXX_FLAGS_RELEASE	"-Wall -O3")
+set(CMAKE_CXX_FLAGS_DEBUG	"-g")
+set(CMAKE_BUILD_TYPE		Release)
+
+add_definitions(-DNDEBUG -DSSE4)
+
+include_directories(. ${X11_INCLUDE_DIRS} ${Xaw3d_INCLUDE_DIRS})
 
 set(sources
     App.cc
