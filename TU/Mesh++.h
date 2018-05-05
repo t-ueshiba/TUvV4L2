@@ -9,7 +9,11 @@
 #include <list>
 #include <vector>
 #include <map>
+#include <cstdint>
+#include <string>
+#include <limits>
 #include "TU/Geometry++.h"
+#include "TU/Manip.h"
 
 namespace TU
 {
@@ -33,10 +37,7 @@ class Mesh
     typedef typename std::list<F>::iterator		fiterator;
     typedef typename std::list<F>::const_iterator	const_fiterator;
 
-    enum
-    {
-	NSides = M			//!< 1つの面が持つ辺の数
-    };
+    constexpr static size_t	NSides = M;	//!< 1つの面が持つ辺の数
 
     class Edge;
     
@@ -58,10 +59,21 @@ class Mesh
 	
       private:
 	fiterator	self()					const	;
-
+	
       private:
 	viterator	_v[NSides];	//!< この面の頂点を指す反復子
 	fiterator	_f[NSides];	//!< この面に隣接する面を指す反復子
+
+	friend std::ostream&
+			operator <<(std::ostream& out, const Face& f)
+			{
+			    out << "Face[" << &f << "]:" << std::endl;
+			    for (size_t e = 0; e < NSides; ++e)
+				out << '\t' << &(*f._v[e])
+				    << ':' << *f._v[e];
+			    return out;
+			}
+	
 #ifdef TU_MESH_DEBUG
       public:
 	const size_t	fnum;
@@ -109,27 +121,31 @@ class Mesh
     };
 
   private:
-    struct Compare
+    class Compare
     {
-	typedef viterator	first_argument_type;
-	typedef viterator	second_argument_type;
-	typedef bool		result_type;
+      private:
+	template <class T>
+	static bool	less(T x, T y)
+			{
+			    return y - x > std::numeric_limits<T>::epsilon();
+			}
 
-	bool	operator ()(viterator v, viterator w) const
-		{
-		    if ((*v)[2] < (*w)[2])
-			return true;
-		    else if ((*v)[2] > (*w)[2])
-			return false;
-		    else if ((*v)[1] < (*w)[1])
-			return true;
-		    else if ((*v)[1] > (*w)[1])
-			return false;
-		    else if ((*v)[0] < (*w)[0])
-			return true;
-		    else
-			return false;
-		}
+      public:
+	bool		operator ()(viterator v, viterator w) const
+			{
+			    if (less((*v)[2], (*w)[2]))
+				return true;
+			    else if (less((*w)[2], (*v)[2]))
+				return false;
+			    else if (less((*v)[1], (*w)[1]))
+				return true;
+			    else if (less((*w)[1], (*v)[1]))
+				return false;
+			    else if (less((*v)[0], (*w)[0]))
+				return true;
+			    else
+				return false;
+			}
     };
     
   public:
@@ -154,7 +170,8 @@ class Mesh
     std::ostream&	showTopology(std::ostream& out)		const	;
 #endif
     std::istream&	restoreSTL(std::istream& in)			;
-    std::ostream&	saveSTL(std::ostream& out)		const	;
+    std::ostream&	saveSTL(std::ostream& out,
+				bool binary=false)		const	;
     
   private:
     std::istream&	get(std::istream& in)				;
@@ -487,7 +504,7 @@ Mesh<V, F, M>::fend() const
 template <class V, class F, size_t M> std::ostream&
 Mesh<V, F, M>::showTopology(std::ostream& out) const
 {
-    for (const_fiterator f = _faces.begin(); f != _faces.end(); ++f)
+    for (const_fiterator f = fbegin(); f != fend(); ++f)
     {
 	out << "Face[" << f->fnum << "]:";
 	for (size_t e = 0; e < NSides; ++e)
@@ -507,56 +524,104 @@ Mesh<V, F, M>::showTopology(std::ostream& out) const
 template <class V, class F, size_t M> std::istream&
 Mesh<V, F, M>::restoreSTL(std::istream& in)
 {
-    using namespace	std;
-
-    typedef vector<fiterator>				Faces;
-    typedef map<viterator, Faces, Compare>		VerticesWithFaces;
+    typedef std::vector<fiterator>			Faces;
+    typedef std::map<viterator, Faces, Compare>		VerticesWithFaces;
     typedef typename VerticesWithFaces::iterator	VertexIterator;
 
-    clear();					// 頂点と面のリストを空にする．
-    
-    char	header[80];
-    in.read(header, sizeof(header));		// ヘッダ(80文字)を読み捨てる.
-    
-    size_t	nfaces;
-    in.read((char*)&nfaces, sizeof(nfaces));	// 面数を読み込む.
+    clear();					// 頂点と面のリストを空にする
+
+    char	magic[6];
+    in.read(magic, 5);				// 先頭の5 byteを読む．
+    magic[5] = '\0';
 
     VerticesWithFaces	verticesWithFaces;
-    for (size_t i = 0; i < nfaces; ++i)
+
+    if (std::string(magic) != "solid")
     {
-	Vector3f	normal;
-	normal.restore(in);			// 法線ベクトルを読み捨てる.
+	char	header[80 - 5];
+	in.read(header, sizeof(header));  // ヘッダ(80文字)の残りを読み捨てる.
+    
+	uint32_t	nfaces;
+	in.read((char*)&nfaces, sizeof(nfaces));  // 面数を読み込む.
 
-	VertexIterator	vf[3];
-	for (size_t e = 0; e < 3; ++e)
+	for (size_t i = 0; i < nfaces; ++i)
 	{
-	    V		vertex;
-	    vertex.restore(in);			// 頂点の3D座標を読み込む.
-	    viterator	v = newVertex(vertex);
+	    Vector3f	normal;
+	    normal.restore(in);			// 法線ベクトルを読み捨てる.
 
-	    bool	isNew;
-	    std::tie(vf[e], isNew)
-		= verticesWithFaces.insert(make_pair(v, Faces()));
-	    if (!isNew)
-		deleteVertex(v);
+	    VertexIterator	vf[3];
+	    for (size_t e = 0; e < 3; ++e)
+	    {
+		V		vertex;
+		vertex.restore(in);		// 頂点の3D座標を読み込む.
+		viterator	v = newVertex(vertex);
+
+		bool	isNew;
+		std::tie(vf[e], isNew)
+		    = verticesWithFaces.insert(std::make_pair(v, Faces()));
+		if (!isNew)
+		    deleteVertex(v);
+	    }
+	    
+	    uint16_t	flags;
+	    in.read((char*)&flags, sizeof(flags));	// フラグを読み込む.
+
+	    viterator	v[] = {vf[0]->first, vf[1]->first, vf[2]->first};
+#ifndef TU_MESH_DEBUG
+	    fiterator	f = newFace(F(v));	// 新しい面を生成
+#else
+	    fiterator	f = newFace(F(v, i));	// 新しい面を生成
+#endif
+	    vf[0]->second.push_back(f);
+	    vf[1]->second.push_back(f);
+	    vf[2]->second.push_back(f);
+	}
+    }
+    else
+    {
+#ifdef TU_MESH_DEBUG
+	size_t	i = 0;
+#endif
+	for (std::string s; in >> s && s != "endsolid"; )
+	{
+	    if (s != "facet")
+		continue;
+	    
+	    Vector3f	norm;
+	    in >> s >> norm >> s >> s;	// "normal" nx ny nz "outer" "loop"
+
+	    VertexIterator	vf[3];
+	    bool		isNew[3];
+	    for (size_t e = 0; e < 3; ++e)
+	    {
+		V		vertex;
+		in >> s >> vertex;		// "vertex" x y z
+		viterator	v = newVertex(vertex);
+
+		tie(vf[e], isNew[e])
+		    = verticesWithFaces.insert(make_pair(v, Faces()));
+		if (!isNew[e])
+		    deleteVertex(v);
+	    }
+
+	    viterator	v[] = {vf[0]->first, vf[1]->first, vf[2]->first};
+#ifndef TU_MESH_DEBUG
+	    fiterator	f = newFace(F(v));	// 新しい面を生成
+#else
+	    fiterator	f = newFace(F(v, i++));	// 新しい面を生成
+#endif
+	    vf[0]->second.push_back(f);
+	    vf[1]->second.push_back(f);
+	    vf[2]->second.push_back(f);
+	    
+	    in >> s >> s;			// "endloop" "endfacet"
 	}
 
-	viterator	v[] = {vf[0]->first, vf[1]->first, vf[2]->first};
-#ifndef TU_MESH_DEBUG
-	fiterator	f = newFace(F(v));	// 新しい面を生成
-#else
-	fiterator	f = newFace(F(v, i));	// 新しい面を生成
-#endif
-	vf[0]->second.push_back(f);
-	vf[1]->second.push_back(f);
-	vf[2]->second.push_back(f);
-	
-	char	delimiter[2];
-	in.read(delimiter, sizeof(delimiter));	// デリミタを読み捨てる.
+	in >> skipl;
     }
-
-    setTopology(verticesWithFaces);		// 面と点，面と面を関係づける.
     
+    setTopology(verticesWithFaces);		// 面と点，面と面を関係づける.
+
     return in;
 }
 
@@ -566,29 +631,50 @@ Mesh<V, F, M>::restoreSTL(std::istream& in)
   \return	outで指定した出力ストリーム
 */
 template <class V, class F, size_t M> std::ostream&
-Mesh<V, F, M>::saveSTL(std::ostream& out) const
+Mesh<V, F, M>::saveSTL(std::ostream& out, bool binary) const
 {
-    char	header[80];
-    std::fill(header, header + 80, '\0');
-    out.write(header, sizeof(header));		// ヘッダ(80文字)を書き出す.
-
-    size_t	nfaces = _faces.size();
-    out.write((char*)&nfaces, sizeof(nfaces));	// 面数を書き出す.
-
-    for (const_fiterator f = fbegin(); f != fend(); ++f)
+    if (binary)
     {
-	Vector3f	coord[3];
-	coord[0] = f->v(0);
-	coord[1] = f->v(1);
-	coord[2] = f->v(2);
-	Vector3f	norm = (coord[1] - coord[0]) ^ (coord[2] - coord[0]);
-	normalize(norm);
+	char	header[80];
+	std::fill(header, header + 80, '\0');
+	out.write(header, sizeof(header));	// ヘッダ(80文字)を書き出す.
 
-	out.write((char*)&norm, sizeof(norm));
-	out.write((char*)coord, sizeof(coord));
+	uint32_t	nfaces = _faces.size();
+	out.write((char*)&nfaces, sizeof(nfaces));	// 面数を書き出す.
+	
+	for (const_fiterator f = fbegin(); f != fend(); ++f)
+	{
+	    Vector3f	coord[] = {f->v(0), f->v(1), f->v(2)};
+	    Vector3f	norm = (coord[1] - coord[0]) ^ (coord[2] - coord[0]);
+	    normalize(norm);
 
-	char	delimiter[2];
-	out.write(delimiter, sizeof(delimiter));
+	    out.write((char*)&norm, sizeof(norm));
+	    out.write((char*)coord, sizeof(coord));
+
+	    char	delimiter[2] = {0, 0};
+	    out.write(delimiter, sizeof(delimiter));
+	}
+    }
+    else
+    {
+	out << "solid TUMesh++" << std::endl;
+
+	for (const_fiterator f = fbegin(); f != fend(); ++f)
+	{
+	    Vector3f	coord[] = {f->v(0), f->v(1), f->v(2)};
+	    Vector3f	norm = (coord[1] - coord[0]) ^ (coord[2] - coord[0]);
+	    normalize(norm);
+
+	    out << "  facet normal" << norm
+		<< "    outerloop\n"
+		<< "      vertex"   << coord[0]
+		<< "      vertex"   << coord[1]
+		<< "      vertex"   << coord[2]
+		<< "    endloop\n"
+		<< "  endfacet"	    << std::endl;
+	}
+
+	out << "endsolid TUMesh++" << std::endl;
     }
     
     return out;
@@ -602,17 +688,23 @@ Mesh<V, F, M>::saveSTL(std::ostream& out) const
 template <class V, class F, size_t M> std::istream&
 Mesh<V, F, M>::get(std::istream& in)
 {
-    using namespace	std;
-    
-    typedef vector<fiterator>			Faces;
-    typedef vector<pair<viterator, Faces> >	VerticesWithFaces;
+    typedef std::vector<fiterator>			Faces;
+    typedef std::vector<std::pair<viterator, Faces> >	VerticesWithFaces;
 
+  // 最初の1文字を読む．
+    char	c;
+    if (!(in >> c))
+	return in;
+    in.putback(c);
+    
+    if (c != 'V')
+	return restoreSTL(in);
+    
   // 頂点と面のリストを空にする．
     clear();
     
   // 全ての頂点を読み込む．
     VerticesWithFaces	verticesWithFaces;
-    char		c;
     while (in >> c && c == 'V')
     {
 	char		dummy[64];
@@ -622,7 +714,7 @@ Mesh<V, F, M>::get(std::istream& in)
 	viterator	v = newVertex(vertex);	// 新しい頂点を生成
 
       // 追加した頂点への反復子を，この頂点を共有する面の空リストと一緒に登録．
-	verticesWithFaces.push_back(make_pair(v, Faces()));
+	verticesWithFaces.emplace_back(v, Faces());
     }
     in.putback(c);
 
@@ -711,9 +803,12 @@ Mesh<V, F, M>::setTopology(const VF& verticesWithFaces)
 
 	    viterator	vn = edge.next().viter();	// edgeの終点
 	    
-	  // vertexを囲む別の面f1について．．．
-	    for (FaceIterator f1 = faces.begin(); f1 != f; ++f1)
+	  // vを囲む別の面f1について．．．
+	    for (FaceIterator f1 = faces.begin(); f1 != faces.end(); ++f1)
 	    {
+		if (f1 == f)
+		    continue;
+		
 	      // f1のまわりを一周してedgeの終点vnを始点とする辺を探す．
 		Edge	edgeF0(*f1), edgeF(edgeF0);
 		do
@@ -725,18 +820,43 @@ Mesh<V, F, M>::setTopology(const VF& verticesWithFaces)
 		    }
 		} while (++edgeF != edgeF0);
 	    }
+
+	  // vを囲むfでない面の中にvnを始点とするedgeがみつからないのは矛盾
+	    std::cerr << "***\nError face: " << **f
+		      << "\nError vertex v:  " << &(*v)
+		      << "\nError vertex vn: " << &(*vn)
+		      << std::endl
+		      << std::endl;
+	    
+	    std::cerr << "Faces around v: " << &(*v) << std::endl;
+	    for (const auto& ff : vertex->second)
+		std::cerr << ' ' << *ff;
+	    std::cerr << std::endl;
+	    
+	    for (const auto& vf : verticesWithFaces)
+		if (vf.first == vn)
+		{
+		    std::cerr << "Faces around vn:" << &(*vn) << std::endl;
+		    for (const auto& ff : vf.second)
+			std::cerr << ' ' << *ff;
+		    std::cerr << std::endl;
+		}
+
+	    throw std::runtime_error("Conjugate edge not found!");
+	    
 	  done:
 	    continue;
 	}
     }
+
 #ifdef TU_MESH_DEBUG
-    showTopology(cerr);
+    showTopology(std::cerr);
 #endif
 }
 
 //! 新しい頂点を生成して頂点リストに登録する．
 /*!
- \param f	生成する頂点のプロトタイプ
+ \param v	生成する頂点のプロトタイプ
  \return	生成された頂点を指す反復子
 */
 template <class V, class F, size_t M> inline typename Mesh<V, F, M>::viterator
@@ -760,7 +880,7 @@ Mesh<V, F, M>::newFace(const F& f)
     
 //! 指定された頂点を破壊して頂点リストから取り除く．
 /*!
- \param f	破壊する頂点を指す反復子
+ \param v	破壊する頂点を指す反復子
 */
 template <class V, class F, size_t M> inline void
 Mesh<V, F, M>::deleteVertex(viterator v)
@@ -777,7 +897,7 @@ Mesh<V, F, M>::deleteFace(fiterator f)
 {
     _faces.erase(f);
 }
-    
+
 /************************************************************************
 *  class Mesh<V, F, M>::Face						*
 ************************************************************************/
@@ -826,8 +946,6 @@ Mesh<V, F, M>::Face::f(size_t e) const
 template <class V, class F, size_t M> typename Mesh<V, F, M>::fiterator
 Mesh<V, F, M>::Face::self() const
 {
-    using namespace	std;
-    
     fiterator	fC = _f[0];		// 0番目の辺を介して隣接する面
     for (size_t e = 0; e < NSides; ++e)
     {					// fCのe番目の辺を
@@ -836,11 +954,11 @@ Mesh<V, F, M>::Face::self() const
 	    return f;			// fがこの面への反復子である．
     }
 
-    throw runtime_error("TU::Mesh<V, F, M>::Face::self(): Internal error!");
+    throw std::runtime_error("TU::Mesh<V, F, M>::Face::self(): Internal error!");
 
     return fC;
 }
-
+    
 /************************************************************************
 *  class Mesh<V, F, M>::Edge						*
 ************************************************************************/
@@ -850,7 +968,7 @@ Mesh<V, F, M>::Face::self() const
 */
 template <class V, class F, size_t M> inline
 Mesh<V, F, M>::Edge::Edge(const Face& face)
-    :_f(face.self()), _e(0)
+    :Edge(face.self())
 {
 }
 
