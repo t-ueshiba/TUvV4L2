@@ -24,7 +24,10 @@ set(sources
   io.cc
   manipulators.cc)
 
-add_library(TUTools++ SHARED ${sources})
+set(headers
+	TU/*.h TU/simd/*.h TU/simd/x86/*.h)
+
+add_library(TUTools++ SHARED ${sources} ${headers})
 
 install(TARGETS TUTools++ LIBRARY DESTINATION lib)
 

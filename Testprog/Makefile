@@ -10,11 +10,13 @@ SUBDIR	= BandMatrix		\
 	  ICIA			\
 	  IIRFilter		\
 	  List			\
+	  Mesh			\
 	  NDTree		\
 	  Quantizer		\
 	  Serial		\
 	  Sparse		\
 	  Spline		\
+	  SURF			\
 	  TreeFilter		\
 	  Vector		\
 	  WeightedMedianFilter	\

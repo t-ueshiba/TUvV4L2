@@ -801,9 +801,7 @@ Projectivity<T, DO, DI>::fit(ITER_ begin, ITER_ end, bool refine)
 template <class T, size_t DO, size_t DI> inline Projectivity<T, DO, DI>
 Projectivity<T, DO, DI>::inverse() const
 {
-    Projectivity	inv;
-    inv.set(TU::inverse(*this));
-    return inv;
+    return TU::inverse(*this);
 }
     
 //! この射影変換のパラメータ数を返す．
@@ -1113,7 +1111,7 @@ class Affinity : public Projectivity<T, DO, DI>
 			Affinity(const E_& expr)
 			    :base_type(expr)
 			{
-			    fill((*this)[outDim()], 0);
+			    (*this)[outDim()] = 0;
 			    (*this)[outDim()][inDim()] = 1;
 			}
     
@@ -1253,9 +1251,7 @@ Affinity<T, DO, DI>::ndataMin() const
 template <class T, size_t DO, size_t DI> inline Affinity<T, DO, DI>
 Affinity<T, DO, DI>::inverse() const
 {
-    Affinity	inv;
-    inv.set(TU::inverse(*this));
-    return inv;
+    return TU::inverse(*this);
 }
     
 template <class T, size_t DO, size_t DI>
@@ -1371,20 +1367,21 @@ class Rigidity : public Affinity<T, D, D>
   */
     template <class E_, std::enable_if_t<rank<E_>() == 2>* = nullptr>
 			Rigidity(const E_& expr)
+			    :base_type(expr)
 			{
-			    set(expr);
 			}
 
   //! 変換行列を指定する．
   /*!
     \param T	(d+1) x (d+1) 行列(dは入力/出力空間の次元)
   */
-    template <class E_> std::enable_if_t<rank<E_>() == 2>
-			set(const E_& expr)
+    template <class E_> std::enable_if_t<rank<E_>() == 2, Rigidity&>
+			operator =(const E_& expr)
 			{
 			    if (TU::size<0>(expr) != TU::size<1>(expr))
 				throw std::invalid_argument("Rigidity::set(): non-square matrix!!");
-			    base_type::set(expr);
+			    base_type::operator =(expr);
+			    return *this;
 			}
 
     using		base_type::inDim;
