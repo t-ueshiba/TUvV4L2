@@ -796,7 +796,7 @@ MyCmdWindow<STEREO, CAMERAS, PIXEL, DISP>::tick()
     countTime();
 
     if (_sync)
-	syncedSnap(_cameras);
+	syncedSnap(_cameras, std::chrono::milliseconds(1));
     else
 	for (auto& camera : _cameras)
 	    camera.snap();
