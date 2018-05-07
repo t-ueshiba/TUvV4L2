@@ -1222,13 +1222,12 @@ namespace detail
       const std::tuple<E...>	_expr;
   };
     
-  template <class OP, class... E> inline auto
+  template <class OP, class... E> inline generic_opnode<OP, E...>
   make_generic_opnode(OP&& op, E&&... expr)
   {
     // exprの実引数がX&&型(X型の一時オブジェクト)ならば E = X,
     // そうでなければ E = X& または E = const X& となる．
-      return generic_opnode<OP, E...>(std::forward<OP>(op),
-				      std::forward<E>(expr)...);
+      return {std::forward<OP>(op), std::forward<E>(expr)...};
   }
 
 }	// namespace detail
