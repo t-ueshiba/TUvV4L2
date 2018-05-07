@@ -363,21 +363,24 @@ size(const std::tuple<T...>& t)
 }
 
 /************************************************************************
-*  map_iterator<FUNC, ITER...>						*
+*  map_iterator<FUNC, ITER>						*
 ************************************************************************/
-template <class FUNC, class... ITER>
+template <class FUNC, class ITER>
 class map_iterator
-    : public boost::iterator_adaptor<
-	map_iterator<FUNC, ITER...>,
-	zip_iterator<std::tuple<ITER...> >,
-	std::decay_t<std::result_of_t<FUNC(iterator_reference<ITER>...)> >,
+    : public boost::iterator_adaptor<map_iterator<FUNC, ITER>,
+	ITER,
+	std::decay_t<
+	    decltype(apply(std::declval<FUNC>(),
+			   std::declval<iterator_reference<ITER> >()))>,
 	boost::use_default,
-	std::result_of_t<FUNC(iterator_reference<ITER>...)> >
+	decltype(apply(std::declval<FUNC>(),
+		       std::declval<iterator_reference<ITER> >()))>
 {
   private:
-    using ref	= std::result_of_t<FUNC(iterator_reference<ITER>...)>;
+    using ref	= decltype(apply(std::declval<FUNC>(),
+				 std::declval<iterator_reference<ITER> >()));
     using super	= boost::iterator_adaptor<map_iterator,
-					  zip_iterator<std::tuple<ITER...> >,
+					  ITER,
 					  std::decay_t<ref>,
 					  boost::use_default,
 					  ref>;
@@ -387,41 +390,31 @@ class map_iterator
     using	typename super::reference;
 	
   public:
-		map_iterator(FUNC&& func, const ITER&... iter)
-		    :super(std::make_tuple(iter...)),
-		     _func(std::forward<FUNC>(func))
-		{
-		}
-		map_iterator(FUNC&& func,
-			     const std::tuple<ITER...>& iter_tuple)
-		    :super(iter_tuple), _func(std::forward<FUNC>(func))
-		{
-		}
-    const auto&	functor() const
-		{
-		    return _func;
-		}
+		map_iterator(FUNC&& func, const ITER& iter)
+		    :super(iter), _func(std::forward<FUNC>(func))	{}
+
+    const auto&	functor()	const	{ return _func; }
 	
   private:
-    reference	dereference() const
-		{
-		    return apply(_func, *super::base());
-		}
+    reference	dereference()	const	{ return apply(_func, *super::base()); }
 	
   private:
     FUNC	_func;	//!< 演算子
 };
 
-template <class FUNC, class... ITER> inline map_iterator<FUNC, ITER...>
-make_map_iterator(FUNC&& func, const ITER&... iter)
+template <class FUNC, class ITER> inline map_iterator<FUNC, ITER>
+make_map_iterator(FUNC&& func, const ITER& iter)
 {
-    return {std::forward<FUNC>(func), iter...};
+    return {std::forward<FUNC>(func), iter};
 }
     
-template <class FUNC, class... ITER> inline map_iterator<FUNC, ITER...>
-make_map_iterator(FUNC&& func, const std::tuple<ITER...>& iter_tuple)
+template <class FUNC, class ITER0, class ITER1, class... ITERS>
+inline map_iterator<FUNC, zip_iterator<std::tuple<ITER0, ITER1, ITERS...> > >
+make_map_iterator(FUNC&& func,
+		  const ITER0& iter0, const ITER1& iter1, const ITERS&... iters)
 {
-    return {std::forward<FUNC>(func), iter_tuple};
+    return {std::forward<FUNC>(func),
+	    make_zip_iterator(iter0, iter1, iters...)};
 }
     
 /************************************************************************
@@ -584,8 +577,8 @@ class assignment_iterator
     using	typename super::reference;
     
   public:
-    assignment_iterator(const FUNC& func, const ITER& iter)
-	:super(iter), _func(func)	{}
+		assignment_iterator(FUNC&& func, const ITER& iter)
+		    :super(iter), _func(std::forward<FUNC>(func))	{}
 
     const auto&	functor()	const	{ return _func; }
 
@@ -597,18 +590,19 @@ class assignment_iterator
 };
     
 template <class FUNC, class ITER> inline assignment_iterator<FUNC, ITER>
-make_assignment_iterator(const FUNC& func, const ITER& iter)
+make_assignment_iterator(FUNC&& func, const ITER& iter)
 {
-    return {func, iter};
+    return {std::forward<FUNC>(func), iter};
 }
 
-template <class FUNC, class... ITERS>
-inline std::enable_if_t<(sizeof...(ITERS) > 1),
-			assignment_iterator<
-			    FUNC, zip_iterator<std::tuple<ITERS...> > > >
-make_assignment_iterator(const FUNC& func, const ITERS&... iters)
+template <class FUNC, class ITER0, class ITER1, class... ITERS>
+inline assignment_iterator<FUNC,
+			   zip_iterator<std::tuple<ITER0, ITER1, ITERS...> > >
+make_assignment_iterator(FUNC&& func, const ITER0& iter0,
+			 const ITER1& iter1, const ITERS&... iters)
 {
-    return {func, make_zip_iterator(iters...)};
+    return {std::forward<FUNC>(func),
+	    make_zip_iterator(iter0, iter1, iters...)};
 }
 
 /************************************************************************

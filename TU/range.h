@@ -1200,23 +1200,15 @@ namespace detail
 		}
       auto	begin()	const
 		{
-		    return make_map_iterator(
-				_op,
-				tuple_transform(
-				    [](auto&& x){ return std::cbegin(x); },
-				    _expr));
+		    return make_map_iterator(_op, cbegin(_expr));
 		}
       auto	end() const
 		{
-		    return make_map_iterator(
-				_op,
-				tuple_transform(
-				    [](auto&& x){ return std::cend(x); },
-				    _expr));
+		    return make_map_iterator(_op, cend(_expr));
 		}
       auto	size() const
 		{
-		    return TU::size(std::get<0>(_expr));
+		    return TU::size(_expr);
 		}
       decltype(auto)
 		operator [](size_t i) const
