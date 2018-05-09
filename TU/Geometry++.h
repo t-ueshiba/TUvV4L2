@@ -301,6 +301,7 @@ Normalize<S, D>::insert(ITER_ begin, ITER_ end)
 	    throw std::invalid_argument("Normalize::insert(): 0-length input data!!");
 	_centroid.resize(begin->size());	// 点の次元を設定
     }
+    
     _scale = _npoints*(spaceDim()*_scale*_scale + _centroid*_centroid);
     _centroid *= _npoints;
     for (; begin != end; ++begin)
@@ -312,7 +313,12 @@ Normalize<S, D>::insert(ITER_ begin, ITER_ end)
     if (_npoints == 0)
 	throw std::invalid_argument("Normalize::insert(): no input data accumulated!!");
     _centroid /= _npoints;
-    _scale = sqrt((_scale/_npoints - _centroid*_centroid)/spaceDim());
+    _scale = _scale/_npoints - _centroid*_centroid;
+
+    if (_scale < 0)
+	throw std::invalid_argument("Normalize::insert(): negative square scale!!");
+	
+    _scale = sqrt(_scale/spaceDim());
 }
 
 //! 正規化変換行列を返す．
@@ -594,7 +600,7 @@ class Projectivity : public std::conditional_t<(DO==0 || DI==0),
 						     Array2<T, DO+1, DI+1> >;
     using			typename base_type::element_type;
     using point_type		= Array<element_type, DO>;
-    using ppoint_type		= Array<element_type, DI1>;
+    using ppoint_type		= Array<element_type, DO1>;
     using vector_type		= Array<element_type>;
     using derivative_type	= Array2<element_type, DO, NPARAMS>;
     using derivative0_type	= Array2<element_type, DO, DOF>;
@@ -643,7 +649,8 @@ class Projectivity : public std::conditional_t<(DO==0 || DI==0),
     Projectivity	inverse()				 const	;
     template <class T_, size_t D_>
     point_type		operator ()(const Array<T_, D_>& x)	 const	;
-    std::enable_if_t<DO == 2 && DI == 2, point_type>
+    template <size_t DO_=DO, size_t DI_=DI>
+    std::enable_if_t<DO_ == 2 && DI_ == 2, point_type>
 			operator ()(element_type u,
 				    element_type v)		 const	;
     template <class T_, size_t D_>
@@ -657,7 +664,8 @@ class Projectivity : public std::conditional_t<(DO==0 || DI==0),
     jacobian_type	jacobian(const Array<T_, D_>& x)	 const	;
     template <class T_, size_t D_>
     derivative_type	derivative(const Array<T_, D_>& x)	 const	;
-    static std::enable_if_t<DO == 2 && DI == 2, derivative0_type>
+    template <size_t DO_=DO, size_t DI_=DI>
+    static std::enable_if_t<DO_ == 2 && DI_ == 2, derivative0_type>
 			derivative0(element_type u, element_type v)
 			{
 			    constexpr element_type	_0 = 0;
@@ -667,7 +675,8 @@ class Projectivity : public std::conditional_t<(DO==0 || DI==0),
 				    {_0, _0, _0,  u,  v, _1, -u*v, -v*v}};
 			}
     void		update(const Array<element_type, NPARAMS>& dt)	;
-    std::enable_if_t<DO == 2 && DI == 2>
+    template <size_t DO_=DO, size_t DI_=DI>
+    std::enable_if_t<DO_ == 2 && DI_ == 2>
 			compose(const Array<element_type, DOF>& dt)	;
     template <class ITER_>
     element_type	rmsError(ITER_ begin, ITER_ end)	 const	;
@@ -843,8 +852,8 @@ Projectivity<T, DO, DI>::operator ()(const Array<T_, D_>& x) const -> point_type
 	return inhomogeneous(*this * x);
 }
 
-template <class T, size_t DO, size_t DI>
-inline std::enable_if_t<DO == 2 && DI == 2,
+template <class T, size_t DO, size_t DI> template <size_t DO_, size_t DI_>
+inline std::enable_if_t<DO_ == 2 && DI_ == 2,
 			typename Projectivity<T, DO, DI>::point_type>
 Projectivity<T, DO, DI>::operator ()(element_type u, element_type v) const
 {
@@ -925,7 +934,7 @@ template <class T, size_t DO, size_t DI> template <class T_, size_t D_> auto
 Projectivity<T, DO, DI>::derivative(const Array<T_, D_>& x) const
     -> derivative_type
 {
-    ppoint_type	xP;
+    Array<T, DI1>	xP;
     if (x.size() == inDim())
 	xP = homogeneous(x);
     else
@@ -955,8 +964,8 @@ Projectivity<T, DO, DI>::update(const Array<element_type, NPARAMS>& dt)
     t *= (norm / length(t));	// 修正の前後で射影変換行列のノルムは不変
 }
 
-template <class T, size_t DO, size_t DI>
-inline std::enable_if_t<DO == 2 && DI == 2>
+template <class T, size_t DO, size_t DI> template <size_t DO_, size_t DI_>
+inline std::enable_if_t<DO_ == 2 && DI_ == 2>
 Projectivity<T, DO, DI>::compose(const Array<element_type, DOF>& dt)
 {
     auto	t0 = (*this)[0][0];
@@ -1139,12 +1148,14 @@ class Affinity : public Projectivity<T, DO, DI>
     size_t		nparams()				const	;
     size_t		ndataMin()				const	;
     Affinity		inverse()				const	;
-    std::enable_if_t<DO == 2 && DI == 2, point_type>
+    template <size_t DO_=DO, size_t DI_=DI>
+    std::enable_if_t<DO_ == 2 && DI_ == 2, point_type>
 			operator ()(element_type u,
 				    element_type v)		const	;
     template <class T_, size_t D_>
     derivative_type	derivative(const Array<T_, D_>& x)	const	;
-    static std::enable_if_t<DO == 2 && DI == 2, derivative0_type>
+    template <size_t DO_=DO, size_t DI_=DI>
+    static std::enable_if_t<DO_ == 2 && DI_ == 2, derivative0_type>
 			derivative0(element_type u, element_type v)
 			{
 			    constexpr element_type	_0 = 0;
@@ -1154,7 +1165,8 @@ class Affinity : public Projectivity<T, DO, DI>
 				    {_0, _0, _0,  u,  v, _1}};
 			}
     void		update(const Array<element_type, NPARAMS>& dt)	;
-    std::enable_if_t<DO == 2 && DI == 2>
+    template <size_t DO_=DO, size_t DI_=DI>
+    std::enable_if_t<DO_ == 2 && DI_ == 2>
 			compose(const Array<element_type, DOF>& dt)	;
     
   //! このアフィン変換の変形部分を表現する行列を返す．
@@ -1254,8 +1266,8 @@ Affinity<T, DO, DI>::inverse() const
     return TU::inverse(*this);
 }
     
-template <class T, size_t DO, size_t DI>
-inline std::enable_if_t<DO == 2 && DI == 2,
+template <class T, size_t DO, size_t DI> template <size_t DO_, size_t DI_>
+inline std::enable_if_t<DO_ == 2 && DI_ == 2,
 			typename Affinity<T, DO, DI>::point_type>
 Affinity<T, DO, DI>::operator ()(element_type u, element_type v) const
 {
@@ -1296,8 +1308,8 @@ Affinity<T, DO, DI>::update(const Array<element_type, NPARAMS>& dt)
     make_range(base_type::data(), nparams()) -= dt;
 }
 
-template <class T, size_t DO, size_t DI>
-inline std::enable_if_t<DO == 2 && DI == 2>
+template <class T, size_t DO, size_t DI> template <size_t DO_, size_t DI_>
+inline std::enable_if_t<DO_ == 2 && DI_ == 2>
 Affinity<T, DO, DI>::compose(const Array<element_type, DOF>& dt)
 {
     auto	t0 = (*this)[0][0];

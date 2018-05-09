@@ -7,7 +7,6 @@
 #define TU_ITERATOR_H
 
 #include <iterator>
-#include <functional>			// for std::function
 #include <boost/iterator/iterator_adaptor.hpp>
 #include "TU/tuple.h"
 
@@ -428,13 +427,7 @@ make_map_iterator(FUNC&& func,
 template <class ITER, class T> inline auto
 make_mbr_iterator(const ITER& iter, T iterator_value<ITER>::* mbr)
 {
-    return make_map_iterator(
-	       std::function<std::conditional_t<
-				 std::is_same<iterator_pointer<ITER>,
-					      iterator_value<ITER>*>::value,
-				 T&, const T&>(iterator_reference<ITER>)>(
-				     std::mem_fn(mbr)),
-	       iter);
+    return make_map_iterator([mbr](auto&& x){ return x.*mbr; }, iter);
 }
 
 //! std::pairへの反復子からその第1要素に直接アクセスする反復子を作る．

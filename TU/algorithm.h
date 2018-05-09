@@ -487,15 +487,16 @@ inner_product(ITER0 iter0, size_t n, ITER1 iter1, T init)
 ************************************************************************/
 namespace detail
 {
-  template <class T> inline std::enable_if_t<std::is_arithmetic<T>::value, T>
-  square(const T& val)
+  template <class T, std::enable_if_t<std::is_arithmetic<T>::value>* = nullptr>
+  inline auto
+  square(T val)
   {
       return val * val;
   }
   template <class ITER> auto
   square(ITER iter, size_t n, std::integral_constant<size_t, 0>)
   {
-      using value_type	= typename std::iterator_traits<ITER>::value_type;
+      using value_type	= decltype(square(*iter));
 
       value_type	val = 0;
       for (; n--; ++iter)
@@ -534,7 +535,8 @@ square(ITER iter, size_t n)
   \param val	数値
   \retrun	2乘値
 */ 
-template <class T> inline std::enable_if_t<std::is_arithmetic<T>::value, T>
+template <class T, std::enable_if_t<std::is_arithmetic<T>::value>* = nullptr>
+inline auto
 square(T val)
 {
     return detail::square(val);
