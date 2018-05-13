@@ -304,22 +304,26 @@ GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowR, ROW_D rowD)
 
     for (; rowL != rowLe; ++rowL)
     {
+	using	std::cbegin;
+	using	std::cend;
+	using	std::begin;
+	
 	start(1);
       // 各左画素に対して視差[0, D)の右画素のそれぞれとの間の相違度を計算し，
       // フィルタパラメータ(= 縦横両方向に積算された相違度(コスト)の総和
       // および画素毎のコストとガイド画素の積和)を初期化
 	if (rowL <= rowL0)
-	    initializeFilterParameters(std::cbegin(*rowL), std::cend(*rowL),
-				       std::cbegin(*rowR),
-				       TU::begin(buffers->Q),
-				       TU::begin(buffers->F));
+	    initializeFilterParameters(cbegin(*rowL), cend(*rowL),
+				       cbegin(*rowR),
+				       begin(buffers->Q),
+				       buffers->F.begin());
 	else
 	{
-	    updateFilterParameters(std::cbegin(*rowL), std::cend(*rowL),
-				   std::cbegin(*rowR),
-				   std::cbegin(*rowLp), std::cbegin(*rowRp),
-				   TU::begin(buffers->Q),
-				   TU::begin(buffers->F));
+	    updateFilterParameters(cbegin(*rowL), cend(*rowL),
+				   cbegin(*rowR),
+				   cbegin(*rowLp), cbegin(*rowRp),
+				   begin(buffers->Q),
+				   buffers->F.begin());
 	    ++rowLp;
 	    ++rowRp;
 	}
@@ -329,14 +333,17 @@ GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowR, ROW_D rowD)
 	    start(2);
 	  // さらにコストを横方向に積算してフィルタパラメータを計算し，
 	  // それを用いてフィルタ係数を初期化
-	    initializeFilterCoefficients(TU::cbegin(buffers->Q),
-					 TU::cend(buffers->Q),
-					 std::cbegin(buffers->F),
-					 TU::begin(*rowA));
+	    initializeFilterCoefficients(cbegin(buffers->Q),
+					 cend(buffers->Q),
+					 buffers->F.begin(),
+					 begin(*rowA));
 	    ++rowA;
 
 	    if (rowL >= rowL1)		// rowL0からN行分のフィルタ係数が
 	    {				// 計算済みならば...
+		using	std::crbegin;
+		using	std::crend;
+		
 		start(3);
 		if (rowL == rowL1)
 		    boxB.initialize(rowA - N, N);
@@ -347,8 +354,8 @@ GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowR, ROW_D rowD)
 	      // それにguide画像を適用してウィンドウコストを求め，それを
 	      // 用いてそれぞれ左/右/上画像を基準とした最適視差を計算
 	  	buffers->RminR = std::numeric_limits<Score>::max();
-		computeDisparities(TU::crbegin(B), TU::crend(B),
-				   std::crbegin(*rowG) + N - 1,
+		computeDisparities(crbegin(B), crend(B),
+				   crbegin(*rowG) + N - 1,
 				   buffers->dminL.rbegin(),
 				   buffers->delta.rbegin(),
 				   buffers->dminR.end() - D + 1,
@@ -405,6 +412,10 @@ GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 
     for (; rowL != rowLe; ++rowL)
     {
+	using	std::cbegin;
+	using	std::cend;
+	using	std::begin;
+	
 	--v;
 	--cV;
 	
@@ -413,29 +424,29 @@ GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
       // フィルタパラメータ(= 縦横両方向に積算された相違度(コスト)の総和
       // および画素毎のコストとガイド画素の積和)を初期化
 	if (rowL <= rowL0)
-	    initializeFilterParameters(std::cbegin(*rowL), std::cend(*rowL),
+	    initializeFilterParameters(cbegin(*rowL), cend(*rowL),
 				       make_zip_iterator(
 					   std::make_tuple(
-					       std::cbegin(*rowR),
+					       cbegin(*rowR),
 					       make_vertical_iterator(rowV,
 								      cV))),
-				       TU::begin(buffers->Q),
-				       TU::begin(buffers->F));
+				       begin(buffers->Q),
+				       buffers->F.begin());
 	else
 	{
-	    updateFilterParameters(std::cbegin(*rowL), std::cend(*rowL),
+	    updateFilterParameters(cbegin(*rowL), cend(*rowL),
 				   make_zip_iterator(
 				       std::make_tuple(
-					   std::cbegin(*rowR),
+					   cbegin(*rowR),
 					   make_vertical_iterator(rowV, cV))),
-				   std::cbegin(*rowLp),
+				   cbegin(*rowLp),
 				   make_zip_iterator(
 				       std::make_tuple(
-					   std::cbegin(*rowRp),
+					   cbegin(*rowRp),
 					   make_vertical_iterator(rowV,
 								  --cVp))),
-				   TU::begin(buffers->Q),
-				   TU::begin(buffers->F));
+				   begin(buffers->Q),
+				   buffers->F.begin());
 	    ++rowLp;
 	    ++rowRp;
 	}
@@ -445,14 +456,17 @@ GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 	    start(2);
 	  // さらにコストを横方向に積算してフィルタパラメータを計算し，
 	  // それを用いてフィルタ係数を初期化
-	    initializeFilterCoefficients(TU::cbegin(buffers->Q),
-					 TU::cend(buffers->Q),
-					 std::cbegin(buffers->F),
-					 TU::begin(*rowA));
+	    initializeFilterCoefficients(cbegin(buffers->Q),
+					 cend(buffers->Q),
+					 buffers->F.cbegin(),
+					 begin(*rowA));
 	    ++rowA;
 
 	    if (rowL >= rowL1)		// rowL0からN行分のフィルタ係数が
 	    {				// 計算済みならば...
+		using	std::crbegin;
+		using	std::crend;
+
 		start(3);
 	      // フィルタ係数を縦方向に積算
 		if (rowL == rowL1)
@@ -464,8 +478,8 @@ GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 	      // それにguide画像を適用してウィンドウコストを求め，それを
 	      // 用いてそれぞれ左/右/上画像を基準とした最適視差を計算
 		buffers->RminR = std::numeric_limits<Score>::max();
-		computeDisparities(TU::crbegin(B), TU::crend(B),
-				   std::crbegin(*rowG) + N - 1,
+		computeDisparities(crbegin(B), crend(B),
+				   crbegin(*rowG) + N - 1,
 				   buffers->dminL.rbegin(),
 				   buffers->delta.rbegin(),
 				   make_zip_iterator(
@@ -487,7 +501,7 @@ GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 				  buffers->dminL.cend(),
 				  buffers->dminR.cbegin(),
 				  buffers->delta.cbegin(),
-				  TU::begin(*rowD) + N - 1);
+				  begin(*rowD) + N - 1);
 	    }
 
 	    ++rowG;	// guide画像と視差画像は左画像よりもN-1行だけ遅れる
@@ -503,9 +517,11 @@ GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 	rowD = rowD0;
 	for (v = H - 2*(N - 1); v-- != 0; )
 	{
+	    using	std::begin;
+	    
 	    pruneDisparities(make_vertical_iterator(buffers->dminV.cbegin(), v),
 			     make_vertical_iterator(buffers->dminV.cend(),   v),
-			     TU::begin(*rowD) + N - 1);
+			     begin(*rowD) + N - 1);
 	    ++rowD;
 	}
     }
@@ -723,7 +739,7 @@ GFStereo<SCORE, DISP>::initializeFilterCoefficients(const_col_siterator colQ,
     for (const_col_sbox boxR(colQ, _params.windowSize), boxRe(colQe);
 	 boxR != boxRe; ++boxR)
     {
-	std::transform(TU::cbegin(*boxR), TU::cend(*boxR), begin(*colA),
+	std::transform(cbegin(*boxR), cend(*boxR), begin(*colA),
 		       init_coeffs((*boxG)[0]/n, (*boxG)[1]/n,
 				   _params.epsilon));
 	++boxG;
@@ -746,7 +762,7 @@ GFStereo<SCORE, DISP>::computeDisparities(const_reverse_col_siterator colB,
     for (const_reverse_col_sbox boxC(colB, _params.windowSize), boxCe(colBe);
 	 boxC != boxCe; ++boxC)
     {
-	std::transform(TU::cbegin(*boxC), TU::cend(*boxC),
+	std::transform(cbegin(*boxC), cend(*boxC),
 		       R.begin(), trans_guides(*colG));
 	++colG;
 

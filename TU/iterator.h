@@ -97,7 +97,6 @@ using iterator_difference = typename std::iterator_traits<ITER>
 template <class ITER>
 using iterator_category	  = typename std::iterator_traits<ITER>
 					::iterator_category;
-
 /************************************************************************
 *  class zip_iterator<ITER_TUPLE>					*
 ************************************************************************/
@@ -235,100 +234,72 @@ using decayed_iterator_value = typename detail::decayed_iterator_value<ITER>
 					      ::type;
 
 /************************************************************************
-*  TU::[begin|end|rbegin|rend](T&&), TU::size(const T&)			*
+*  TU::size(const T&), TU::[begin|end|rbegin|rend]()			*
 ************************************************************************/
-template <class T> inline auto
-begin(T&& x) -> decltype(x.begin())
-{
-    return x.begin();
-}
-
-template <class T> inline auto
-end(T&& x) -> decltype(x.end())
-{
-    return x.end();
-}
-    
-template <class T> inline auto
-rbegin(T&& x) -> decltype(x.rbegin())
-{
-    return x.rbegin();
-}
-    
-template <class T> inline auto
-rend(T&& x) -> decltype(x.rend())
-{
-    return x.rend();
-}
-
 template <class T> inline auto
 size(const T& x) -> decltype(x.size())
 {
     return x.size();
 }
 
-template <class T, size_t N> constexpr T*
-begin(T (&array)[N]) noexcept
-{
-    return array;
-}
-
-template <class T, size_t N> constexpr T*
-end(T (&array)[N]) noexcept
-{
-    return array + N;
-}
-
-template <class T, size_t N> std::reverse_iterator<T*>
-rbegin(T (&array)[N])
-{
-    return {array + N};
-}
-
-template <class T, size_t N> std::reverse_iterator<T*>
-rend(T (&array)[N])
-{
-    return {array};
-}
-
-template <class T, size_t N> inline constexpr size_t
-size(const T (&array)[N]) noexcept
-{
-    return N;
-}
-
-template <class TUPLE, std::enable_if_t<is_tuple<TUPLE>::value>* = nullptr>
-inline auto
-begin(TUPLE&& t)
+template <class... T> inline auto
+begin(const std::tuple<T...>& t)
 {
     return TU::make_zip_iterator(tuple_transform(
 				     [](auto&& x)
 				     { using std::begin; return begin(x); },
-				     std::forward<TUPLE>(t)));
+				     t));
 }
 
-template <class TUPLE, std::enable_if_t<is_tuple<TUPLE>::value>* = nullptr>
-inline auto
-end(TUPLE&& t)
+template <class... T> inline auto
+end(const std::tuple<T...>& t)
 {
     return TU::make_zip_iterator(tuple_transform(
 				     [](auto&& x)
 				     { using std::end; return end(x); },
-				     std::forward<TUPLE>(t)));
+				     t));
 }
 
-template <class TUPLE, std::enable_if_t<is_tuple<TUPLE>::value>* = nullptr>
-inline auto
-rbegin(TUPLE&& t)
+template <class... T> inline auto
+rbegin(const std::tuple<T...>& t)
 {
-    return std::make_reverse_iterator(end(std::forward<TUPLE>(t)));
+    return std::make_reverse_iterator(end(t));
 }
 
-template <class TUPLE, std::enable_if_t<is_tuple<TUPLE>::value>* = nullptr>
-inline auto
-rend(TUPLE&& t)
+template <class... T> inline auto
+rend(const std::tuple<T...>& t)
 {
-    return std::make_reverse_iterator(begin(std::forward<TUPLE>(t)));
+    return std::make_reverse_iterator(begin(t));
+}
+
+template <class... T> inline auto
+begin(std::tuple<T...>& t)
+{
+    return TU::make_zip_iterator(tuple_transform(
+				     [](auto&& x)
+				     { using std::begin; return begin(x); },
+				     t));
+}
+
+template <class... T> inline auto
+end(std::tuple<T...>& t)
+{
+    return TU::make_zip_iterator(tuple_transform(
+				     [](auto&& x)
+				     { using std::end; return end(x); },
+				     t));
+}
+
+template <class... T> inline auto
+rbegin(std::tuple<T...>& t)
+{
+    return std::make_reverse_iterator(end(t));
+}
+
+template <class... T> inline auto
+rend(std::tuple<T...>& t)
+{
+    return std::make_reverse_iterator(begin(t));
 }
 
 template <class... T> inline auto
@@ -358,7 +329,7 @@ crend(const std::tuple<T...>& t)
 template <class... T> inline auto
 size(const std::tuple<T...>& t)
 {
-    return TU::size(std::get<0>(t));
+    return size(std::get<0>(t));
 }
 
 /************************************************************************

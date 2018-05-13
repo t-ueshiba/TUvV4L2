@@ -165,7 +165,9 @@ class Warp
 		    auto	out = _out + r.begin();
 		    for (auto v = r.begin(); v != r.end(); ++v)
 		    {
-			_warp.warpLine(_in, TU::begin(*out), _warp._fracs[v]);
+			using	std::begin;
+			
+			_warp.warpLine(_in, begin(*out), _warp._fracs[v]);
 			++out;
 		    }
 		}
@@ -375,7 +377,9 @@ Warp::operator ()(IN in, OUT out) const
 #else
     for (const auto& frac : _fracs)
     {
-	warpLine(in, TU::begin(*out), frac);
+	using	std::begin;
+	
+	warpLine(in, begin(*out), frac);
 	++out;
     }
 #endif
@@ -400,11 +404,11 @@ Warp::warpLine(IN in, OUT out, const FracArray& frac) const
 {
     Interpolate<IN>	interpolate(in);
     
-    auto	u  = std::cbegin(frac.us);
-    auto	ue = std::cend(  frac.us);
-    auto	v  = std::cbegin(frac.vs);
-    auto	du = std::cbegin(frac.du);
-    auto	dv = std::cbegin(frac.dv);
+    auto	u  = frac.us.cbegin();
+    auto	ue = frac.us.cend();
+    auto	v  = frac.vs.cbegin();
+    auto	du = frac.du.cbegin();
+    auto	dv = frac.dv.cbegin();
     out += frac.lmost;
 #if defined(SIMD)
     using	value_type = typename Interpolate<IN>::value_type;

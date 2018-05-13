@@ -18,6 +18,8 @@ namespace TU
 std::istream&
 GenericImage::restoreData(std::istream& in)
 {
+    using	std::begin;
+    
     _colormap.resize(_format.ncolors());
     _colormap.restore(in);
 
@@ -25,14 +27,14 @@ GenericImage::restoreData(std::istream& in)
     if (_format.bottomToTop())
     {
 	for (auto row = _a.rbegin(); row != _a.rend(); ++row)
-	    if (!in.read(TU::begin(*row), TU::size(*row)) ||
+	    if (!in.read(begin(*row), size(*row)) ||
 		!in.ignore(npads))
 		break;
     }
     else
     {
 	for (auto&& row : _a)
-	    if (!in.read(TU::begin(row), TU::size(row)) ||
+	    if (!in.read(begin(row), size(row)) ||
 		!in.ignore(npads))
 		break;
     }
@@ -48,6 +50,8 @@ GenericImage::restoreData(std::istream& in)
 std::ostream&
 GenericImage::saveData(std::ostream& out) const
 {
+    using	std::cbegin;
+    
     if (_colormap.size() > 0)
     {
 	_colormap.save(out);
@@ -59,14 +63,14 @@ GenericImage::saveData(std::ostream& out) const
     if (_format.bottomToTop())
     {
 	for (auto row = _a.rbegin(); row != _a.rend(); ++row)
-	    if (!out.write(std::cbegin(*row), TU::size(*row)) ||
+	    if (!out.write(cbegin(*row), size(*row)) ||
 		!pads.save(out))
 		break;
     }
     else
     {
 	for (const auto& row : _a)
-	    if (!out.write(std::cbegin(row), TU::size(row)) ||
+	    if (!out.write(cbegin(row), size(row)) ||
 		!pads.save(out))
 		break;
     }

@@ -48,7 +48,7 @@ homogeneous(const E& expr)
 					     Array<element_type, 0>,
 					     Array<element_type, N+1> >;
 
-    const auto	n = TU::size(expr);
+    const auto	n = size(expr);
     result_type	r(n + 1);
     slice(r, 0, n) = expr;
     r[n]	   = 1;
@@ -68,7 +68,7 @@ inhomogeneous(const E& expr)
 					     Array<element_type, 0>,
 					     Array<element_type, N-1> >;
 
-    const auto	n = TU::size(expr) - 1;
+    const auto	n = size(expr) - 1;
     return result_type(slice(expr, 0, n) / *(std::cbegin(expr) + n));
 }
 
@@ -100,7 +100,7 @@ trace(const E& expr)
     assert(size<0>(expr) == size<1>(expr));
 
     element_t<E>	val = 0;
-    for (size_t i = 0; i < TU::size(expr); ++i)
+    for (size_t i = 0; i < size(expr); ++i)
 	val += expr[i][i];
     return val;
 }
@@ -400,10 +400,12 @@ template <class E, class F>
 inline std::enable_if_t<rank<E>() == 2 && rank<F>() == 2, F&>
 solve(const E& A, F&& B)
 {
+    using	std::begin;
+    
     LUDecomposition<element_t<E>, size0<E>()>	lu(A);
     for_each<size0<F>()>([&lu](auto&& b)
 			 { lu.substitute(std::forward<decltype(b)>(b)); },
-			 TU::size(B), TU::begin(B));
+			 size(B), begin(B));
     return B;
 }
     
@@ -418,7 +420,7 @@ inverse(const E& A)
     using	element_type = element_t<E>;
     
     constexpr size_t		N = size0<E>();
-    Array2<element_type, N, N>	B = diag<N>(element_type(1), TU::size(A));
+    Array2<element_type, N, N>	B = diag<N>(element_type(1), size(A));
     return solve(A, B);
 }
     
@@ -1666,7 +1668,7 @@ template <class E>
 inline std::enable_if_t<rank<E>() == 1, Array2<element_t<E>, 3, 3>>
 rotation(const E& n, element_t<E> c, element_t<E> s)
 {
-    if (TU::size(n) != 3)
+    if (size(n) != 3)
 	throw std::invalid_argument("TU::Rt: dimension of the argument \'n\' must be 3");
     const auto			nn = evaluate(n);
     Array2<element_t<E>, 3, 3>	Qt = nn % nn;
@@ -1713,7 +1715,7 @@ rotation(const E& v)
 {
     using	T = element_t<E>;
     
-    if (TU::size(v) == 4)		// quaternion ?
+    if (size(v) == 4)		// quaternion ?
     {
 	const T		q0 = v[0];
 	Array<T, 3>	q{{v[1], v[2], v[3]}};

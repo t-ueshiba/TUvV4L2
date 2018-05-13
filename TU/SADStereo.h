@@ -187,7 +187,7 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowR, ROW_D rowD)
     const size_t	N = _params.windowSize,
 			D = _params.disparitySearchWidth,
 			H = std::distance(rowL, rowLe),
-			W = (H != 0 ? TU::size(*rowL) : 0);
+			W = (H != 0 ? size(*rowL) : 0);
     if (H < N || W < N)				// 充分な行数／列数があるか確認
 	return;
 
@@ -201,17 +201,21 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowR, ROW_D rowD)
   // 各行に対してステレオマッチングを行い視差を計算
     for (const auto rowL0 = rowL + N - 1; rowL != rowLe; ++rowL)
     {
+	using	std::cbegin;
+	using	std::cend;
+	using	std::begin;
+	
 	start(1);
 	if (rowL <= rowL0)
 	{
-	    initializeDissimilarities(std::cbegin(*rowL), std::cend(*rowL),
-				      std::cbegin(*rowR), buffers->Q.begin());
+	    initializeDissimilarities(cbegin(*rowL), cend(*rowL),
+				      cbegin(*rowR), buffers->Q.begin());
 	}
 	else
 	{
-	    updateDissimilarities(std::cbegin(*rowL), std::cend(*rowL),
-				  std::cbegin(*rowR),
-				  std::cbegin(*rowLp), std::cbegin(*rowRp),
+	    updateDissimilarities(cbegin(*rowL), cend(*rowL),
+				  cbegin(*rowR),
+				  cbegin(*rowLp), cbegin(*rowRp),
 				  buffers->Q.begin());
 	    ++rowLp;
 	    ++rowRp;
@@ -229,7 +233,7 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowR, ROW_D rowD)
 	    start(3);
 	    selectDisparities(buffers->dminL.cbegin(), buffers->dminL.cend(),
 			      buffers->dminR.cbegin(), buffers->delta.cbegin(),
-			      TU::begin(*rowD) + N/2);
+			      begin(*rowD) + N/2);
 	    ++rowD;
 	}
 
@@ -248,7 +252,7 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
     const size_t	N = _params.windowSize,
 			D = _params.disparitySearchWidth,
 			H = std::distance(rowL, rowLe),
-			W = (H != 0 ? TU::size(*rowL) : 0);
+			W = (H != 0 ? size(*rowL) : 0);
     if (H < N || W < N)				// 充分な行数／列数があるか確認
 	return;
 
@@ -267,29 +271,33 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
   // 各行に対してステレオマッチングを行い視差を計算
     for (const auto rowL0 = rowL + N - 1; rowL != rowLe; ++rowL)
     {
+	using	std::cbegin;
+	using	std::cend;
+	using	std::begin;
+	    
 	--v;
 	--cV;
 	
 	start(1);
 	if (rowL <= rowL0)
-	    initializeDissimilarities(std::cbegin(*rowL), std::cend(*rowL),
+	    initializeDissimilarities(cbegin(*rowL), cend(*rowL),
 				      make_zip_iterator(
 					  std::make_tuple(
-					      std::cbegin(*rowR),
+					      cbegin(*rowR),
 					      make_vertical_iterator(rowV,
 								     cV))),
 				      buffers->Q.begin());
 	else
 	{
-	    updateDissimilarities(std::cbegin(*rowL), std::cend(*rowL),
+	    updateDissimilarities(cbegin(*rowL), cend(*rowL),
 				  make_zip_iterator(
 				      std::make_tuple(
-					  std::cbegin(*rowR),
+					  cbegin(*rowR),
 					  make_vertical_iterator(rowV, cV))),
-				  std::cbegin(*rowLp),
+				  cbegin(*rowLp),
 				  make_zip_iterator(
 				      std::make_tuple(
-					  std::cbegin(*rowRp),
+					  cbegin(*rowRp),
 					  make_vertical_iterator(rowV,
 								 --cVp))),
 				  buffers->Q.begin());
@@ -316,7 +324,7 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 	    start(3);
 	    selectDisparities(buffers->dminL.cbegin(), buffers->dminL.cend(),
 			      buffers->dminR.cbegin(), buffers->delta.cbegin(),
-			      TU::begin(*rowD) + N/2);
+			      begin(*rowD) + N/2);
 
 	    ++rowD;
 	}
@@ -333,9 +341,11 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 	rowD = rowD0;
 	for (v = H - N + 1; v-- != 0; )
 	{
+	    using	std::begin;
+	    
 	    pruneDisparities(make_vertical_iterator(buffers->dminV.cbegin(), v),
 			     make_vertical_iterator(buffers->dminV.cend(),   v),
-			     TU::begin(*rowD) + N/2);
+			     begin(*rowD) + N/2);
 	    ++rowD;
 	}
     }
