@@ -102,52 +102,52 @@ namespace detail
       
 	
     public:
-      store_proxy(T* p)		:_p(p)			{}
+			store_proxy(T* p)	:_p(p)			{}
 
 			operator value_type() const
 			{
 			    return load<ALIGNED>(_p);
 			}
-      store_proxy&	operator =(value_type val)
+      const auto&	operator =(value_type val) const
 			{
 			    store<ALIGNED>(_p, val);
 			    return *this;
 			}
-      store_proxy&	operator +=(value_type val)
+      const auto&	operator +=(value_type val) const
 			{
 			    return operator =(load<ALIGNED>(_p) + val);
 			}
-      store_proxy&	operator -=(value_type val)
+      const auto&	operator -=(value_type val) const
 			{
 			    return operator =(load<ALIGNED>(_p) - val);
 			}
-      store_proxy&	operator *=(value_type val)
+      const auto&	operator *=(value_type val) const
 			{
 			    return operator =(load<ALIGNED>(_p) * val);
 			}
-      store_proxy&	operator /=(value_type val)
+      const auto&	operator /=(value_type val) const
 			{
 			    return operator =(load<ALIGNED>(_p) / val);
 			}
-      store_proxy&	operator %=(value_type val)
+      const auto&	operator %=(value_type val) const
 			{
 			    return operator =(load<ALIGNED>(_p) % val);
 			}
-      store_proxy&	operator &=(value_type val)
+      const auto&	operator &=(value_type val) const
 			{
 			    return operator =(load<ALIGNED>(_p) & val);
 			}
-      store_proxy&	operator |=(value_type val)
+      const auto&	operator |=(value_type val) const
 			{
 			    return operator =(load<ALIGNED>(_p) | val);
 			}
-      store_proxy&	operator ^=(value_type val)
+      const auto&	operator ^=(value_type val) const
 			{
 			    return operator =(load<ALIGNED>(_p) ^ val);
 			}
 
     private:
-      T* 	_p;
+      T* const	_p;
   };
 }	// namespace detail
 

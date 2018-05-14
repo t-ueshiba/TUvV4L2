@@ -447,63 +447,63 @@ namespace detail
 	  :_iter(iter), _func(func)					{}
 
       template <class T_>
-      std::enable_if_t<is_binary_func<T_>::value, assignment_proxy&>
-			operator =(T_&& val)
+      std::enable_if_t<is_binary_func<T_>::value, const assignment_proxy&>
+			operator =(T_&& val) const
 			{
 			    _func(*_iter, std::forward<T_>(val));
 			    return *this;
 			}
       template <class T_>
-      std::enable_if_t<!is_binary_func<T_>::value, assignment_proxy&>
-			operator =(T_&& val)
+      std::enable_if_t<!is_binary_func<T_>::value, const assignment_proxy&>
+			operator =(T_&& val) const
 			{
 			    *_iter  = _func(std::forward<T_>(val));
 			    return *this;
 			}
       template <class T_>
-      assignment_proxy&	operator +=(T_&& val)
+      const auto&	operator +=(T_&& val) const
 			{
 			    *_iter += _func(std::forward<T_>(val));
 			    return *this;
 			}
       template <class T_>
-      assignment_proxy&	operator -=(T_&& val)
+      const auto&	operator -=(T_&& val) const
 			{
 			    *_iter -= _func(std::forward<T_>(val));
 			    return *this;
 			}
       template <class T_>
-      assignment_proxy&	operator *=(T_&& val)
+      const auto&	operator *=(T_&& val) const
 			{
 			    *_iter *= _func(std::forward<T_>(val));
 			    return *this;
 			}
       template <class T_>
-      assignment_proxy&	operator /=(T_&& val)
+      const auto&	operator /=(T_&& val) const
 			{
 			    *_iter /= _func(std::forward<T_>(val));
 			    return *this;
 			}
       template <class T_>
-      assignment_proxy&	operator %=(T_&& val)
+      const auto&	operator %=(T_&& val) const
 			{
 			    *_iter %= _func(std::forward<T_>(val));
 			    return *this;
 			}
       template <class T_>
-      assignment_proxy&	operator &=(T_&& val)
+      const auto&	operator &=(T_&& val) const
 			{
 			    *_iter &= _func(std::forward<T_>(val));
 			    return *this;
 			}
       template <class T_>
-      assignment_proxy&	operator |=(T_&& val)
+      const auto&	operator |=(T_&& val) const
 			{
 			    *_iter |= _func(std::forward<T_>(val));
 			    return *this;
 			}
       template <class T_>
-      assignment_proxy&	operator ^=(T_&& val)
+      const auto&	operator ^=(T_&& val) const
 			{
 			    *_iter ^= _func(std::forward<T_>(val));
 			    return *this;

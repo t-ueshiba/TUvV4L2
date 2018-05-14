@@ -203,8 +203,8 @@ class map_iterator
 
   // detail::store_proxy を convert down
     template <size_t, bool ALIGNED_>
-    static auto&
-		cvtdown(detail::store_proxy<T, ALIGNED_>& x)
+    static const auto&
+		cvtdown(const detail::store_proxy<T, ALIGNED_>& x)
 		{
 		    return x;
 		}
@@ -339,20 +339,23 @@ make_map_iterator(FUNC&& func,
 }
 
 template <class T=void, bool MASK=false, class FUNC,
-	  class ITER0, bool ALIGNED0, class... ITER, bool... ALIGNED,
-	  std::enable_if_t<sizeof...(ITER)>* = nullptr>
+	  class ITER0, bool ALIGNED0, class ITER1, bool ALIGNED1,
+	  class... ITER, bool... ALIGNED>
 inline auto
 make_map_iterator(FUNC&& func,
 		  const iterator_wrapper<ITER0, ALIGNED0>&   iter0,
+		  const iterator_wrapper<ITER1, ALIGNED1>&   iter1,
 		  const iterator_wrapper<ITER,  ALIGNED>&... iter)
 {
     using iters_t  = decltype(std::make_tuple(make_accessor(iter0),
+					      make_accessor(iter1),
 					      make_accessor(iter)...));
     using argelm_t = detail::map_iterator_argument_element<T, iters_t>;
     
     return wrap_iterator(map_iterator<argelm_t, MASK, FUNC, iters_t>(
 			     std::forward<FUNC>(func),
 			     std::make_tuple(make_accessor(iter0),
+					     make_accessor(iter1),
 					     make_accessor(iter)...)));
 }
 

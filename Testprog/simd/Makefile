@@ -1,8 +1,10 @@
+
 SUBDIR	= cvt_iterator_test		\
 	  cvt_mask_iterator_test	\
 	  dup				\
 	  lookup			\
-	  transform
+	  transform			\
+	  map_iterator
 
 TARGETS	= all clean depend
 
