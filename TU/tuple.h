@@ -7,6 +7,9 @@
 #define TU_TUPLE_H
 
 #include <tuple>
+#include <utility>
+#include <iterator>
+#include <boost/iterator/iterator_facade.hpp>
 #include <iostream>
 #include "TU/type_traits.h"	// for TU::any<PRED, T...>
 
@@ -494,6 +497,236 @@ apply(FUNC&& f, T&& t)
     return f(std::forward<T>(t));
 }
     
+/************************************************************************
+*  class zip_iterator<ITER_TUPLE>					*
+************************************************************************/
+namespace detail
+{
+  struct generic_dereference
+  {
+    // assignment_iterator<FUNC, ITER> のように dereference すると
+    // その base iterator への参照を内包する proxy を返す反復子もあるので，
+    // 引数は const ITER_& 型にする．もしも ITER_ 型にすると，呼出側から
+    // コピーされたローカルな反復子 iter への参照を内包する proxy を
+    // 返してしまい，dangling reference が生じる．
+      template <class ITER_>
+      decltype(auto)	operator ()(const ITER_& iter) const
+			{
+			    return *iter;
+			}
+  };
+}	// namespace detail
+    
+template <class ITER_TUPLE>
+class zip_iterator : public boost::iterator_facade<
+			zip_iterator<ITER_TUPLE>,
+			decltype(tuple_transform(detail::generic_dereference(),
+						 std::declval<ITER_TUPLE>())),
+			typename std::iterator_traits<
+				    std::tuple_element_t<0, ITER_TUPLE> >
+				       ::iterator_category,
+			decltype(tuple_transform(detail::generic_dereference(),
+						 std::declval<ITER_TUPLE>()))>
+{
+  private:
+    using super = boost::iterator_facade<
+			zip_iterator,
+			decltype(tuple_transform(detail::generic_dereference(),
+						 std::declval<ITER_TUPLE>())),
+			typename std::iterator_traits<
+					std::tuple_element_t<0, ITER_TUPLE> >
+					   ::iterator_category,
+			decltype(tuple_transform(detail::generic_dereference(),
+						 std::declval<ITER_TUPLE>()))>;
+    friend	class boost::iterator_core_access;
+    
+  public:
+    using	typename super::reference;
+    using	typename super::difference_type;
+    
+  public:
+		zip_iterator(ITER_TUPLE iter_tuple)
+		    :_iter_tuple(iter_tuple)				{}
+    template <class ITER_TUPLE_,
+	      std::enable_if_t<
+		  std::is_convertible<ITER_TUPLE_, ITER_TUPLE>::value>*
+	      = nullptr>
+		zip_iterator(const zip_iterator<ITER_TUPLE_>& iter)
+		    :_iter_tuple(iter.get_iterator_tuple())		{}
+
+    const auto&	get_iterator_tuple()	const	{ return _iter_tuple; }
+    
+  private:
+    reference	dereference() const
+		{
+		    return tuple_transform(detail::generic_dereference(),
+					   _iter_tuple);
+		}
+    template <class ITER_TUPLE_>
+    std::enable_if_t<std::is_convertible<ITER_TUPLE_, ITER_TUPLE>::value, bool>
+		equal(const zip_iterator<ITER_TUPLE_>& iter) const
+		{
+		    return std::get<0>(iter.get_iterator_tuple())
+			== std::get<0>(_iter_tuple);
+		}
+    void	increment()
+		{
+		    ++_iter_tuple;
+		}
+    void	decrement()
+		{
+		    --_iter_tuple;
+		}
+    void	advance(difference_type n)
+		{
+		    _iter_tuple += n;
+		}
+    template <class ITER_TUPLE_>
+    std::enable_if_t<std::is_convertible<ITER_TUPLE_, ITER_TUPLE>::value,
+		     difference_type>
+		distance_to(const zip_iterator<ITER_TUPLE_>& iter) const
+		{
+		    return std::get<0>(iter.get_iterator_tuple())
+			 - std::get<0>(_iter_tuple);
+		}
+
+  private:
+    ITER_TUPLE	_iter_tuple;
+};
+
+template <class... ITERS> inline zip_iterator<std::tuple<ITERS...> >
+make_zip_iterator(const std::tuple<ITERS...>& iter_tuple)
+{
+    return {iter_tuple};
+}
+
+template <class... ITERS> inline zip_iterator<std::tuple<ITERS...> >
+make_zip_iterator(const ITERS&... iters)
+{
+    return {std::make_tuple(iters...)};
+}
+
+/************************************************************************
+*  type alias: decayed_iterator_value<ITER>				*
+************************************************************************/
+namespace detail
+{
+  template <class ITER>
+  struct decayed_iterator_value
+  {
+      using type = typename std::iterator_traits<ITER>::value_type;
+  };
+  template <class... ITER>
+  struct decayed_iterator_value<zip_iterator<std::tuple<ITER...> > >
+  {
+      using type = std::tuple<typename decayed_iterator_value<ITER>::type...>;
+  };
+}	// namespace detail
+
+//! 反復子が指す型を返す．
+/*!
+  zip_iterator<ITER_TUPLE>::value_type はITER_TUPLE中の各反復子が指す値への
+  参照のtupleの型であるが，decayed_iterator_value<zip_iterator<ITER_TUPLE> >
+  は，ITER_TUPLE中の各反復子が指す値そのもののtupleの型を返す．
+  \param ITER	反復子
+*/
+template <class ITER>
+using decayed_iterator_value = typename detail::decayed_iterator_value<ITER>
+					      ::type;
+
+/************************************************************************
+*  TU::size(const T&), TU::[begin|end|rbegin|rend]()			*
+************************************************************************/
+template <class... T> inline auto
+begin(std::tuple<T...>& t)
+{
+    return TU::make_zip_iterator(tuple_transform(
+				     [](auto&& x)
+				     { using std::begin; return begin(x); },
+				     t));
+}
+
+template <class... T> inline auto
+end(std::tuple<T...>& t)
+{
+    return TU::make_zip_iterator(tuple_transform(
+				     [](auto&& x)
+				     { using std::end; return end(x); },
+				     t));
+}
+
+template <class... T> inline auto
+rbegin(std::tuple<T...>& t)
+{
+    return std::make_reverse_iterator(end(t));
+}
+
+template <class... T> inline auto
+rend(std::tuple<T...>& t)
+{
+    return std::make_reverse_iterator(begin(t));
+}
+
+template <class... T> inline auto
+begin(const std::tuple<T...>& t)
+{
+    return TU::make_zip_iterator(tuple_transform(
+				     [](auto&& x)
+				     { using std::begin; return begin(x); },
+				     t));
+}
+
+template <class... T> inline auto
+end(const std::tuple<T...>& t)
+{
+    return TU::make_zip_iterator(tuple_transform(
+				     [](auto&& x)
+				     { using std::end; return end(x); },
+				     t));
+}
+
+template <class... T> inline auto
+rbegin(const std::tuple<T...>& t)
+{
+    return std::make_reverse_iterator(end(t));
+}
+
+template <class... T> inline auto
+rend(const std::tuple<T...>& t)
+{
+    return std::make_reverse_iterator(begin(t));
+}
+
+template <class... T> inline auto
+cbegin(const std::tuple<T...>& t)
+{
+    return begin(t);
+}
+
+template <class... T> inline auto
+cend(const std::tuple<T...>& t)
+{
+    return end(t);
+}
+
+template <class... T> inline auto
+crbegin(const std::tuple<T...>& t)
+{
+    return rbegin(t);
+}
+
+template <class... T> inline auto
+crend(const std::tuple<T...>& t)
+{
+    return rend(t);
+}
+
+template <class... T> inline auto
+size(const std::tuple<T...>& t)
+{
+    return size(std::get<0>(t));
+}
+
 }	// namespace TU
 
 namespace std

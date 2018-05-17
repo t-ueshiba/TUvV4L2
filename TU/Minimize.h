@@ -224,7 +224,6 @@ minimizeSquare(const F& f, const G& g, AT& x,
 	}
     }
     throw std::runtime_error("minimizeSquare: maximum iteration limit exceeded!");
-    return matrix_type(0, 0);
 }
 
 /************************************************************************
@@ -457,8 +456,6 @@ minimizeSquareSparse(const F& f, const G& g, ATA& a, IB bbegin, IB bend,
 	}
     }
     throw std::runtime_error("minimizeSquareSparse: maximum iteration limit exceeded!");
-
-    return matrix_type(0, 0);
 }
 
 /************************************************************************
@@ -589,8 +586,6 @@ minimizeSquareSparseDebug(const F& f, const G& g, ATA& a, IB bbegin, IB bend,
 	}
     }
     throw std::runtime_error("minimizeSquareSparseDebug: maximum iteration limit exceeded!");
-
-    return matrix_type(0, 0);
 }
 
 }

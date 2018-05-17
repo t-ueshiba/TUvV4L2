@@ -28,7 +28,7 @@ namespace detail
     適用できるかチェックし，可能な場合はその型を返す．
   */
   template <class E>
-  auto	iterator_t(E&& x) -> decltype(std::begin(x))			;
+  auto	iterator_t(E&& x) -> decltype(x.begin())			;
   template <class E>
   auto	iterator_t(E&& x) -> decltype(TU::begin(x))			;
   void	iterator_t(...)							;
@@ -119,12 +119,11 @@ using const_iterator_t = typename detail::const_iterator_t<ITER>::type;
 namespace detail
 {
   template <class E>
-  auto	check_stdbegin(E&& x) -> decltype(std::begin(x),
-					  std::true_type())		;
-  auto	check_stdbegin(...)   -> std::false_type			;
+  auto	check_begin(E&& x) -> decltype(x.begin(), std::true_type())	;
+  auto	check_begin(...)   -> std::false_type				;
 
   template <class E>
-  using has_stdbegin = decltype(check_stdbegin(std::declval<E>()));
+  using has_begin = decltype(check_begin(std::declval<E>()));
 }	// namespace detail
 
 //! 式の次元数(軸の個数)を返す
@@ -133,13 +132,13 @@ namespace detail
   \return	式の次元数
 */
 template <class E>
-constexpr std::enable_if_t<!detail::has_stdbegin<E>::value, size_t>
+constexpr std::enable_if_t<!detail::has_begin<E>::value, size_t>
 rank()
 {
     return 0;
 }
 template <class E>
-constexpr std::enable_if_t<detail::has_stdbegin<E>::value, size_t>
+constexpr std::enable_if_t<detail::has_begin<E>::value, size_t>
 rank()
 {
     return 1 + rank<value_t<E> >();
@@ -361,8 +360,7 @@ class range
     
 		range()						= delete;
 		range(const range&)				= default;
-    const range&
-		operator =(const range& r) const
+    const auto&	operator =(const range& r) const
 		{
 		    copy<SIZE>(r.begin(), SIZE, _begin);
 		    return *this;
@@ -393,8 +391,7 @@ class range
     		{
 		    assert(args.size() == size());
 		}
-    const range&
-		operator =(std::initializer_list<value_type> args) const
+    const auto&	operator =(std::initializer_list<value_type> args) const
 		{
 		    assert(args.size() == SIZE);
 		  // initializer_list<T> はalignmentされないので，
@@ -403,8 +400,8 @@ class range
 		    return *this;
 		}
 
-    template <class T_> std::enable_if_t<rank<T_>() == 0, const range&>
-		operator =(const T_& c) const
+    template <class T_> std::enable_if_t<rank<T_>() == 0, const range&> const
+		operator =(const T_& c)
 		{
 		    fill<SIZE>(_begin, SIZE, c);
 		    return *this;
@@ -442,6 +439,7 @@ class range<ITER, 0>
 {
   public:
     using value_type	 = iterator_value<ITER>;
+    using iterator	 = ITER;
     using const_iterator = const_iterator_t<ITER>;
     
   public:
@@ -450,8 +448,7 @@ class range<ITER, 0>
     
 		range()						= delete;
 		range(const range&)				= default;
-    const range&
-		operator =(const range& r) const
+    const auto&	operator =(const range& r) const
 		{
 		    assert(r.size() == size());
 		    copy<0>(r._begin, _size, _begin);
@@ -483,8 +480,7 @@ class range<ITER, 0>
 		     _size(args.size())
     		{
 		}
-    const range&
-		operator =(std::initializer_list<value_type> args) const
+    const auto&	operator =(std::initializer_list<value_type> args) const
 		{
 		    assert(args.size() == _size);
 		  // initializer_list<T> はalignmentされないので，
@@ -508,9 +504,9 @@ class range<ITER, 0>
     auto	cbegin()  const	{ return const_iterator(_begin); }
     auto	cend()	  const	{ return const_iterator(_begin + _size); }
     auto	rbegin()  const	{ return std::make_reverse_iterator(end()); }
-    auto	rend()	  const	{ return std::make_reverse_iterator(begin()); }
+    auto	rend()    const	{ return std::make_reverse_iterator(begin()); }
     auto	crbegin() const	{ return std::make_reverse_iterator(cend()); }
-    auto	crend()	  const	{ return std::make_reverse_iterator(cbegin()); }
+    auto	crend()   const	{ return std::make_reverse_iterator(cbegin()); }
     decltype(auto)
 		operator [](size_t i) const
 		{

@@ -562,8 +562,6 @@ HyperPlane<T, D>::distance(const Array<T_, D_>& x) const -> element_type
     }
     else
 	throw std::invalid_argument("HyperPlane::distance(): dimension mismatch!!");
-
-    return 0;
 }
 
 template <class T> using LineP	= HyperPlane<T, 2>;	//!< 2次元空間中の直線
