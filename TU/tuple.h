@@ -469,35 +469,6 @@ select(const std::tuple<S...>& s, X&& x, Y&& y)
 }
 
 /************************************************************************
-*  Applying a multi-input function to a tuple of arguments		*
-************************************************************************/
-namespace detail
-{
-  template <class FUNC, class TUPLE, size_t... IDX> inline decltype(auto)
-  apply(FUNC&& f, TUPLE&& t, std::index_sequence<IDX...>)
-  {
-      return f(std::get<IDX>(std::forward<TUPLE>(t))...);
-  }
-}
-    
-template <class FUNC, class TUPLE,
-	  std::enable_if_t<is_tuple<TUPLE>::value>* = nullptr>
-inline decltype(auto)
-apply(FUNC&& f, TUPLE&& t)
-{
-    return detail::apply(std::forward<FUNC>(f), std::forward<TUPLE>(t),
-			 std::make_index_sequence<
-			     std::tuple_size<std::decay_t<TUPLE> >::value>());
-}
-template <class FUNC, class T,
-	  std::enable_if_t<!is_tuple<T>::value>* = nullptr>
-inline decltype(auto)
-apply(FUNC&& f, T&& t)
-{
-    return f(std::forward<T>(t));
-}
-    
-/************************************************************************
 *  class zip_iterator<ITER_TUPLE>					*
 ************************************************************************/
 namespace detail
@@ -523,8 +494,8 @@ class zip_iterator : public boost::iterator_facade<
 			decltype(tuple_transform(detail::generic_dereference(),
 						 std::declval<ITER_TUPLE>())),
 			typename std::iterator_traits<
-				    std::tuple_element_t<0, ITER_TUPLE> >
-				       ::iterator_category,
+			    std::tuple_element_t<0, ITER_TUPLE> >
+			       ::iterator_category,
 			decltype(tuple_transform(detail::generic_dereference(),
 						 std::declval<ITER_TUPLE>()))>
 {
@@ -534,8 +505,8 @@ class zip_iterator : public boost::iterator_facade<
 			decltype(tuple_transform(detail::generic_dereference(),
 						 std::declval<ITER_TUPLE>())),
 			typename std::iterator_traits<
-					std::tuple_element_t<0, ITER_TUPLE> >
-					   ::iterator_category,
+			    std::tuple_element_t<0, ITER_TUPLE> >
+			       ::iterator_category,
 			decltype(tuple_transform(detail::generic_dereference(),
 						 std::declval<ITER_TUPLE>()))>;
     friend	class boost::iterator_core_access;
@@ -594,14 +565,17 @@ class zip_iterator : public boost::iterator_facade<
     ITER_TUPLE	_iter_tuple;
 };
 
-template <class... ITERS> inline zip_iterator<std::tuple<ITERS...> >
-make_zip_iterator(const std::tuple<ITERS...>& iter_tuple)
+template <class ITER_TUPLE>
+inline std::enable_if_t<is_tuple<ITER_TUPLE>::value, zip_iterator<ITER_TUPLE> >
+make_zip_iterator(ITER_TUPLE iter_tuple)
 {
     return {iter_tuple};
 }
 
-template <class... ITERS> inline zip_iterator<std::tuple<ITERS...> >
-make_zip_iterator(const ITERS&... iters)
+template <class... ITERS>
+inline std::enable_if_t<(sizeof...(ITERS) > 1),
+			zip_iterator<std::tuple<ITERS...> > >
+make_zip_iterator(ITERS... iters)
 {
     return {std::make_tuple(iters...)};
 }
@@ -633,99 +607,6 @@ namespace detail
 template <class ITER>
 using decayed_iterator_value = typename detail::decayed_iterator_value<ITER>
 					      ::type;
-
-/************************************************************************
-*  TU::size(const T&), TU::[begin|end|rbegin|rend]()			*
-************************************************************************/
-template <class... T> inline auto
-begin(std::tuple<T...>& t)
-{
-    return TU::make_zip_iterator(tuple_transform(
-				     [](auto&& x)
-				     { using std::begin; return begin(x); },
-				     t));
-}
-
-template <class... T> inline auto
-end(std::tuple<T...>& t)
-{
-    return TU::make_zip_iterator(tuple_transform(
-				     [](auto&& x)
-				     { using std::end; return end(x); },
-				     t));
-}
-
-template <class... T> inline auto
-rbegin(std::tuple<T...>& t)
-{
-    return std::make_reverse_iterator(end(t));
-}
-
-template <class... T> inline auto
-rend(std::tuple<T...>& t)
-{
-    return std::make_reverse_iterator(begin(t));
-}
-
-template <class... T> inline auto
-begin(const std::tuple<T...>& t)
-{
-    return TU::make_zip_iterator(tuple_transform(
-				     [](auto&& x)
-				     { using std::begin; return begin(x); },
-				     t));
-}
-
-template <class... T> inline auto
-end(const std::tuple<T...>& t)
-{
-    return TU::make_zip_iterator(tuple_transform(
-				     [](auto&& x)
-				     { using std::end; return end(x); },
-				     t));
-}
-
-template <class... T> inline auto
-rbegin(const std::tuple<T...>& t)
-{
-    return std::make_reverse_iterator(end(t));
-}
-
-template <class... T> inline auto
-rend(const std::tuple<T...>& t)
-{
-    return std::make_reverse_iterator(begin(t));
-}
-
-template <class... T> inline auto
-cbegin(const std::tuple<T...>& t)
-{
-    return begin(t);
-}
-
-template <class... T> inline auto
-cend(const std::tuple<T...>& t)
-{
-    return end(t);
-}
-
-template <class... T> inline auto
-crbegin(const std::tuple<T...>& t)
-{
-    return rbegin(t);
-}
-
-template <class... T> inline auto
-crend(const std::tuple<T...>& t)
-{
-    return rend(t);
-}
-
-template <class... T> inline auto
-size(const std::tuple<T...>& t)
-{
-    return size(std::get<0>(t));
-}
 
 }	// namespace TU
 

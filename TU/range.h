@@ -24,13 +24,11 @@ namespace detail
 {
   //! 式に適用できる反復子の型を返す
   /*!
-    E, const E&, E&, E&&型の x に std::begin() または TU::begin() が
+    E, const E&, E&, E&&型の x に begin() が
     適用できるかチェックし，可能な場合はその型を返す．
   */
   template <class E>
-  auto	iterator_t(E&& x) -> decltype(x.begin())			;
-  template <class E>
-  auto	iterator_t(E&& x) -> decltype(TU::begin(x))			;
+  auto	iterator_t(E&& x) -> decltype(begin(x))				;
   void	iterator_t(...)							;
 }	// namespace detail
 
@@ -119,11 +117,12 @@ using const_iterator_t = typename detail::const_iterator_t<ITER>::type;
 namespace detail
 {
   template <class E>
-  auto	check_begin(E&& x) -> decltype(x.begin(), std::true_type())	;
-  auto	check_begin(...)   -> std::false_type				;
+  auto	check_stdbegin(E&& x) -> decltype(std::begin(x),
+					  std::true_type())		;
+  auto	check_stdbegin(...)   -> std::false_type			;
 
   template <class E>
-  using has_begin = decltype(check_begin(std::declval<E>()));
+  using has_stdbegin = decltype(check_stdbegin(std::declval<E>()));
 }	// namespace detail
 
 //! 式の次元数(軸の個数)を返す
@@ -132,13 +131,13 @@ namespace detail
   \return	式の次元数
 */
 template <class E>
-constexpr std::enable_if_t<!detail::has_begin<E>::value, size_t>
+constexpr std::enable_if_t<!detail::has_stdbegin<E>::value, size_t>
 rank()
 {
     return 0;
 }
 template <class E>
-constexpr std::enable_if_t<detail::has_begin<E>::value, size_t>
+constexpr std::enable_if_t<detail::has_stdbegin<E>::value, size_t>
 rank()
 {
     return 1 + rank<value_t<E> >();
@@ -206,9 +205,7 @@ namespace detail
   template <size_t I, class E> inline auto
   size(const E& expr, std::integral_constant<size_t, I>)
   {
-      using	std::cbegin;
-      
-      return size(*cbegin(expr), std::integral_constant<size_t, I-1>());
+      return size(*begin(expr), std::integral_constant<size_t, I-1>());
   }
 }	// namespace detail
 
@@ -344,6 +341,12 @@ operator <<(std::ostream& out, const sizes_and_strides_holder<E>& holder)
 ************************************************************************/
 //! 先頭要素を指す反復子と要素数によって指定される範囲(レンジ)を表すクラス
 /*!
+  メンバ変数(_iter, _size)が全てconstなので代入演算子も含め全メンバ関数を
+  constにすることも可能だが，非constな反復子を返す begin(), end() は
+  敢えて非constメンバ関数にしている．これは，std::cbegin(const T& x) の型が
+  decltype(x.begin()) であって decltype(x.cbegin()) でないため，非constな
+  rangeに対してstd::cbegin(range)を適用しても非constな反復子が返されて
+  しまうことを防ぐためである．
   \param ITER	反復子の型
   \param SIZE	レンジサイズ(0ならば可変長)
 */
@@ -360,7 +363,7 @@ class range
     
 		range()						= delete;
 		range(const range&)				= default;
-    const auto&	operator =(const range& r) const
+    range&	operator =(const range& r)
 		{
 		    copy<SIZE>(r.begin(), SIZE, _begin);
 		    return *this;
@@ -376,13 +379,13 @@ class range
 		{
 		}
 
-    template <class E_> std::enable_if_t<rank<E_>() != 0, const range&>
-		operator =(const E_& expr) const
+    template <class E_> std::enable_if_t<rank<E_>() != 0, range&>
+		operator =(const E_& expr)
 		{
-		    using	std::cbegin;
-		    
+		    using	TU::begin;
+
 		    assert(TU::size(expr) == SIZE);
-		    copy<SIZE>(cbegin(expr), SIZE, _begin);
+		    copy<SIZE>(begin(expr), SIZE, _begin);
 		    return *this;
 		}
 
@@ -391,7 +394,7 @@ class range
     		{
 		    assert(args.size() == size());
 		}
-    const auto&	operator =(std::initializer_list<value_type> args) const
+    range&	operator =(std::initializer_list<value_type> args)
 		{
 		    assert(args.size() == SIZE);
 		  // initializer_list<T> はalignmentされないので，
@@ -400,7 +403,7 @@ class range
 		    return *this;
 		}
 
-    template <class T_> std::enable_if_t<rank<T_>() == 0, const range&> const
+    template <class T_> std::enable_if_t<rank<T_>() == 0, range&>
 		operator =(const T_& c)
 		{
 		    fill<SIZE>(_begin, SIZE, c);
@@ -411,14 +414,18 @@ class range
     size_t	size0()		{ return SIZE; }
     constexpr static
     size_t	size()		{ return SIZE; }
-    auto	begin()	  const	{ return _begin; }
-    auto	end()	  const	{ return _begin + SIZE; }
-    auto	cbegin()  const	{ return const_iterator(_begin); }
-    auto	cend()	  const	{ return const_iterator(_begin + SIZE); }
-    auto	rbegin()  const	{ return std::make_reverse_iterator(end()); }
+    auto	begin()		{ return _begin; }
+    auto	end()		{ return _begin + SIZE; }
+    auto	begin()   const	{ return const_iterator(_begin); }
+    auto	end()	  const	{ return const_iterator(_begin + SIZE); }
+    auto	cbegin()  const	{ return begin(); }
+    auto	cend()	  const	{ return end(); }
+    auto	rbegin()  	{ return std::make_reverse_iterator(end()); }
+    auto	rend()	  	{ return std::make_reverse_iterator(begin()); }
+    auto	rbegin()  const { return std::make_reverse_iterator(end()); }
     auto	rend()	  const	{ return std::make_reverse_iterator(begin()); }
-    auto	crbegin() const	{ return std::make_reverse_iterator(cend()); }
-    auto	crend()	  const	{ return std::make_reverse_iterator(cbegin()); }
+    auto	crbegin() const	{ return rbegin(); }
+    auto	crend()	  const	{ return rend(); }
     decltype(auto)
 		operator [](size_t i) const
 		{
@@ -439,7 +446,6 @@ class range<ITER, 0>
 {
   public:
     using value_type	 = iterator_value<ITER>;
-    using iterator	 = ITER;
     using const_iterator = const_iterator_t<ITER>;
     
   public:
@@ -448,7 +454,7 @@ class range<ITER, 0>
     
 		range()						= delete;
 		range(const range&)				= default;
-    const auto&	operator =(const range& r) const
+    range&	operator =(const range& r)
 		{
 		    assert(r.size() == size());
 		    copy<0>(r._begin, _size, _begin);
@@ -465,13 +471,13 @@ class range<ITER, 0>
 		{
 		}
 
-    template <class E_> std::enable_if_t<rank<E_>() != 0, const range&>
-		operator =(const E_& expr) const
+    template <class E_> std::enable_if_t<rank<E_>() != 0, range&>
+		operator =(const E_& expr)
 		{
-		    using	std::cbegin;
+		    using	TU::begin;
 		    
 		    assert(TU::size(expr) == _size);
-		    copy<TU::size0<E_>()>(cbegin(expr), _size, _begin);
+		    copy<TU::size0<E_>()>(begin(expr), _size, _begin);
 		    return *this;
 		}
 		
@@ -480,7 +486,7 @@ class range<ITER, 0>
 		     _size(args.size())
     		{
 		}
-    const auto&	operator =(std::initializer_list<value_type> args) const
+    range&	operator =(std::initializer_list<value_type> args)
 		{
 		    assert(args.size() == _size);
 		  // initializer_list<T> はalignmentされないので，
@@ -489,8 +495,8 @@ class range<ITER, 0>
 		    return *this;
 		}
 		
-    template <class T_> std::enable_if_t<rank<T_>() == 0, const range&>
-		operator =(const T_& c) const
+    template <class T_> std::enable_if_t<rank<T_>() == 0, range&>
+		operator =(const T_& c)
 		{
 		    fill<0>(_begin, _size, c);
 		    return *this;
@@ -499,14 +505,16 @@ class range<ITER, 0>
     constexpr static
     size_t	size0()		{ return 0; }
     size_t	size()	  const	{ return _size; }
-    auto	begin()	  const	{ return _begin; }
-    auto	end()	  const	{ return _begin + _size; }
-    auto	cbegin()  const	{ return const_iterator(_begin); }
-    auto	cend()	  const	{ return const_iterator(_begin + _size); }
+    auto	begin()		{ return _begin; }
+    auto	end()		{ return _begin + _size; }
+    auto	begin()	  const	{ return const_iterator(_begin); }
+    auto	end()	  const	{ return const_iterator(_begin + _size); }
+    auto	cbegin()  const	{ return begin(); }
+    auto	cend()	  const	{ return end(); }
     auto	rbegin()  const	{ return std::make_reverse_iterator(end()); }
-    auto	rend()    const	{ return std::make_reverse_iterator(begin()); }
-    auto	crbegin() const	{ return std::make_reverse_iterator(cend()); }
-    auto	crend()   const	{ return std::make_reverse_iterator(cbegin()); }
+    auto	rend()	  const	{ return std::make_reverse_iterator(begin()); }
+    auto	crbegin() const	{ return rbegin(); }
+    auto	crend()	  const	{ return rend(); }
     decltype(auto)
 		operator [](size_t i) const
 		{
@@ -1012,8 +1020,6 @@ template <class RANGE, class... IS,
 inline auto
 slice(RANGE&& r, size_t idx, size_t size, IS... is)
 {
-    using	std::begin;
-    
     return make_range(detail::make_slice_iterator(begin(r) + idx, is...),
 		      size);
 }
@@ -1024,8 +1030,6 @@ template <size_t SIZE, size_t... SIZES, class RANGE, class... INDICES,
 inline auto
 slice(RANGE&& r, size_t idx, INDICES... indices)
 {
-    using	std::begin;
-    
     return make_range<SIZE>(detail::make_slice_iterator<SIZES...>(
 				begin(r) + idx, indices...));
 }
@@ -1110,7 +1114,6 @@ make_column_iterator(ROW row, size_t nrows, size_t col)
 template <class E> inline auto
 column_begin(E&& expr)
 {
-    using		std::begin;
     constexpr auto	N = size0<E>();
     
     return make_column_iterator<N>(begin(expr), size(expr), 0);
@@ -1125,7 +1128,6 @@ column_cbegin(const E& expr)
 template <class E> inline auto
 column_end(E&& expr)
 {
-    using		std::begin;
     constexpr auto	N = size0<E>();
     
     return make_column_iterator<N>(begin(expr), size(expr), size<1>(expr));
@@ -1206,15 +1208,15 @@ namespace detail
 		}
       auto	begin()	const
 		{
-		    using	std::cbegin;
+		    using	TU::begin;
 
-		    return make_map_iterator(_op, cbegin(_expr));
+		    return make_map_iterator(_op, begin(_expr));
 		}
       auto	end() const
 		{
-		    using	std::cend;
+		    using	TU::end;
 
-		    return make_map_iterator(_op, cend(_expr));
+		    return make_map_iterator(_op, end(_expr));
 		}
       auto	size() const
 		{
@@ -1306,7 +1308,6 @@ operator /(E&& expr, element_t<E> c)
 template <class E> inline std::enable_if_t<rank<E>() != 0, E&>
 operator *=(E&& expr, element_t<E> c)
 {
-    using		std::begin;
     constexpr size_t	N = size0<E>();
     
     for_each<N>([c](auto&& x){ x *= c; }, size(expr), begin(expr));
@@ -1322,7 +1323,6 @@ operator *=(E&& expr, element_t<E> c)
 template <class E> inline std::enable_if_t<rank<E>() != 0, E&>
 operator /=(E&& expr, element_t<E> c)
 {
-    using		std::begin;
     constexpr size_t	N = size0<E>();
     
     for_each<N>([c](auto&& x){ x /= c; }, size(expr), begin(expr));
@@ -1373,12 +1373,10 @@ template <class L, class R>
 inline std::enable_if_t<rank<L>() != 0 && rank<L>() == rank<R>(), L&>
 operator +=(L&& l, const R& r)
 {
-    using		std::begin;
-    using		std::cbegin;
     constexpr size_t	N = detail::max<size0<L>(), size0<R>()>::value;
     
     for_each<N>([](auto&& x, const auto& y){ x += y; },
-		size(l), begin(l), cbegin(r));
+		size(l), begin(l), begin(r));
     return l;
 }
 
@@ -1392,12 +1390,10 @@ template <class L, class R>
 inline std::enable_if_t<rank<L>() != 0 && rank<L>() == rank<R>(), L&>
 operator -=(L&& l, const R& r)
 {
-    using		std::begin;
-    using		std::cbegin;
     constexpr size_t	N = detail::max<size0<L>(), size0<R>()>::value;
     
     for_each<N>([](auto&& x, const auto& y){ x -= y; },
-		size(l), begin(l), cbegin(r));
+		size(l), begin(l), begin(r));
     return l;
 }
 
@@ -1511,9 +1507,7 @@ transpose(E&& expr)
 template <class E, std::enable_if_t<(rank<E>() != 0)>* = nullptr> inline auto
 square(const E& expr)
 {
-    using	std::cbegin;
-    
-    return square<size0<E>()>(cbegin(expr), size(expr));
+    return square<size0<E>()>(begin(expr), size(expr));
 }
 
 //! 与えられた式の各要素の自乗和の平方根を求める.

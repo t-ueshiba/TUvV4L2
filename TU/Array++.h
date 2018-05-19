@@ -601,23 +601,23 @@ class array : public Buf<T, ALLOC, SIZE, SIZES...>
 		    :super(sizes(expr, std::make_index_sequence<rank()>()),
 			   super::Alignment)
 		{
-		    using		std::cbegin;
+		    using		TU::begin;
 		    constexpr auto	S = detail::max<size0(),
 							TU::size0<E_>()>::value;
-		    copy<S>(cbegin(expr), size(), begin());
+		    copy<S>(begin(expr), size(), array::begin());
 		}
     template <class E_>
     std::enable_if_t<TU::rank<E_>() == rank() + TU::rank<T>(), array&>
 		operator =(const E_& expr)
 		{
-		    using	std::cbegin;
+		    using	TU::begin;
 		    
 		    super::resize(sizes(expr,
 					std::make_index_sequence<rank()>()),
 				  super::Alignment);
 		    constexpr auto	S = detail::max<size0(),
 							TU::size0<E_>()>::value;
-		    copy<S>(cbegin(expr), size(), begin());
+		    copy<S>(begin(expr), size(), array::begin());
 
 		    return *this;
 		}
@@ -1007,10 +1007,7 @@ template <class E>
 inline std::enable_if_t<detail::is_opnode<E>::value, std::ostream&>
 operator <<(std::ostream& out, const E& expr)
 {
-    using	std::cbegin;
-    using	std::cend;
-    
-    for (auto iter = cbegin(expr); iter != cend(expr); ++iter)
+    for (auto iter = begin(expr); iter != end(expr); ++iter)
 	out << ' ' << *iter;
     return out << std::endl;
 }
@@ -1079,18 +1076,18 @@ namespace detail
 		}
       auto	begin()	const
 		{
-		    using	std::cbegin;
+		    using	TU::begin;
 		    
 		  // map_iterator への第1テンプレートパラメータを，
 		  // binder2nd そのものではなく，それへの定数参照とする
 		  // ことにより，キャッシュのコピーを防ぐ
-		    return make_map_iterator(std::cref(_binder), cbegin(_l));
+		    return make_map_iterator(std::cref(_binder), begin(_l));
 		}
       auto	end() const
 		{
-		    using	std::cend;
+		    using	TU::end;
 		    
-		    return make_map_iterator(std::cref(_binder), cend(_l));
+		    return make_map_iterator(std::cref(_binder), end(_l));
 		}
       auto	size() const
 		{
@@ -1205,13 +1202,11 @@ template <class L, class R,
 inline auto
 operator *(const L& l, const R& r)
 {
-    using std::cbegin;
     using element_type = std::common_type_t<element_t<L>, element_t<R> >;
 
     assert(size<0>(l) == size<0>(r));
     constexpr size_t	S = detail::max<size0<L>(), size0<R>()>::value;
-    return inner_product<S>(cbegin(l), size(l), cbegin(r),
-			    element_type(0));
+    return inner_product<S>(begin(l), size(l), begin(r), element_type(0));
 }
 
 //! 1次元配列式と転置されていない2次元配列式の積をとる.

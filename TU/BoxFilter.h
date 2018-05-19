@@ -299,7 +299,6 @@ BoxFilter2<T>::convolveRows(IN ib, IN ie, OUT out, bool shift) const
 {
     using	std::cbegin;
     using	std::cend;
-    using	std::begin;
     
     if (std::distance(ib, ie) < winSizeV())
 	throw std::runtime_error("BoxFilter2::convolveRows(): not enough rows!");

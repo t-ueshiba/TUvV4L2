@@ -39,7 +39,7 @@ rend(T& x) -> decltype(x.rend())
 {
     return x.rend();
 }
-    
+
 template <class T> inline auto
 cbegin(const T& x) -> decltype(std::begin(x))
 {
@@ -99,14 +99,143 @@ using iterator_category	  = typename std::iterator_traits<ITER>
 					::iterator_category;
 
 /************************************************************************
-*  TU::size(const T&)							*
+*  TU::[begin|end|rbegin|rend](T&&), TU::size(const T&)			*
 ************************************************************************/
+/*
+ *  range<ITER, SIZE> 等のproxyオブジェクトの右辺値から
+ *  非constな反復子を取り出すために定義
+ */ 
+template <class T> inline auto
+begin(T&& x) -> decltype(std::begin(x))
+{
+    return std::begin(x);
+}
+    
+template <class T> inline auto
+end(T&& x) -> decltype(std::end(x))
+{
+    return std::end(x);
+}
+    
+template <class T> inline auto
+rbegin(T&& x) -> decltype(std::rbegin(x))
+{
+    return std::rbegin(x);
+}
+    
+template <class T> inline auto
+rend(T&& x) -> decltype(std::rend(x))
+{
+    return std::rend(x);
+}
+
 template <class T> inline auto
 size(const T& x) -> decltype(x.size())
 {
     return x.size();
 }
 
+/************************************************************************
+*  TU::[begin|end|rbegin|rend](TUPLE&&), TU::size(const tuple<T...>&)	*
+************************************************************************/
+template <class TUPLE, std::enable_if_t<is_tuple<TUPLE>::value>* = nullptr>
+inline auto
+begin(TUPLE&& t)
+{
+    return TU::make_zip_iterator(tuple_transform(
+				     [](auto&& x){ return begin(x); },
+				     std::forward<TUPLE>(t)));
+}
+
+template <class TUPLE, std::enable_if_t<is_tuple<TUPLE>::value>* = nullptr>
+inline auto
+end(TUPLE&& t)
+{
+    return TU::make_zip_iterator(tuple_transform(
+				     [](auto&& x){ return end(x); },
+				     std::forward<TUPLE>(t)));
+}
+
+template <class TUPLE, std::enable_if_t<is_tuple<TUPLE>::value>* = nullptr>
+inline auto
+rbegin(TUPLE&& t)
+{
+    return std::make_reverse_iterator(end(std::forward<TUPLE>(t)));
+}
+
+template <class TUPLE, std::enable_if_t<is_tuple<TUPLE>::value>* = nullptr>
+inline auto
+rend(TUPLE&& t)
+{
+    return std::make_reverse_iterator(begin(std::forward<TUPLE>(t)));
+}
+
+template <class... T> inline auto
+size(const std::tuple<T...>& t)
+{
+    return size(std::get<0>(t));
+}
+
+template <class... T> inline auto
+cbegin(const std::tuple<T...>& t)
+{
+    return begin(t);
+}
+
+template <class... T> inline auto
+cend(const std::tuple<T...>& t)
+{
+    return end(t);
+}
+
+template <class... T> inline auto
+crbegin(const std::tuple<T...>& t)
+{
+    return rbegin(t);
+}
+
+template <class... T> inline auto
+crend(const std::tuple<T...>& t)
+{
+    return rend(t);
+}
+
+/************************************************************************
+*  Applying a multi-input function to a tuple of arguments		*
+************************************************************************/
+namespace detail
+{
+  template <class FUNC, class TUPLE, size_t... IDX> inline decltype(auto)
+  apply(FUNC&& f, TUPLE&& t, std::index_sequence<IDX...>)
+  {
+      return f(std::get<IDX>(std::forward<TUPLE>(t))...);
+  }
+}
+
+//! 複数の引数をまとめたtupleを関数に適用する
+/*!
+  t が std::tuple でない場合は f を1引数関数とみなして t をそのまま渡す．
+  \param f	関数
+  \param t	引数をまとめたtuple
+  \return	関数の戻り値
+*/
+template <class FUNC, class TUPLE,
+	  std::enable_if_t<is_tuple<TUPLE>::value>* = nullptr>
+inline decltype(auto)
+apply(FUNC&& f, TUPLE&& t)
+{
+    return detail::apply(std::forward<FUNC>(f), std::forward<TUPLE>(t),
+			 std::make_index_sequence<
+			     std::tuple_size<std::decay_t<TUPLE> >::value>());
+}
+template <class FUNC, class T,
+	  std::enable_if_t<!is_tuple<T>::value>* = nullptr>
+inline decltype(auto)
+apply(FUNC&& f, T&& t)
+{
+    return f(std::forward<T>(t));
+}
+    
 /************************************************************************
 *  map_iterator<FUNC, ITER>						*
 ************************************************************************/
@@ -362,8 +491,6 @@ class row2col
     
     decltype(auto)	operator ()(argument_type row) const
 			{
-			    using	std::begin;
-			    
 			    return *(begin(row) + _col);
 			}
     
