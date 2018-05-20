@@ -581,6 +581,71 @@ make_zip_iterator(ITERS... iters)
 }
 
 /************************************************************************
+*  TU::[begin|end|rbegin|rend](TUPLE&&)					*
+************************************************************************/
+template <class TUPLE, std::enable_if_t<is_tuple<TUPLE>::value>* = nullptr>
+inline auto
+begin(TUPLE&& t)
+{
+    return TU::make_zip_iterator(
+		tuple_transform([](auto&& x)
+				{ using std::begin; return begin(x); },
+				std::forward<TUPLE>(t)));
+}
+
+template <class TUPLE, std::enable_if_t<is_tuple<TUPLE>::value>* = nullptr>
+inline auto
+end(TUPLE&& t)
+{
+    return TU::make_zip_iterator(
+		tuple_transform([](auto&& x)
+				{ using std::end; return end(x); },
+				std::forward<TUPLE>(t)));
+}
+
+template <class TUPLE, std::enable_if_t<is_tuple<TUPLE>::value>* = nullptr>
+inline auto
+rbegin(TUPLE&& t)
+{
+    return std::make_reverse_iterator(end(std::forward<TUPLE>(t)));
+}
+
+template <class TUPLE, std::enable_if_t<is_tuple<TUPLE>::value>* = nullptr>
+inline auto
+rend(TUPLE&& t)
+{
+    return std::make_reverse_iterator(begin(std::forward<TUPLE>(t)));
+}
+
+template <class... T> inline auto
+cbegin(const std::tuple<T...>& t)
+{
+    return TU::make_zip_iterator(
+		tuple_transform([](const auto& x)
+				{ using std::cbegin; return cbegin(x); }, t));
+}
+
+template <class... T> inline auto
+cend(const std::tuple<T...>& t)
+{
+    return TU::make_zip_iterator(
+		tuple_transform([](const auto& x)
+				{ using std::cend; return cend(x); }, t));
+}
+
+template <class... T> inline auto
+crbegin(const std::tuple<T...>& t)
+{
+    return std::make_reverse_iterator(cend(t));
+}
+
+template <class... T> inline auto
+crend(const std::tuple<T...>& t)
+{
+    return std::make_reverse_iterator(cbegin(t));
+}
+
+/************************************************************************
 *  type alias: decayed_iterator_value<ITER>				*
 ************************************************************************/
 namespace detail
@@ -608,6 +673,42 @@ template <class ITER>
 using decayed_iterator_value = typename detail::decayed_iterator_value<ITER>
 					      ::type;
 
+/************************************************************************
+*  Applying a multi-input function to a tuple of arguments		*
+************************************************************************/
+namespace detail
+{
+  template <class FUNC, class TUPLE, size_t... IDX> inline decltype(auto)
+  apply(FUNC&& f, TUPLE&& t, std::index_sequence<IDX...>)
+  {
+      return f(std::get<IDX>(std::forward<TUPLE>(t))...);
+  }
+}
+
+//! 複数の引数をまとめたtupleを関数に適用する
+/*!
+  t が std::tuple でない場合は f を1引数関数とみなして t をそのまま渡す．
+  \param f	関数
+  \param t	引数をまとめたtuple
+  \return	関数の戻り値
+*/
+template <class FUNC, class TUPLE,
+	  std::enable_if_t<is_tuple<TUPLE>::value>* = nullptr>
+inline decltype(auto)
+apply(FUNC&& f, TUPLE&& t)
+{
+    return detail::apply(std::forward<FUNC>(f), std::forward<TUPLE>(t),
+			 std::make_index_sequence<
+			     std::tuple_size<std::decay_t<TUPLE> >::value>());
+}
+template <class FUNC, class T,
+	  std::enable_if_t<!is_tuple<T>::value>* = nullptr>
+inline decltype(auto)
+apply(FUNC&& f, T&& t)
+{
+    return f(std::forward<T>(t));
+}
+    
 }	// namespace TU
 
 namespace std

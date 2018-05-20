@@ -424,7 +424,7 @@ copy(IN in, size_t n, OUT out)
 {
 #ifdef TU_DEBUG
   //std::cout << "copy<" << N << "> ["
-  //	      << print_sizes(range<IN, N>(in, n)) << ']' << std::endl;
+  //	    << print_sizes(range<IN, N>(in, n)) << ']' << std::endl;
 #endif
     for_each<N>([](auto&& x, const auto& y){ x = y; }, n, out, in);
 }
