@@ -33,7 +33,7 @@ GenericImage::restoreData(std::istream& in)
     }
     else
     {
-	for (auto&& row : _a)
+	for (auto row : _a)
 	    if (!in.read(begin(row), size(row)) ||
 		!in.ignore(npads))
 		break;
@@ -69,7 +69,7 @@ GenericImage::saveData(std::ostream& out) const
     }
     else
     {
-	for (const auto& row : _a)
+	for (const auto row : _a)
 	    if (!out.write(cbegin(row), size(row)) ||
 		!pads.save(out))
 		break;

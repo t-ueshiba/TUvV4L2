@@ -2076,7 +2076,7 @@ Image<T, ALLOC>::restoreRows(std::istream& in, const ImageFormat& format)
     }
     else
     {
-	for (auto&& row : *this)
+	for (auto row : *this)
 	{
 	    if (!buf.restore(in) || !in.ignore(npads))
 		break;
@@ -2116,7 +2116,7 @@ Image<T, ALLOC>::restoreAndLookupRows(std::istream& in,
     }
     else
     {
-	for (auto&& row : *this)
+	for (auto row : *this)
 	{
 	    if (!buf.restore(in) || !in.ignore(npads))
 		break;
@@ -2159,7 +2159,7 @@ Image<T, ALLOC>::saveRows(std::ostream& out, ImageFormat::Type type) const
     }
     else
     {
-	for (const auto& row : *this)
+	for (const auto row : *this)
 	{
 	    using	std::begin;
 	    using	std::end;

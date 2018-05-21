@@ -196,7 +196,7 @@ class LUDecomposition
 	
   private:
     Array2<T, N, N>	_A;
-    Array<int>		_indices;
+    Array<size_t>	_indices;
     T			_det;
 };
 
@@ -222,7 +222,7 @@ LUDecomposition<T, N>::LUDecomposition(const E_& expr)
     for (size_t j = 0; j < size(); ++j)
     {
 	T	max = 0;
-	for (const auto& a : _A)
+	for (const auto a : _A)
 	{
 	    const T	tmp = std::fabs(a[j]);
 	    if (tmp > max)
@@ -1433,7 +1433,7 @@ class SVDecomposition : private BiDiagonal<T>
     \param i	絶対値の大きい順に並んだ特異値の1つを指定するindex
     \return	指定されたindexに対応する特異値
   */
-    T		operator [](int i)	const	{ return diagonal()[i]; }
+    T		operator [](size_t i)	const	{ return diagonal()[i]; }
 };
 
 /************************************************************************
