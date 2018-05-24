@@ -18,12 +18,12 @@ CFLAGS		= -g -O3
 NVCCFLAGS	= -g
 SANITIZE	= -fsanitize=address -fsanitize-address-use-after-scope
 ifeq ($(shell arch), armv7l)
-#  CPPFLAGS     += -DNEON
+  CPPFLAGS     += -DNEON
 else ifeq ($(shell arch), aarch64)
-#  CPPFLAGS     += -DNEON
+  CPPFLAGS     += -DNEON
 else
-#  CPPFLAGS     += -DSSE4
-#  CFLAGS       += -msse4
+  CPPFLAGS     += -DSSE4
+  CFLAGS       += -msse4
 #  CPPFLAGS     += -DAVX2
 #  CFLAGS       += -mavx2
 endif

@@ -37,7 +37,7 @@ class GuidedFilter : public BoxFilter<T>
     class init_coeffs
     {
       public:
-	init_coeffs(size_t n, T e)	:_n(n), _sq_e(e*e)		{}
+	init_coeffs(size_t n, T e)	:_n(n), _n_sq_e(n*e*e)		{}
 
 	template <class VAL_>
 	auto	operator ()(const std::tuple<VAL_, T, VAL_, T>& params) const
@@ -46,10 +46,11 @@ class GuidedFilter : public BoxFilter<T>
 		    
 		    VAL_	a = (_n*get<2>(params) -
 				     get<0>(params)*get<1>(params))
-				  / (_n*(get<3>(params) + _n*_sq_e) -
+				  / (_n*(get<3>(params) + _n_sq_e) -
 				     get<1>(params)*get<1>(params));
-		    VAL_	b = (get<0>(params) - a*get<1>(params))/_n;
-		    return std::make_tuple(std::move(a), std::move(b));
+		    return std::make_tuple(
+				std::move(a),
+				(get<0>(params) - a*get<1>(params))/_n);
 		}
 	auto	operator ()(const std::tuple<T, T>& params) const
 		{
@@ -57,14 +58,14 @@ class GuidedFilter : public BoxFilter<T>
 		    
 		    const auto	var = _n*get<1>(params)
 				    - get<0>(params)*get<0>(params);
-		    const auto	a   = var/(var + _n*_n*_sq_e);
+		    const auto	a   = var/(var + _n*_n_sq_e);
 		    return std::make_tuple(
 				a, (get<0>(params) - a*get<0>(params))/_n);
 		}
 	
       private:
 	const size_t	_n;
-	const T		_sq_e;
+	const T		_n_sq_e;
     };
 
     class trans_guides
