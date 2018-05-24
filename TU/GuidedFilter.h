@@ -48,9 +48,8 @@ class GuidedFilter : public BoxFilter<T>
 				     get<0>(params)*get<1>(params))
 				  / (_n*(get<3>(params) + _n_sq_e) -
 				     get<1>(params)*get<1>(params));
-		    return std::make_tuple(
-				std::move(a),
-				(get<0>(params) - a*get<1>(params))/_n);
+		    VAL_	b = (get<0>(params) - a*get<1>(params))/_n;
+		    return std::make_tuple(std::move(a), std::move(b));
 		}
 	auto	operator ()(const std::tuple<T, T>& params) const
 		{
