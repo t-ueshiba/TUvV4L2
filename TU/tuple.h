@@ -21,7 +21,7 @@ namespace TU
 namespace detail
 {
   template <class... T>
-  std::true_type	check_tuple(std::tuple<T...>)			;
+  std::true_type	check_tuple(const std::tuple<T...>&)		;
   std::false_type	check_tuple(...)				;
 }	// namespace detail
 
@@ -38,9 +38,9 @@ using is_tuple = decltype(detail::check_tuple(std::declval<T>()));
 namespace detail
 {
   template <class HEAD, class... TAIL>
-  HEAD	tuple_head(std::tuple<HEAD, TAIL...>)				;
+  HEAD	tuple_head(const std::tuple<HEAD, TAIL...>&)			;
   template <class T>
-  T	tuple_head(T)							;
+  T	tuple_head(const T&)						;
 }	// namespace detail
     
 //! 与えられた型がtupleならばその先頭要素の型を，そうでなければ元の型を返す．
@@ -139,25 +139,25 @@ namespace detail
   };
     
   template <class FUNC, class... TUPLES> inline void
-  tuple_for_each(std::index_sequence<>, FUNC, TUPLES&&...)
+  tuple_for_each(std::index_sequence<>, FUNC&&, TUPLES&&...)
   {
   }
   template <size_t I, size_t... IDX, class FUNC, class... TUPLES> inline void
-  tuple_for_each(std::index_sequence<I, IDX...>, FUNC f, TUPLES&&... x)
+  tuple_for_each(std::index_sequence<I, IDX...>, FUNC&& f, TUPLES&&... x)
   {
       f(tuple_get<I>(std::forward<TUPLES>(x))...);
-      tuple_for_each(std::index_sequence<IDX...>(), f,
-		     std::forward<TUPLES>(x)...);
+      tuple_for_each(std::index_sequence<IDX...>(),
+		     std::forward<FUNC>(f), std::forward<TUPLES>(x)...);
   }
 }	// namespace detail
     
 template <class FUNC, class... TUPLES>
 inline std::enable_if_t<any<is_tuple, TUPLES...>::value>
-tuple_for_each(FUNC f, TUPLES&&... x)
+tuple_for_each(FUNC&& f, TUPLES&&... x)
 {
     detail::tuple_for_each(std::make_index_sequence<
 			       detail::first_tuple_size<TUPLES...>::value>(),
-			   f, std::forward<TUPLES>(x)...);
+			   std::forward<FUNC>(f), std::forward<TUPLES>(x)...);
 }
 
 /************************************************************************
@@ -166,31 +166,32 @@ tuple_for_each(FUNC f, TUPLES&&... x)
 namespace detail
 {
   template <class FUNC, class... TUPLES> inline auto
-  tuple_transform(std::index_sequence<>, FUNC, TUPLES&&...)
+  tuple_transform(std::index_sequence<>, FUNC&&, TUPLES&&...)
   {
       return std::tuple<>();
   }
   template <class FUNC, class... TUPLES, size_t I, size_t... IDX> inline auto
-  tuple_transform(std::index_sequence<I, IDX...>, FUNC f, TUPLES&&... x)
+  tuple_transform(std::index_sequence<I, IDX...>, FUNC&& f, TUPLES&&... x)
   {
+      auto&&	val = f(tuple_get<I>(std::forward<TUPLES>(x))...);
       return std::tuple_cat(
 		std::make_tuple(
-		    make_reference_wrapper(
-			f(tuple_get<I>(std::forward<TUPLES>(x))...))),
+		    make_reference_wrapper(std::forward<decltype(val)>(val))),
 		tuple_transform(std::index_sequence<IDX...>(),
-				f, std::forward<TUPLES>(x)...));
+				std::forward<FUNC>(f),
+				std::forward<TUPLES>(x)...));
   }
 }	// namespace detail
     
 template <class FUNC, class... TUPLES,
 	  std::enable_if_t<any<is_tuple, TUPLES...>::value>* = nullptr>
 inline auto
-tuple_transform(FUNC f, TUPLES&&... x)
+tuple_transform(FUNC&& f, TUPLES&&... x)
 {
     return detail::tuple_transform(
 	       std::make_index_sequence<
 		   detail::first_tuple_size<TUPLES...>::value>(),
-	       f, std::forward<TUPLES>(x)...);
+	       std::forward<FUNC>(f), std::forward<TUPLES>(x)...);
 }
 
 /************************************************************************

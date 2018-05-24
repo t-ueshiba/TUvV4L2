@@ -16,6 +16,7 @@ INCDIRS		= -I../../..
 CPPFLAGS	= -DNDEBUG #-DSCORE_ARRAY3 #-DTU_DEBUG #-DUSE_TBB
 CFLAGS		= -g -O3
 NVCCFLAGS	= -g
+SANITIZE	= -fsanitize=address -fsanitize-address-use-after-scope
 ifeq ($(shell arch), armv7l)
 #  CPPFLAGS     += -DNEON
 else ifeq ($(shell arch), aarch64)
@@ -26,7 +27,7 @@ else
 #  CPPFLAGS     += -DAVX2
 #  CFLAGS       += -mavx2
 endif
-CCFLAGS		= $(CFLAGS) #-ftemplate-backtrace-limit=0
+CCFLAGS		= $(CFLAGS) #${SANITIZE} #-ftemplate-backtrace-limit=0
 
 LIBS		= -lTUTools++ -ltbb
 ifneq ($(findstring darwin,$(OSTYPE)),)
@@ -34,7 +35,7 @@ ifneq ($(findstring darwin,$(OSTYPE)),)
 		  -framework CoreServices
 endif
 
-LINKER		= $(CXX)
+LINKER		= $(CXX) #${SANITIZE}
 
 BINDIR		= $(PREFIX)/bin
 LIBDIR		= $(PREFIX)/lib

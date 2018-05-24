@@ -25,11 +25,8 @@ class GuidedFilter : public BoxFilter<T>
 	template <class IN_, class GUIDE_>
 	auto	operator ()(IN_&& p, GUIDE_&& g) const
 		{
-		    return std::make_tuple(p, g, evaluate(p*g), g*g);
+		    return std::make_tuple(p, g, std::forward<IN_>(p)*g, g*g);
 		}
-
-      // 引数型をuniversal reference(IN_&&)にすると上記関数とオーバーロード
-      // できなくなるので，const IN_& とする．
 	template <class IN_>
 	auto	operator ()(IN_&& p) const
 		{

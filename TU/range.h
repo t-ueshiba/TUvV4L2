@@ -149,7 +149,8 @@ rank()
 namespace detail
 {
   template <class E>
-  auto		  has_size0(E) -> decltype(E::size0(), std::true_type());
+  auto		  has_size0(const E&)
+			-> decltype(E::size0(), std::true_type())	;
   std::false_type has_size0(...)					;
 }	// namespace detail
 
@@ -1160,7 +1161,7 @@ namespace detail
   };
 
   template <class ITER, size_t SIZE>
-  std::true_type	check_range(range<ITER, SIZE>)			;
+  std::true_type	check_range(const range<ITER, SIZE>&)		;
   std::false_type	check_range(...)				;
 
   template <class E>
