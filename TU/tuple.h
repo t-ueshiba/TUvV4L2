@@ -566,17 +566,14 @@ class zip_iterator : public boost::iterator_facade<
     ITER_TUPLE	_iter_tuple;
 };
 
-template <class ITER_TUPLE>
-inline std::enable_if_t<is_tuple<ITER_TUPLE>::value, zip_iterator<ITER_TUPLE> >
-make_zip_iterator(ITER_TUPLE iter_tuple)
+template <class... ITERS> inline zip_iterator<std::tuple<ITERS...> >
+make_zip_iterator(const std::tuple<ITERS...>& iter_tuple)
 {
     return {iter_tuple};
 }
 
-template <class... ITERS>
-inline std::enable_if_t<(sizeof...(ITERS) > 1),
-			zip_iterator<std::tuple<ITERS...> > >
-make_zip_iterator(ITERS... iters)
+template <class... ITERS> inline zip_iterator<std::tuple<ITERS...> >
+make_zip_iterator(const ITERS&... iters)
 {
     return {std::make_tuple(iters...)};
 }
@@ -588,7 +585,7 @@ template <class TUPLE, std::enable_if_t<is_tuple<TUPLE>::value>* = nullptr>
 inline auto
 begin(TUPLE&& t)
 {
-    return TU::make_zip_iterator(
+    return make_zip_iterator(
 		tuple_transform([](auto&& x)
 				{ using std::begin; return begin(x); },
 				std::forward<TUPLE>(t)));
@@ -598,7 +595,7 @@ template <class TUPLE, std::enable_if_t<is_tuple<TUPLE>::value>* = nullptr>
 inline auto
 end(TUPLE&& t)
 {
-    return TU::make_zip_iterator(
+    return make_zip_iterator(
 		tuple_transform([](auto&& x)
 				{ using std::end; return end(x); },
 				std::forward<TUPLE>(t)));
@@ -621,7 +618,7 @@ rend(TUPLE&& t)
 template <class... T> inline auto
 cbegin(const std::tuple<T...>& t)
 {
-    return TU::make_zip_iterator(
+    return make_zip_iterator(
 		tuple_transform([](const auto& x)
 				{ using std::cbegin; return cbegin(x); }, t));
 }
@@ -629,7 +626,7 @@ cbegin(const std::tuple<T...>& t)
 template <class... T> inline auto
 cend(const std::tuple<T...>& t)
 {
-    return TU::make_zip_iterator(
+    return make_zip_iterator(
 		tuple_transform([](const auto& x)
 				{ using std::cend; return cend(x); }, t));
 }

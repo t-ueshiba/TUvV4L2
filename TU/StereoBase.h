@@ -119,14 +119,12 @@ make_col_accessor(const zip_iterator<ITER_TUPLE>& col)
 #if defined(SIMD)
     return simd::make_accessor(
 	       make_zip_iterator(
-		   std::make_tuple(
-		       std::get<0>(col.get_iterator_tuple()),
-		       std::get<1>(col.get_iterator_tuple()).operator ->())));
-#else
-    return make_zip_iterator(
-	       std::make_tuple(
 		   std::get<0>(col.get_iterator_tuple()),
 		   std::get<1>(col.get_iterator_tuple()).operator ->()));
+#else
+    return make_zip_iterator(
+		std::get<0>(col.get_iterator_tuple()),
+		std::get<1>(col.get_iterator_tuple()).operator ->());
 #endif
 }
     

@@ -282,24 +282,19 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 	if (rowL <= rowL0)
 	    initializeDissimilarities(cbegin(*rowL), cend(*rowL),
 				      make_zip_iterator(
-					  std::make_tuple(
-					      cbegin(*rowR),
-					      make_vertical_iterator(rowV,
-								     cV))),
+					  cbegin(*rowR),
+					  make_vertical_iterator(rowV, cV)),
 				      buffers->Q.begin());
 	else
 	{
 	    updateDissimilarities(cbegin(*rowL), cend(*rowL),
 				  make_zip_iterator(
-				      std::make_tuple(
 					  cbegin(*rowR),
-					  make_vertical_iterator(rowV, cV))),
+					  make_vertical_iterator(rowV, cV)),
 				  cbegin(*rowLp),
 				  make_zip_iterator(
-				      std::make_tuple(
-					  cbegin(*rowRp),
-					  make_vertical_iterator(rowV,
-								 --cVp))),
+				      cbegin(*rowRp),
+				      make_vertical_iterator(rowV, --cVp)),
 				  buffers->Q.begin());
 	    ++rowLp;
 	    ++rowRp;
@@ -313,14 +308,12 @@ SADStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 			       buffers->dminL.rbegin(),
 			       buffers->delta.rbegin(),
 			       make_zip_iterator(
-				   std::make_tuple(
-				       buffers->dminR.end() - D + 1,
-				       make_vertical_iterator(
-					   buffers->dminV.end(), v))),
+				   buffers->dminR.end() - D + 1,
+				   make_vertical_iterator(
+				       buffers->dminV.end(), v)),
 			       make_zip_iterator(
-				   std::make_tuple(
-				       make_dummy_iterator(&(buffers->RminR)),
-				       buffers->RminV.rbegin())));
+				   make_dummy_iterator(&(buffers->RminR)),
+				   buffers->RminV.rbegin()));
 	    start(3);
 	    selectDisparities(buffers->dminL.cbegin(), buffers->dminL.cend(),
 			      buffers->dminR.cbegin(), buffers->delta.cbegin(),
@@ -381,18 +374,16 @@ SADStereo<SCORE, DISP>::initializeDissimilarities(COL colL, COL colLe,
 	    ++colQ;
 
 	    auto	P = make_zip_iterator(
-				std::make_tuple(
+				make_map_iterator(
+				    diff_t(*colL, _params.intensityDiffMax),
+				    make_col_accessor(colRV)),
+				make_map_iterator(
+				    ddiff_t(*(colL + 1) - *(colL - 1),
+					    _params.derivativeDiffMax),
 				    make_map_iterator(
-					diff_t(*colL,
-					       _params.intensityDiffMax),
-					make_col_accessor(colRV)),
-				    make_map_iterator(
-					ddiff_t(*(colL + 1) - *(colL - 1),
-						_params.derivativeDiffMax),
-					make_map_iterator(
-					    Minus(),
-					    make_col_accessor(colRV) + 1,
-					    make_col_accessor(colRV) - 1))));
+					Minus(),
+					make_col_accessor(colRV) + 1,
+					make_col_accessor(colRV) - 1)));
 	    for (qiterator Q( make_assignment_iterator(
 				  blend_t(_params.blend), colQ->begin())),
 			   Qe(make_assignment_iterator(
@@ -452,29 +443,26 @@ SADStereo<SCORE, DISP>::updateDissimilarities(COL colL,  COL colLe,
 	    ++colQ;
 
 	    auto	P = make_zip_iterator(
-				std::make_tuple(
+				make_map_iterator(
+				    diff_t(*colL, _params.intensityDiffMax),
+				    make_col_accessor(colRV)),
+				make_map_iterator(
+				    ddiff_t(*(colL + 1) - *(colL - 1),
+					    _params.derivativeDiffMax),
 				    make_map_iterator(
-					diff_t(*colL,
-					       _params.intensityDiffMax),
-					make_col_accessor(colRV)),
+					Minus(),
+					make_col_accessor(colRV) + 1,
+					make_col_accessor(colRV) - 1)),
+				make_map_iterator(
+				    diff_t(*colLp, _params.intensityDiffMax),
+				    make_col_accessor(colRVp)),
+				make_map_iterator(
+				    ddiff_t(*(colLp + 1) - *(colLp - 1),
+					    _params.derivativeDiffMax),
 				    make_map_iterator(
-					ddiff_t(*(colL + 1) - *(colL - 1),
-						_params.derivativeDiffMax),
-					make_map_iterator(
-					    Minus(),
-					    make_col_accessor(colRV) + 1,
-					    make_col_accessor(colRV) - 1)),
-				    make_map_iterator(
-					diff_t(*colLp,
-					       _params.intensityDiffMax),
-					make_col_accessor(colRVp)),
-				    make_map_iterator(
-					ddiff_t(*(colLp + 1) - *(colLp - 1),
-						_params.derivativeDiffMax),
-					make_map_iterator(
-					    Minus(),
-					    make_col_accessor(colRVp) + 1,
-					    make_col_accessor(colRVp) - 1))));
+					Minus(),
+					make_col_accessor(colRVp) + 1,
+					make_col_accessor(colRVp) - 1)));
 	    for (qiterator Q( make_assignment_iterator(
 				  ScoreUpdate(_params.blend), colQ->begin())),
 			   Qe(make_assignment_iterator(

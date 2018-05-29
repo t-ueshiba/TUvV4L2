@@ -426,25 +426,20 @@ GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 	if (rowL <= rowL0)
 	    initializeFilterParameters(cbegin(*rowL), cend(*rowL),
 				       make_zip_iterator(
-					   std::make_tuple(
-					       cbegin(*rowR),
-					       make_vertical_iterator(rowV,
-								      cV))),
+					   cbegin(*rowR),
+					   make_vertical_iterator(rowV, cV)),
 				       begin(buffers->Q),
 				       buffers->F.begin());
 	else
 	{
 	    updateFilterParameters(cbegin(*rowL), cend(*rowL),
 				   make_zip_iterator(
-				       std::make_tuple(
-					   cbegin(*rowR),
-					   make_vertical_iterator(rowV, cV))),
+				       cbegin(*rowR),
+				       make_vertical_iterator(rowV, cV)),
 				   cbegin(*rowLp),
 				   make_zip_iterator(
-				       std::make_tuple(
-					   cbegin(*rowRp),
-					   make_vertical_iterator(rowV,
-								  --cVp))),
+				       cbegin(*rowRp),
+				       make_vertical_iterator(rowV, --cVp)),
 				   begin(buffers->Q),
 				   buffers->F.begin());
 	    ++rowLp;
@@ -483,15 +478,12 @@ GFStereo<SCORE, DISP>::match(ROW rowL, ROW rowLe, ROW rowLlast,
 				   buffers->dminL.rbegin(),
 				   buffers->delta.rbegin(),
 				   make_zip_iterator(
-				       std::make_tuple(
-					   buffers->dminR.end() - D + 1,
-					   make_vertical_iterator(
-					       buffers->dminV.end(), v))),
+				       buffers->dminR.end() - D + 1,
+				       make_vertical_iterator(
+					   buffers->dminV.end(), v)),
 				   make_zip_iterator(
-				       std::make_tuple(
-					   make_dummy_iterator(
-					       &(buffers->RminR)),
-					   buffers->RminV.rbegin())));
+				       make_dummy_iterator(&(buffers->RminR)),
+				       buffers->RminV.rbegin()));
 		++boxB;
 
 		start(5);
@@ -560,18 +552,16 @@ GFStereo<SCORE, DISP>::initializeFilterParameters(COL colL, COL colLe,
 	
 	    const auto	pixL = *colL;
 	    auto	P = make_zip_iterator(
-				std::make_tuple(
+				make_map_iterator(
+				    diff_t(pixL, _params.intensityDiffMax),
+				    make_col_accessor(colRV)),
+				make_map_iterator(
+				    ddiff_t(*(colL + 1) - *(colL - 1),
+					    _params.derivativeDiffMax),
 				    make_map_iterator(
-					diff_t(pixL,
-					       _params.intensityDiffMax),
-					make_col_accessor(colRV)),
-				    make_map_iterator(
-					ddiff_t(*(colL + 1) - *(colL - 1),
-						_params.derivativeDiffMax),
-					make_map_iterator(
-					    Minus(),
-					    make_col_accessor(colRV) + 1,
-					    make_col_accessor(colRV) - 1))));
+					Minus(),
+					make_col_accessor(colRV) + 1,
+					make_col_accessor(colRV) - 1)));
 	    for (qiterator Q( make_assignment_iterator(
 				  init_params2(pixL, _params.blend),
 				  begin(*colQ))),
@@ -650,29 +640,26 @@ GFStereo<SCORE, DISP>::updateFilterParameters(COL colL, COL colLe, COL_RV colRV,
 	    const auto	pixLp = *colLp;
 	    const auto	pixL  = *colL;
 	    auto	P = make_zip_iterator(
-				std::make_tuple(
+				make_map_iterator(
+				    diff_t(*colL, _params.intensityDiffMax),
+				    make_col_accessor(colRV)),
+				make_map_iterator(
+				    ddiff_t(*(colL + 1) - *(colL - 1),
+					    _params.derivativeDiffMax),
 				    make_map_iterator(
-					diff_t(*colL,
-					       _params.intensityDiffMax),
-					make_col_accessor(colRV)),
+					Minus(),
+					make_col_accessor(colRV) + 1,
+					make_col_accessor(colRV) - 1)),
+				make_map_iterator(
+				    diff_t(*colLp, _params.intensityDiffMax),
+				    make_col_accessor(colRVp)),
+				make_map_iterator(
+				    ddiff_t(*(colLp + 1) - *(colLp - 1),
+					    _params.derivativeDiffMax),
 				    make_map_iterator(
-					ddiff_t(*(colL + 1) - *(colL - 1),
-						_params.derivativeDiffMax),
-					make_map_iterator(
-					    Minus(),
-					    make_col_accessor(colRV) + 1,
-					    make_col_accessor(colRV) - 1)),
-				    make_map_iterator(
-					diff_t(*colLp,
-					       _params.intensityDiffMax),
-					make_col_accessor(colRVp)),
-				    make_map_iterator(
-					ddiff_t(*(colLp + 1) - *(colLp - 1),
-						_params.derivativeDiffMax),
-					make_map_iterator(
-					    Minus(),
-					    make_col_accessor(colRVp) + 1,
-					    make_col_accessor(colRVp) - 1))));
+					Minus(),
+					make_col_accessor(colRVp) + 1,
+					make_col_accessor(colRVp) - 1)));
 	    for (qiterator Q( make_assignment_iterator(
 				  update_params2(pixL, pixLp, _params.blend),
 				  begin(*colQ))),
