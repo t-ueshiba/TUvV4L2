@@ -581,66 +581,84 @@ make_zip_iterator(const ITERS&... iters)
 /************************************************************************
 *  TU::[begin|end|rbegin|rend](TUPLE&&)					*
 ************************************************************************/
-template <class TUPLE, std::enable_if_t<is_tuple<TUPLE>::value>* = nullptr>
-inline auto
-begin(TUPLE&& t)
+template <class... T> inline auto
+begin(std::tuple<T...>& t)
 {
     return make_zip_iterator(
-		tuple_transform([](auto&& x)
-				{ using std::begin; return begin(x); },
-				std::forward<TUPLE>(t)));
+		tuple_transform([](auto& x)
+				{ using std::begin; return begin(x); }, t));
 }
 
-template <class TUPLE, std::enable_if_t<is_tuple<TUPLE>::value>* = nullptr>
-inline auto
-end(TUPLE&& t)
+template <class... T> inline auto
+end(std::tuple<T...>& t)
 {
     return make_zip_iterator(
-		tuple_transform([](auto&& x)
-				{ using std::end; return end(x); },
-				std::forward<TUPLE>(t)));
+		tuple_transform([](auto& x)
+				{ using std::end; return end(x); }, t));
 }
 
-template <class TUPLE, std::enable_if_t<is_tuple<TUPLE>::value>* = nullptr>
-inline auto
-rbegin(TUPLE&& t)
+template <class... T> inline auto
+rbegin(std::tuple<T...>& t)
 {
-    return std::make_reverse_iterator(end(std::forward<TUPLE>(t)));
+    return std::make_reverse_iterator(end(t));
 }
 
-template <class TUPLE, std::enable_if_t<is_tuple<TUPLE>::value>* = nullptr>
-inline auto
-rend(TUPLE&& t)
+template <class... T> inline auto
+rend(std::tuple<T...>& t)
 {
-    return std::make_reverse_iterator(begin(std::forward<TUPLE>(t)));
+    return std::make_reverse_iterator(begin(t));
+}
+
+template <class... T> inline auto
+begin(const std::tuple<T...>& t)
+{
+    return make_zip_iterator(
+		tuple_transform([](auto& x)
+				{ using std::begin; return begin(x); }, t));
+}
+
+template <class... T> inline auto
+end(const std::tuple<T...>& t)
+{
+    return make_zip_iterator(
+		tuple_transform([](auto& x)
+				{ using std::end; return end(x); }, t));
+}
+
+template <class... T> inline auto
+rbegin(const std::tuple<T...>& t)
+{
+    return std::make_reverse_iterator(end(t));
+}
+
+template <class... T> inline auto
+rend(const std::tuple<T...>& t)
+{
+    return std::make_reverse_iterator(begin(t));
 }
 
 template <class... T> inline auto
 cbegin(const std::tuple<T...>& t)
 {
-    return make_zip_iterator(
-		tuple_transform([](const auto& x)
-				{ using std::cbegin; return cbegin(x); }, t));
+    return begin(t);
 }
 
 template <class... T> inline auto
 cend(const std::tuple<T...>& t)
 {
-    return make_zip_iterator(
-		tuple_transform([](const auto& x)
-				{ using std::cend; return cend(x); }, t));
+    return end(t);
 }
 
 template <class... T> inline auto
 crbegin(const std::tuple<T...>& t)
 {
-    return std::make_reverse_iterator(cend(t));
+    return rbegin(t);
 }
 
 template <class... T> inline auto
 crend(const std::tuple<T...>& t)
 {
-    return std::make_reverse_iterator(cbegin(t));
+    return rend(t);
 }
 
 /************************************************************************

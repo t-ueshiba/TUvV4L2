@@ -112,7 +112,7 @@ doJob(const Image<T>& imageL, const Image<T>& imageR,
 	filter.convolve(rowI, rowIe, rowO, true);
       }
 	break;
-
+      /*
       case GF:
       {
 	GuidedFilter2<S>
@@ -120,7 +120,7 @@ doJob(const Image<T>& imageL, const Image<T>& imageR,
 	filter.convolve(rowI, rowIe, rowL, rowLe, rowO, true);
       }
 	break;
-	
+      */
       case TF:
       {
 	using wfunc_type = MyDiff<T, S>;

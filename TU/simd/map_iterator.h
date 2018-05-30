@@ -329,7 +329,7 @@ template <class T=void, bool MASK=false, class FUNC,
 	  class... ITER, bool... ALIGNED>
 inline auto
 make_map_iterator(FUNC&& func,
-		  const std::tuple<iterator_wrapper<ITER, ALIGNED>...>& iter)
+		  std::tuple<iterator_wrapper<ITER, ALIGNED>...>& iter)
 {
     using iters_t  = decltype(make_accessor(iter));
     using argelm_t = detail::map_iterator_argument_element<T, iters_t>;
@@ -357,6 +357,17 @@ make_map_iterator(FUNC&& func,
 			     std::make_tuple(make_accessor(iter0),
 					     make_accessor(iter1),
 					     make_accessor(iter)...)));
+}
+
+template <class T=void, bool MASK=false,
+	  class FUNC, class ITER_TUPLE, bool ALIGNED>
+inline auto
+make_map_iterator(FUNC&& func,
+		  const iterator_wrapper<
+				zip_iterator<ITER_TUPLE>, ALIGNED>& iter)
+{
+    return make_map_iterator<T, MASK>(std::forward<FUNC>(func),
+				      make_accessor(iter).get_iterator_tuple());
 }
 
 }	// namespace simd

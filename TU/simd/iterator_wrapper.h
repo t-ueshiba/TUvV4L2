@@ -135,12 +135,25 @@ make_accessor(const std::tuple<ITER...>& iter_tuple)
   \return		SIMDベクトルを読み書きする反復子を束ねたzip_iterator
 */
 template <class ITER_TUPLE> inline auto
-make_accessor(zip_iterator<ITER_TUPLE> zip_iter)
+make_accessor(const zip_iterator<ITER_TUPLE>& zip_iter)
 {
     return make_zip_iterator(make_accessor(zip_iter.get_iterator_tuple()));
 }
 
+template <class... ITER, bool... ALIGNED> inline auto
+make_zip_iterator(const std::tuple<
+			    iterator_wrapper<ITER, ALIGNED>...>& iter_tuple)
+{
+    return wrap_iterator(TU::make_zip_iterator(make_accessor(iter_tuple)));
 }
+
+template <class... ITER, bool... ALIGNED> inline auto
+make_zip_iterator(const iterator_wrapper<ITER, ALIGNED>&... iter)
+{
+    return wrap_iterator(TU::make_zip_iterator(make_accessor(iter)...));
 }
+
+}	// namespace simd
+}	// namespace TU
 #endif	// !TU_SIMD_ITERATOR_WRAPPER_H
 

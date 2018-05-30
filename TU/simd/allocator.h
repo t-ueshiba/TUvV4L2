@@ -80,5 +80,3 @@ class allocator
 }	// namespace simd
 }	// namespace TU
 #endif	// !TU_SIMD_ALLOCATOR_H)
-
-
