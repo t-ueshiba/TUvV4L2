@@ -314,29 +314,17 @@ class map_iterator
     FUNC	_func;
 };
 
-template <class T=void, bool MASK=false, class FUNC, class ITER, bool ALIGNED>
+template <class T=void, bool MASK=false,
+	  class FUNC, class... ITER, bool... ALIGNED>
 inline auto
-make_map_iterator(FUNC&& func, const iterator_wrapper<ITER, ALIGNED>& iter)
+make_map_iterator(FUNC&& func, const iterator_wrapper<ITER, ALIGNED>&... iter)
 {
-    using iters_t  = decltype(make_accessor(iter));
+    using iters_t  = decltype(make_accessor(TU::make_zip_iterator(iter...)));
     using argelm_t = detail::map_iterator_argument_element<T, iters_t>;
 
     return wrap_iterator(map_iterator<argelm_t, MASK, FUNC, iters_t>(
-			     std::forward<FUNC>(func), make_accessor(iter)));
-}
-
-template <class T=void, bool MASK=false, class FUNC,
-	  class ITER0, bool ALIGNED0, class ITER1, bool ALIGNED1,
-	  class... ITER, bool... ALIGNED>
-inline auto
-make_map_iterator(FUNC&& func,
-		  const iterator_wrapper<ITER0, ALIGNED0>&   iter0,
-		  const iterator_wrapper<ITER1, ALIGNED1>&   iter1,
-		  const iterator_wrapper<ITER,  ALIGNED>&... iter)
-{
-    return make_map_iterator<T, MASK>(
-		std::forward<FUNC>(func),
-		TU::make_zip_iterator(iter0, iter1, iter...));
+			     std::forward<FUNC>(func),
+			     make_accessor(TU::make_zip_iterator(iter...))));
 }
 
 }	// namespace simd
@@ -371,8 +359,7 @@ namespace detail
   };
 }	// namespace detail
 
-template <class T=void, bool MASK=false, class FUNC>
-inline auto
+template <class T=void, bool MASK=false, class FUNC> inline auto
 mapped(FUNC&& func)
 {
     return detail::mapped_tag<T, MASK, FUNC>(std::forward<FUNC>(func));
@@ -381,12 +368,11 @@ mapped(FUNC&& func)
 template <class... ARG> inline auto
 zip(const ARG&... x)
 {
-    return make_range(make_zip_iterator(std::begin(x)...),
+    return make_range(TU::make_zip_iterator(begin(x)...),
 		      std::min({size(x)...}));
 }
     
-template <class ARG, class T, bool MASK, class FUNC>
-inline auto
+template <class ARG, class T, bool MASK, class FUNC> inline auto
 operator |(const ARG& x, detail::mapped_tag<T, MASK, FUNC>&& m)
 {
     using S = typename detail::mapped_tag<T, MASK, FUNC>::element_type;
