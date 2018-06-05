@@ -184,18 +184,13 @@ class map_iterator
     FUNC	_func;	//!< 演算子
 };
 
-template <class FUNC, class ITER> inline map_iterator<FUNC, ITER>
-make_map_iterator(FUNC&& func, const ITER& iter)
+template <class FUNC, class... ITERS> inline auto
+make_map_iterator(FUNC&& func, const ITERS&... iters)
 {
-    return {std::forward<FUNC>(func), iter};
-}
-
-template <class FUNC, class ITER0, class ITER1, class... ITERS> inline auto
-make_map_iterator(FUNC&& func,
-		  const ITER0& iter0, const ITER1& iter1, const ITERS&... iters)
-{
-    return make_map_iterator(std::forward<FUNC>(func),
-			     make_zip_iterator(iter0, iter1, iters...));
+    using iters_t = decltype(TU::make_zip_iterator(iters...));
+    
+    return map_iterator<FUNC, iters_t>(std::forward<FUNC>(func),
+				       TU::make_zip_iterator(iters...));
 }
 
 /************************************************************************
@@ -364,20 +359,13 @@ class assignment_iterator
     FUNC 	_func;	// 代入を可能にするためconstは付けない
 };
     
-template <class FUNC, class ITER> inline assignment_iterator<FUNC, ITER>
-make_assignment_iterator(FUNC&& func, const ITER& iter)
+template <class FUNC, class... ITERS> inline auto
+make_assignment_iterator(FUNC&& func, const ITERS&... iters)
 {
-    return {std::forward<FUNC>(func), iter};
-}
-
-template <class FUNC, class ITER0, class ITER1, class... ITERS>
-inline assignment_iterator<FUNC,
-			   zip_iterator<std::tuple<ITER0, ITER1, ITERS...> > >
-make_assignment_iterator(FUNC&& func, const ITER0& iter0,
-			 const ITER1& iter1, const ITERS&... iters)
-{
-    return {std::forward<FUNC>(func),
-	    make_zip_iterator(iter0, iter1, iters...)};
+    using iters_t = decltype(TU::make_zip_iterator(iters...));
+    
+    return assignment_iterator<FUNC, iters_t>(std::forward<FUNC>(func),
+					      TU::make_zip_iterator(iters...));
 }
 
 /************************************************************************

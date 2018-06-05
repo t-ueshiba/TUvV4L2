@@ -838,6 +838,9 @@ stride(const thrust::zip_iterator<ITER_TUPLE>& iter)
 }
 #endif
     
+/************************************************************************
+*  fixed size & fixed stride ranges and associated iterators		*
+************************************************************************/
 //! 固定長レンジを指し，インクリメント時に固定した要素数だけ進める反復子を生成する
 /*!
   \param STRIDE	インクリメント時に進める要素数
@@ -852,36 +855,6 @@ make_range_iterator(ITER iter)
     return {iter};
 }
 
-//! 固定長レンジを指し，インクリメント時に指定した要素数だけ進める反復子を生成する
-/*!
-  \param SIZE	レンジサイズ
-  \param iter	レンジの先頭要素を指す反復子
-  \param stride	インクリメント時に進める要素数
-  \return	レンジ反復子
-*/
-template <size_t SIZE, class ITER>
-inline range_iterator<ITER, 0, SIZE>
-make_range_iterator(ITER iter, iterator_stride<ITER> stride)
-{
-    return {iter, stride};
-}
-    
-//! 指定された長さのレンジを指し，インクリメント時に指定した要素数だけ進める反復子を生成する
-/*!
-  \param iter	レンジの先頭要素を指す反復子
-  \param stride	インクリメント時に進める要素数
-  \param size	レンジサイズ
-  \return	レンジ反復子
-*/
-template <class ITER> inline range_iterator<ITER, 0, 0>
-make_range_iterator(ITER iter, iterator_stride<ITER> stride, size_t size)
-{
-    return {iter, stride, size};
-}
-    
-/************************************************************************
-*  fixed size & fixed stride ranges and associated iterators		*
-************************************************************************/
 //! 多次元固定長レンジを指し，インクリメント時に固定したブロック数だけ進める反復子を生成する
 /*!
   \param STRIDE	インクリメント時に進める最上位軸のブロック数
@@ -908,6 +881,20 @@ make_range(ITER iter)
 /************************************************************************
 *  fixed size & variable stride ranges and associated iterators		*
 ************************************************************************/
+//! 固定長レンジを指し，インクリメント時に指定した要素数だけ進める反復子を生成する
+/*!
+  \param SIZE	レンジサイズ
+  \param iter	レンジの先頭要素を指す反復子
+  \param stride	インクリメント時に進める要素数
+  \return	レンジ反復子
+*/
+template <size_t SIZE, class ITER>
+inline range_iterator<ITER, 0, SIZE>
+make_range_iterator(ITER iter, iterator_stride<ITER> stride)
+{
+    return {iter, stride};
+}
+    
 //! 多次元固定長レンジを指し，インクリメント時に指定したブロック数だけ進める反復子を生成する
 /*!
   \param SIZE		最上位軸のレンジサイズ
@@ -938,6 +925,19 @@ make_range(ITER iter, STRIDES... strides)
 /************************************************************************
 *  variable size & variable stride ranges and associated iterators	*
 ************************************************************************/
+//! 指定された長さのレンジを指し，インクリメント時に指定した要素数だけ進める反復子を生成する
+/*!
+  \param iter	レンジの先頭要素を指す反復子
+  \param stride	インクリメント時に進める要素数
+  \param size	レンジサイズ
+  \return	レンジ反復子
+*/
+template <class ITER> inline range_iterator<ITER, 0, 0>
+make_range_iterator(ITER iter, iterator_stride<ITER> stride, size_t size)
+{
+    return {iter, stride, size};
+}
+    
 //! 多次元可変長レンジを指し，インクリメント時に指定したブロック数だけ進める反復子を生成する
 /*!
   \param iter		レンジの先頭要素を指す反復子
