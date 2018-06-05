@@ -120,37 +120,31 @@ make_accessor(const iterator_wrapper<T*, ALIGNED>& p)
     return {p.base()};
 }
 
-//! ラップされた反復子の tuple からSIMDベクトル用のアルゴリズムに渡せる反復子の tuple を生成する
-template <class... ITER> constexpr inline auto
-make_accessor(const std::tuple<ITER...>& iter_tuple)
+//! zip_iterator中の各反復子からSIMDベクトルを読み書きする反復子を生成し，それをtupleにまとめる
+/*!
+  \param iter	SIMDベクトルを読み込み元/書き込み先を指す反復子を束ねたzip_iterator
+  \return	SIMDベクトルを読み書きする反復子を束ねたzip_iterator
+*/
+template <class ITER_TUPLE, bool ALIGNED> inline auto
+make_accessor(const iterator_wrapper<zip_iterator<ITER_TUPLE>, ALIGNED>& iter)
 {
-    return tuple_transform([](const auto& iter){ return make_accessor(iter); },
-			   iter_tuple);
+    return tuple_transform([](const auto& it){ return make_accessor(it); },
+			   iter.base().get_iterator_tuple());
 }
 
-//! zip_iterator中の各反復子からSIMDベクトルを読み書きする反復子を生成し，それを再度zip_iteratorにまとめる
-/*!
-  \param zip_iter	SIMDベクトルを読み込み元/書き込み先を指す反復子を束ねた
-			zip_iterator
-  \return		SIMDベクトルを読み書きする反復子を束ねたzip_iterator
-*/
 template <class ITER_TUPLE> inline auto
-make_accessor(const zip_iterator<ITER_TUPLE>& zip_iter)
+make_accessor(const zip_iterator<ITER_TUPLE>& iter)
 {
-    return make_zip_iterator(make_accessor(zip_iter.get_iterator_tuple()));
+    return make_zip_iterator(tuple_transform([](const auto& it)
+					     { return make_accessor(it); },
+					     iter.get_iterator_tuple()));
 }
 
 template <class... ITER, bool... ALIGNED> inline auto
 make_zip_iterator(const std::tuple<
 			    iterator_wrapper<ITER, ALIGNED>...>& iter_tuple)
 {
-    return wrap_iterator(TU::make_zip_iterator(make_accessor(iter_tuple)));
-}
-
-template <class... ITER, bool... ALIGNED> inline auto
-make_zip_iterator(const iterator_wrapper<ITER, ALIGNED>&... iter)
-{
-    return wrap_iterator(TU::make_zip_iterator(make_accessor(iter)...));
+    return wrap_iterator(TU::make_zip_iterator(iter_tuple));
 }
 
 }	// namespace simd

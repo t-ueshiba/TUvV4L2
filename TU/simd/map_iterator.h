@@ -320,20 +320,7 @@ make_map_iterator(FUNC&& func, const iterator_wrapper<ITER, ALIGNED>& iter)
 {
     using iters_t  = decltype(make_accessor(iter));
     using argelm_t = detail::map_iterator_argument_element<T, iters_t>;
-    
-    return wrap_iterator(map_iterator<argelm_t, MASK, FUNC, iters_t>(
-			     std::forward<FUNC>(func), make_accessor(iter)));
-}
 
-template <class T=void, bool MASK=false, class FUNC,
-	  class... ITER, bool... ALIGNED>
-inline auto
-make_map_iterator(FUNC&& func,
-		  std::tuple<iterator_wrapper<ITER, ALIGNED>...>& iter)
-{
-    using iters_t  = decltype(make_accessor(iter));
-    using argelm_t = detail::map_iterator_argument_element<T, iters_t>;
-    
     return wrap_iterator(map_iterator<argelm_t, MASK, FUNC, iters_t>(
 			     std::forward<FUNC>(func), make_accessor(iter)));
 }
@@ -347,27 +334,9 @@ make_map_iterator(FUNC&& func,
 		  const iterator_wrapper<ITER1, ALIGNED1>&   iter1,
 		  const iterator_wrapper<ITER,  ALIGNED>&... iter)
 {
-    using iters_t  = decltype(std::make_tuple(make_accessor(iter0),
-					      make_accessor(iter1),
-					      make_accessor(iter)...));
-    using argelm_t = detail::map_iterator_argument_element<T, iters_t>;
-    
-    return wrap_iterator(map_iterator<argelm_t, MASK, FUNC, iters_t>(
-			     std::forward<FUNC>(func),
-			     std::make_tuple(make_accessor(iter0),
-					     make_accessor(iter1),
-					     make_accessor(iter)...)));
-}
-
-template <class T=void, bool MASK=false,
-	  class FUNC, class ITER_TUPLE, bool ALIGNED>
-inline auto
-make_map_iterator(FUNC&& func,
-		  const iterator_wrapper<
-				zip_iterator<ITER_TUPLE>, ALIGNED>& iter)
-{
-    return make_map_iterator<T, MASK>(std::forward<FUNC>(func),
-				      make_accessor(iter).get_iterator_tuple());
+    return make_map_iterator<T, MASK>(
+		std::forward<FUNC>(func),
+		TU::make_zip_iterator(iter0, iter1, iter...));
 }
 
 }	// namespace simd
@@ -376,27 +345,6 @@ make_map_iterator(FUNC&& func,
 ************************************************************************/
 namespace detail
 {
-  template <class ITERS>
-  class mapped_args
-  {
-    public:
-      mapped_args(ITERS&& iters, size_t n)
-	  :_iters(std::forward<ITERS>(iters)), _size(n)	{}
-      
-      auto	begin()				const	{ return _iters; }
-      auto	size()				const	{ return _size; }
-      
-    private:
-      ITERS	_iters;
-      size_t	_size;
-  };
-
-  template <class... ITER> inline mapped_args<std::tuple<ITER...> >
-  make_mapped_args(std::tuple<ITER...>&& iters, size_t n)
-  {
-      return {std::move(iters), n};
-  }
-
   template <class T, bool MASK, class FUNC>
   class mapped_tag
   {
@@ -423,18 +371,18 @@ namespace detail
   };
 }	// namespace detail
 
-template <class... ARG> inline auto
-zip(const ARG&... x)
-{
-    return detail::make_mapped_args(std::make_tuple(std::begin(x)...),
-				    std::min({size(x)...}));
-}
-    
 template <class T=void, bool MASK=false, class FUNC>
 inline auto
 mapped(FUNC&& func)
 {
     return detail::mapped_tag<T, MASK, FUNC>(std::forward<FUNC>(func));
+}
+    
+template <class... ARG> inline auto
+zip(const ARG&... x)
+{
+    return make_range(make_zip_iterator(std::begin(x)...),
+		      std::min({size(x)...}));
 }
     
 template <class ARG, class T, bool MASK, class FUNC>

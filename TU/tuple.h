@@ -572,10 +572,10 @@ make_zip_iterator(const std::tuple<ITERS...>& iter_tuple)
     return {iter_tuple};
 }
 
-template <class... ITERS> inline zip_iterator<std::tuple<ITERS...> >
+template <class... ITERS> inline auto
 make_zip_iterator(const ITERS&... iters)
 {
-    return {std::make_tuple(iters...)};
+    return make_zip_iterator(std::make_tuple(iters...));
 }
 
 /************************************************************************

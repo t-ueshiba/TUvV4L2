@@ -189,16 +189,15 @@ make_map_iterator(FUNC&& func, const ITER& iter)
 {
     return {std::forward<FUNC>(func), iter};
 }
-    
-template <class FUNC, class ITER0, class ITER1, class... ITERS>
-inline map_iterator<FUNC, zip_iterator<std::tuple<ITER0, ITER1, ITERS...> > >
+
+template <class FUNC, class ITER0, class ITER1, class... ITERS> inline auto
 make_map_iterator(FUNC&& func,
 		  const ITER0& iter0, const ITER1& iter1, const ITERS&... iters)
 {
-    return {std::forward<FUNC>(func),
-	    make_zip_iterator(iter0, iter1, iters...)};
+    return make_map_iterator(std::forward<FUNC>(func),
+			     make_zip_iterator(iter0, iter1, iters...));
 }
-    
+
 /************************************************************************
 *  make_mbr_iterator<ITER, T>						*
 ************************************************************************/

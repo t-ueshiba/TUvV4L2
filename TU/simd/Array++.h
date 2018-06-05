@@ -50,8 +50,8 @@ template <size_t N, class FUNC, class ITER0, bool ALIGNED0,
 for_each(FUNC func, size_t n, iterator_wrapper<ITER0, ALIGNED0> iter0,
 	 iterator_wrapper<ITER, ALIGNED>... iter)
 {
-    auto		map = make_accessor(make_map_iterator(func, iter0,
-							      iter...));
+    auto		map  = make_accessor(make_map_iterator(func, iter0,
+							       iter...));
     constexpr auto	STEP = map.step();
     
     TU::for_each<detail::nsteps(N, STEP)>(map, detail::nsteps(n, STEP));

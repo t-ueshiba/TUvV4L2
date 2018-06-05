@@ -106,7 +106,7 @@ main()
     std::cerr << "--------------" << std::endl;
     
     TU::test_two_stages<int16_t, int32_t, float, int8_t, int16_t>();
-    
+ 
     std::cerr << "--------------" << std::endl;
     
     TU::test_map_iterator<int16_t, int16_t, float>();
