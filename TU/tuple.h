@@ -572,11 +572,10 @@ make_zip_iterator(const std::tuple<ITERS...>& iter_tuple)
     return {iter_tuple};
 }
 
-template <class ITER, std::enable_if_t<!is_tuple<ITER>::value>* = nullptr>
-inline auto
-make_zip_iterator(ITER&& iter)
+template <class ITER> inline ITER
+make_zip_iterator(const ITER& iter)
 {
-    return std::forward<ITER>(iter);
+    return iter;
 }
 
 template <class ITER0, class ITER1, class... ITERS> inline auto
