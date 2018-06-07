@@ -6,6 +6,12 @@
 
 namespace TU
 {
+template <class T> auto
+demangle()
+{
+    return boost::core::demangle(typeid(T).name());
+}
+    
 template <class S, class T> void
 arithmetic_test()
 {
@@ -48,21 +54,19 @@ zip_iterator_test()
   //const auto	u = make_range<3>(std::begin(t) + 2);
     auto	w = slice<2, 4>(t, 1, 3);
 #ifdef DEMANGLE
-    using	boost::core::demangle;
-
     cout << endl;
     cout << "rank(tuple_t): "
 	 << rank<decltype(t)>() << endl;
     cout << "tuple_t: "
-	 << demangle(typeid(decltype(t)).name()) << endl << endl;
+	 << demangle<decltype(t)>() << endl << endl;
     cout << "begin(t): "
-	 << demangle(typeid(decltype(begin(t))).name()) << endl << endl;
+	 << demangle<decltype(begin(t))>() << endl << endl;
     cout << "begin(*begin(t): "
-	 << demangle(typeid(decltype(begin(*begin(t)))).name())
+	 << demangle<decltype(begin(*begin(t)))>()
 	 << endl << endl;
 
   //cout << demangle(typeid(decltype(u)).name()) << endl << endl;
-    cout << demangle(typeid(decltype(w)).name()) << endl << endl;
+    cout << demangle<decltype(w)>() << endl << endl;
 #endif
   //cout << u << endl;
     cout << w << endl;

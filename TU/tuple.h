@@ -632,6 +632,38 @@ rend(std::tuple<T...>& t) -> decltype(std::make_reverse_iterator(begin(t)))
 template <class... T,
 	  std::enable_if_t<all<detail::has_begin, T...>::value>* = nullptr>
 inline auto
+begin(std::tuple<T...>&& t)
+{
+    return make_zip_iterator(
+		tuple_transform([](auto& x)
+				{ using std::begin; return begin(x); }, t));
+}
+
+template <class... T,
+	  std::enable_if_t<all<detail::has_begin, T...>::value>* = nullptr>
+inline auto
+end(std::tuple<T...>&& t)
+{
+    return make_zip_iterator(
+		tuple_transform([](auto& x)
+				{ using std::end; return end(x); }, t));
+}
+
+template <class... T> inline auto
+rbegin(std::tuple<T...>&& t) -> decltype(std::make_reverse_iterator(end(t)))
+{
+    return std::make_reverse_iterator(end(t));
+}
+
+template <class... T> inline auto
+rend(std::tuple<T...>&& t) -> decltype(std::make_reverse_iterator(begin(t)))
+{
+    return std::make_reverse_iterator(begin(t));
+}
+
+template <class... T,
+	  std::enable_if_t<all<detail::has_begin, T...>::value>* = nullptr>
+inline auto
 begin(const std::tuple<T...>& t)
 {
     return make_zip_iterator(

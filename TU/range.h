@@ -977,8 +977,8 @@ namespace detail
   make_slice_iterator(ITER iter, size_t idx, size_t size, IS... is)
   {
       return make_range_iterator(make_slice_iterator(
-				     iter->begin() + idx, is...),
-				 iter.stride(), size);
+				     begin(*iter) + idx, is...),
+				 stride(iter), size);
   }
 
   template <size_t SIZE, size_t... SIZES, class ITER, class... INDICES>
@@ -986,8 +986,8 @@ namespace detail
   make_slice_iterator(ITER iter, size_t idx, INDICES... indices)
   {
       return make_range_iterator<SIZE>(make_slice_iterator<SIZES...>(
-					   iter->begin() + idx, indices...),
-				       iter.stride());
+					   begin(*iter) + idx, indices...),
+				       stride(iter));
   }
 }	// namespace detail
     
