@@ -101,7 +101,7 @@ namespace detail
   {
       using type = std::tuple<typename const_iterator_t<ITER>::type...>;
   };
-}
+}	// namespace detail
 
 //! 与えられた反復子のconstバージョンを返す
 /*!
@@ -577,58 +577,33 @@ namespace detail
   struct iterator_stride
   {
     private:
-    // ITER が boost::iterator_adaptor から派生している場合，
-    // 元になっている反復子を抽出
       template <class ITER_, class BASE_, class VAL_,
 		class CAT_,  class REF_,  class DIFF_>
-      static BASE_	check_base_type(
-			    boost::iterator_adaptor<ITER_, BASE_, VAL_,
-						    CAT_, REF_, DIFF_>)	;
-#if 0
-    //#if defined(__NVCC__)
-    // ITER が thrust::iterator_adaptor から派生している場合，
-    // 元になっている反復子を抽出
-      template <class ITER_, class BASE_, class VAL_,
-		class SYS_, class CAT_,  class REF_,  class DIFF_>
-      static BASE_	check_base_type(
-			    thrust::iterator_adaptor<ITER_, BASE_, VAL_, SYS_,
-						     CAT_, REF_, DIFF_>);
+      static typename iterator_stride<BASE_>::type
+      stride(const boost::iterator_adaptor<ITER_, BASE_, VAL_,
+					   CAT_, REF_, DIFF_>&)		;
+
+      template <class... ITER_>
+      static std::tuple<typename iterator_stride<ITER_>::type...>
+      stride(const zip_iterator<std::tuple<ITER_...> >&)		;
+
+#if defined(__NVCC__)
+      template <class... ITER_>
+      static thrust::tuple<typename iterator_stride<ITER_>::type...>
+      stride(const thrust::zip_iterator<thrust::tuple<ITER_...> >&)	;
 #endif
-      static void	check_base_type(...)				;
-      using base_type	= decltype(check_base_type(std::declval<ITER>()));
+
+      static iterator_difference<ITER>
+      stride(...)							;
       
     public:
-      using type	= typename std::conditional_t<
-					std::is_void<base_type>::value,
-					identity<iterator_difference<ITER> >,
-					iterator_stride<base_type> >::type;
+      using type = decltype(stride(std::declval<ITER>()))		;
   };
-  template <class... ITER_>
-  struct iterator_stride<zip_iterator<std::tuple<ITER_...> > >
-  {
-      using type	= std::tuple<typename iterator_stride<ITER_>::type...>;
-  };
-#if 0
-  //#if defined(__NVCC__)
-  template <class ITER_TUPLE>
-  struct iterator_stride<thrust::zip_iterator<ITER_TUPLE> >
-  {
-      struct iter_stride
-      {
-	  template <class ITER_> typename iterator_stride<ITER_>::type
-	  operator ()(ITER_)					const	;
-      };
-      
-      using type	= decltype(thrust::tuple_transform(
-				       iter_stride(),
-				       std::declval<ITER_TUPLE>()));
-  };
-#endif
 }	// namespace detail
-
+    
 template <class ITER>
 using iterator_stride = typename detail::iterator_stride<ITER>::type;
-    
+
 /************************************************************************
 *  class range_iterator<ITER, STRIDE, SIZE>				*
 ************************************************************************/
@@ -775,8 +750,7 @@ class range_iterator
 		    advance(const_cast<typename ITER_::base_type&>(iter.base()),
 			    stride);
 		}
-#if 0
-  //#if defined(__NVCC__)
+#if defined(__NVCC__)
     template <class ITER_TUPLE_, class STRIDE_, class TAIL_>
     static void	advance(thrust::zip_iterator<ITER_TUPLE_>& iter,
 			thrust::detail::cons<STRIDE_, TAIL_> stride)
@@ -812,24 +786,20 @@ class range_iterator
   \param iter	レンジを指す反復子
   \return	レンジ軸のストライド
 */
-template <class ITER> inline auto
-stride(ITER iter)
-{
-    return size(*iter);
-}
 template <class ITER, ptrdiff_t STRIDE, size_t SIZE> inline auto
 stride(const range_iterator<ITER, STRIDE, SIZE>& iter)
 {
     return iter.stride();
 }
+
 template <class ITER_TUPLE> inline auto
 stride(const zip_iterator<ITER_TUPLE>& iter)
 {
     return tuple_transform([](const auto& it){ return stride(it); },
 			   iter.get_iterator_tuple());
 }
-#if 0
-  //#if defined(__NVCC__)
+
+#if defined(__NVCC__)
 template <class ITER_TUPLE> inline auto
 stride(const thrust::zip_iterator<ITER_TUPLE>& iter)
 {
@@ -837,7 +807,13 @@ stride(const thrust::zip_iterator<ITER_TUPLE>& iter)
 			   iter.get_iterator_tuple());
 }
 #endif
-    
+
+template <class ITER, class... ITERS> inline auto
+stride(const ITER& iter, const ITERS&... iters)
+{
+    return std::make_tuple(stride(iter), stride(iters)...);
+}
+
 /************************************************************************
 *  fixed size & fixed stride ranges and associated iterators		*
 ************************************************************************/

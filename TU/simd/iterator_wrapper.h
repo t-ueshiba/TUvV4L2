@@ -140,6 +140,15 @@ make_accessor(const zip_iterator<ITER_TUPLE>& iter)
 					     iter.get_iterator_tuple()));
 }
 
+/************************************************************************
+*  stride(const iterator_wrapper<ITER, ALIGNED>&)			*
+************************************************************************/
+template <class ITER, bool ALIGNED> inline auto
+stride(const iterator_wrapper<ITER, ALIGNED>& iter)
+{
+    return stride(iter.base());
+}
+    
 template <class... ITER, bool... ALIGNED> inline auto
 make_zip_iterator(const std::tuple<
 			    iterator_wrapper<ITER, ALIGNED>...>& iter_tuple)

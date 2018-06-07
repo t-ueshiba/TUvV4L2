@@ -259,12 +259,12 @@ GuidedFilter2<T>::convolve(IN ib, IN ie,
 			make_map_iterator(init_params(),
 					  cbegin(*ib),
 					  cbegin(*gb)),
-			std::make_tuple(stride(ib), stride(gb)), size(*ib)),
+			stride(ib, gb), size(*ib)),
 		    make_range_iterator(
 			make_map_iterator(init_params(),
 					  cbegin(*ie),
 					  cbegin(*ge)),
-			std::make_tuple(stride(ie), stride(ge)), size(*ie)),
+			stride(ie, ge), size(*ie)),
 		    make_range_iterator(
 			make_assignment_iterator(init_coeffs(n, _e),
 						 c.begin()->begin()),
@@ -280,7 +280,7 @@ GuidedFilter2<T>::convolve(IN ib, IN ie,
 			    trans_guides(n),
 			    begin(*gb)   + offsetH(),
 			    begin(*out)) + (shift ? offsetH() : 0),
-			std::make_tuple(stride(gb), stride(out)), size(*out)));
+			stride(gb, out), size(*out)));
 }
 
 //! 2次元入力データにguided filterを適用する
@@ -333,7 +333,7 @@ GuidedFilter2<T>::convolve(IN ib, IN ie, OUT out, bool shift) const
 			    trans_guides(n),
 			    begin(*ib)  + offsetH(),
 			    begin(*out) + (shift ? offsetH() : 0)),
-			std::make_tuple(stride(ib), stride(out)), size(*out)));
+			stride(ib, out), size(*out)));
 }
 
 }

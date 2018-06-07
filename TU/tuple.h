@@ -488,7 +488,7 @@ namespace detail
 			}
   };
 }	// namespace detail
-    
+
 template <class ITER_TUPLE>
 class zip_iterator : public boost::iterator_facade<
 			zip_iterator<ITER_TUPLE>,
@@ -527,7 +527,7 @@ class zip_iterator : public boost::iterator_facade<
 		    :_iter_tuple(iter.get_iterator_tuple())		{}
 
     const auto&	get_iterator_tuple()	const	{ return _iter_tuple; }
-    
+
   private:
     reference	dereference() const
 		{
@@ -587,7 +587,19 @@ make_zip_iterator(const ITER0& iter0, const ITER1& iter1, const ITERS&... iters)
 /************************************************************************
 *  TU::[begin|end|rbegin|rend](TUPLE&&)					*
 ************************************************************************/
-template <class... T> inline auto
+namespace detail
+{
+  template <class T>
+  auto	check_begin(const T& x) -> decltype(begin(x), std::true_type())	;
+  auto	check_begin(...)	-> std::false_type			;
+
+  template <class T>
+  using has_begin = decltype(check_begin(std::declval<T>()));
+}	// namespace detail
+
+template <class... T,
+	  std::enable_if_t<all<detail::has_begin, T...>::value>* = nullptr>
+inline auto
 begin(std::tuple<T...>& t)
 {
     return make_zip_iterator(
@@ -595,7 +607,9 @@ begin(std::tuple<T...>& t)
 				{ using std::begin; return begin(x); }, t));
 }
 
-template <class... T> inline auto
+template <class... T,
+	  std::enable_if_t<all<detail::has_begin, T...>::value>* = nullptr>
+inline auto
 end(std::tuple<T...>& t)
 {
     return make_zip_iterator(
@@ -604,18 +618,20 @@ end(std::tuple<T...>& t)
 }
 
 template <class... T> inline auto
-rbegin(std::tuple<T...>& t)
+rbegin(std::tuple<T...>& t) -> decltype(std::make_reverse_iterator(end(t)))
 {
     return std::make_reverse_iterator(end(t));
 }
 
 template <class... T> inline auto
-rend(std::tuple<T...>& t)
+rend(std::tuple<T...>& t) -> decltype(std::make_reverse_iterator(begin(t)))
 {
     return std::make_reverse_iterator(begin(t));
 }
 
-template <class... T> inline auto
+template <class... T,
+	  std::enable_if_t<all<detail::has_begin, T...>::value>* = nullptr>
+inline auto
 begin(const std::tuple<T...>& t)
 {
     return make_zip_iterator(
@@ -623,7 +639,9 @@ begin(const std::tuple<T...>& t)
 				{ using std::begin; return begin(x); }, t));
 }
 
-template <class... T> inline auto
+template <class... T,
+	  std::enable_if_t<all<detail::has_begin, T...>::value>* = nullptr>
+inline auto
 end(const std::tuple<T...>& t)
 {
     return make_zip_iterator(
@@ -633,36 +651,38 @@ end(const std::tuple<T...>& t)
 
 template <class... T> inline auto
 rbegin(const std::tuple<T...>& t)
+    -> decltype(std::make_reverse_iterator(end(t)))
 {
     return std::make_reverse_iterator(end(t));
 }
 
 template <class... T> inline auto
 rend(const std::tuple<T...>& t)
+    -> decltype(std::make_reverse_iterator(begin(t)))
 {
     return std::make_reverse_iterator(begin(t));
 }
 
 template <class... T> inline auto
-cbegin(const std::tuple<T...>& t)
+cbegin(const std::tuple<T...>& t) -> decltype(begin(t))
 {
     return begin(t);
 }
 
 template <class... T> inline auto
-cend(const std::tuple<T...>& t)
+cend(const std::tuple<T...>& t) -> decltype(end(t))
 {
     return end(t);
 }
 
 template <class... T> inline auto
-crbegin(const std::tuple<T...>& t)
+crbegin(const std::tuple<T...>& t) -> decltype(rbegin(t))
 {
     return rbegin(t);
 }
 
 template <class... T> inline auto
-crend(const std::tuple<T...>& t)
+crend(const std::tuple<T...>& t) -> decltype(rend(t))
 {
     return rend(t);
 }

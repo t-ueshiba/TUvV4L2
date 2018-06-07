@@ -315,8 +315,7 @@ class map_iterator
 };
 
 template <class T=void, bool MASK=false,
-	  class FUNC, class... ITER, bool... ALIGNED>
-inline auto
+	  class FUNC, class... ITER, bool... ALIGNED> inline auto
 make_map_iterator(FUNC&& func, const iterator_wrapper<ITER, ALIGNED>&... iter)
 {
     using iters_t  = decltype(make_accessor(TU::make_zip_iterator(iter...)));
@@ -325,6 +324,12 @@ make_map_iterator(FUNC&& func, const iterator_wrapper<ITER, ALIGNED>&... iter)
     return wrap_iterator(map_iterator<argelm_t, MASK, FUNC, iters_t>(
 			     std::forward<FUNC>(func),
 			     make_accessor(TU::make_zip_iterator(iter...))));
+}
+
+template <class T, bool MASK, class FUNC, class ITERS> inline auto
+stride(const map_iterator<T, MASK, FUNC, ITERS>& iter)
+{
+    return iter.stride();
 }
 
 }	// namespace simd
@@ -364,12 +369,60 @@ mapped(FUNC&& func)
 {
     return detail::mapped_tag<T, MASK, FUNC>(std::forward<FUNC>(func));
 }
+
+namespace detail
+{
+  template <class ITER>
+  auto	check_begin(const ITER& iter) -> decltype(begin(*iter),
+						  std::true_type())	;
+  auto	check_begin(...)	      -> std::false_type		;
     
+  template <class ITER>
+  using value_has_begin = decltype(check_begin(std::declval<ITER>()));
+}
+    
+template <class... ITER,
+	  std::enable_if_t<!all<detail::value_has_begin, ITER...>::value>*
+	  = nullptr>
+inline auto
+make_zip_range_iterator(const ITER&... iter)
+{
+    return TU::make_zip_iterator(iter...);
+}
+
+template <class... ITER,
+	  std::enable_if_t<all<detail::value_has_begin, ITER...>::value>*
+	  = nullptr>
+inline auto
+make_zip_range_iterator(const ITER&... iter)
+{
+    return make_range_iterator(make_zip_range_iterator(begin(*iter)...),
+			       stride(iter...), std::min({size(*iter)...}));
+}
+
 template <class... ARG> inline auto
 zip(const ARG&... x)
 {
-    return make_range(TU::make_zip_iterator(begin(x)...),
+    return make_range(make_zip_range_iterator(begin(x)...),
 		      std::min({size(x)...}));
+}
+    
+template <class S, class ITER, class T, bool MASK, class FUNC,
+	  std::enable_if_t<!detail::value_has_begin<ITER>::value>* = nullptr>
+inline auto
+make_zip_map_iterator(const ITER& iter, detail::mapped_tag<T, MASK, FUNC>&& m)
+{
+    return make_map_iterator<S>(m.functor(), iter);
+}
+
+template <class S, class ITER, class T, bool MASK, class FUNC,
+	  std::enable_if_t<detail::value_has_begin<ITER>::value>* = nullptr>
+inline auto
+make_zip_map_iterator(const ITER& iter, detail::mapped_tag<T, MASK, FUNC>&& m)
+{
+    return make_range_iterator(make_zip_map_iterator<S>(begin(*iter),
+							std::move(m)),
+			       stride(iter), size(*iter));
 }
     
 template <class ARG, class T, bool MASK, class FUNC> inline auto
@@ -377,7 +430,8 @@ operator |(const ARG& x, detail::mapped_tag<T, MASK, FUNC>&& m)
 {
     using S = typename detail::mapped_tag<T, MASK, FUNC>::element_type;
     
-    return make_range(make_map_iterator<S>(m.functor(), cbegin(x)), size(x));
+    return make_range(make_zip_map_iterator<S>(begin(x), std::move(m)),
+		      size(x));
 }
 
 }	// namespace TU
