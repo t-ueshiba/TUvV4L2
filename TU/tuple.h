@@ -577,11 +577,17 @@ make_zip_iterator(const ITER& iter)
 {
     return iter;
 }
-
+/*
 template <class ITER0, class ITER1, class... ITERS> inline auto
 make_zip_iterator(const ITER0& iter0, const ITER1& iter1, const ITERS&... iters)
 {
     return make_zip_iterator(std::make_tuple(iter0, iter1, iters...));
+}
+*/
+template <class ITER, class... ITERS> inline auto
+make_zip_iterator(const ITER& iter, const ITERS&... iters)
+{
+    return make_zip_iterator(std::make_tuple(iter, iters...));
 }
 
 /************************************************************************

@@ -576,31 +576,44 @@ namespace detail
   template <class ITER>
   struct iterator_stride
   {
-    private:
-      template <class ITER_, class BASE_, class VAL_,
-		class CAT_,  class REF_,  class DIFF_>
-      static typename iterator_stride<BASE_>::type
-      stride(const boost::iterator_adaptor<ITER_, BASE_, VAL_,
-					   CAT_, REF_, DIFF_>&)		;
-
+      template <class ITER_> static auto
+      stride(const ITER_& iter) -> decltype(stride(iter.base()))
+      {
+	  return stride(iter.base());
+      }
       template <class... ITER_>
       static std::tuple<typename iterator_stride<ITER_>::type...>
-      stride(const zip_iterator<std::tuple<ITER_...> >&)		;
-
-#if defined(__NVCC__)
-      template <class... ITER_>
-      static thrust::tuple<typename iterator_stride<ITER_>::type...>
-      stride(const thrust::zip_iterator<thrust::tuple<ITER_...> >&)	;
-#endif
-
+      stride(const std::tuple<ITER_...>& iter_tuple)
+      {
+	  return tuple_transform([](const auto& iter)
+				 { return iterator_stride::stride(iter); },
+				 iter_tuple);
+      }
+      template <class ITER_> static auto
+      stride(const ITER_& iter) -> decltype(stride(iter.get_iterator_tuple()))
+      {
+	  return stride(iter.get_iterator_tuple());
+      }
       static iterator_difference<ITER>
       stride(...)							;
       
-    public:
       using type = decltype(stride(std::declval<ITER>()))		;
   };
 }	// namespace detail
     
+template <class ITER> inline auto
+stride(const ITER& iter)
+    -> decltype(detail::iterator_stride<ITER>::stride(iter))
+{
+    return detail::iterator_stride<ITER>::stride(iter);
+}
+
+template <class ITER, class... ITERS> inline auto
+stride(const ITER& iter, const ITERS&... iters)
+{
+    return std::make_tuple(stride(iter), stride(iters)...);
+}
+
 template <class ITER>
 using iterator_stride = typename detail::iterator_stride<ITER>::type;
 
@@ -615,8 +628,8 @@ namespace detail
       using stride_t	= ptrdiff_t;
       
       stride_and_size(stride_t, size_t)		{}
-      constexpr static auto	stride()	{ return STRIDE; }
-      constexpr static auto	size()		{ return SIZE; }
+      constexpr static stride_t	stride()	{ return STRIDE; }
+      constexpr static size_t	size()		{ return SIZE; }
   };
   template <class DIFF, size_t SIZE>
   struct stride_and_size<DIFF, 0, SIZE>
@@ -625,8 +638,8 @@ namespace detail
       
       stride_and_size(stride_t stride, size_t)
 	  :_stride(stride)			{}
-      auto			stride() const	{ return _stride; }
-      constexpr static auto	size()		{ return SIZE; }
+      stride_t			stride() const	{ return _stride; }
+      constexpr static size_t	size()		{ return SIZE; }
 
     private:
       stride_t	_stride;
@@ -638,8 +651,8 @@ namespace detail
       
       stride_and_size(stride_t, size_t size)
 	  :_size(size)				{}
-      constexpr static auto	stride()	{ return STRIDE; }
-      auto			size()	 const	{ return _size; }
+      constexpr static stride_t	stride()	{ return STRIDE; }
+      size_t			size()	 const	{ return _size; }
 
     private:
       size_t	_size;
@@ -651,8 +664,8 @@ namespace detail
       
       stride_and_size(stride_t stride, size_t size)
 	  :_stride(stride), _size(size)		{}
-      auto			stride() const	{ return _stride; }
-      auto			size()	 const	{ return _size; }
+      stride_t			stride() const	{ return _stride; }
+      size_t			size()	 const	{ return _size; }
 
     private:
       stride_t	_stride;
@@ -790,28 +803,6 @@ template <class ITER, ptrdiff_t STRIDE, size_t SIZE> inline auto
 stride(const range_iterator<ITER, STRIDE, SIZE>& iter)
 {
     return iter.stride();
-}
-
-template <class ITER_TUPLE> inline auto
-stride(const zip_iterator<ITER_TUPLE>& iter)
-{
-    return tuple_transform([](const auto& it){ return stride(it); },
-			   iter.get_iterator_tuple());
-}
-
-#if defined(__NVCC__)
-template <class ITER_TUPLE> inline auto
-stride(const thrust::zip_iterator<ITER_TUPLE>& iter)
-{
-    return tuple_transform([](const auto& it){ return stride(it); },
-			   iter.get_iterator_tuple());
-}
-#endif
-
-template <class ITER, class... ITERS> inline auto
-stride(const ITER& iter, const ITERS&... iters)
-{
-    return std::make_tuple(stride(iter), stride(iters)...);
 }
 
 /************************************************************************
@@ -1076,25 +1067,25 @@ make_zip_range_iterator(const ITER&... iter)
 template <class... ARG> inline auto
 zip(const ARG&... x)
 {
-    return make_range(make_zip_range_iterator(begin(x)...),
+    return make_range(make_zip_iterator(begin(x)...),
 		      std::min({size(x)...}));
 }
     
-template <class S, class ITER, class T, bool MASK, class FUNC,
+template <class S, class T, bool MASK, class FUNC, class ITER,
 	  std::enable_if_t<!detail::value_has_begin<ITER>::value>* = nullptr>
 inline auto
-make_zip_map_iterator(const ITER& iter, detail::mapped_tag<T, MASK, FUNC>&& m)
+make_map_range_iterator(detail::mapped_tag<T, MASK, FUNC>&& m, const ITER& iter)
 {
     return make_map_iterator<S, MASK>(m.functor(), iter);
 }
 
-template <class S, class ITER, class T, bool MASK, class FUNC,
+template <class S, class T, bool MASK, class FUNC, class ITER,
 	  std::enable_if_t<detail::value_has_begin<ITER>::value>* = nullptr>
 inline auto
-make_zip_map_iterator(const ITER& iter, detail::mapped_tag<T, MASK, FUNC>&& m)
+make_map_range_iterator(detail::mapped_tag<T, MASK, FUNC>&& m, const ITER& iter)
 {
-    return make_range_iterator(make_zip_map_iterator<S>(begin(*iter),
-							std::move(m)),
+    return make_range_iterator(make_map_range_iterator<S>(std::move(m),
+							  begin(*iter)),
 			       stride(iter), size(*iter));
 }
     
@@ -1103,7 +1094,7 @@ operator |(const ARG& x, detail::mapped_tag<T, MASK, FUNC>&& m)
 {
     using S = typename detail::mapped_tag<T, MASK, FUNC>::element_type;
     
-    return make_range(make_zip_map_iterator<S>(begin(x), std::move(m)),
+    return make_range(make_map_range_iterator<S>(std::move(m), begin(x)),
 		      size(x));
 }
 
