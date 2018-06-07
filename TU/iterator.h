@@ -184,13 +184,13 @@ class map_iterator
     FUNC	_func;	//!< 演算子
 };
 
-template <class FUNC, class... ITERS> inline auto
-make_map_iterator(FUNC&& func, const ITERS&... iters)
+template <class T=void, bool MASK=false, class FUNC, class... ITER> inline auto
+make_map_iterator(FUNC&& func, const ITER&... iter)
 {
-    using iters_t = decltype(TU::make_zip_iterator(iters...));
+    using iters_t = decltype(TU::make_zip_iterator(iter...));
     
     return map_iterator<FUNC, iters_t>(std::forward<FUNC>(func),
-				       TU::make_zip_iterator(iters...));
+				       TU::make_zip_iterator(iter...));
 }
 
 /************************************************************************

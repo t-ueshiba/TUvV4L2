@@ -281,6 +281,10 @@ class map_iterator
     constexpr
     static auto	step()			{ return vsize<map_iterator>::max; }
     const auto&	functor()	 const	{ return _func; }
+    const auto&	get_iterator_tuple() const
+		{
+		    return _iters;
+		}
     
     void	operator ()()
 		{
@@ -326,113 +330,14 @@ make_map_iterator(FUNC&& func, const iterator_wrapper<ITER, ALIGNED>&... iter)
 			     make_accessor(TU::make_zip_iterator(iter...))));
 }
 
-template <class T, bool MASK, class FUNC, class ITERS> inline auto
-stride(const map_iterator<T, MASK, FUNC, ITERS>& iter)
+template <class T, bool MASK, class FUNC, class ITERS, bool ALIGNED> inline auto
+stride(const iterator_wrapper<
+		map_iterator<T, MASK, FUNC, ITERS>, ALIGNED>& iter)
 {
-    return iter.stride();
+    return tuple_transform([](const auto& it){ return stride(it); },
+			   iter.base().get_iterator_tuple());
 }
 
 }	// namespace simd
-/************************************************************************
-*  pipeline stuffs							*
-************************************************************************/
-namespace detail
-{
-  template <class T, bool MASK, class FUNC>
-  class mapped_tag
-  {
-    private:
-      template <class FUNC_>
-      static typename FUNC_::argument_type::element_type
-		element_t(FUNC_)					;
-      template <class FUNC_>
-      static typename FUNC_::first_argument_type::element_type
-		element_t(FUNC_)					;
-      static T	element_t(...)						;
-      
-    public:
-      using element_type = decltype(element_t(
-					std::declval<std::decay_t<FUNC> >()));
-
-    public:
-      mapped_tag(FUNC&& func)	:_func(std::forward<FUNC>(func))	{}
-
-      const auto&	functor()	const	{ return _func; }
-
-    private:
-      FUNC	_func;
-  };
-}	// namespace detail
-
-template <class T=void, bool MASK=false, class FUNC> inline auto
-mapped(FUNC&& func)
-{
-    return detail::mapped_tag<T, MASK, FUNC>(std::forward<FUNC>(func));
-}
-
-namespace detail
-{
-  template <class ITER>
-  auto	check_begin(const ITER& iter) -> decltype(begin(*iter),
-						  std::true_type())	;
-  auto	check_begin(...)	      -> std::false_type		;
-    
-  template <class ITER>
-  using value_has_begin = decltype(check_begin(std::declval<ITER>()));
-}
-    
-template <class... ITER,
-	  std::enable_if_t<!all<detail::value_has_begin, ITER...>::value>*
-	  = nullptr>
-inline auto
-make_zip_range_iterator(const ITER&... iter)
-{
-    return TU::make_zip_iterator(iter...);
-}
-
-template <class... ITER,
-	  std::enable_if_t<all<detail::value_has_begin, ITER...>::value>*
-	  = nullptr>
-inline auto
-make_zip_range_iterator(const ITER&... iter)
-{
-    return make_range_iterator(make_zip_range_iterator(begin(*iter)...),
-			       stride(iter...), std::min({size(*iter)...}));
-}
-
-template <class... ARG> inline auto
-zip(const ARG&... x)
-{
-    return make_range(make_zip_range_iterator(begin(x)...),
-		      std::min({size(x)...}));
-}
-    
-template <class S, class ITER, class T, bool MASK, class FUNC,
-	  std::enable_if_t<!detail::value_has_begin<ITER>::value>* = nullptr>
-inline auto
-make_zip_map_iterator(const ITER& iter, detail::mapped_tag<T, MASK, FUNC>&& m)
-{
-    return make_map_iterator<S>(m.functor(), iter);
-}
-
-template <class S, class ITER, class T, bool MASK, class FUNC,
-	  std::enable_if_t<detail::value_has_begin<ITER>::value>* = nullptr>
-inline auto
-make_zip_map_iterator(const ITER& iter, detail::mapped_tag<T, MASK, FUNC>&& m)
-{
-    return make_range_iterator(make_zip_map_iterator<S>(begin(*iter),
-							std::move(m)),
-			       stride(iter), size(*iter));
-}
-    
-template <class ARG, class T, bool MASK, class FUNC> inline auto
-operator |(const ARG& x, detail::mapped_tag<T, MASK, FUNC>&& m)
-{
-    using S = typename detail::mapped_tag<T, MASK, FUNC>::element_type;
-    
-    return make_range(make_zip_map_iterator<S>(begin(x), std::move(m)),
-		      size(x));
-}
-
 }	// namespace TU
 #endif	// !TU_SIMD_MAP_ITERATOR_H

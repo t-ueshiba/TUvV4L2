@@ -981,8 +981,7 @@ namespace detail
 				 iter.stride(), size);
   }
 
-  template <size_t SIZE, size_t... SIZES, class ITER, class... INDICES,
-	    std::enable_if_t<sizeof...(SIZES) == sizeof...(INDICES)>* = nullptr>
+  template <size_t SIZE, size_t... SIZES, class ITER, class... INDICES>
   inline auto
   make_slice_iterator(ITER iter, size_t idx, INDICES... indices)
   {
@@ -992,18 +991,14 @@ namespace detail
   }
 }	// namespace detail
     
-template <class RANGE, class... IS,
-	  std::enable_if_t<rank<RANGE>() != 0>* = nullptr>
-inline auto
+template <class RANGE, class... IS> inline auto
 slice(RANGE&& r, size_t idx, size_t size, IS... is)
 {
     return make_range(detail::make_slice_iterator(begin(r) + idx, is...),
 		      size);
 }
 
-template <size_t SIZE, size_t... SIZES, class RANGE, class... INDICES,
-	  std::enable_if_t<rank<RANGE>() != 0 &&
-			   sizeof...(SIZES) == sizeof...(INDICES)>* = nullptr>
+template <size_t SIZE, size_t... SIZES, class RANGE, class... INDICES>
 inline auto
 slice(RANGE&& r, size_t idx, INDICES... indices)
 {
@@ -1012,29 +1007,106 @@ slice(RANGE&& r, size_t idx, INDICES... indices)
 }
 
 /************************************************************************
-*  supports for range tuples						*
+*  pipeline stuffs							*
 ************************************************************************/
-template <size_t... SIZES, class ITER_TUPLE, class... ARGS> inline auto
-make_range(const zip_iterator<ITER_TUPLE>& zip_iter, ARGS... args)
+namespace detail
 {
-    return tuple_transform([args...](auto iter)
-			   {
-			       return make_range<SIZES...>(iter, args...);
-			   }, zip_iter.get_iterator_tuple());
+  template <class T, bool MASK, class FUNC>
+  class mapped_tag
+  {
+    private:
+      template <class FUNC_>
+      static typename FUNC_::argument_type::element_type
+		element_t(FUNC_)					;
+      template <class FUNC_>
+      static typename FUNC_::first_argument_type::element_type
+		element_t(FUNC_)					;
+      static T	element_t(...)						;
+      
+    public:
+      using element_type = decltype(element_t(
+					std::declval<std::decay_t<FUNC> >()));
+
+    public:
+      mapped_tag(FUNC&& func)	:_func(std::forward<FUNC>(func))	{}
+
+      const auto&	functor()	const	{ return _func; }
+
+    private:
+      FUNC	_func;
+  };
+}	// namespace detail
+
+template <class T=void, bool MASK=false, class FUNC> inline auto
+mapped(FUNC&& func)
+{
+    return detail::mapped_tag<T, MASK, FUNC>(std::forward<FUNC>(func));
+}
+
+namespace detail
+{
+  template <class ITER>
+  auto	check_begin(const ITER& iter) -> decltype(begin(*iter),
+						  std::true_type())	;
+  auto	check_begin(...)	      -> std::false_type		;
+    
+  template <class ITER>
+  using value_has_begin = decltype(check_begin(std::declval<ITER>()));
 }
     
-template <size_t... SIZES, class TUPLE, class... ARGS,
-	  std::enable_if_t<is_tuple<TUPLE>::value>* = nullptr>
+template <class... ITER,
+	  std::enable_if_t<!all<detail::value_has_begin, ITER...>::value>*
+	  = nullptr>
 inline auto
-slice(TUPLE&& t, ARGS... args)
+make_zip_range_iterator(const ITER&... iter)
 {
-    return tuple_transform([args...](auto&& x)
-			   {
-			       return slice<SIZES...>(
-				   std::forward<decltype(x)>(x), args...);
-			   }, std::forward<TUPLE>(t));
+    return TU::make_zip_iterator(iter...);
+}
+
+template <class... ITER,
+	  std::enable_if_t<all<detail::value_has_begin, ITER...>::value>*
+	  = nullptr>
+inline auto
+make_zip_range_iterator(const ITER&... iter)
+{
+    return make_range_iterator(make_zip_range_iterator(begin(*iter)...),
+			       stride(iter...), std::min({size(*iter)...}));
+}
+
+template <class... ARG> inline auto
+zip(const ARG&... x)
+{
+    return make_range(make_zip_range_iterator(begin(x)...),
+		      std::min({size(x)...}));
 }
     
+template <class S, class ITER, class T, bool MASK, class FUNC,
+	  std::enable_if_t<!detail::value_has_begin<ITER>::value>* = nullptr>
+inline auto
+make_zip_map_iterator(const ITER& iter, detail::mapped_tag<T, MASK, FUNC>&& m)
+{
+    return make_map_iterator<S, MASK>(m.functor(), iter);
+}
+
+template <class S, class ITER, class T, bool MASK, class FUNC,
+	  std::enable_if_t<detail::value_has_begin<ITER>::value>* = nullptr>
+inline auto
+make_zip_map_iterator(const ITER& iter, detail::mapped_tag<T, MASK, FUNC>&& m)
+{
+    return make_range_iterator(make_zip_map_iterator<S>(begin(*iter),
+							std::move(m)),
+			       stride(iter), size(*iter));
+}
+    
+template <class ARG, class T, bool MASK, class FUNC> inline auto
+operator |(const ARG& x, detail::mapped_tag<T, MASK, FUNC>&& m)
+{
+    using S = typename detail::mapped_tag<T, MASK, FUNC>::element_type;
+    
+    return make_range(make_zip_map_iterator<S>(begin(x), std::move(m)),
+		      size(x));
+}
+
 /************************************************************************
 *  class column_iterator<ROW, NROWS>					*
 ************************************************************************/

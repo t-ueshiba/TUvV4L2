@@ -6,6 +6,14 @@
 
 namespace TU
 {
+#ifdef SIMD
+template <class T>
+using Allocator = simd::allocator<T>;
+#else
+template <class T>
+using Allocator = std::allocator<T>;
+#endif
+    
 template <class T> inline auto
 demangle()
 {
@@ -14,17 +22,17 @@ demangle()
 
 struct sum
 {
-    template <class T>
-    T	operator ()(T x, T y, T z)	const	{ return x + y + z; }
+    template <class S, class T, class U>
+    auto	operator ()(S x, T y, U z)	const	{ return x + y + z; }
 };
     
 template <class IN, class OUT> void
 test_assign()
 {
-    Array<IN, 0, simd::allocator<IN> >
+    Array<IN, 0, Allocator<IN> >
 	x({ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
 	   16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31});
-    Array<OUT, 0, simd::allocator<OUT> >	w;
+    Array<OUT, 0, Allocator<OUT> >	w;
 
     w = x;
 
@@ -36,13 +44,13 @@ test_assign()
 template <class IN0, class IN1, class T, class OUT> void
 test_single_stage()
 {
-    Array<IN0, 0, simd::allocator<IN0> >
+    Array<IN0, 0, Allocator<IN0> >
 	x({ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
 	   16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31});
-    Array<IN1, 0, simd::allocator<IN1> >
+    Array<IN1, 0, Allocator<IN1> >
 	y({ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
 	   16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31});
-    Array<OUT, 0, simd::allocator<OUT> >	w;
+    Array<OUT, 0, Allocator<OUT> >	w;
 
     w = zip(x, y) | mapped<T>(std::plus<>());
 
@@ -53,16 +61,16 @@ test_single_stage()
 template <class IN0, class IN1, class T, class IN2, class OUT> void
 test_two_stages()
 {
-    Array<IN0, 0, simd::allocator<IN0> >
+    Array<IN0, 0, Allocator<IN0> >
 	x({ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
 	   16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31});
-    Array<IN1, 0, simd::allocator<IN1> >
+    Array<IN1, 0, Allocator<IN1> >
 	y({ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
 	   16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31});
-    Array<IN2, 0, simd::allocator<IN2> >
+    Array<IN2, 0, Allocator<IN2> >
 	z({ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
 	   16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31});
-    Array<OUT, 0, simd::allocator<OUT> >	w;
+    Array<OUT, 0, Allocator<OUT> >	w;
 
     w = zip(zip(x, y) | mapped<T>(std::plus<>()), z)
 	| mapped<OUT>(std::multiplies<>());
@@ -79,10 +87,10 @@ test_two_stages()
 template <class T, class IN0, class IN1> void
 test_map_iterator()
 {
-    Array<IN0, 0, simd::allocator<IN0> >
+    Array<IN0, 0, Allocator<IN0> >
 	x({ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
 	   16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31});
-    Array<IN1, 0, simd::allocator<IN1> >
+    Array<IN1, 0, Allocator<IN1> >
 	y({ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
 	   16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31});
 
@@ -95,12 +103,12 @@ test_map_iterator()
 template <class IN, class OUT> void
 test_assign2()
 {
-    Array2<IN, 0, 0, simd::allocator<IN> >
+    Array2<IN, 0, 0, Allocator<IN> >
 	x({{ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
 	    16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31},
 	   { 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
 	    16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31}});
-    Array2<OUT, 0, 0, simd::allocator<OUT> >	w;
+    Array2<OUT, 0, 0, Allocator<OUT> >	w;
 
     w = x;
 
@@ -116,17 +124,17 @@ test_assign2()
 template <class IN0, class IN1, class T, class OUT> void
 test_single_stage2()
 {
-    Array2<IN0, 0, 0, simd::allocator<IN0> >
+    Array2<IN0, 0, 0, Allocator<IN0> >
 	x({{ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
 	    16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31},
 	   { 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
 	    16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31}});
-    Array2<IN1, 0, 0, simd::allocator<IN1> >
+    Array2<IN1, 0, 0, Allocator<IN1> >
 	y({{ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
 	    16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31},
 	   { 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
 	    16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31}});
-    Array2<OUT, 0, 0, simd::allocator<OUT> >	w;
+    Array2<OUT, 0, 0, Allocator<OUT> >	w;
 #if 0
     auto	z = zip(x, y);
 
@@ -152,23 +160,23 @@ main()
     TU::test_assign<int32_t, int8_t>();
 
     std::cerr << "--------------" << std::endl;
-    
+
     TU::test_single_stage<int16_t, int16_t, int8_t, int32_t>();
 
     std::cerr << "--------------" << std::endl;
     
     TU::test_two_stages<int16_t, int32_t, float, int8_t, int16_t>();
- 
+
     std::cerr << "--------------" << std::endl;
     
     TU::test_map_iterator<int16_t, int16_t, float>();
 
     std::cerr << "--------------" << std::endl;
-    
+
     TU::test_assign2<int16_t, int8_t>();
 
     std::cerr << "--------------" << std::endl;
-    
+
     TU::test_single_stage2<int16_t, int16_t, int8_t, int32_t>();
 
     return 0;
