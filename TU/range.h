@@ -569,21 +569,22 @@ operator <<(std::ostream& out, const range<ITER, SIZE>& r)
 }
     
 /************************************************************************
-*  type alias: iterator_stride<ITER>					*
+*  TU::stride(const ITER&)						*
 ************************************************************************/
 namespace detail
 {
-  template <class ITER>
   struct iterator_stride
   {
+    // どの stride() からも多重定義された任意の stride() に
+    // アクセス可能にするため，構造体の静的メンバ関数として実装する．
       template <class ITER_> static auto
       stride(const ITER_& iter) -> decltype(stride(iter.base()))
       {
 	  return stride(iter.base());
       }
-      template <class... ITER_>
-      static std::tuple<typename iterator_stride<ITER_>::type...>
+      template <class... ITER_> static auto
       stride(const std::tuple<ITER_...>& iter_tuple)
+	  -> std::tuple<decltype(stride(std::declval<ITER_>()))...>
       {
 	  return tuple_transform([](const auto& iter)
 				 { return iterator_stride::stride(iter); },
@@ -594,18 +595,15 @@ namespace detail
       {
 	  return stride(iter.get_iterator_tuple());
       }
-      static iterator_difference<ITER>
+      static ptrdiff_t
       stride(...)							;
-      
-      using type = decltype(stride(std::declval<ITER>()))		;
   };
 }	// namespace detail
     
 template <class ITER> inline auto
-stride(const ITER& iter)
-    -> decltype(detail::iterator_stride<ITER>::stride(iter))
+stride(const ITER& iter) -> decltype(detail::iterator_stride::stride(iter))
 {
-    return detail::iterator_stride<ITER>::stride(iter);
+    return detail::iterator_stride::stride(iter);
 }
 
 template <class ITER, class... ITERS> inline auto
@@ -615,7 +613,8 @@ stride(const ITER& iter, const ITERS&... iters)
 }
 
 template <class ITER>
-using iterator_stride = typename detail::iterator_stride<ITER>::type;
+using iterator_stride
+	= decltype(detail::iterator_stride::stride(std::declval<ITER>()));
 
 /************************************************************************
 *  class range_iterator<ITER, STRIDE, SIZE>				*

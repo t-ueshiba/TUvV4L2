@@ -184,7 +184,7 @@ class map_iterator
     FUNC	_func;	//!< 演算子
 };
 
-template <class T=void, bool MASK=false, class FUNC, class... ITER> inline auto
+template <class FUNC, class... ITER> inline auto
 make_map_iterator(FUNC&& func, const ITER&... iter)
 {
     using iters_t = decltype(TU::make_zip_iterator(iter...));

@@ -177,7 +177,7 @@ main()
 
     std::cerr << "--------------" << std::endl;
 
-    TU::test_single_stage2<int16_t, int16_t, int8_t, int32_t>();
+  //    TU::test_single_stage2<int16_t, int16_t, int8_t, int32_t>();
 
     return 0;
 }
