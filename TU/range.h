@@ -569,52 +569,50 @@ operator <<(std::ostream& out, const range<ITER, SIZE>& r)
 }
     
 /************************************************************************
-*  TU::stride(const ITER&)						*
+*  type alias: iterator_stride<ITER>					*
 ************************************************************************/
 namespace detail
 {
-  struct iterator_stride
+  static ptrdiff_t
+  stride_impl(...)							;
+
+  template <class ITER> static auto
+  stride_impl(const ITER& iter) -> decltype(stride_impl(iter.base()))	;
+
+  template <class... ITER> static auto
+  stride_impl(const std::tuple<ITER...>& iter_tuple)
+      -> std::tuple<decltype(stride_impl(std::declval<ITER>()))...>
   {
-    // どの stride() からも多重定義された任意の stride() に
-    // アクセス可能にするため，構造体の静的メンバ関数として実装する．
-      template <class ITER_> static auto
-      stride(const ITER_& iter) -> decltype(stride(iter.base()))
-      {
-	  return stride(iter.base());
-      }
-      template <class... ITER_> static auto
-      stride(const std::tuple<ITER_...>& iter_tuple)
-	  -> std::tuple<decltype(stride(std::declval<ITER_>()))...>
-      {
-	  return tuple_transform([](const auto& iter)
-				 { return iterator_stride::stride(iter); },
-				 iter_tuple);
-      }
-      template <class ITER_> static auto
-      stride(const ITER_& iter) -> decltype(stride(iter.get_iterator_tuple()))
-      {
-	  return stride(iter.get_iterator_tuple());
-      }
-      static ptrdiff_t
-      stride(...)							;
-  };
+      return tuple_transform([](const auto& iter)
+			     { return stride_impl(iter); },
+			     iter_tuple);
+  }
+    
+#if defined(__NVCC__)
+  template <class... ITER> static auto
+  stride_impl(const thrust::tuple<ITER...>& iter_tuple)
+      -> thrust::tuple<decltype(stride_impl(std::declval<ITER>()))...>
+  {
+      return thrust::tuple_transform([](const auto& iter)
+				     { return stride_impl(iter); },
+				     iter_tuple);
+  }
+#endif
+
+  template <class ITER> static auto
+  stride_impl(const ITER& iter)
+      -> decltype(stride_impl(iter.get_iterator_tuple()))
+  {
+      return stride_impl(iter.get_iterator_tuple());
+  }
+
+  // iter.base() が zip_iterator 型の場合に備えて再度宣言する．
+  template <class ITER> static auto
+  stride_impl(const ITER& iter) -> decltype(stride_impl(iter.base()))	;
 }	// namespace detail
     
-template <class ITER> inline auto
-stride(const ITER& iter) -> decltype(detail::iterator_stride::stride(iter))
-{
-    return detail::iterator_stride::stride(iter);
-}
-
-template <class ITER, class... ITERS> inline auto
-stride(const ITER& iter, const ITERS&... iters)
-{
-    return std::make_tuple(stride(iter), stride(iters)...);
-}
-
 template <class ITER>
-using iterator_stride
-	= decltype(detail::iterator_stride::stride(std::declval<ITER>()));
+using iterator_stride = decltype(detail::stride_impl(std::declval<ITER>()));
 
 /************************************************************************
 *  class range_iterator<ITER, STRIDE, SIZE>				*
@@ -792,16 +790,34 @@ class range_iterator
 		    return leftmost(std::get<0>(stride));
 		}
 };
-
+	
+/************************************************************************
+*  TU::stride(const ITER&)						*
+************************************************************************/
+namespace detail
+{
+  template <class ITER, ptrdiff_t STRIDE, size_t SIZE> auto
+  stride_impl(const range_iterator<ITER, STRIDE, SIZE>& iter)
+  {
+      return iter.stride();
+  }
+}	// namespace detail
+    
 //! 反復子が指すレンジが所属する軸のストライドを返す
 /*!
   \param iter	レンジを指す反復子
   \return	レンジ軸のストライド
 */
-template <class ITER, ptrdiff_t STRIDE, size_t SIZE> inline auto
-stride(const range_iterator<ITER, STRIDE, SIZE>& iter)
+template <class ITER> inline auto
+stride(const ITER& iter) -> decltype(detail::stride_impl(iter))
 {
-    return iter.stride();
+    return detail::stride_impl(iter);
+}
+
+template <class ITER, class... ITERS> inline auto
+stride(const ITER& iter, const ITERS&... iters)
+{
+    return std::make_tuple(stride(iter), stride(iters)...);
 }
 
 /************************************************************************

@@ -52,7 +52,9 @@ zip_iterator_test()
 
     const auto	t = std::make_tuple(std::ref(a), std::ref(b));
   //const auto	u = make_range<3>(std::begin(t) + 2);
+
     auto	w = slice<2, 4>(t, 1, 3);
+
 #ifdef DEMANGLE
     cout << endl;
     cout << "rank(tuple_t): "
@@ -70,7 +72,7 @@ zip_iterator_test()
 #endif
   //cout << u << endl;
     cout << w << endl;
-
+    
     w = std::make_tuple(100, 1000.0);
 
     for (const auto& row : t)
