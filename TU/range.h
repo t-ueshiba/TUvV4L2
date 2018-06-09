@@ -573,13 +573,13 @@ operator <<(std::ostream& out, const range<ITER, SIZE>& r)
 ************************************************************************/
 namespace detail
 {
-  static ptrdiff_t
+  ptrdiff_t
   stride_impl(...)							;
 
-  template <class ITER> static auto
+  template <class ITER> auto
   stride_impl(const ITER& iter) -> decltype(stride_impl(iter.base()))	;
 
-  template <class... ITER> static auto
+  template <class... ITER> auto
   stride_impl(const std::tuple<ITER...>& iter_tuple)
       -> std::tuple<decltype(stride_impl(std::declval<ITER>()))...>
   {
@@ -588,8 +588,9 @@ namespace detail
 			     iter_tuple);
   }
     
-#if defined(__NVCC__)
-  template <class... ITER> static auto
+  //#if defined(__NVCC__)
+#if 0
+  template <class... ITER> auto
   stride_impl(const thrust::tuple<ITER...>& iter_tuple)
       -> thrust::tuple<decltype(stride_impl(std::declval<ITER>()))...>
   {
@@ -599,7 +600,7 @@ namespace detail
   }
 #endif
 
-  template <class ITER> static auto
+  template <class ITER> auto
   stride_impl(const ITER& iter)
       -> decltype(stride_impl(iter.get_iterator_tuple()))
   {
@@ -607,7 +608,7 @@ namespace detail
   }
 
   // iter.base() が zip_iterator 型の場合に備えて再度宣言する．
-  template <class ITER> static auto
+  template <class ITER> auto
   stride_impl(const ITER& iter) -> decltype(stride_impl(iter.base()))	;
 }	// namespace detail
     
