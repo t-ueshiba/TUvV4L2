@@ -272,7 +272,7 @@ class map_iterator
 		{
 		    return _iters == iter._iters;
 		}
-    
+
   public:
 		map_iterator(FUNC&& func, ITERS&& iters)
 		    :_iters(std::forward<ITERS>(iters)),
@@ -282,10 +282,10 @@ class map_iterator
     static auto	step()			{ return vsize<map_iterator>::max; }
     const auto&	functor()	 const	{ return _func; }
     const auto&	get_iterator_tuple() const
-		{
+    		{
 		    return _iters;
 		}
-    
+	
     void	operator ()()
 		{
 		    exec(cvtup<false, step()>(_iters));

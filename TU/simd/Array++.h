@@ -19,21 +19,18 @@ namespace simd
 ************************************************************************/
 namespace detail
 {
-  template <class ITER>	constexpr inline size_t
-  step(ITER)
-  {
-      return iterator_value<ITER>::size;
-  }
-  template <class T> constexpr inline size_t
-  step(T*)
-  {
-      return vec<std::remove_cv_t<T> >::size;
-  }
-    
   constexpr inline size_t
   nsteps(size_t n, size_t step)
   {
       return (n ? (n - 1)/step + 1 : 0);
+  }
+
+  template <class... STRIDE> constexpr inline std::tuple<STRIDE...>
+  nsteps(std::tuple<STRIDE...> strides, size_t step)
+  {
+      return TU::tuple_transform([step](auto stride)
+				 { return nsteps(stride, step); },
+				 strides);
   }
 }	// namespace detail
 
@@ -43,7 +40,8 @@ namespace detail
   N = 0 の場合，要素数をnで指定，
   \param func	適用する関数
   \param n	適用要素数
-  \param begin	適用範囲の先頭を指す反復子
+  \param iter0	第1変数の適用範囲の先頭を指す反復子
+  \param iter	第2変数以降の適用範囲の先頭を指す反復子
 */
 template <size_t N, class FUNC, class ITER0, bool ALIGNED0,
 	  class... ITER, bool... ALIGNED> inline FUNC
@@ -63,9 +61,9 @@ for_each(FUNC func, size_t n, iterator_wrapper<ITER0, ALIGNED0> iter0,
 /*!
   N != 0 の場合，Nで指定した要素数の範囲の内積を求め，nは無視．
   N = 0 の場合，要素数をnで指定，
-  \param iter0	適用範囲の第1変数の先頭を指す反復子
+  \param iter0	第1変数の適用範囲の先頭を指す反復子
   \param n	要素数
-  \param iter1	適用範囲の第2変数の先頭を指す反復子
+  \param iter1	第2変数の適用範囲の先頭を指す反復子
   \param init	初期値
   \return	内積の値
 */

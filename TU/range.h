@@ -606,7 +606,7 @@ namespace detail
   {
       return stride_impl(iter.get_iterator_tuple());
   }
-
+    
   // iter.base() が zip_iterator 型の場合に備えて再度宣言する．
   template <class ITER> auto
   stride_impl(const ITER& iter) -> decltype(stride_impl(iter.base()))	;
@@ -695,6 +695,20 @@ class range_iterator
     using ss	= detail::stride_and_size<iterator_stride<ITER>,
 					  STRIDE, SIZE>;
     
+    template <class ITER_>
+    static auto	has_base_impl(const ITER_& iter)
+		    -> decltype(iter.base(), std::true_type())		;
+    static auto has_base_impl(...) -> std::false_type			;
+    template <class ITER_>
+    using has_base	= decltype(has_base_impl(std::declval<ITER_>()));
+    
+    template <class ITER_>
+    static auto has_iter_tuple_impl(const ITER_& iter)
+		-> decltype(iter.get_iterator_tuple(), std::true_type());
+    static auto has_iter_tuple_impl(...) -> std::false_type		;
+    template <class ITER_>
+    using has_iter_tuple = decltype(has_iter_tuple_impl(std::declval<ITER_>()));
+    
   public:
     using		typename super::reference;
     using		typename super::difference_type;
@@ -745,21 +759,26 @@ class range_iterator
 		{
 		    iter += stride;
 		}
-    template <class ITER_TUPLE_, class... STRIDE_>
-    static void	advance(zip_iterator<ITER_TUPLE_>& iter,
-			std::tuple<STRIDE_...> stride)
+    template <class ITER_, class... STRIDE_>
+    static std::enable_if_t<has_iter_tuple<ITER_>::value>
+    		advance(ITER_& iter, std::tuple<STRIDE_...> stride)
 		{
+		    using tuple_t = std::decay_t<
+					decltype(iter.get_iterator_tuple())>;
+		    
 		    tuple_for_each([](auto&& x, auto y)
 				   { range_iterator::advance(x, y); },
-				   const_cast<ITER_TUPLE_&>(
+				   const_cast<tuple_t&>(
 				       iter.get_iterator_tuple()),
 				   stride);
 		}
     template <class ITER_, class... STRIDE_>
-    static void	advance(ITER_& iter, std::tuple<STRIDE_...> stride)
+    static std::enable_if_t<has_base<ITER_>::value>
+    		advance(ITER_& iter, std::tuple<STRIDE_...> stride)
 		{
-		    advance(const_cast<typename ITER_::base_type&>(iter.base()),
-			    stride);
+		    using base_t = std::decay_t<decltype(iter.base())>;
+
+		    advance(const_cast<base_t&>(iter.base()), stride);
 		}
 #if defined(__NVCC__)
     template <class ITER_TUPLE_, class STRIDE_, class TAIL_>
@@ -1014,7 +1033,7 @@ slice(RANGE&& r, size_t idx, INDICES... indices)
 }
 
 /************************************************************************
-*  pipeline stuffs							*
+*  pipeline stuff							*
 ************************************************************************/
 namespace detail
 {
@@ -1044,73 +1063,54 @@ namespace detail
   };
 }	// namespace detail
 
-template <class T=void, bool MASK=false, class FUNC> inline auto
+template <class T=void, bool MASK=false, class FUNC>
+inline detail::mapped_tag<T, MASK, FUNC>
 mapped(FUNC&& func)
 {
-    return detail::mapped_tag<T, MASK, FUNC>(std::forward<FUNC>(func));
+    return {std::forward<FUNC>(func)};
 }
 
+template <class... ARG> inline std::tuple<const ARG&...>
+zip(const ARG&... x)
+{
+    return std::tie(x...);
+}
+    
 namespace detail
 {
   template <class ITER>
-  auto	check_begin(const ITER& iter) -> decltype(begin(*iter),
-						  std::true_type())	;
-  auto	check_begin(...)	      -> std::false_type		;
-    
+  auto	check_begin(ITER&& iter) -> decltype(begin(*iter),
+					     std::true_type())		;
+  auto	check_begin(...)	 -> std::false_type			;
+
   template <class ITER>
   using value_has_begin = decltype(check_begin(std::declval<ITER>()));
-}
-    
-template <class... ITER,
-	  std::enable_if_t<!all<detail::value_has_begin, ITER...>::value>*
-	  = nullptr>
-inline auto
-make_zip_range_iterator(const ITER&... iter)
-{
-    return TU::make_zip_iterator(iter...);
-}
+}	// namespace detail
 
-template <class... ITER,
-	  std::enable_if_t<all<detail::value_has_begin, ITER...>::value>*
-	  = nullptr>
-inline auto
-make_zip_range_iterator(const ITER&... iter)
-{
-    return make_range_iterator(make_zip_range_iterator(begin(*iter)...),
-			       stride(iter...), std::min({size(*iter)...}));
-}
-
-template <class... ARG> inline auto
-zip(const ARG&... x)
-{
-    return make_range(make_zip_iterator(begin(x)...),
-		      std::min({size(x)...}));
-}
-    
-template <class S, class T, bool MASK, class FUNC, class ITER,
+template <class T, bool MASK, class FUNC, class ITER,
 	  std::enable_if_t<!detail::value_has_begin<ITER>::value>* = nullptr>
 inline auto
 make_map_range_iterator(detail::mapped_tag<T, MASK, FUNC>&& m, const ITER& iter)
 {
+    using S = typename detail::mapped_tag<T, MASK, FUNC>::element_type;
+    
     return make_map_iterator<S, MASK>(m.functor(), iter);
 }
 
-template <class S, class T, bool MASK, class FUNC, class ITER,
+template <class T, bool MASK, class FUNC, class ITER,
 	  std::enable_if_t<detail::value_has_begin<ITER>::value>* = nullptr>
 inline auto
 make_map_range_iterator(detail::mapped_tag<T, MASK, FUNC>&& m, const ITER& iter)
 {
-    return make_range_iterator(make_map_range_iterator<S>(std::move(m),
-							  begin(*iter)),
+    return make_range_iterator(make_map_range_iterator(std::move(m),
+						       begin(*iter)),
 			       stride(iter), size(*iter));
 }
     
 template <class ARG, class T, bool MASK, class FUNC> inline auto
-operator |(const ARG& x, detail::mapped_tag<T, MASK, FUNC>&& m)
+operator >>(const ARG& x, detail::mapped_tag<T, MASK, FUNC>&& m)
 {
-    using S = typename detail::mapped_tag<T, MASK, FUNC>::element_type;
-    
-    return make_range(make_map_range_iterator<S>(std::move(m), begin(x)),
+    return make_range(make_map_range_iterator(std::move(m), begin(x)),
 		      size(x));
 }
 

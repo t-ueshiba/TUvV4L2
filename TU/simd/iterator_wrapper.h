@@ -120,13 +120,27 @@ make_accessor(const iterator_wrapper<T*, ALIGNED>& p)
     return {p.base()};
 }
 
+/************************************************************************
+*  stuff concerning with zip_iterator<ITER_TUPLE>			*
+************************************************************************/
+template <class... ITER, bool... ALIGNED> inline auto
+make_zip_iterator(const std::tuple<
+			    iterator_wrapper<ITER, ALIGNED>...>& iter_tuple)
+{
+    return wrap_iterator(TU::make_zip_iterator(iter_tuple));
+}
+
 //! zip_iterator中の各反復子からSIMDベクトルを読み書きする反復子を生成し，それをtupleにまとめる
 /*!
   \param iter	SIMDベクトルを読み込み元/書き込み先を指す反復子を束ねたzip_iterator
   \return	SIMDベクトルを読み書きする反復子を束ねたzip_iterator
 */
-template <class ITER_TUPLE, bool ALIGNED> inline auto
-make_accessor(const iterator_wrapper<zip_iterator<ITER_TUPLE>, ALIGNED>& iter)
+template <class... ITER, bool... ALIGNED> inline auto
+make_accessor(const iterator_wrapper<
+			zip_iterator<
+			    std::tuple<
+				iterator_wrapper<
+				    ITER, ALIGNED>...> >, true>& iter)
 {
     return tuple_transform([](const auto& it){ return make_accessor(it); },
 			   iter.base().get_iterator_tuple());
@@ -135,9 +149,9 @@ make_accessor(const iterator_wrapper<zip_iterator<ITER_TUPLE>, ALIGNED>& iter)
 template <class ITER_TUPLE> inline auto
 make_accessor(const zip_iterator<ITER_TUPLE>& iter)
 {
-    return make_zip_iterator(tuple_transform([](const auto& it)
-					     { return make_accessor(it); },
-					     iter.get_iterator_tuple()));
+    return TU::make_zip_iterator(tuple_transform([](const auto& it)
+						 { return make_accessor(it); },
+						 iter.get_iterator_tuple()));
 }
 
 /************************************************************************
@@ -147,13 +161,6 @@ template <class ITER, bool ALIGNED> inline auto
 stride(const iterator_wrapper<ITER, ALIGNED>& iter)
 {
     return stride(iter.base());
-}
-    
-template <class... ITER, bool... ALIGNED> inline auto
-make_zip_iterator(const std::tuple<
-			    iterator_wrapper<ITER, ALIGNED>...>& iter_tuple)
-{
-    return wrap_iterator(TU::make_zip_iterator(iter_tuple));
 }
 
 }	// namespace simd

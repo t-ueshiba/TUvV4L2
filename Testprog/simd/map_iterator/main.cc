@@ -52,7 +52,7 @@ test_single_stage()
 	   16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31});
     Array<OUT, 0, Allocator<OUT> >	w;
 
-    w = zip(x, y) | mapped<T>(std::plus<>());
+    w = zip(x, y) >> mapped<T>(std::plus<>());
 
     std::copy(cbegin(w), cend(w), std::ostream_iterator<int>(std::cout, " "));
     std::cout << std::endl;
@@ -72,13 +72,13 @@ test_two_stages()
 	   16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31});
     Array<OUT, 0, Allocator<OUT> >	w;
 
-    w = zip(zip(x, y) | mapped<T>(std::plus<>()), z)
-	| mapped<OUT>(std::multiplies<>());
+    w = zip(zip(x, y) >> mapped<T>(std::plus<>()), z)
+	>> mapped<OUT>(std::multiplies<>());
     
     std::copy(cbegin(w), cend(w), std::ostream_iterator<int>(std::cout, " "));
     std::cout << std::endl;
 
-    w += zip(x, y, z) | mapped<T>(sum());
+    w += zip(x, y, z) >> mapped<T>(sum());
     
     std::copy(cbegin(w), cend(w), std::ostream_iterator<int>(std::cout, " "));
     std::cout << std::endl;
@@ -103,16 +103,17 @@ test_map_iterator()
 template <class IN, class OUT> void
 test_assign2()
 {
-    Array2<IN, 0, 0, Allocator<IN> >
-	x({{ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
-	    16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31},
-	   { 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
-	    16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31}});
+  // simd::allocatorを使った場合，alignmentが満たされないので
+  // 2次元配列はinitializer_listで初期化できない
+    Array2<IN, 0, 0, Allocator<IN> >	x(2, 32);
+    x[0] = { 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
+	    16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31};
+    x[1] = 2*x[0];
     Array2<OUT, 0, 0, Allocator<OUT> >	w;
 
     w = x;
 
-    for (const auto& row : w)
+    for (auto row : w)
     {
 	std::copy(begin(row), end(row),
 		  std::ostream_iterator<int>(std::cout, " "));
@@ -124,25 +125,22 @@ test_assign2()
 template <class IN0, class IN1, class T, class OUT> void
 test_single_stage2()
 {
-    Array2<IN0, 0, 0, Allocator<IN0> >
-	x({{ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
-	    16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31},
-	   { 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
-	    16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31}});
-    Array2<IN1, 0, 0, Allocator<IN1> >
-	y({{ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
-	    16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31},
-	   { 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
-	    16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31}});
+    Array2<IN0, 0, 0, Allocator<IN0> >	x(2, 32);
+    x[0] = { 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
+	    16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31};
+    x[1] = 2*x[0];
+    Array2<IN1, 0, 0, Allocator<IN1> >	y = x;
     Array2<OUT, 0, 0, Allocator<OUT> >	w;
 #if 0
     auto	z = zip(x, y);
-
-    std::cout << demangle<decltype(z)>() << std::endl;
+    std::cout << demangle<decltype(begin(z))>() << std::endl;
 #else
-    w = zip(x, y) | mapped<T>(std::plus<>());
+    auto	z = zip(x, y) >> mapped<T>(std::plus<>());
+    std::cout << demangle<decltype(z)>() << std::endl;
+    
+    w = zip(x, y) >> mapped<T>(std::plus<>());
 
-    for (const auto& row : w)
+    for (auto row : w)
     {
 	std::copy(begin(row), end(row),
 		  std::ostream_iterator<int>(std::cout, " "));
@@ -177,7 +175,7 @@ main()
 
     std::cerr << "--------------" << std::endl;
 
-  //    TU::test_single_stage2<int16_t, int16_t, int8_t, int32_t>();
+    TU::test_single_stage2<int16_t, int16_t, int8_t, int32_t>();
 
     return 0;
 }
