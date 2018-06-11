@@ -121,6 +121,19 @@ make_accessor(const iterator_wrapper<T*, ALIGNED>& p)
 }
 
 /************************************************************************
+*  stride(const iterator_wrapper<ITER, ALIGNED>&)			*
+************************************************************************/
+template <class ITER, bool ALIGNED> inline auto
+stride(const iterator_wrapper<ITER, ALIGNED>& iter)
+{
+  /*
+    using		value_t = iterator_value<decltype(make_accessor(iter))>;
+    constexpr ptrdiff_t	N = (is_vec<value_t>::value ? value_t::size : 1);
+  */
+    return TU::stride(iter.base());
+}
+
+/************************************************************************
 *  stuff concerning with zip_iterator<ITER_TUPLE>			*
 ************************************************************************/
 template <class... ITER, bool... ALIGNED> inline auto
@@ -152,15 +165,6 @@ make_accessor(const zip_iterator<ITER_TUPLE>& iter)
     return TU::make_zip_iterator(tuple_transform([](const auto& it)
 						 { return make_accessor(it); },
 						 iter.get_iterator_tuple()));
-}
-
-/************************************************************************
-*  stride(const iterator_wrapper<ITER, ALIGNED>&)			*
-************************************************************************/
-template <class ITER, bool ALIGNED> inline auto
-stride(const iterator_wrapper<ITER, ALIGNED>& iter)
-{
-    return stride(iter.base());
 }
 
 }	// namespace simd

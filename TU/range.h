@@ -571,49 +571,20 @@ operator <<(std::ostream& out, const range<ITER, SIZE>& r)
 /************************************************************************
 *  type alias: iterator_stride<ITER>					*
 ************************************************************************/
-namespace detail
-{
-  ptrdiff_t
-  stride_impl(...)							;
+ptrdiff_t	stride(...)						;
 
-  template <class ITER> auto
-  stride_impl(const ITER& iter) -> decltype(stride_impl(iter.base()))	;
+template <class ITER> auto
+stride(const ITER& iter) -> decltype(stride(iter.base()))		;
 
-  template <class... ITER> auto
-  stride_impl(const std::tuple<ITER...>& iter_tuple)
-      -> std::tuple<decltype(stride_impl(std::declval<ITER>()))...>
-  {
-      return tuple_transform([](const auto& iter)
-			     { return stride_impl(iter); },
-			     iter_tuple);
-  }
-    
-  //#if defined(__NVCC__)
-#if 0
-  template <class... ITER> auto
-  stride_impl(const thrust::tuple<ITER...>& iter_tuple)
-      -> thrust::tuple<decltype(stride_impl(std::declval<ITER>()))...>
-  {
-      return thrust::tuple_transform([](const auto& iter)
-				     { return stride_impl(iter); },
-				     iter_tuple);
-  }
-#endif
+template <class... ITER> auto
+stride(const std::tuple<ITER...>&)
+    -> std::tuple<decltype(stride(std::declval<ITER>()))...>		;
 
-  template <class ITER> auto
-  stride_impl(const ITER& iter)
-      -> decltype(stride_impl(iter.get_iterator_tuple()))
-  {
-      return stride_impl(iter.get_iterator_tuple());
-  }
-    
-  // iter.base() が zip_iterator 型の場合に備えて再度宣言する．
-  template <class ITER> auto
-  stride_impl(const ITER& iter) -> decltype(stride_impl(iter.base()))	;
-}	// namespace detail
-    
+template <class ITER> auto
+stride(const ITER& iter) -> decltype(stride(iter.get_iterator_tuple()))	;
+
 template <class ITER>
-using iterator_stride = decltype(detail::stride_impl(std::declval<ITER>()));
+using iterator_stride = decltype(stride(std::declval<ITER>()));
 
 /************************************************************************
 *  class range_iterator<ITER, STRIDE, SIZE>				*
@@ -814,30 +785,35 @@ class range_iterator
 /************************************************************************
 *  TU::stride(const ITER&)						*
 ************************************************************************/
-namespace detail
-{
-  template <class ITER, ptrdiff_t STRIDE, size_t SIZE> auto
-  stride_impl(const range_iterator<ITER, STRIDE, SIZE>& iter)
-  {
-      return iter.stride();
-  }
-}	// namespace detail
-    
 //! 反復子が指すレンジが所属する軸のストライドを返す
 /*!
   \param iter	レンジを指す反復子
   \return	レンジ軸のストライド
 */
-template <class ITER> inline auto
-stride(const ITER& iter) -> decltype(detail::stride_impl(iter))
+template <class ITER, ptrdiff_t STRIDE, size_t SIZE> inline auto
+stride(const range_iterator<ITER, STRIDE, SIZE>& iter)
 {
-    return detail::stride_impl(iter);
+    return iter.stride();
 }
 
-template <class ITER, class... ITERS> inline auto
-stride(const ITER& iter, const ITERS&... iters)
+template <class... ITER> inline auto
+stride(const std::tuple<ITER...>& iter_tuple)
+    -> std::tuple<decltype(stride(std::declval<ITER>()))...>
 {
-    return std::make_tuple(stride(iter), stride(iters)...);
+    return tuple_transform([](const auto& iter){ return stride(iter); },
+			   iter_tuple);
+}
+
+template <class ITER> inline auto
+stride(const ITER& iter) -> decltype(stride(iter.get_iterator_tuple()))
+{
+    return stride(iter.get_iterator_tuple());
+}
+
+template <class ITER0, class ITER1, class... ITERS> inline auto
+stride(const ITER0& iter0, const ITER1& iter1, const ITERS&... iters)
+{
+    return std::make_tuple(stride(iter0), stride(iter1), stride(iters)...);
 }
 
 /************************************************************************

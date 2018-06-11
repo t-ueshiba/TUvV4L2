@@ -6,8 +6,8 @@
 #if !defined(TU_SIMD_ARRAYPP_H)
 #define TU_SIMD_ARRAYPP_H
 
-#include "TU/simd/simd.h"
 #include "TU/Array++.h"
+#include "TU/simd/simd.h"
 
 namespace TU
 {

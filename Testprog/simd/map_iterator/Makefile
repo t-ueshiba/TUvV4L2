@@ -121,20 +121,21 @@ OBJS		= main.o
 #include $(PROJECT)/lib/lib.mk		# PUBHDRS TARGHDRS
 include $(PROJECT)/lib/common.mk
 ###
-main.o: ../../../TU/simd/Array++.h ../../../TU/simd/simd.h \
-	../../../TU/simd/config.h ../../../TU/simd/vec.h \
-	../../../TU/simd/type_traits.h ../../../TU/simd/x86/type_traits.h \
-	../../../TU/simd/arm/type_traits.h ../../../TU/simd/x86/vec.h \
-	../../../TU/simd/x86/arch.h ../../../TU/simd/arm/vec.h \
-	../../../TU/simd/arm/arch.h ../../../TU/simd/allocator.h \
-	../../../TU/simd/iterator_wrapper.h \
-	../../../TU/simd/load_store_iterator.h ../../../TU/iterator.h \
-	../../../TU/tuple.h ../../../TU/type_traits.h \
-	../../../TU/simd/load_store.h ../../../TU/simd/x86/load_store.h \
-	../../../TU/simd/arm/load_store.h ../../../TU/simd/zero.h \
-	../../../TU/simd/x86/zero.h ../../../TU/simd/arm/zero.h \
-	../../../TU/simd/cast.h ../../../TU/simd/x86/cast.h \
-	../../../TU/simd/arm/cast.h ../../../TU/simd/insert_extract.h \
+main.o: ../../../TU/simd/Array++.h ../../../TU/Array++.h \
+	../../../TU/range.h ../../../TU/iterator.h ../../../TU/tuple.h \
+	../../../TU/type_traits.h ../../../TU/algorithm.h \
+	../../../TU/simd/simd.h ../../../TU/simd/config.h \
+	../../../TU/simd/vec.h ../../../TU/simd/type_traits.h \
+	../../../TU/simd/x86/type_traits.h ../../../TU/simd/arm/type_traits.h \
+	../../../TU/simd/x86/vec.h ../../../TU/simd/x86/arch.h \
+	../../../TU/simd/arm/vec.h ../../../TU/simd/arm/arch.h \
+	../../../TU/simd/allocator.h ../../../TU/simd/iterator_wrapper.h \
+	../../../TU/simd/load_store_iterator.h ../../../TU/simd/load_store.h \
+	../../../TU/simd/x86/load_store.h ../../../TU/simd/arm/load_store.h \
+	../../../TU/simd/zero.h ../../../TU/simd/x86/zero.h \
+	../../../TU/simd/arm/zero.h ../../../TU/simd/cast.h \
+	../../../TU/simd/x86/cast.h ../../../TU/simd/arm/cast.h \
+	../../../TU/simd/insert_extract.h \
 	../../../TU/simd/x86/insert_extract.h \
 	../../../TU/simd/arm/insert_extract.h ../../../TU/simd/shift.h \
 	../../../TU/simd/x86/shift.h ../../../TU/simd/arm/shift.h \
@@ -155,5 +156,4 @@ main.o: ../../../TU/simd/Array++.h ../../../TU/simd/simd.h \
 	../../../TU/simd/lookup.h ../../../TU/simd/x86/lookup.h \
 	../../../TU/simd/arm/lookup.h ../../../TU/simd/cvtdown_iterator.h \
 	../../../TU/simd/cvtup_iterator.h ../../../TU/simd/shift_iterator.h \
-	../../../TU/simd/map_iterator.h ../../../TU/range.h \
-	../../../TU/algorithm.h ../../../TU/Array++.h
+	../../../TU/simd/map_iterator.h

@@ -330,14 +330,6 @@ make_map_iterator(FUNC&& func, const iterator_wrapper<ITER, ALIGNED>&... iter)
 			     make_accessor(TU::make_zip_iterator(iter...))));
 }
 
-template <class T, bool MASK, class FUNC, class ITERS, bool ALIGNED> inline auto
-stride(const iterator_wrapper<
-		map_iterator<T, MASK, FUNC, ITERS>, ALIGNED>& iter)
-{
-    return tuple_transform([](const auto& it){ return stride(it); },
-			   iter.base().get_iterator_tuple());
-}
-
 }	// namespace simd
 }	// namespace TU
 #endif	// !TU_SIMD_MAP_ITERATOR_H
