@@ -6,6 +6,7 @@
 #if !defined(TU_SIMD_ITERATOR_WRAPPER_H)
 #define	TU_SIMD_ITERATOR_WRAPPER_H
 
+#include "TU/range.h"
 #include "TU/simd/load_store_iterator.h"
 
 namespace TU
@@ -123,13 +124,19 @@ make_accessor(const iterator_wrapper<T*, ALIGNED>& p)
 /************************************************************************
 *  stride(const iterator_wrapper<ITER, ALIGNED>&)			*
 ************************************************************************/
+template <class ITER, bool ALIGNED, ptrdiff_t STRIDE, size_t SIZE> inline auto
+stride(const range_iterator<iterator_wrapper<ITER, ALIGNED>,
+			    STRIDE, SIZE>& iter)
+{
+    using value_t = iterator_value<decltype(make_accessor(iter->begin()))>;
+    constexpr ptrdiff_t	N = (is_vec<value_t>::value ? value_t::size : 1);
+
+    return iter.stride() / N;
+}
+
 template <class ITER, bool ALIGNED> inline auto
 stride(const iterator_wrapper<ITER, ALIGNED>& iter)
 {
-  /*
-    using		value_t = iterator_value<decltype(make_accessor(iter))>;
-    constexpr ptrdiff_t	N = (is_vec<value_t>::value ? value_t::size : 1);
-  */
     return TU::stride(iter.base());
 }
 

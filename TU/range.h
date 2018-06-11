@@ -666,19 +666,10 @@ class range_iterator
     using ss	= detail::stride_and_size<iterator_stride<ITER>,
 					  STRIDE, SIZE>;
     
-    template <class ITER_>
-    static auto	has_base_impl(const ITER_& iter)
-		    -> decltype(iter.base(), std::true_type())		;
-    static auto has_base_impl(...) -> std::false_type			;
-    template <class ITER_>
-    using has_base	= decltype(has_base_impl(std::declval<ITER_>()));
-    
-    template <class ITER_>
-    static auto has_iter_tuple_impl(const ITER_& iter)
-		-> decltype(iter.get_iterator_tuple(), std::true_type());
-    static auto has_iter_tuple_impl(...) -> std::false_type		;
-    template <class ITER_>
-    using has_iter_tuple = decltype(has_iter_tuple_impl(std::declval<ITER_>()));
+    template <class... T>
+    struct void_t_impl	{ using type = void; };
+    template <class... T>
+    using void_t      = typename void_t_impl<T...>::type;
     
   public:
     using		typename super::reference;
@@ -731,8 +722,9 @@ class range_iterator
 		    iter += stride;
 		}
     template <class ITER_, class... STRIDE_>
-    static std::enable_if_t<has_iter_tuple<ITER_>::value>
-    		advance(ITER_& iter, std::tuple<STRIDE_...> stride)
+    static auto	advance(ITER_& iter, std::tuple<STRIDE_...> stride)
+		    -> void_t<decltype(std::declval<ITER_>()
+				       .get_iterator_tuple())>
 		{
 		    using tuple_t = std::decay_t<
 					decltype(iter.get_iterator_tuple())>;
@@ -744,8 +736,8 @@ class range_iterator
 				   stride);
 		}
     template <class ITER_, class... STRIDE_>
-    static std::enable_if_t<has_base<ITER_>::value>
-    		advance(ITER_& iter, std::tuple<STRIDE_...> stride)
+    static auto	advance(ITER_& iter, std::tuple<STRIDE_...> stride)
+		    -> void_t<decltype(std::declval<ITER_>().base())>
 		{
 		    using base_t = std::decay_t<decltype(iter.base())>;
 
