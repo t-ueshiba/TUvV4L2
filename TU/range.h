@@ -716,8 +716,8 @@ class range_iterator
 		    return (iter.base() - super::base()) / leftmost(stride());
 		}
 
-    template <class ITER_, class STRIDE_>
-    static void	advance(ITER_& iter, STRIDE_ stride)
+    template <class ITER_>
+    static void	advance(ITER_& iter, ptrdiff_t stride)
 		{
 		    iter += stride;
 		}
