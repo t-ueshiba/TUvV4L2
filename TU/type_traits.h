@@ -54,16 +54,11 @@ struct is_convertible
   \param T...	適用対象となる型の並び
 */
 template <template <class> class PRED, class... T>
-struct all
-{
-    constexpr static bool	value = true;
-};
+struct all : std::true_type						{};
 template <template <class> class PRED, class S, class... T>
 struct all<PRED, S, T...>
-{
-    constexpr static bool	value = PRED<S>::value &&
-					all<PRED, T...>::value;
-};
+    : std::integral_constant<bool,
+			     PRED<S>::value && all<PRED, T...>::value>	{};
 
 /************************************************************************
 *  predicate: any<PRED, T...>						*
@@ -74,16 +69,11 @@ struct all<PRED, S, T...>
   \param T...	適用対象となる型の並び
 */
 template <template <class> class PRED, class... T>
-struct any
-{
-    constexpr static bool	value = false;
-};
+struct any : std::false_type						{};
 template <template <class> class PRED, class S, class... T>
 struct any<PRED, S, T...>
-{
-    constexpr static bool	value = PRED<S>::value ||
-					any<PRED, T...>::value;
-};
+    : std::integral_constant<bool,
+			     PRED<S>::value || any<PRED, T...>::value>	{};
 
 }	// namespace TU
 #endif	// !TU_TYPE_TRAITS_H

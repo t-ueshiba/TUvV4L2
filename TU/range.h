@@ -10,9 +10,6 @@
 #include <initializer_list>
 #include "TU/iterator.h"
 #include "TU/algorithm.h"
-#if defined(__NVCC__)
-#  include "TU/cuda/tuple.h"
-#endif
 
 namespace TU
 {
@@ -730,8 +727,8 @@ class range_iterator
 		{
 		    iter += stride;
 		}
-    template <class ITER_, class... STRIDE_>
-    static auto	advance(ITER_& iter, std::tuple<STRIDE_...> stride)
+    template <class ITER_, class STRIDE_>
+    static auto	advance(ITER_& iter, const STRIDE_& stride)
 		    -> void_t<decltype(std::declval<ITER_>()
 				       .get_iterator_tuple())>
 		{
@@ -744,33 +741,14 @@ class range_iterator
 				       iter.get_iterator_tuple()),
 				   stride);
 		}
-    template <class ITER_, class... STRIDE_>
-    static auto	advance(ITER_& iter, std::tuple<STRIDE_...> stride)
+    template <class ITER_, class STRIDE_>
+    static auto	advance(ITER_& iter, const STRIDE_& stride)
 		    -> void_t<decltype(std::declval<ITER_>().base())>
 		{
 		    using base_t = std::decay_t<decltype(iter.base())>;
 
 		    advance(const_cast<base_t&>(iter.base()), stride);
 		}
-#if defined(__NVCC__)
-    template <class ITER_TUPLE_, class STRIDE_, class TAIL_>
-    static void	advance(thrust::zip_iterator<ITER_TUPLE_>& iter,
-			thrust::detail::cons<STRIDE_, TAIL_> stride)
-		{
-		    tuple_for_each([](auto&& x, auto y)
-				   { range_iterator::advance(x, y); },
-				   const_cast<ITER_TUPLE_&>(
-				       iter.get_iterator_tuple()),
-				   stride);
-		}
-    template <class ITER_, class STRIDE_, class TAIL_>
-    static void	advance(ITER_& iter,
-			thrust::detail::cons<STRIDE_, TAIL_> stride)
-		{
-		    advance(const_cast<typename ITER_::base_type&>(iter.base()),
-			    stride);
-		}
-#endif
     template <class STRIDE_>
     static auto	leftmost(STRIDE_ stride)
 		{
