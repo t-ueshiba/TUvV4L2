@@ -40,6 +40,14 @@ namespace detail
 template <class E>
 using iterator_t = decltype(detail::iterator_t(std::declval<E>()));
 
+//! 反復子が指す式に適用できる反復子の型を返す
+/*!
+  \param ITER	反復子
+  \return	ITER が指す式に反復子が適用できればその型，適用できなければ void
+*/
+template <class ITER>
+using iterator_iterator = iterator_t<iterator_value<ITER> >;
+
 //! 式が持つ逆反復子の型を返す
 /*!
   反復子を持たない式を与えるとコンパイルエラーとなる.
@@ -571,17 +579,18 @@ operator <<(std::ostream& out, const range<ITER, SIZE>& r)
 /************************************************************************
 *  type alias: iterator_stride<ITER>					*
 ************************************************************************/
-ptrdiff_t	stride(...)						;
+template <class T> auto
+stride(T*) -> ptrdiff_t							;
 
 template <class ITER> auto
-stride(const ITER& iter) -> decltype(stride(iter.base()))		;
+stride(ITER iter) -> decltype(stride(iter.base()))			;
 
 template <class... ITER> auto
 stride(const std::tuple<ITER...>&)
     -> std::tuple<decltype(stride(std::declval<ITER>()))...>		;
 
 template <class ITER> auto
-stride(const ITER& iter) -> decltype(stride(iter.get_iterator_tuple()))	;
+stride(ITER iter) -> decltype(stride(iter.get_iterator_tuple()))	;
 
 template <class ITER>
 using iterator_stride = decltype(stride(std::declval<ITER>()));
@@ -783,7 +792,7 @@ class range_iterator
   \return	レンジ軸のストライド
 */
 template <class ITER, ptrdiff_t STRIDE, size_t SIZE> inline auto
-stride(const range_iterator<ITER, STRIDE, SIZE>& iter)
+stride(range_iterator<ITER, STRIDE, SIZE> iter)
 {
     return iter.stride();
 }
@@ -797,13 +806,13 @@ stride(const std::tuple<ITER...>& iter_tuple)
 }
 
 template <class ITER> inline auto
-stride(const ITER& iter) -> decltype(stride(iter.get_iterator_tuple()))
+stride(ITER iter) -> decltype(stride(iter.get_iterator_tuple()))
 {
     return stride(iter.get_iterator_tuple());
 }
 
 template <class ITER0, class ITER1, class... ITERS> inline auto
-stride(const ITER0& iter0, const ITER1& iter1, const ITERS&... iters)
+stride(ITER0 iter0, ITER1 iter1, ITERS... iters)
 {
     return std::make_tuple(stride(iter0), stride(iter1), stride(iters)...);
 }
@@ -1024,7 +1033,7 @@ namespace detail
     public:
       mapped_tag(FUNC&& func)	:_func(std::forward<FUNC>(func))	{}
 
-      const auto&	functor()	const	{ return _func; }
+      FUNC&&	functor() 	{ return std::forward<FUNC>(_func); }
 
     private:
       FUNC	_func;
@@ -1044,42 +1053,29 @@ zip(const ARG&... x)
     return std::tie(x...);
 }
     
-namespace detail
-{
-  template <class ITER>
-  auto	check_begin(ITER&& iter) -> decltype(begin(*iter),
-					     std::true_type())		;
-  auto	check_begin(...)	 -> std::false_type			;
-
-  template <class ITER>
-  using value_has_begin = decltype(check_begin(std::declval<ITER>()));
-}	// namespace detail
-
 template <class T, bool MASK, class FUNC, class ITER,
-	  std::enable_if_t<!detail::value_has_begin<ITER>::value>* = nullptr>
+	  std::enable_if_t<std::is_void<iterator_iterator<ITER> >::value>*
+	  = nullptr>
 inline auto
-make_map_range_iterator(detail::mapped_tag<T, MASK, FUNC>&& m, const ITER& iter)
+make_map_iterator(detail::mapped_tag<T, MASK, FUNC>&& m, const ITER& iter)
 {
-    using S = typename detail::mapped_tag<T, MASK, FUNC>::element_type;
-    
-    return make_map_iterator<S, MASK>(m.functor(), iter);
+    return make_map_iterator(m.functor(), iter);
 }
 
 template <class T, bool MASK, class FUNC, class ITER,
-	  std::enable_if_t<detail::value_has_begin<ITER>::value>* = nullptr>
+	  std::enable_if_t<!std::is_void<iterator_iterator<ITER> >::value>*
+	  = nullptr>
 inline auto
-make_map_range_iterator(detail::mapped_tag<T, MASK, FUNC>&& m, const ITER& iter)
+make_map_iterator(detail::mapped_tag<T, MASK, FUNC>&& m, const ITER& iter)
 {
-    return make_range_iterator(make_map_range_iterator(std::move(m),
-						       begin(*iter)),
+    return make_range_iterator(make_map_iterator(std::move(m), begin(*iter)),
 			       stride(iter), size(*iter));
 }
     
 template <class ARG, class T, bool MASK, class FUNC> inline auto
 operator >>(const ARG& x, detail::mapped_tag<T, MASK, FUNC>&& m)
 {
-    return make_range(make_map_range_iterator(std::move(m), begin(x)),
-		      size(x));
+    return make_range(make_map_iterator(std::move(m), begin(x)), size(x));
 }
 
 /************************************************************************

@@ -8,13 +8,24 @@
 
 #include <type_traits>
 #include <utility>	// std::declval<T>
+#if !defined(NDEBUG)
+#  include <boost/core/demangle.hpp>
+#endif
 
 namespace TU
 {
+#if !defined(NDEBUG)
 /************************************************************************
-*  display type for debugging purpose					*
+*  display type name for debugging					*
 ************************************************************************/
 template <class T> class display_type;
+
+template <class T> inline auto
+demangle()
+{
+    return boost::core::demangle(typeid(T).name());
+}
+#endif
     
 /************************************************************************
 *  struct is_convertible<T, C<ARGS...> >				*

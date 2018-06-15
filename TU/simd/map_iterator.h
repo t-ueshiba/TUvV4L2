@@ -318,16 +318,48 @@ class map_iterator
     FUNC	_func;
 };
 
-template <class T=void, bool MASK=false,
-	  class FUNC, class... ITER, bool... ALIGNED> inline auto
-make_map_iterator(FUNC&& func, const iterator_wrapper<ITER, ALIGNED>&... iter)
+template <class T=void, bool MASK=false, class FUNC,
+	  class ITER0, bool ALIGNED0, class... ITER, bool... ALIGNED>
+inline auto
+make_map_iterator(FUNC&& func,
+		  const iterator_wrapper<ITER0, ALIGNED0>& iter0,
+		  const iterator_wrapper<ITER,  ALIGNED>&... iter)
 {
-    using iters_t  = decltype(make_accessor(TU::make_zip_iterator(iter...)));
+    using iters_t  = decltype(make_accessor(
+				  TU::make_zip_iterator(iter0, iter...)));
     using argelm_t = detail::map_iterator_argument_element<T, iters_t>;
 
     return wrap_iterator(map_iterator<argelm_t, MASK, FUNC, iters_t>(
 			     std::forward<FUNC>(func),
-			     make_accessor(TU::make_zip_iterator(iter...))));
+			     make_accessor(
+				 TU::make_zip_iterator(iter0, iter...))));
+}
+
+template <class T, bool MASK, class FUNC, class ITER, bool ALIGNED,
+	  std::enable_if_t<std::is_void<iterator_iterator<ITER> >::value>*
+	  = nullptr>
+inline auto
+make_map_iterator(TU::detail::mapped_tag<T, MASK, FUNC>&& m,
+		  const iterator_wrapper<ITER, ALIGNED>& iter)
+{
+    using S = typename TU::detail::mapped_tag<T, MASK, FUNC>::element_type;
+    
+    return make_map_iterator<S, MASK>(m.functor(), iter);
+}
+
+/*
+ *  iterator_stride<ITER> = decltype(stride(std::declval<ITER>())) において
+ *    ITER = range_iterator<
+ *		simd::iterator_wrapper<simd::map_iterator<...>, true>,
+ *		STRIDE, SIZE>
+ *  であるとき， simd::map_iterator型である iter.base().base() に対して
+ *  ADLを利用して stride() を呼び出すために定義．
+ */
+template <class T, bool MASK, class FUNC, class ITERS> auto
+stride(const map_iterator<T, MASK, FUNC, ITERS>& iter)
+    -> decltype(TU::stride(iter.get_iterator_tuple()))
+{
+    return TU::stride(iter.get_iterator_tuple());
 }
 
 }	// namespace simd

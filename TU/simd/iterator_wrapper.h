@@ -89,8 +89,9 @@ wrap_iterator(T* p)
   \param iter	ラップされた反復子
   \return	もとの反復子
 */
-template <class ITER, bool ALIGNED> inline ITER
-make_accessor(const iterator_wrapper<ITER, ALIGNED>& iter)
+template <class ITER>
+inline std::enable_if_t<!std::is_pointer<ITER>::value, ITER>
+make_accessor(const iterator_wrapper<ITER, true>& iter)
 {
     return iter.base();
 }
@@ -119,25 +120,6 @@ template <class T, bool ALIGNED> inline store_iterator<T, ALIGNED>
 make_accessor(const iterator_wrapper<T*, ALIGNED>& p)
 {
     return {p.base()};
-}
-
-/************************************************************************
-*  stride(const iterator_wrapper<ITER, ALIGNED>&)			*
-************************************************************************/
-template <class ITER, bool ALIGNED, ptrdiff_t STRIDE, size_t SIZE> inline auto
-stride(const range_iterator<iterator_wrapper<ITER, ALIGNED>,
-			    STRIDE, SIZE>& iter)
-{
-    using value_t = iterator_value<decltype(make_accessor(iter->begin()))>;
-    constexpr ptrdiff_t	N = (is_vec<value_t>::value ? value_t::size : 1);
-
-    return iter.stride() / N;
-}
-
-template <class ITER, bool ALIGNED> inline auto
-stride(const iterator_wrapper<ITER, ALIGNED>& iter)
-{
-    return TU::stride(iter.base());
 }
 
 /************************************************************************
@@ -170,6 +152,18 @@ make_accessor(const zip_iterator<ITER_TUPLE>& iter)
     return TU::make_zip_iterator(tuple_transform([](const auto& it)
 						 { return make_accessor(it); },
 						 iter.get_iterator_tuple()));
+}
+
+/************************************************************************
+*  stride(const iterator_wrapper<ITER, ALIGNED>&)			*
+************************************************************************/
+template <class T, bool ALIGNED, ptrdiff_t STRIDE, size_t SIZE> inline auto
+stride(const range_iterator<iterator_wrapper<T*, ALIGNED>, STRIDE, SIZE>& iter)
+    -> decltype(iter.stride())
+{
+    using value_t = iterator_value<decltype(make_accessor(iter->begin()))>;
+
+    return iter.stride() / value_t::size;
 }
 
 }	// namespace simd

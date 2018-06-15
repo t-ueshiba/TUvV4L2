@@ -536,8 +536,11 @@ class zip_iterator : public boost::iterator_facade<
 		zip_iterator(const zip_iterator<ITER_TUPLE_>& iter)
 		    :_iter_tuple(iter.get_iterator_tuple())		{}
 
-    const auto&	get_iterator_tuple()	const	{ return _iter_tuple; }
-
+    const auto&	get_iterator_tuple() const
+		{
+		    return _iter_tuple;
+		}
+    
   private:
     reference	dereference() const
 		{

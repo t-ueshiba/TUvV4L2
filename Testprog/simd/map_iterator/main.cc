@@ -2,7 +2,6 @@
  *  $Id$
  */
 #include "TU/simd/Array++.h"
-#include <boost/core/demangle.hpp>
 
 namespace TU
 {
@@ -14,12 +13,6 @@ template <class T>
 using Allocator = std::allocator<T>;
 #endif
     
-template <class T> inline auto
-demangle()
-{
-    return boost::core::demangle(typeid(T).name());
-}
-
 struct sum
 {
     template <class S, class T, class U>
@@ -135,9 +128,6 @@ test_single_stage2()
     auto	z = zip(x, y);
     std::cout << demangle<decltype(begin(z))>() << std::endl;
 #else
-    auto	z = zip(x, y) >> mapped<T>(std::plus<>());
-    std::cout << demangle<decltype(z)>() << std::endl;
-    
     w = zip(x, y) >> mapped<T>(std::plus<>());
 
     for (auto row : w)
@@ -160,6 +150,19 @@ test_two_stages2()
     Array2<IN1, 0, 0, Allocator<IN1> >	y = x;
     Array2<IN2, 0, 0, Allocator<IN2> >	z = x;
     Array2<OUT, 0, 0, Allocator<OUT> >	w;
+
+    auto	yy = zip(x, y) >> mapped<T>(std::plus<>());
+    std::cout << "=======" << std::endl;
+    std::cout << demangle<decltype(yy)>() << std::endl;
+    std::cout << yy.begin().stride() << std::endl;
+    std::cout << "=======" << std::endl;
+
+    auto	zz =  zip(zip(x, y) >> mapped<T>(std::plus<>()), z)
+		   >> mapped<OUT>(std::multiplies<>());
+    std::cout << "=======" << std::endl;
+    std::cout << demangle<decltype(zz)>() << std::endl;
+    std::cout << zz.begin().stride() << std::endl;
+    std::cout << "=======" << std::endl;
 
     w = zip(zip(x, y) >> mapped<T>(std::plus<>()), z)
 	>> mapped<OUT>(std::multiplies<>());
@@ -188,6 +191,7 @@ test_two_stages2()
 int
 main()
 {
+
     TU::test_assign<int32_t, int8_t>();
 
     std::cerr << "--------------" << std::endl;
@@ -212,7 +216,7 @@ main()
 
     std::cerr << "--------------" << std::endl;
 
-//    TU::test_two_stages2<int16_t, int32_t, float, int8_t, int16_t>();
+    TU::test_two_stages2<int16_t, int32_t, float, int8_t, int16_t>();
 
     return 0;
 }
