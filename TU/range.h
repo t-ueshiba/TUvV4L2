@@ -593,6 +593,35 @@ template <class ITER>
 using iterator_stride = decltype(stride(std::declval<ITER>()));
 
 /************************************************************************
+*  advance_stride(ITER&, STRIDE)					*
+************************************************************************/
+template <class ITER> inline auto
+advance_stride(ITER& iter, ptrdiff_t stride)
+    -> void_t<decltype(iter += stride)>
+{
+    iter += stride;
+}
+
+template <class ITER, class STRIDE> inline auto
+advance_stride(ITER& iter, const STRIDE& stride)
+    -> void_t<decltype(iter.get_iterator_tuple())>
+{
+    using tuple_t = std::decay_t<decltype(iter.get_iterator_tuple())>;
+    
+    tuple_for_each([](auto&& x, const auto& y){ advance_stride(x, y); },
+		   const_cast<tuple_t&>(iter.get_iterator_tuple()), stride);
+}
+
+template <class ITER, class STRIDE> inline auto
+advance_stride(ITER& iter, const STRIDE& stride)
+    -> void_t<decltype(iter.base())>
+{
+    using base_t = std::decay_t<decltype(iter.base())>;
+    
+    advance_stride(const_cast<base_t&>(iter.base()), stride);
+}
+
+/************************************************************************
 *  class range_iterator<ITER, STRIDE, SIZE>				*
 ************************************************************************/
 namespace detail
@@ -672,11 +701,6 @@ class range_iterator
     using ss	= detail::stride_and_size<iterator_stride<ITER>,
 					  STRIDE, SIZE>;
     
-    template <class... T>
-    struct void_t_impl	{ using type = void; };
-    template <class... T>
-    using void_t      = typename void_t_impl<T...>::type;
-    
   public:
     using		typename super::reference;
     using		typename super::difference_type;
@@ -706,58 +730,31 @@ class range_iterator
 		}
     void	increment()
 		{
-		    advance(super::base_reference(), stride());
+		    advance_stride(super::base_reference(), stride());
 		}
     void	decrement()
 		{
-		    advance(super::base_reference(), -stride());
+		    advance_stride(super::base_reference(), -stride());
 		}
     void	advance(difference_type n)
 		{
-		    advance(super::base_reference(), n*stride());
+		    advance_stride(super::base_reference(), n*stride());
 		}
     difference_type
 		distance_to(const range_iterator& iter) const
 		{
 		    return (iter.base() - super::base()) / leftmost(stride());
 		}
-
-    template <class ITER_>
-    static void	advance(ITER_& iter, ptrdiff_t stride)
-		{
-		    iter += stride;
-		}
-    template <class ITER_, class STRIDE_>
-    static auto	advance(ITER_& iter, const STRIDE_& stride)
-		    -> void_t<decltype(std::declval<ITER_>()
-				       .get_iterator_tuple())>
-		{
-		    using tuple_t = std::decay_t<
-					decltype(iter.get_iterator_tuple())>;
-		    
-		    tuple_for_each([](auto&& x, auto y)
-				   { range_iterator::advance(x, y); },
-				   const_cast<tuple_t&>(
-				       iter.get_iterator_tuple()),
-				   stride);
-		}
-    template <class ITER_, class STRIDE_>
-    static auto	advance(ITER_& iter, const STRIDE_& stride)
-		    -> void_t<decltype(std::declval<ITER_>().base())>
-		{
-		    using base_t = std::decay_t<decltype(iter.base())>;
-
-		    advance(const_cast<base_t&>(iter.base()), stride);
-		}
-    template <class STRIDE_>
-    static auto	leftmost(STRIDE_ stride)
+    static auto	leftmost(ptrdiff_t stride) -> ptrdiff_t
 		{
 		    return stride;
 		}
-    template <class... STRIDE_>
-    static auto	leftmost(std::tuple<STRIDE_...> stride)
+    template <class STRIDE_>
+    static auto	leftmost(const STRIDE_& stride)
 		{
-		    return leftmost(std::get<0>(stride));
+		    using	std::get;
+		    
+		    return leftmost(get<0>(stride));
 		}
 };
 	

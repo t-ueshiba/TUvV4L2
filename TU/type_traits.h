@@ -75,5 +75,15 @@ struct any<PRED, S, T...>
     : std::integral_constant<bool,
 			     PRED<S>::value || any<PRED, T...>::value>	{};
 
+/************************************************************************
+*  void_t<T...>								*
+************************************************************************/
+namespace detail
+{
+  template <class... T> struct void_t	{ using type = void; };
+}
+template <class... T>
+using void_t = typename detail::void_t<T...>::type;
+    
 }	// namespace TU
 #endif	// !TU_TYPE_TRAITS_H
