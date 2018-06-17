@@ -580,14 +580,15 @@ template <class T> auto
 stride(T*) -> ptrdiff_t							;
 
 template <class ITER> auto
-stride(ITER iter) -> decltype(stride(iter.base()))			;
+stride(const ITER& iter) -> decltype(stride(iter.base()))		;
 
 template <class... ITER> auto
 stride(const std::tuple<ITER...>&)
     -> std::tuple<decltype(stride(std::declval<ITER>()))...>		;
 
-template <class ITER> auto
-stride(ITER iter) -> decltype(stride(iter.get_iterator_tuple()))	;
+template <class ITER_TUPLE> auto
+stride(const zip_iterator<ITER_TUPLE>& iter)
+    -> decltype(stride(iter.get_iterator_tuple()))			;
 
 template <class ITER>
 using iterator_stride = decltype(stride(std::declval<ITER>()));
@@ -602,8 +603,8 @@ advance_stride(ITER& iter, ptrdiff_t stride)
     iter += stride;
 }
 
-template <class ITER, class STRIDE> inline auto
-advance_stride(ITER& iter, const STRIDE& stride)
+template <class ITER, class... STRIDE> inline auto
+advance_stride(ITER& iter, const std::tuple<STRIDE...>& stride)
     -> void_t<decltype(iter.get_iterator_tuple())>
 {
     using tuple_t = std::decay_t<decltype(iter.get_iterator_tuple())>;
@@ -612,8 +613,8 @@ advance_stride(ITER& iter, const STRIDE& stride)
 		   const_cast<tuple_t&>(iter.get_iterator_tuple()), stride);
 }
 
-template <class ITER, class STRIDE> inline auto
-advance_stride(ITER& iter, const STRIDE& stride)
+template <class ITER, class... STRIDE> inline auto
+advance_stride(ITER& iter, const std::tuple<STRIDE...>& stride)
     -> void_t<decltype(iter.base())>
 {
     using base_t = std::decay_t<decltype(iter.base())>;
@@ -767,7 +768,7 @@ class range_iterator
   \return	レンジ軸のストライド
 */
 template <class ITER, ptrdiff_t STRIDE, size_t SIZE> inline auto
-stride(range_iterator<ITER, STRIDE, SIZE> iter)
+stride(const range_iterator<ITER, STRIDE, SIZE>& iter)
 {
     return iter.stride();
 }
@@ -780,14 +781,15 @@ stride(const std::tuple<ITER...>& iter_tuple)
 			   iter_tuple);
 }
 
-template <class ITER> inline auto
-stride(ITER iter) -> decltype(stride(iter.get_iterator_tuple()))
+template <class ITER_TUPLE> inline auto
+stride(const zip_iterator<ITER_TUPLE>& iter)
+    -> decltype(stride(iter.get_iterator_tuple()))
 {
     return stride(iter.get_iterator_tuple());
 }
 
 template <class ITER0, class ITER1, class... ITERS> inline auto
-stride(ITER0 iter0, ITER1 iter1, ITERS... iters)
+stride(const ITER0& iter0, const ITER1& iter1, const ITERS&... iters)
 {
     return std::make_tuple(stride(iter0), stride(iter1), stride(iters)...);
 }

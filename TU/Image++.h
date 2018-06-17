@@ -1391,15 +1391,14 @@ ImageBase<IMAGE>::restoreHeader(std::istream& in)
     switch (c)
     {
       case 'P':
-	return restorePBMHeader(in);
+	break;
       case 'B':
 	return restoreBMPHeader(in);
       default:
 	throw std::runtime_error("TU::ImageBase::restoreHeader: neighter PBM nor BMP file!!");
-    	break;
     }
 
-    return ImageFormat::DEFAULT;
+    return restorePBMHeader(in);
 }
 
 //! 指定した画素タイプで出力ストリームに画像のヘッダを書き出す．
@@ -1421,11 +1420,9 @@ ImageBase<IMAGE>::saveHeader(std::ostream& out, ImageFormat::Type type) const
       case ImageFormat::BMP_24:
       case ImageFormat::BMP_32:
 	return saveBMPHeader(out, type);
-      default:
-	return savePBMHeader(out, type);
     }
 
-    return type;
+    return savePBMHeader(out, type);
 }
 
 template <class IMAGE> ImageFormat
@@ -1537,7 +1534,7 @@ ImageBase<IMAGE>::restorePBMHeader(std::istream& in)
 	}
     }
     in.putback(c);
-#  ifndef __NVCC__	// nvcc-9.0.176 cannot compile Camera++.h.
+#  ifndef __NVCC__	// nvcc-9.2.88 cannot compile Camera++.h.
     if (legacy)
     {
 	Camera<Intrinsic<double> >	camera(P);
@@ -1642,7 +1639,6 @@ ImageBase<IMAGE>::restoreBMPHeader(std::istream& in)
 
       default:	// Illegal information header size:
 	throw std::runtime_error("TU::ImageBase::restoreBMPHeader: information header corrupted!!");
-	break;
     }
 
   // Set type of the image.
@@ -1660,7 +1656,6 @@ ImageBase<IMAGE>::restoreBMPHeader(std::istream& in)
 	break;
       default:
 	throw std::runtime_error("TU::ImageBase::restoreBMPHeader: unsupported depth!!");
-	break;
     }
 
     ImageFormat	format(type, bottomToTop, ncolors);
@@ -2006,6 +2001,7 @@ Image<T, ALLOC>::restoreData(std::istream& in, const ImageFormat& format)
       default:
 	throw std::runtime_error("Image<T, ALLOC>::restoreData(): unknown pixel type!!");
     }
+
     return in;
 }
 
