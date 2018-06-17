@@ -50,8 +50,6 @@ EXTHDRS		= /usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/Minimize.h \
 		/usr/local/include/TU/Vector++.h \
 		/usr/local/include/TU/algorithm.h \
-		/usr/local/include/TU/cuda/iterator.h \
-		/usr/local/include/TU/cuda/tuple.h \
 		/usr/local/include/TU/iterator.h \
 		/usr/local/include/TU/pair.h \
 		/usr/local/include/TU/range.h \
@@ -89,8 +87,6 @@ createFormatMenu.o: TU/v/vIIDC++.h /usr/local/include/TU/v/CmdPane.h \
 	/usr/local/include/TU/Array++.h /usr/local/include/TU/range.h \
 	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
 	/usr/local/include/TU/type_traits.h /usr/local/include/TU/algorithm.h \
-	/usr/local/include/TU/cuda/tuple.h \
-	/usr/local/include/TU/cuda/iterator.h \
 	/usr/local/include/TU/v/Widget-Xaw.h \
 	/usr/local/include/TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/pair.h /usr/local/include/TU/Manip.h \
@@ -104,8 +100,6 @@ featureCmds.o: TU/v/vIIDC++.h /usr/local/include/TU/v/CmdPane.h \
 	/usr/local/include/TU/Array++.h /usr/local/include/TU/range.h \
 	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
 	/usr/local/include/TU/type_traits.h /usr/local/include/TU/algorithm.h \
-	/usr/local/include/TU/cuda/tuple.h \
-	/usr/local/include/TU/cuda/iterator.h \
 	/usr/local/include/TU/v/Widget-Xaw.h \
 	/usr/local/include/TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/pair.h /usr/local/include/TU/Manip.h \
@@ -119,8 +113,6 @@ selectROI.o: TU/v/vIIDC++.h /usr/local/include/TU/v/CmdPane.h \
 	/usr/local/include/TU/Array++.h /usr/local/include/TU/range.h \
 	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
 	/usr/local/include/TU/type_traits.h /usr/local/include/TU/algorithm.h \
-	/usr/local/include/TU/cuda/tuple.h \
-	/usr/local/include/TU/cuda/iterator.h \
 	/usr/local/include/TU/v/Widget-Xaw.h \
 	/usr/local/include/TU/v/Colormap.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/pair.h /usr/local/include/TU/Manip.h \
