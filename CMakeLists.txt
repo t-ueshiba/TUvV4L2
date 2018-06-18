@@ -14,8 +14,12 @@ find_package(Boost REQUIRED)
 
 add_definitions(-DNDEBUG)
 
-include_directories(. ${Boost_INCLUDE_DIRS})
-link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
+include_directories(
+    .
+    ${CMAKE_INSTALL_PREFIX}/include
+    ${Boost_INCLUDE_DIRS}
+)
+link_directories(${CMAKE_INSTALL_PREFIX}/lib)
 
 file(GLOB sources *.cc)
 file(GLOB headers TU/*.h)
