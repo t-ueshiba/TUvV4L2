@@ -1,27 +1,28 @@
-#
-#
-#
 cmake_minimum_required(VERSION 2.4)
+project(TUV4L2++)
 
-set(CMAKE_CXX_FLAGS		"${CMAKE_CXX_FLAGS} -msse4 -std=c++14")
+if(COMMAND cmake_policy)
+    cmake_policy(SET CMP0003 NEW)
+endif()
+
+set(CMAKE_CXX_FLAGS		"${CMAKE_CXX_FLAGS} -std=c++14")
 set(CMAKE_CXX_FLAGS_RELEASE	"-Wall -O3")
 set(CMAKE_CXX_FLAGS_DEBUG	"-g")
 set(CMAKE_BUILD_TYPE		Release)
 
-add_definitions(-DNDEBUG -DSSE4)
+find_package(Boost REQUIRED)
 
-set(sources
-    V4L2Camera.cc
-    V4L2CameraArray.cc)
+add_definitions(-DNDEBUG)
 
-if (COMMAND cmake_policy)
-    cmake_policy(SET CMP0003 NEW)
-endif ()
+include_directories(. ${Boost_INCLUDE_DIRS})
+link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 
-add_library(TUV4L2++ SHARED ${sources})
+file(GLOB sources *.cc)
+file(GLOB headers TU/*.h)
 
-include_directories(${LIBRAW1394_INCLUDE_DIRS})
-target_link_libraries(TUTools++)
+add_library(TUV4L2++ SHARED ${sources} ${headers})
+
+target_link_libraries(TUV4L2++ TUTools++)
 
 install(TARGETS TUV4L2++ LIBRARY DESTINATION lib)
 

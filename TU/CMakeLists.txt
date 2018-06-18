@@ -1,5 +1,3 @@
-set(headers
-  V4L2++.h
-  V4L2CameraArray.h)
+file(GLOB headers *.h)
 
 install(FILES ${headers} DESTINATION include/TU)
