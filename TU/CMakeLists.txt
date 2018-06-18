@@ -1,5 +1,3 @@
-set(headers
-  IIDC++.h
-  IIDCCameraArray.h)
+file(GLOB headers *.h)
 
 install(FILES ${headers} DESTINATION include/TU)
