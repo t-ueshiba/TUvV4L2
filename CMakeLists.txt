@@ -15,11 +15,12 @@ find_package(X11_Xaw3d REQUIRED)
 find_package(Boost REQUIRED)
 include_directories(
     .
+    ${CMAKE_INSTALL_PREFIX}/include
     ${X11_INCLUDE_DIRS}
     ${Xaw3d_INCLUDE_DIRS}
     ${Boost_INCLUDE_DIRS})
 
-link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
+link_directories(${CMAKE_INSTALL_PREFIX}/lib)
 
 add_definitions(-DNDEBUG)
 
