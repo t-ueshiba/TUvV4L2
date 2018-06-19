@@ -1,14 +1,19 @@
 cmake_minimum_required(VERSION 2.4)
+
 project(TUIIDC++)
 
 if(COMMAND cmake_policy)
     cmake_policy(SET CMP0003 NEW)
 endif()
 
-set(CMAKE_CXX_FLAGS		"${CMAKE_CXX_FLAGS} -std=c++14")
+enable_language(CXX)
+set(CMAKE_CXX_STANDARD		14)
+set(CMAKE_CXX_STANDARD_REQUIRED	ON)
+set(CMAKE_CXX_EXTENSIONS	OFF)
 set(CMAKE_CXX_FLAGS_RELEASE	"-Wall -O3")
 set(CMAKE_CXX_FLAGS_DEBUG	"-g")
 set(CMAKE_BUILD_TYPE		Release)
+add_definitions(-DNDEBUG)
 
 find_package(PkgConfig)
 pkg_check_modules(LIBUSB REQUIRED libusb-1.0)
