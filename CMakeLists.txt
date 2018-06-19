@@ -1,5 +1,15 @@
 cmake_minimum_required(VERSION 2.4)
+
 project(TUTools++)
+
+enable_language(CXX)
+set(CMAKE_CXX_STANDARD		14)
+set(CMAKE_CXX_STANDARD_REQUIRED	ON)
+set(CMAKE_CXX_EXTENSIONS	OFF)
+set(CMAKE_CXX_FLAGS_RELEASE	"-Wall -O3")
+set(CMAKE_CXX_FLAGS_DEBUG	"-g")
+set(CMAKE_BUILD_TYPE		Release)
+add_definitions(-DNDEBUG)
 
 set(CMAKE_MODULE_PATH
     ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake_modules")
@@ -25,15 +35,8 @@ if(AVX2_FOUND)
   set(CXX_DFLAGS -mavx2)
 endif()
 
-set(CMAKE_CXX_FLAGS		"${CMAKE_CXX_FLAGS} ${CXX_DFLAGS} -std=c++14")
-set(CMAKE_CXX_FLAGS_RELEASE	"-Wall -O3")
-set(CMAKE_CXX_FLAGS_DEBUG	"-g")
-set(CMAKE_BUILD_TYPE		Release)
-
 find_package(Boost REQUIRED)
 include_directories(. ${Boost_INCLUDE_DIRS})
-
-add_definitions(-DNDEBUG ${CPP_DFLAGS})
 
 file(GLOB sources *.cc)
 file(GLOB headers TU/*.h TU/simd/*.h TU/simd/x86/*.h)
