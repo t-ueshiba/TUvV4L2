@@ -23,8 +23,10 @@ else ifeq ($(shell arch), aarch64)
 else
 #  CPPFLAGS     += -DAVX2
 #  CFLAGS       += -mavx2
-  CPPFLAGS     += -DSSE4
-  CFLAGS       += -msse4
+#  CPPFLAGS     += -DSSE4
+#  CFLAGS       += -msse4
+  CPPFLAGS     += -DAVX
+  CFLAGS       += -mavx
 endif
 CCFLAGS		= $(CFLAGS)
 

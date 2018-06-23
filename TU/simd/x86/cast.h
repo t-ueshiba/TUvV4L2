@@ -24,25 +24,25 @@ namespace detail
 
 // 整数 <-> float, double
 #if !defined(AVX2) && defined(AVX)
-  template <> fvec_t
+  template <> inline fvec_t
   cast_base<fvec_t>(ivec_t x)
   {
       return _mm256_castsi256_ps(_mm256_castsi128_si256(x));
   }
 
-  template <> ivec_t
+  template <> inline ivec_t
   cast_base<ivec_t>(fvec_t x)
   {
       return _mm256_castsi256_si128(_mm256_castps_si256(x));
   }
 
-  template <> dvec_t
+  template <> inline dvec_t
   cast_base<dvec_t>(ivec_t x)
   {
       return _mm256_castsi256_pd(_mm256_castsi128_si256(x));
   }
 
-  template <> ivec_t
+  template <> inline ivec_t
   cast_base<ivec_t>(dvec_t x)
   {
       return _mm256_castsi256_si128(_mm256_castpd_si256(x));
