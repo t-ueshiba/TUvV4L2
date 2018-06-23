@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 2.4)
 project(TUV4L2++)
 
+if(NOT EXISTS "/usr/include/linux/videodev2.h")
+  return()
+endif()
+
 if(COMMAND cmake_policy)
     cmake_policy(SET CMP0003 NEW)
 endif()
