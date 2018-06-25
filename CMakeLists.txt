@@ -25,8 +25,7 @@ include_directories(
     .
     ${CMAKE_INSTALL_PREFIX}/include
     ${Boost_INCLUDE_DIRS}
-    ${LIBUSB_INCLUDE_DIRS}
-)
+    ${LIBUSB_INCLUDE_DIRS})
 link_directories(${CMAKE_INSTALL_PREFIX}/lib)
 
 file(GLOB sources *.cc)

@@ -26,15 +26,13 @@ else
 endif
 CCFLAGS		= $(CFLAGS)
 
-LIBS		=
+LIBS		= -lTUTools++ -lraw1394 -lusb-1.0
 
 LINKER		= $(CXX)
 
 BINDIR		= $(PREFIX)/bin
 LIBDIR		= $(PREFIX)/lib
 INCDIR		= $(PREFIX)/include
-
-OTHER_DIR	= $(HOME)/projects/HRP-5P/hrp5p-calib/libraries/TUIIDC++
 
 #########################
 #  Macros set by mkmf	#
