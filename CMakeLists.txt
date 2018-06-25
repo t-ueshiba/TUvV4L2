@@ -2,10 +2,6 @@ cmake_minimum_required(VERSION 2.4)
 
 project(TUv++)
 
-if(NOT LINUX)
-  return()
-endif()
-
 enable_language(CXX)
 set(CMAKE_CXX_STANDARD		14)
 set(CMAKE_CXX_STANDARD_REQUIRED	ON)

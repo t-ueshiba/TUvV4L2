@@ -25,7 +25,7 @@ else
 endif
 CCFLAGS		= $(CFLAGS)
 
-LIBS		= -lTUv++ -lTUTools++ -lXaw3d -lXt -lXext -lXmu -lX11
+LIBS		= -lTUv++ -lTUTools++
 LINKER		= $(CXX)
 
 BINDIR		= $(PREFIX)/bin
