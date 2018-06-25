@@ -27,7 +27,7 @@ endif
 CCFLAGS		= $(CFLAGS)
 
 LIBS		= -lTUOgl++ -lTUv++ -lTUTools++ \
-		  -lGLU -lGL -lXaw3d -lXt -lXext -lXmu -lX11 -ltbb -ltbbmalloc
+		  -lGLU -lGL -ltbb -ltbbmalloc
 ifeq ($(shell arch), aarch64)
   LIBS	       += -ldrm
 endif
