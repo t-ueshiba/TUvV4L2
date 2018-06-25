@@ -24,13 +24,8 @@ ifneq ($(findstring icpc,$(CXX)),)
 endif
 CCFLAGS		= $(CFLAGS)
 
-LIBS		= -lTUOgl++ -lTUv++ -lTUTools++ -lmkl_rt \
-		  -lGLU -lGL -lXaw3d -lXt -lXext -lXmu -lX11 #-ltbb -ltbbmalloc
-ifneq ($(findstring darwin,$(OSTYPE)),)
-  LIBS	       += -framework IOKit -framework CoreFoundation \
-		  -framework CoreServices
-endif
-
+LIBS		= -lTUOgl++ -lTUv++ -lTUTools++ \
+		  -lGLU -lGL -lmkl_rt
 LINKER		= $(CXX)
 
 BINDIR		= $(PREFIX)/bin

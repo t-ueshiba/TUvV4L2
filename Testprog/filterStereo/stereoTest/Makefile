@@ -30,11 +30,6 @@ endif
 CCFLAGS		= $(CFLAGS) #${SANITIZE} #-ftemplate-backtrace-limit=0
 
 LIBS		= -lTUTools++ -ltbb
-ifneq ($(findstring darwin,$(OSTYPE)),)
-  LIBS	       += -framework IOKit -framework CoreFoundation \
-		  -framework CoreServices
-endif
-
 LINKER		= $(CXX) #${SANITIZE}
 
 BINDIR		= $(PREFIX)/bin

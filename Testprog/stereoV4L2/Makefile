@@ -28,10 +28,6 @@ CCFLAGS		= $(CFLAGS)
 
 LIBS		= -lTUvV4L2++ -lTUV4L2++ -lTUOgl++ -lTUv++ -lTUTools++ \
 		  -lGLU -lGL -ltbb -ltbbmalloc
-ifneq ($(findstring darwin,$(OSTYPE)),)
-  LIBS	       += -framework IOKit -framework CoreFoundation \
-		  -framework CoreServices
-endif
 ifeq ($(shell arch), aarch64)
   LIBS	       += -ldrm
 endif

@@ -25,11 +25,6 @@ endif
 CCFLAGS		= $(CFLAGS)
 
 LIBS		=
-ifneq ($(findstring darwin,$(OSTYPE)),)
-  LIBS	       += -framework IOKit -framework CoreFoundation \
-		  -framework CoreServices
-endif
-
 LINKER		= $(CXX)
 
 BINDIR		= $(PREFIX)/bin
