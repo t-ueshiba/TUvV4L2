@@ -1365,6 +1365,8 @@ ImageBase<IMAGE>::npixelsToBorder(size_t u, size_t v, size_t dir) const
 	return std::min(u + 1, v + 1);
       case 6:
 	return v + 1;
+      default:
+	break;
     }
 
     return std::min(width() - u, v + 1);
