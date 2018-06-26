@@ -1420,6 +1420,8 @@ ImageBase<IMAGE>::saveHeader(std::ostream& out, ImageFormat::Type type) const
       case ImageFormat::BMP_24:
       case ImageFormat::BMP_32:
 	return saveBMPHeader(out, type);
+      default:
+	break;
     }
 
     return savePBMHeader(out, type);
