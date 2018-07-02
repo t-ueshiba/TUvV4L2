@@ -33,7 +33,7 @@ demangle()
 namespace detail
 {
   template <template <class...> class C>
-  struct is_convertible
+  struct check_convertible
   {
       template <class... ARGS_>
       static std::true_type	check(C<ARGS_...>)			;
@@ -43,7 +43,7 @@ namespace detail
 
 template <class T, template <class...> class C>
 struct is_convertible
-    : decltype(detail::is_convertible<C>::check(std::declval<T>()))	{};
+    : decltype(detail::check_convertible<C>::check(std::declval<T>()))	{};
 	
 /************************************************************************
 *  predicate: all<PRED, T...>						*

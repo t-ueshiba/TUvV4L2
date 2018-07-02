@@ -29,19 +29,12 @@ namespace TU
 /************************************************************************
 *  predicate: is_tuple<T>						*
 ************************************************************************/
-namespace detail
-{
-  template <class... T>
-  std::true_type	check_tuple(const std::tuple<T...>&)		;
-  std::false_type	check_tuple(...)				;
-}	// namespace detail
-
 //! 与えられた型が std::tuple 又はそれに変換可能であるか判定する
 /*!
   \param T	判定対象となる型
 */ 
 template <class T>
-using is_tuple = decltype(detail::check_tuple(std::declval<T>()));
+using is_tuple = is_convertible<T, std::tuple>;
 
 /************************************************************************
 *  type alias: tuple_head<T>						*

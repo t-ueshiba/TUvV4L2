@@ -1164,16 +1164,38 @@ namespace detail
   using is_range = decltype(check_range(std::declval<E>()));
 
   /**********************************************************************
-  *  struct opnode							*
+  *  struct opnode<NODE>						*
   **********************************************************************/
   //! 演算子のノードを表すクラス
-  class opnode
+  template <class NODE> struct opnode
   {
+      constexpr static auto
+		size0()
+		{
+		    return NODE::size0();
+		}
+      auto	begin()	const
+		{
+		    return static_cast<const NODE*>(this)->begin();
+		}
+      auto	end() const
+		{
+		    return static_cast<const NODE*>(this)->end();
+		}
+      auto	size() const
+		{
+		    return static_cast<const NODE*>(this)->size();
+		}
   };
 
-  template <class E>
-  using is_opnode = std::is_convertible<E, opnode>;
-    
+  template <class NODE> inline std::ostream&
+  operator <<(std::ostream& out, const opnode<NODE>& expr)
+  {
+      for (const auto& x : expr)
+	  out << ' ' << x;
+      return out << std::endl;
+  }
+
   /**********************************************************************
   *  class generic_opnode<OP, E...>					*
   **********************************************************************/
@@ -1186,7 +1208,7 @@ namespace detail
     \param E	演算子の引数となる式または式への参照の型
   */
   template <class OP, class E0, class... E>
-  class generic_opnode : public opnode
+  class generic_opnode : public opnode<generic_opnode<OP, E0, E...> >
   {
     private:
       using	expr_t = std::conditional_t<sizeof...(E),
@@ -1403,7 +1425,7 @@ namespace detail
   *  class transpose_opnode<E>						*
   **********************************************************************/
   template <class E>
-  class transpose_opnode : public opnode
+  class transpose_opnode : public opnode<transpose_opnode<E> >
   {
     public:
 		transpose_opnode(E&& expr)
@@ -1446,15 +1468,11 @@ namespace detail
     private:
       E		_expr;
   };
-
-  template <class E>
-  std::true_type	check_transposed(const transpose_opnode<E>&)	;
-  std::false_type	check_transposed(...)				;
 }
     
 //! 2次元配列式が他の2次元配列式を転置したものであるか判定する．
 template <class E>
-using is_transposed = decltype(detail::check_transposed(std::declval<E>()));
+using is_transposed = is_convertible<E, detail::transpose_opnode>;
 
 //! 与えられたスカラもしくは1次元配列式をそのまま返す
 /*

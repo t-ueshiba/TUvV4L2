@@ -181,19 +181,12 @@ using Iu64vec	= vec<uint64_t>;	//!< 符号なし64bit整数ベクトル
 /************************************************************************
 *  predicate: is_vec<T>							*
 ************************************************************************/
-namespace detail
-{
-  template <class T>
-  std::true_type	check_vec(vec<T>)				;
-  std::false_type	check_vec(...)					;
-}
-    
 //! 与えられた型が simd::vec 又はそれに変換可能であるか判定する
 /*!
   \param T	判定対象となる型
 */
 template <class T>
-using is_vec	= decltype(detail::check_vec(std::declval<T>()));
+using is_vec	= is_convertible<T, vec>;
 
 /************************************************************************
 *  Control functions							*

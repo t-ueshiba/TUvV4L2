@@ -12,8 +12,18 @@
 namespace TU
 {
 #if defined(SIMD)
+/************************************************************************
+*  make_array()								*
+************************************************************************/
 namespace simd
 {
+template <size_t SIZE, class ITER, bool ALIGNED> auto
+make_array(iterator_reference<ITER> x, iterator_wrapper<ITER, ALIGNED> iter)
+    -> array<typename decltype(*make_accessor(iter))::element_type,
+	     simd::allocator<
+		 typename decltype(*make_accessor(iter))::element_type>,
+	     SIZE>;
+
 /************************************************************************
 *  algorithms overloaded for simd::iterator_wrapper<ITER, ALIGNED>	*
 ************************************************************************/

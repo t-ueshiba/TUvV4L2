@@ -23,13 +23,13 @@ namespace simd
   sizeof(vec<T_>) バイトに，それぞれalignされた領域を返す．
   \param T	メモリ領域の要素の型
 */
-template <class T, bool ALIGNED=true>
+template <class T>
 class allocator
 {
   public:
     using value_type	= T;
-    using pointer	= iterator_wrapper<T*, ALIGNED>;
-    using const_pointer	= iterator_wrapper<const T*, ALIGNED>;
+    using pointer	= iterator_wrapper<T*, true>;
+    using const_pointer	= iterator_wrapper<const T*, true>;
 
   private:
     template <class T_>

@@ -886,132 +886,77 @@ namespace detail
     public:
       using type = array<U, ALLOC<U>, SIZE, SIZES...>;
   };
-#if defined(SIMD)
-  template <class S, bool ALIGNED,
-	    size_t SIZE, size_t... SIZES, class T>
-  struct replace_element<array<S, simd::allocator<S, ALIGNED>, SIZE, SIZES...>,
-			 T>
-  {
-    private:
-      using U	 = typename replace_element<S, T>::type;
-
-    public:
-      using type = array<U, simd::allocator<U, ALIGNED>, SIZE, SIZES...>;
-  };
-#endif
 }	// namespace detail
     
-/************************************************************************
-*  substance_t<E, PRED>							*
-************************************************************************/
-#if defined(SIMD)
-namespace simd
-{
-  template <class T>			class vec;
-  template <class T, bool ALIGNED>	class allocator;
-  template <class ITER, bool ALIGNED>	class iterator_wrapper;
-}
-#endif
-    
-namespace detail
-{
-  template <class T>
-  using	is_range_or_opnode	= std::integral_constant<bool,
-							 is_range<T>::value ||
-							 is_opnode<T>::value>;
-
-  template <class E, template <class> class PRED, bool=PRED<E>::value>
-  struct substance_t
-  {
-      using type = E;		// PRED<E>::value == false ならば E そのもの
-  };
-  template <class E, template <class> class PRED>
-  struct substance_t<E, PRED, true>
-  {
-    private:
-      template <class T_, class ITER_, size_t SIZE_>
-      struct array_t
-      {
-	  using type = array<T_, std::allocator<T_>, SIZE_>;
-      };
-      template <class T_, class ITER_, class ALLOC_,
-		size_t SIZE_, size_t... SIZES_>
-      struct array_t<array<T_, ALLOC_, SIZES_...>, ITER_, SIZE_>
-      {
-	  using type = array<T_, ALLOC_, SIZE_, SIZES_...>;
-      };
-#if defined(SIMD)
-      template <class T_, class ITER_, bool ALIGNED_, size_t SIZE_>
-      struct array_t<simd::vec<T_>,
-		     simd::iterator_wrapper<ITER_, ALIGNED_>, SIZE_>
-      {
-	  using type = array<T_, simd::allocator<T_, ALIGNED_>, SIZE_>;
-      };
-      template <class T_, bool ALIGNED_, size_t SIZE_>
-      struct array_t<std::remove_cv_t<T_>,
-		     simd::iterator_wrapper<T_*, ALIGNED_>, SIZE_>
-      {
-	  using type = array<std::remove_cv_t<T_>,
-			     simd::allocator<std::remove_cv_t<T_>, ALIGNED_>,
-			     SIZE_>;
-      };
-#endif
-
-      using ITER = TU::iterator_t<E>;
-      using F	 = typename substance_t<iterator_value<ITER>,
-					is_range_or_opnode>::type;
-      
-    public:
-      using type = typename array_t<F, ITER,
-				    (size0<F>() ? size0<E>() : 0)>::type;
-  };
-  template <class... E, template <class> class PRED>
-  struct substance_t<std::tuple<E...>, PRED, false>
-  {
-      using type = std::tuple<typename substance_t<E, PRED>::type...>;
-  };
-}	// namespace detail
-
-//! 反復子が指す型. ただし，それがrangeまたはopnodeならば，それが表現する配列型
-template <class ITER>
-using iterator_substance
-	  = typename detail::substance_t<decayed_iterator_value<ITER>,
-					 detail::is_range_or_opnode>::type;
-
 /************************************************************************
 *  evaluation of opnodes						*
 ************************************************************************/
-//! 演算子の評価結果の型を返す
-/*!
-  Eが演算子に変換可能ならばその評価結果である配列の型を，そうでなければ
-  Eへの定数参照を返す
-  \param E	配列式の型
-*/
-template <class E>
-using result_t	= typename detail::substance_t<const E&,
-					       detail::is_opnode>::type;
+template <size_t SIZE, class T, class ITER> array<T, std::allocator<T>, SIZE>
+make_array(const T&, ITER)						;
     
+template <size_t SIZE,
+	  class T, class ALLOC, size_t SIZE1, size_t... SIZES, class ITER>
+array<T, ALLOC, (SIZE1 ? SIZE : 0), SIZE1, SIZES...>
+make_array(const array<T, ALLOC, SIZE1, SIZES...>&, ITER)		;
+
 //! 式の評価結果を返す
 /*!
+  range<ITER, SIZE> は評価されない．
   \param expr	式
-  \return	exprが演算子ならばその評価結果である配列を，そうでなければ
-		expr自体の参照を返す
+  \return	exprが演算子の場合，その評価結果である配列を返す，
+		exprが演算子でない場合，exprが右辺値ならばそれをmoveした実体を，
+		左辺値ならばそれへの参照を返す
 */
-template <class E> inline result_t<E>
+template <class E>
+inline std::enable_if_t<!is_convertible<E, detail::opnode>::value, E>
+evaluate(E&& expr)
+{
+    return std::forward<E>(expr);
+}
+
+template <class E, std::enable_if_t<is_convertible<E, detail::opnode>::value>*
+	  = nullptr>
+inline auto
 evaluate(const E& expr)
+    -> decltype(make_array<size0<E>()>(evaluate(*std::begin(expr)),
+				       std::begin(expr)))
+{
+    return {expr};
+}
+
+/************************************************************************
+*  substantiation of opnodes and ranges					*
+************************************************************************/
+//! std::begin() が適用できるあらゆる式の評価結果を返す
+/*!
+  range<ITER, SIZE> も評価される．結果は，参照ではなく値で返される．
+  \param expr	式
+  \return	std::begin() がexprに適用可能な場合，その評価結果である配列を返す.
+		std::begin() がexprに適用可能でない場合，exprの値をそのまま返す.
+*/
+template <class E> inline std::enable_if_t<!detail::has_stdbegin<E>::value, E>
+substantiate(const E& expr)
 {
     return expr;
 }
-
-template <class E>
-inline std::enable_if_t<detail::is_opnode<E>::value, std::ostream&>
-operator <<(std::ostream& out, const E& expr)
-{
-    for (auto iter = begin(expr); iter != end(expr); ++iter)
-	out << ' ' << *iter;
-    return out << std::endl;
-}
     
+template <class E> inline auto
+substantiate(const E& expr)
+    -> decltype(make_array<size0<E>()>(substantiate(*std::begin(expr)),
+				       std::begin(expr)))
+{
+    return {expr};
+}
+
+template <class... T> inline auto
+substantiate(const std::tuple<T...>& t)
+{
+    return tuple_transform([](const auto& x){ return substantiate(x); }, t);
+}
+
+template <class ITER>
+using iterator_substance = decltype(substantiate(*std::declval<ITER>()));
+
 /************************************************************************
 *  products of two ranges						*
 ************************************************************************/
@@ -1024,7 +969,7 @@ namespace detail
     \param R	積演算子の第2引数となる式の型
    */
   template <class OP, class L, class R>
-  class product_opnode : public opnode
+  class product_opnode : public opnode<product_opnode<OP, L, R> >
   {
     private:
       class binder2nd
@@ -1035,12 +980,11 @@ namespace detail
 	  template <class E_>
 	  using cache_t	= std::conditional_t<
 				is_transposed<E_>::value,
-				transpose_opnode<
-				    typename substance_t<
-					decltype(
-					    transpose(std::declval<E_>())),
-					is_opnode>::type>,
-				typename substance_t<E_, is_opnode>::type>;
+				decltype(
+				    transpose(
+					evaluate(
+					    transpose(std::declval<E_>())))),
+				decltype(evaluate(std::declval<E_>()))>;
 
 	public:
 	  template <class R_,
@@ -1112,14 +1056,13 @@ namespace detail
   }
 
   template <class L, class R>
-  class lincomb_opnode : public opnode
+  class lincomb_opnode : public opnode<lincomb_opnode<L, R> >
   {
     private:
     // 未評価でもメンバ関数 size() を呼べるために遅延評価機構を導入
-      using	cache_t = typename substance_t<
-				decltype(*std::cbegin(std::declval<L>()) *
-					 *std::cbegin(std::declval<R>())),
-				is_range_or_opnode>::type;
+      using	cache_t = decltype(substantiate(
+				       *std::cbegin(std::declval<L>()) *
+				       *std::cbegin(std::declval<R>())));
       
     public:
 		lincomb_opnode(L&& l, R&& r)

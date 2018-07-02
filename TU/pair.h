@@ -14,22 +14,12 @@ namespace TU
 /************************************************************************
 *  predicate is_pair<T>							*
 ************************************************************************/
-namespace detail
-{
-  template <class T>
-  struct check_pair : std::false_type					{};
-  template <class S, class T>
-  struct check_pair<std::pair<S, T> > : std::true_type			{};
-}	// namespace detail
-
 //! 与えられた型が std::pair 又はそれへの参照であるか判定する
 /*!
-  T が std::pair に変換可能でも，std::pair そのもの，又はそれへの参照で
-  なければ false
   \param T	判定対象となる型
 */ 
 template <class T>
-using is_pair = detail::check_pair<std::decay_t<T> >;
+using is_pair = is_convertible<T, std::pair>;
     
 /************************************************************************
 *  struct pair_traits<PAIR>						*
