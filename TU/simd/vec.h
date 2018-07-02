@@ -9,6 +9,7 @@
 #include <iostream>
 #include <utility>
 #include <cassert>
+#include "TU/type_traits.h"
 #include "TU/simd/config.h"
 #include "TU/simd/type_traits.h"
 
