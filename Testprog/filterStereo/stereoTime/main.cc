@@ -18,7 +18,7 @@
 namespace TU
 {
 #if defined(SIMD)
-template <class T>	using allocator	= simd::allocator<T, false>;
+template <class T>	using allocator	= simd::allocator<T>;
 #else
 template <class T>	using allocator	= std::allocator<T>;
 #endif
