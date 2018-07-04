@@ -24,7 +24,7 @@ namespace detail
     
 /*!
   T が std::pair に変換可能でも，std::pair そのもの，またはそれへの参照
-  でなければ falseﾃｶ
+  でなければ false（std::tuple に対して true にならないための措置）
   \param T	判定対象となる型
 */ 
 template <class T>
