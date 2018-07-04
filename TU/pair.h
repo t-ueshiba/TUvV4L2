@@ -372,18 +372,14 @@ operator >=(const L& l, const R& r)
 			  { return x >= y; }, l, r);
 }
 
-}	// namespace TU
-
-namespace std
-{
 /************************************************************************
 *  I/O functions							*
 ************************************************************************/
-template <class S, class T> inline ostream&
-operator <<(ostream& out, const pair<S, T>& x)
+template <class S, class T> inline std::ostream&
+operator <<(std::ostream& out, const std::pair<S, T>& x)
 {
     return out << '[' << x.first << ' ' << x.second << ']';
 }
 
-}	// namespace std
+}	// namespace TU
 #endif	// !TU_PAIR_H
