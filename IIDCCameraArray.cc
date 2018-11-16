@@ -192,4 +192,27 @@ getFeature(const IIDCCamera& camera, u_int id, u_int& val, float& fval)
     return false;
 }
     
+std::ostream&
+operator <<(std::ostream& out, const IIDCCameraArray& cameras)
+{
+    YAML::Emitter	emitter;
+    emitter << YAML::BeginSeq;
+    for (const auto& camera : cameras)
+	emitter << camera;
+    emitter << YAML::EndSeq;
+
+    return out << emitter.c_str() << std::endl;
+}
+
+std::istream&
+operator >>(std::istream& in, IIDCCameraArray& cameras)
+{
+    const auto	node = YAML::Load(in);
+    cameras.resize(node.size());
+    for (size_t i = 0; i < node.size(); ++i)
+	node[i] >> cameras[i];
+
+    return in;
+}
+
 }

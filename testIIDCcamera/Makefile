@@ -22,10 +22,10 @@ CCFLAGS		= $(CFLAGS)
 
 ifneq ($(findstring darwin,$(OSTYPE)),)
   LIBS		= -lusb-1.0 -lTUIIDC++ -lTUTools++ -lraw1394 \
-		  $(shell pkg-config gtk+-2.0 --libs)
+		  $(shell pkg-config gtk+-2.0 --libs) -lyaml-cpp
 else
   LIBS		= -lTUIIDC++ -lTUTools++ -lraw1394 -lusb-1.0 \
-		  $(shell pkg-config gtk+-2.0 --libs)
+		  $(shell pkg-config gtk+-2.0 --libs) -lyaml-cpp
 endif
 
 LINKER		= $(CXX)

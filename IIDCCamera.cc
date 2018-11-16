@@ -40,18 +40,6 @@ cycletime_to_cycle(uint32_t cycletime)
     return cycle + 8000*sec;
 }
 
-static std::istream&
-skipws(std::istream& in)
-{
-    for (char c; in.get(c); )
-	if (!isspace(c) || c == '\n')
-	{
-	    in.putback(c);
-	    break;
-	}
-    return in;
-}
-    
 /************************************************************************
 *  local constants							*
 ************************************************************************/
@@ -2725,22 +2713,39 @@ constexpr IIDCCamera::TriggerModeName	IIDCCamera::triggerModeNames[];
 std::ostream&
 operator <<(std::ostream& out, const IIDCCamera& camera)
 {
-    out << std::showbase << std::hex << camera.globalUniqueId()
-	<< ' '							// Write GUID.
-	<< std::find_if(std::begin(IIDCCamera::formatNames),	// Write format.
+    YAML::Emitter	emitter;
+    emitter << camera;
+    return out << emitter.c_str() << std::endl;
+}
+
+//! 現在のカメラの設定をYAML形式で書き出す
+/*!
+  \param emitter	書き出し先のYAMLエミッタ
+  \param camera		対象となるカメラ
+  \return		emitterで指定したYAMLエミッタ
+*/
+YAML::Emitter&
+operator <<(YAML::Emitter& emitter, const IIDCCamera& camera)
+{
+    emitter << YAML::BeginMap;
+
+    emitter << YAML::Key << "id" << YAML::Value
+	    << YAML::Hex << camera.globalUniqueId() << YAML::Dec
+	    << YAML::Key << "format" << YAML::Value
+	    << std::find_if(std::begin(IIDCCamera::formatNames),
 			std::end(IIDCCamera::formatNames),
 			[&](IIDCCamera::FormatName format)
 			{
 			    return camera.getFormat() == format.format;
 			})->name
-	<< ' '
-	<< std::find_if(std::begin(IIDCCamera::frameRateNames),	// Write rate.
-			std::end(IIDCCamera::frameRateNames),
-			[&](IIDCCamera::FrameRateName frameRate)
-			{
-			    return camera.getFrameRate() == frameRate.frameRate;
-			})->name
-	<< std::dec;
+	    << YAML::Key << "frame_rate" << YAML::Value
+	    << std::find_if(std::begin(IIDCCamera::frameRateNames),
+			    std::end(IIDCCamera::frameRateNames),
+			    [&](IIDCCamera::FrameRateName frameRate)
+			    {
+				return camera.getFrameRate()
+				    == frameRate.frameRate;
+			    })->name;
 
     switch (camera.getFormat())
     {
@@ -2754,23 +2759,28 @@ operator <<(std::ostream& out, const IIDCCamera& camera)
       case IIDCCamera::Format_7_7:
       {
 	const auto	fmt7info = camera.getFormat_7_Info(camera.getFormat());
-	out << ' ' << fmt7info.u0 << ' ' << fmt7info.v0
-	    << ' ' << fmt7info.width << ' ' << fmt7info.height
-	    << ' ' << fmt7info.bytePerPacket
-	    << ' '
-	    << std::find_if(std::begin(IIDCCamera::pixelFormatNames),
-			    std::end(IIDCCamera::pixelFormatNames),
-			    [&](IIDCCamera::PixelFormatName pixelFormat)
-			    {
-				return fmt7info.pixelFormat
-				    == pixelFormat.pixelFormat;
-			    })->name;
+	emitter << YAML::Key << "u0"     << YAML::Value << fmt7info.u0
+		<< YAML::Key << "v0"     << YAML::Value << fmt7info.v0
+		<< YAML::Key << "width"  << YAML::Value << fmt7info.width
+		<< YAML::Key << "height" << YAML::Value << fmt7info.height
+		<< YAML::Key << "byte_per_packet"
+		<< YAML::Value << fmt7info.bytePerPacket
+		<< YAML::Key << "pixel_format" << YAML::Value
+		<< std::find_if(std::begin(IIDCCamera::pixelFormatNames),
+				std::end(IIDCCamera::pixelFormatNames),
+				[&](IIDCCamera::PixelFormatName pixelFormat)
+				{
+				    return fmt7info.pixelFormat
+					== pixelFormat.pixelFormat;
+				})->name;
       }
         break;
 
       default:
 	break;
     }
+    
+    emitter << YAML::Key << "features" << YAML::Value << YAML::BeginMap;
     
     for (const auto& feature : IIDCCamera::featureNames)
     {
@@ -2785,51 +2795,56 @@ operator <<(std::ostream& out, const IIDCCamera& camera)
 			       camera.isAuto(feature.feature));
 	    const auto	abs = camera.isAbsControl(feature.feature);
 
-	    out << ' ';
-	    if (camera.isActive(feature.feature))
-		out << '*';
-	    if (aut)
-		out << '+';
-	    if (abs)
-		out << '%';
-	    out << feature.name << ' ';
+	    emitter << YAML::Key << feature.name << YAML::Value
+		    << YAML::BeginMap
+		    << YAML::Key << "active"
+		    << YAML::Value << camera.isActive(feature.feature)
+		    << YAML::Key << "auto" << YAML::Value << aut
+		    << YAML::Key << "abs"  << YAML::Value << abs;
 	    
 	    switch (feature.feature)
 	    {
 	      case IIDCCamera::TRIGGER_MODE:
-		out << std::find_if(std::begin(IIDCCamera::triggerModeNames),
-				    std::end(IIDCCamera::triggerModeNames),
-				    [&](IIDCCamera::TriggerModeName triggerMode)
-				    {
-					return camera.getTriggerMode()
-					    == triggerMode.triggerMode;
-				    })->name;
+		emitter << YAML::Key << "value" << YAML::Value
+			<< std::find_if(
+			    std::begin(IIDCCamera::triggerModeNames),
+			    std::end(IIDCCamera::triggerModeNames),
+			    [&](IIDCCamera::TriggerModeName triggerMode)
+			    {
+				return camera.getTriggerMode()
+				    == triggerMode.triggerMode;
+			    })->name;
 		break;
 	      case IIDCCamera::WHITE_BALANCE:
 		if (abs)
 		{
 		    float	ub, vr;
 		    camera.getWhiteBalance(ub, vr);
-		    out << ub << ' ' << vr;
+		    emitter << YAML::Key << "ub" << YAML::Value << ub
+			    << YAML::Key << "vr" << YAML::Value << vr;
 		}
 		else
 		{
 		    u_int	ub, vr;
 		    camera.getWhiteBalance(ub, vr);
-		    out << ub << ' ' << vr;
+		    emitter << YAML::Key << "ub" << YAML::Value << ub
+			    << YAML::Key << "vr" << YAML::Value << vr;
 		}
 	        break;
 	      default:
+		emitter << YAML::Key << "value" << YAML::Value;
 		if (abs)
-		    out << camera.getValue<float>(feature.feature);
+		    emitter << camera.getValue<float>(feature.feature);
 		else
-		    out << camera.getValue<u_int>(feature.feature);
+		    emitter << camera.getValue<u_int>(feature.feature);
 		break;
 	    }
+
+	    emitter << YAML::EndMap;
 	}
     }
 
-    return out << std::endl;
+    return emitter << YAML::EndMap << YAML::EndMap;
 }
 
 //! ストリームから読み込んだ設定をカメラにセットする
@@ -2841,16 +2856,29 @@ operator <<(std::ostream& out, const IIDCCamera& camera)
 std::istream&
 operator >>(std::istream& in, IIDCCamera& camera)
 {
+    const auto	node = YAML::Load(in);
+    node >> camera;
+    return in;
+}
+
+//! YAMLノードから読み込んだ設定をカメラにセットする
+/*!
+  \param node		YAMLノード
+  \param camera		対象となるカメラ
+  \return		nodeで指定したYAMLノード
+*/
+const YAML::Node&
+operator >>(const YAML::Node& node, IIDCCamera& camera)
+{
     using	std::operator +;
 
   // global unique IDを読み込む
-    std::string	s;
-    in >> s;
+    auto	s = node["id"].as<std::string>();
     const auto	uniqId = strtoull(s.c_str(), 0, 0);
     camera.initialize(uniqId);
     
   // formatを読み込む
-    in >> s;
+    s = node["format"].as<std::string>();
     const auto	format = std::find_if(std::begin(IIDCCamera::formatNames),
 				      std::end(IIDCCamera::formatNames),
 				      [&](IIDCCamera::FormatName fmt)
@@ -2861,7 +2889,7 @@ operator >>(std::istream& in, IIDCCamera& camera)
 	throw std::runtime_error("IIDCCamera: Unknown format[" + s + ']');
 
   // frame rateを読み込む
-    in >> s;
+    s = node["frame_rate"].as<std::string>();
     const auto	frameRate = std::find_if(std::begin(IIDCCamera::frameRateNames),
 					 std::end(IIDCCamera::frameRateNames),
 					 [&](IIDCCamera::FrameRateName rt)
@@ -2882,8 +2910,12 @@ operator >>(std::istream& in, IIDCCamera& camera)
       case IIDCCamera::Format_7_6:
       case IIDCCamera::Format_7_7:
       {
-	size_t	u0, v0, width, height, packetSize;
-	in >> u0 >> v0 >> width >> height >> packetSize >> s;
+	const auto	u0	   = node["u0"].as<size_t>();
+	const auto	v0	   = node["v0"].as<size_t>();
+	const auto	width	   = node["width"].as<size_t>();
+	const auto	height	   = node["height"].as<size_t>();
+	const auto	packetSize = node["byte_per_packet"].as<size_t>();
+	const auto	s	   = node["pixel_format"].as<std::string>();
 
 	const auto
 	    pixelFormat = std::find_if(std::begin(IIDCCamera::pixelFormatNames),
@@ -2906,42 +2938,26 @@ operator >>(std::istream& in, IIDCCamera& camera)
     camera.setFormatAndFrameRate(format->format, frameRate->frameRate);
 
   // featureを読み込んでセットする
-    for (char c; (in >> TU::skipws).get(c) && (c != '\n'); )
-    {
-      // featureのOn/Off, AUTO/Manual, Absolute/Relative を読み込む
-	bool	on = false, aut = false, abs = false;
-	do
-	{
-	    switch (c)
-	    {
-	      case '*':
-		on = true;
-		break;
-	      case '+':
-		aut = true;
-		break;
-	      case '%':
-		abs = true;
-		break;
-	      default:
-		in.putback(c);
-		goto done;
-	    }
-	} while (in >> c);
+    if (!node["features"])
+	return node;
 
-      done:
-      // feature名を読み込む
-	in >> s;					// Read feature name.
-	const auto feature = std::find_if(std::begin(IIDCCamera::featureNames),
-					  std::end(IIDCCamera::featureNames),
-					  [&](IIDCCamera::FeatureName ftr)
-					  {
-					      return s == ftr.name;
-					  });
+    for (const auto& feature_node : node["features"])
+    {
+	const auto	s	= feature_node["name"].as<std::string>();
+	const auto	feature = std::find_if(
+					std::begin(IIDCCamera::featureNames),
+					std::end(IIDCCamera::featureNames),
+					[&](IIDCCamera::FeatureName ftr)
+					{
+					    return s == ftr.name;
+					});
 	if (feature == std::end(IIDCCamera::featureNames))
 	    throw std::runtime_error("IIDCCamera: Unknown feature[" + s + ']');
 
       // featureのOn/Off, AUTO/Manual, Absolute/Relative をセットする
+	const auto	on  = feature_node["active"].as<bool>();
+	const auto	abs = feature_node["abs"].as<bool>();
+	const auto	aut = feature_node["aut"].as<bool>();
 	camera.setActive(feature->feature, on)
 	      .setAbsControl(feature->feature, abs)
 	      .setAuto(feature->feature, aut);
@@ -2951,7 +2967,7 @@ operator >>(std::istream& in, IIDCCamera& camera)
 	{
 	  case IIDCCamera::TRIGGER_MODE:
 	  {
-	      in >> s;
+	      const auto	s = feature_node["value"].as<std::string>();
 	      const auto
 		  triggerMode = std::find_if(
 				    std::begin(IIDCCamera::triggerModeNames),
@@ -2971,35 +2987,33 @@ operator >>(std::istream& in, IIDCCamera& camera)
 	  case IIDCCamera::WHITE_BALANCE:
 	    if (abs)
 	    {
-		float	ub, vr;
-		in >> ub >> vr;
+		const auto	ub = feature_node["ub"].as<float>();
+		const auto	vr = feature_node["vr"].as<float>();
 		camera.setWhiteBalance(ub, vr);
 	    }
 	    else
 	    {
-		u_int	ub, vr;
-		in >> ub >> vr;
+		const auto	ub = feature_node["ub"].as<u_int>();
+		const auto	vr = feature_node["vr"].as<u_int>();
 		camera.setWhiteBalance(ub, vr);
 	    }
 	    break;
 	  default:
 	    if (abs)
 	    {
-		float	val;
-		in >> val;
+		const auto	val = feature_node["value"].as<float>();
 		camera.setValue(feature->feature, val);
 	    }
 	    else
 	    {
-		u_int	val;
-		in >> val;
+		const auto	val = feature_node["value"].as<u_int>();
 		camera.setValue(feature->feature, val);
 	    }
 	    break;
 	}
     }
     
-    return in;
+    return node;
 }
  
 template const IIDCCamera&

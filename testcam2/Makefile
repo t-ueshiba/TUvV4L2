@@ -26,9 +26,9 @@ CCFLAGS		= $(CFLAGS)
 ifneq ($(findstring darwin,$(OSTYPE)),)
   LIBS		= -lusb-1.0 \
 		  -lTUvIIDC++ -lTUIIDC++ -lTUXv++ -lTUv++ -lTUTools++ \
-		  -lXaw3d -lXv -lXt -lXext -lXmu -lX11 -lraw1394
+		  -lXaw3d -lXv -lXt -lXext -lXmu -lX11 -lraw1394 -lyaml-cpp
 else
-  LIBS		= -lTUvIIDC++ -lTUIIDC++ -lTUXv++ -lTUv++ -lTUTools++
+  LIBS		= -lTUvIIDC++ -lTUIIDC++ -lTUXv++ -lTUv++ -lTUTools++ -lyaml-cpp
 endif
 ifneq ($(findstring darwin,$(OSTYPE)),)
   LIBS	       += -framework IOKit -framework CoreFoundation -framework CoreServices

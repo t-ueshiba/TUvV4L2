@@ -142,6 +142,10 @@
 #include <iomanip>
 #include <chrono>
 #include <netinet/in.h>
+#if defined(None)
+#  undef None
+#endif
+#include <yaml-cpp/yaml.h>
 #include "TU/Image++.h"
 
 /*!
@@ -1002,7 +1006,9 @@ IIDCCamera::writeQuadletToACRegister(uint32_t offset, quadlet_t quad)
 *  global functions							*
 ************************************************************************/
 std::ostream&	operator <<(std::ostream& out, const IIDCCamera& camera);
+YAML::Emitter&	operator <<(YAML::Emitter& out, const IIDCCamera& camera);
 std::istream&	operator >>(std::istream& in, IIDCCamera& camera)	;
-
+const YAML::Node&
+		operator >>(const YAML::Node& node, IIDCCamera& camera)	;
 }
 #endif	// !TU_IIDCPP_H
