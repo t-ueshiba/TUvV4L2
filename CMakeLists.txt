@@ -36,12 +36,13 @@ add_library(TUIIDC++ SHARED ${sources} ${headers})
 if(APPLE)
     add_subdirectory(MacOSX)
     include_directories(MacOSX)
-    target_link_libraries(TUIIDC++ TUTools++ raw1394 ${LIBUSB_LIBRARIES})
+    target_link_libraries(TUIIDC++ TUTools++
+			  raw1394 ${LIBUSB_LIBRARIES} yaml-cpp)
 else()
     pkg_check_modules(LIBRAW1394 REQUIRED libraw1394)
     include_directories(${LIBRAW1394_INCLUDE_DIRS})
     target_link_libraries(TUIIDC++ TUTools++
-			  ${LIBRAW1394_LIBRARIES} ${LIBUSB_LIBRARIES})
+			  ${LIBRAW1394_LIBRARIES} ${LIBUSB_LIBRARIES} yaml-cpp)
 endif()
 
 install(TARGETS TUIIDC++ LIBRARY DESTINATION lib)
