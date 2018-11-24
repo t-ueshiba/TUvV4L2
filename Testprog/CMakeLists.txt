@@ -1,0 +1,4 @@
+add_subdirectory(EdgeDetector)
+add_subdirectory(array)
+add_subdirectory(tuple)
+add_subdirectory(stereoTest)

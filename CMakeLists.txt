@@ -39,11 +39,11 @@ find_package(Boost REQUIRED)
 include_directories(. ${Boost_INCLUDE_DIRS})
 
 file(GLOB sources *.cc)
-file(GLOB headers TU/*.h TU/simd/*.h TU/simd/x86/*.h)
 
-add_library(TUTools++ SHARED ${sources} ${headers})
+add_library(${PROJECT_NAME} SHARED ${sources})
 
-install(TARGETS TUTools++ LIBRARY DESTINATION lib)
+install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION lib)
 
 add_subdirectory(TU)
+add_subdirectory(Testprog)
 
