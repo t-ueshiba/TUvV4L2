@@ -31,19 +31,19 @@ link_directories(${CMAKE_INSTALL_PREFIX}/lib)
 file(GLOB sources *.cc)
 file(GLOB headers *.h TU/*.h)
 
-add_library(TUIIDC++ SHARED ${sources} ${headers})
+add_library(${PROJECT_NAME} SHARED ${sources} ${headers})
 
 if(APPLE)
     add_subdirectory(MacOSX)
     include_directories(MacOSX)
-    target_link_libraries(TUIIDC++ TUTools++ raw1394 ${LIBUSB_LIBRARIES})
+    target_link_libraries(${PROJECT_NAME} TUTools++ raw1394 ${LIBUSB_LIBRARIES})
 else()
     pkg_check_modules(LIBRAW1394 REQUIRED libraw1394)
     include_directories(${LIBRAW1394_INCLUDE_DIRS})
-    target_link_libraries(TUIIDC++ TUTools++
+    target_link_libraries(${PROJECT_NAME} TUTools++
 			  ${LIBRAW1394_LIBRARIES} ${LIBUSB_LIBRARIES})
 endif()
 
-install(TARGETS TUIIDC++ LIBRARY DESTINATION lib)
+install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION lib)
 
 add_subdirectory(TU)
