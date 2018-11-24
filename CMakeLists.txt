@@ -29,9 +29,8 @@ include_directories(
 link_directories(${CMAKE_INSTALL_PREFIX}/lib)
 
 file(GLOB sources *.cc)
-file(GLOB headers *.h TU/*.h)
 
-add_library(${PROJECT_NAME} SHARED ${sources} ${headers})
+add_library(${PROJECT_NAME} SHARED ${sources})
 
 if(APPLE)
     add_subdirectory(MacOSX)
