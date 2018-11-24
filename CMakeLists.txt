@@ -25,12 +25,11 @@ include_directories(
 link_directories(${CMAKE_INSTALL_PREFIX}/lib)
 
 file(GLOB sources *.cc)
-file(GLOB headers TU/*.h)
 
-add_library(TUV4L2++ SHARED ${sources} ${headers})
+add_library(${CMAKE_PROJECT_NAME} SHARED ${sources})
 
-target_link_libraries(TUV4L2++ TUTools++)
+target_link_libraries(${CMAKE_PROJECT_NAME} TUTools++)
 
-install(TARGETS TUV4L2++ LIBRARY DESTINATION lib)
+install(TARGETS ${CMAKE_PROJECT_NAME} LIBRARY DESTINATION lib)
 
 add_subdirectory(TU)
