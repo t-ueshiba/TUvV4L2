@@ -18,19 +18,23 @@ if(NOT EXISTS "/usr/include/linux/videodev2.h")
     return()
 endif()
 
+find_package(PkgConfig REQUIRED)
 find_package(Boost REQUIRED)
+pkg_check_modules(YAML-CPP REQUIRED yaml-cpp)
 
 include_directories(
     ${PROJECT_SOURCE_DIR}
     ${CMAKE_INSTALL_PREFIX}/include
     ${Boost_INCLUDE_DIRS}
+    ${YAML-CPP_INCLUDE_DIRS}
 )
 link_directories(${CMAKE_INSTALL_PREFIX}/lib)
 
 file(GLOB sources *.cc)
 add_library(${CMAKE_PROJECT_NAME} SHARED ${sources})
-target_link_libraries(${CMAKE_PROJECT_NAME} TUTools++)
+target_link_libraries(${CMAKE_PROJECT_NAME} TUTools++ ${YAML-CPP_LIBRARIES})
 
 install(TARGETS ${CMAKE_PROJECT_NAME} LIBRARY DESTINATION lib)
 
 add_subdirectory(TU)
+add_subdirectory(testv4l2camera)

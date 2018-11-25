@@ -198,5 +198,8 @@ syncedSnap(CAMERAS&& cameras, std::chrono::duration<REP, PERIOD> maxSkew)
     }
 }
     
+std::ostream&	operator <<(std::ostream& out, const V4L2CameraArray& cameras);
+std::istream&	operator >>(std::istream& in, V4L2CameraArray& cameras);
+    
 }
 #endif	// ! TU_V4L2CAMERARRAY_H

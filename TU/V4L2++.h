@@ -17,6 +17,10 @@
 #include <string>
 #include <chrono>
 #include <boost/iterator_adaptors.hpp>
+#if defined(None)
+#  undef None
+#endif
+#include <yaml-cpp/yaml.h>
 #include "TU/Image++.h"
 
 /*!
@@ -608,7 +612,9 @@ std::ostream&	operator <<(std::ostream& out,
 std::ostream&	operator <<(std::ostream& out,
 			    const V4L2Camera::MenuItem& menuItem)	;
 std::ostream&	operator <<(std::ostream& out, const V4L2Camera& camera);
+YAML::Emitter&	operator <<(YAML::Emitter& out, const V4L2Camera& camera);
 std::istream&	operator >>(std::istream& in, V4L2Camera& camera)	;
-    
+const YAML::Node&
+		operator >>(const YAML::Node& node, V4L2Camera& camera)	;
 }
 #endif	// !TU_V4L2PP_H
