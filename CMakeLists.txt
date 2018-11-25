@@ -1,5 +1,4 @@
 cmake_minimum_required(VERSION 2.4)
-
 project(TUV4L2++)
 
 if(COMMAND cmake_policy)
@@ -15,19 +14,21 @@ set(CMAKE_CXX_FLAGS_DEBUG	"-g")
 set(CMAKE_BUILD_TYPE		Release)
 add_definitions(-DNDEBUG)
 
+if(NOT EXISTS "/usr/include/linux/videodev2.h")
+    return()
+endif()
+
 find_package(Boost REQUIRED)
 
 include_directories(
-    .
+    ${PROJECT_SOURCE_DIR}
     ${CMAKE_INSTALL_PREFIX}/include
     ${Boost_INCLUDE_DIRS}
 )
 link_directories(${CMAKE_INSTALL_PREFIX}/lib)
 
 file(GLOB sources *.cc)
-
 add_library(${CMAKE_PROJECT_NAME} SHARED ${sources})
-
 target_link_libraries(${CMAKE_PROJECT_NAME} TUTools++)
 
 install(TARGETS ${CMAKE_PROJECT_NAME} LIBRARY DESTINATION lib)
