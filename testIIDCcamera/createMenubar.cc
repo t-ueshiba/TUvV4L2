@@ -172,8 +172,6 @@ createMenubar(MyIIDCCamera& camera)
   // "Format"メニューを生成．
     menu = gtk_menu_new();
   // 現在指定されている画像フォーマットおよびフレームレートを調べる．
-    const auto	current_format = camera.getFormat();
-    const auto	current_rate   = camera.getFrameRate();
     int		nitems = 0;
     for (const auto& format : IIDCCamera::formatNames)
     {

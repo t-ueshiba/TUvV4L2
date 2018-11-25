@@ -105,7 +105,7 @@ raw1394::raw1394(UInt32 unit_spec_ID, UInt64 uniqId)
 	throw runtime_error("raw1394::raw1394: failed to get a matched service(=device)!!");
 
   // Find a FireWire device interface.
-    for (io_object_t service; service = IOIteratorNext(iterator); )
+    for (io_object_t service; (service = IOIteratorNext(iterator)); )
     {
 	SInt32	theScore;
 	if ((IOCreatePlugInInterfaceForService(service, kIOFireWireLibTypeID,
@@ -633,7 +633,6 @@ raw1394::allocatePortHandler(IOFireWireLibIsochPortRef	isochPort,
 IOReturn
 raw1394::stopHandler(IOFireWireLibIsochPortRef isochPort)
 {
-    raw1394*	me = (raw1394*)(*isochPort)->GetRefCon(isochPort);
     while (CFRunLoopRunInMode(kCFRunLoopDefaultMode, (CFTimeInterval)0, true)
 	   != kCFRunLoopRunTimedOut)
 	;
