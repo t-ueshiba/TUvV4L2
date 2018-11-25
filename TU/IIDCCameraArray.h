@@ -374,6 +374,9 @@ syncedSnap(CAMERAS&& cameras, std::chrono::duration<REP, PERIOD> maxSkew)
 	std::push_heap(timestamps.begin(), timestamps.end(), cmp());
     }
 }
+
+std::ostream&	operator <<(std::ostream& out, const IIDCCameraArray& cameras);
+std::istream&	operator >>(std::istream& in, IIDCCameraArray& cameras);
     
 }
 #endif	// ! TU_IIDCCAMERAARRAY_H
