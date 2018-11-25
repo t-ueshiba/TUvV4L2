@@ -43,7 +43,7 @@ class USBNode : public IIDCNode
 	    :_ctx(nullptr)
 	{
 	    check(libusb_init(&_ctx), "Failed to initialize libusb!!");
-	    libusb_set_debug(_ctx, 3);
+	    libusb_set_option(_ctx, LIBUSB_OPTION_LOG_LEVEL, 3);
 	}
 	~Context()				{ libusb_exit(_ctx); }
 
