@@ -1,5 +1,4 @@
 cmake_minimum_required(VERSION 2.4)
-
 project(TUTools++)
 
 enable_language(CXX)
@@ -36,10 +35,9 @@ if(AVX2_FOUND)
 endif()
 
 find_package(Boost REQUIRED)
-include_directories(. ${Boost_INCLUDE_DIRS})
+include_directories(${PROJECT_SOURCE_DIR} ${Boost_INCLUDE_DIRS})
 
 file(GLOB sources *.cc)
-
 add_library(${PROJECT_NAME} SHARED ${sources})
 
 install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION lib)
