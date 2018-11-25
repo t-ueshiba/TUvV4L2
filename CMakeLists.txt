@@ -1,5 +1,4 @@
 cmake_minimum_required(VERSION 2.4)
-
 project(TUIIDC++)
 
 if(COMMAND cmake_policy)
@@ -22,14 +21,13 @@ find_package(Boost REQUIRED)
 add_definitions(-DNDEBUG)
 
 include_directories(
-    .
+    ${PROJECT_SOURCE_DIR}
     ${CMAKE_INSTALL_PREFIX}/include
     ${Boost_INCLUDE_DIRS}
     ${LIBUSB_INCLUDE_DIRS})
 link_directories(${CMAKE_INSTALL_PREFIX}/lib)
 
 file(GLOB sources *.cc)
-
 add_library(${PROJECT_NAME} SHARED ${sources})
 
 if(APPLE)
@@ -39,10 +37,11 @@ if(APPLE)
 else()
     pkg_check_modules(LIBRAW1394 REQUIRED libraw1394)
     include_directories(${LIBRAW1394_INCLUDE_DIRS})
-    target_link_libraries(${PROJECT_NAME} TUTools++
-			  ${LIBRAW1394_LIBRARIES} ${LIBUSB_LIBRARIES})
+    target_link_libraries(${PROJECT_NAME}
+			  TUTools++ ${LIBRAW1394_LIBRARIES} ${LIBUSB_LIBRARIES})
 endif()
 
 install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION lib)
 
 add_subdirectory(TU)
+add_subdirectory(testIIDCcamera)

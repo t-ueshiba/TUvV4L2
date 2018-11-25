@@ -1,18 +1,16 @@
-include_directories(. libraw1394)
+project(raw1394)
 
-set(sources
-    raw1394.cc)
-
-set(headers
-    raw1394_.h)
-    
 if(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 NEW)
 endif()
 
-add_library(raw1394 SHARED ${sources})
-target_link_libraries(raw1394 "-framework IOKit -framework CoreFoundation -framework CoreServices")
+include_directories(${PROJECT_SOURCE_DIR})
 
-install(TARGETS raw1394 LIBRARY DESTINATION lib)
+file(GLOB sources *.cc)
+
+add_library(${PROJECT_NAME} SHARED ${sources})
+target_link_libraries(${PROJECT_NAME} "-framework IOKit -framework CoreFoundation -framework CoreServices")
+
+install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION lib)
 
 add_subdirectory(libraw1394)
