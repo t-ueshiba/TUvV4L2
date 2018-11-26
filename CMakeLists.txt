@@ -12,8 +12,8 @@ add_definitions(-DNDEBUG)
 
 set(CMAKE_MODULE_PATH
     ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake_modules")
-include(FindSSE)
-FindSSE()
+include(FindSIMD)
+FindSIMD()
 
 if(AVX2_FOUND)
   add_definitions(-DAVX2)
@@ -33,6 +33,9 @@ elseif(SSE3_FOUND)
 elseif(SSE2_FOUND)
   add_definitions(-DSSE2)
   set(CMAKE_CXX_FLAGS -msse2)
+elseif(NEON_FOUND)
+  add_definitions(-DNEON)
+  set(CMAKE_CXX_FLAGS "-mcpu=cortex-a7 -mtune=cortex-a7 -mfpu=neon -funsafe-math-optimizations")
 endif()
 
 find_package(Boost REQUIRED)
