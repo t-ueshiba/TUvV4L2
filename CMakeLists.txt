@@ -1,5 +1,4 @@
 cmake_minimum_required(VERSION 2.4)
-
 project(TUvV4L2++)
 
 if(COMMAND cmake_policy)
@@ -15,12 +14,14 @@ set(CMAKE_CXX_FLAGS_DEBUG	"-g")
 set(CMAKE_BUILD_TYPE		Release)
 add_definitions(-DNDEBUG)
 
+if(NOT EXISTS "/usr/include/linux/videodev2.h")
+    return()
+endif()
+
 file(GLOB sources *.cc)
+add_library(${PROJECT_NAME} SHARED ${sources})
+target_link_libraries(${PROJECT_NAME} TUV4L2++ TUv++)
 
-add_library(TUvV4L2++ SHARED ${sources})
-
-target_link_libraries(TUvV4L2++ TUV4L2++ TUv++)
-
-install(TARGETS TUvV4L2++ LIBRARY DESTINATION lib)
+install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION lib)
 
 add_subdirectory(TU)
