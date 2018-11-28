@@ -18,6 +18,8 @@ if(NOT EXISTS "/usr/include/linux/videodev2.h")
     return()
 endif()
 
+link_directories(${CMAKE_INSTALL_PREFIX}/lib)
+
 file(GLOB sources *.cc)
 add_library(${PROJECT_NAME} SHARED ${sources})
 target_link_libraries(${PROJECT_NAME} TUV4L2++ TUv++)
