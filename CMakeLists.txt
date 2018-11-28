@@ -27,6 +27,8 @@ include_directories(
     ${YAML-CPP_INCLUDE_DIRS}
 )
 
+link_directories(${CMAKE_INSTALL_PREFIX}/lib)
+
 file(GLOB sources *.cc)
 add_library(${PROJECT_NAME} SHARED ${sources})
 
