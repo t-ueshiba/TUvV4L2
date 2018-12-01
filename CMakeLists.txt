@@ -14,10 +14,6 @@ set(CMAKE_CXX_FLAGS_DEBUG	"-g")
 set(CMAKE_BUILD_TYPE		Release)
 add_definitions(-DNDEBUG)
 
-if(NOT EXISTS "/usr/include/linux/videodev2.h")
-    return()
-endif()
-
 link_directories(${CMAKE_INSTALL_PREFIX}/lib)
 
 file(GLOB sources *.cc)
