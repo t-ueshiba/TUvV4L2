@@ -47,5 +47,10 @@ add_library(${PROJECT_NAME} SHARED ${sources})
 install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION lib)
 
 add_subdirectory(TU)
-add_subdirectory(Testprog)
+
+option(BUILD_TUTOOLSPP_TEST_PROGRAMS "Building test programs for TUTools++" OFF)
+
+if(BUILD_TUTOOLSPP_TEST_PROGRAMS)
+  add_subdirectory(Testprog)
+endif()
 
