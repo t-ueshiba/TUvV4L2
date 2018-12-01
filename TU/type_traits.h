@@ -8,13 +8,10 @@
 
 #include <type_traits>
 #include <utility>	// std::declval<T>
-#if !defined(NDEBUG)
-#  include <boost/core/demangle.hpp>
-#endif
+#include <boost/core/demangle.hpp>
 
 namespace TU
 {
-#if !defined(NDEBUG)
 /************************************************************************
 *  display type name for debugging					*
 ************************************************************************/
@@ -25,7 +22,6 @@ demangle()
 {
     return boost::core::demangle(typeid(T).name());
 }
-#endif
     
 /************************************************************************
 *  struct is_convertible<T, C<ARGS...> >				*

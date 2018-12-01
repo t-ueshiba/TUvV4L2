@@ -21,9 +21,9 @@ ifeq ($(shell arch), armv7l)
 else ifeq ($(shell arch), aarch64)
   CPPFLAGS     += -DNEON
 else
-  CPPFLAGS     += -DSSE4
+  CPPFLAGS     += -DAVX2
 endif
-CCFLAGS		= $(CFLAGS) -msse4
+CCFLAGS		= $(CFLAGS) -mavx2
 
 LIBS		=
 LINKER		= $(CXX)

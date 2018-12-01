@@ -6,12 +6,6 @@
 
 namespace TU
 {
-template <class T> auto
-demangle()
-{
-    return boost::core::demangle(typeid(T).name());
-}
-    
 template <class S, class T> void
 arithmetic_test()
 {
