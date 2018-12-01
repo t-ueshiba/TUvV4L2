@@ -25,9 +25,7 @@ namespace TU
 class IIDCCameraArray : public Array<IIDCCamera>
 {
   public:
-  //! デフォルトのカメラ名
-    static constexpr const char*
-	DEFAULT_CAMERA_NAME = "/usr/local/etc/cameras/IIDCCamera";
+    static constexpr const char*	DEFAULT_CAMERA_NAME = "IIDCCamera";
     
   public:
     explicit		IIDCCameraArray(size_t ncameras=0)		;

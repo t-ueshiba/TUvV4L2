@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.4)
+cmake_minimum_required(VERSION 3.0)
 project(TUIIDC++)
 
 if(COMMAND cmake_policy)
@@ -12,7 +12,11 @@ set(CMAKE_CXX_EXTENSIONS	OFF)
 set(CMAKE_CXX_FLAGS_RELEASE	"-Wall -O3")
 set(CMAKE_CXX_FLAGS_DEBUG	"-g")
 set(CMAKE_BUILD_TYPE		Release)
-add_definitions(-DNDEBUG)
+add_definitions(-DNDEBUG -DIIDC_CONF_DIR="${CMAKE_INSTALL_PREFIX}/etc")
+
+if(APPLE)
+  set(MACOSX_RPATH TRUE)
+endif()
 
 find_package(PkgConfig REQUIRED)
 find_package(Boost REQUIRED)
