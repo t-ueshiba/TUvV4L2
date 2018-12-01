@@ -1,5 +1,5 @@
-project(Bezier)
+project(cvt_mask_iterator_test)
 
 file(GLOB sources *.cc)
 add_executable(${PROJECT_NAME} ${sources})
-target_link_libraries(${PROJECT_NAME} TUOgl++)
+

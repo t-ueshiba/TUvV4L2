@@ -1,0 +1,2 @@
+add_subdirectory(quantizeFlt)
+add_subdirectory(quantizeRGB)

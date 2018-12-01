@@ -1,0 +1,7 @@
+add_subdirectory(cvt_iterator_test)
+add_subdirectory(cvt_mask_iterator_test)
+add_subdirectory(dup)
+add_subdirectory(lookup)
+#add_subdirectory(map_iterator)
+#add_subdirectory(numeric)
+add_subdirectory(transform)
