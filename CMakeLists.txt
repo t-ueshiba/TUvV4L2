@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.4)
+cmake_minimum_required(VERSION 3.0)
 project(TUTools++)
 
 enable_language(CXX)
@@ -36,6 +36,10 @@ elseif(SSE2_FOUND)
 elseif(NEON_FOUND)
   add_definitions(-DNEON)
   set(CMAKE_CXX_FLAGS "-mcpu=cortex-a7 -mtune=cortex-a7 -mfpu=neon -funsafe-math-optimizations")
+endif()
+
+if(APPLE)
+  set(MACOSX_RPATH TRUE)
 endif()
 
 find_package(Boost REQUIRED)
