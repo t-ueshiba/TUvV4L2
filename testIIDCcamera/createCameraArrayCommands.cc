@@ -20,6 +20,7 @@
 /*
  * NOTE: このファイルはXPM形式の画像データを含んでいる
  */
+#include "TU/IIDCCameraArray.h"
 #include "MyIIDCCameraArray.h"
 #include <iomanip>
 #include <fstream>
@@ -27,6 +28,10 @@
 
 namespace TU
 {
+#ifndef TUIIDCPP_CONF_DIR
+#  define TUIIDCPP_CONF_DIR	"/usr/local/etc"
+#endif
+    
 /************************************************************************
 *  local data                                                           *
 ************************************************************************/
@@ -436,8 +441,11 @@ CBsave(GtkMenuItem*, gpointer userdata)
 				  (GtkSignalFunc)gtk_widget_destroy,
 				  GTK_OBJECT(filesel));
 
-	char	filename[] = "IIDCCamera.conf";
-	gtk_file_selection_set_filename(GTK_FILE_SELECTION(filesel), filename);
+	const auto	filename = std::string(TUIIDCPP_CONF_DIR) + '/'
+				 + IIDCCameraArray::DEFAULT_CAMERA_NAME
+				 + ".conf";
+	gtk_file_selection_set_filename(GTK_FILE_SELECTION(filesel),
+					filename.c_str());
 	gtk_widget_show(filesel);
 	gtk_main();
     }
