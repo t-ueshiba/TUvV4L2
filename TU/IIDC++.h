@@ -129,9 +129,6 @@
 #ifndef TU_IIDCPP_H
 #define TU_IIDCPP_H
 
-#if defined(HAVE_CONFIG_H)
-#  include <config.h>
-#endif
 #include <cstddef>	// for size_t
 #include <cstdint>	// for uintXX_t
 #include <sys/types.h>	// for u_int
