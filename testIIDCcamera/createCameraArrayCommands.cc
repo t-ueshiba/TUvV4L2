@@ -310,33 +310,32 @@ static const char * camera_xpm[] = {
 "  0&;1;6b3;1;;b0                ",
 "   33330                        "};
 
-  /*!
-    カメラの転送速度の設定値と名前の対応表．
-    （転送速度はカメラ個々の属性だが，運用上の利便性を考えてまとめて設定する）
-   */
-    static struct
-    {
-        IIDCCamera::Speed	data_rate;
-        const char*		name;
-    } speed[] =
-    {
-      {IIDCCamera::SPD_400M, ""},	// 0 for backward compatibility
-      {IIDCCamera::SPD_100M, "S100"},	// 1
-      {IIDCCamera::SPD_200M, "S200"},	// 2
-      {IIDCCamera::SPD_400M, "S400"},	// 3 default
-      {IIDCCamera::SPD_800M, "S800"},	// 4 requires 1394.b
-      {IIDCCamera::SPD_1_6G, "S1600"},	// 5 requires 1394.b
-      {IIDCCamera::SPD_3_2G, "S3200"}	// 6 requires 1394.b
-    };
-    const u_int	nspeeds = sizeof(speed) / sizeof(speed[0]);
-    static const int B_MODE = 4;
+/*!
+  カメラの転送速度の設定値と名前の対応表．
+  （転送速度はカメラ個々の属性だが，運用上の利便性を考えてまとめて設定する）
+*/
+static struct
+{
+    IIDCCamera::Speed	data_rate;
+    const char*		name;
+} speed[] =
+{
+    {IIDCCamera::SPD_400M, ""},	// 0 for backward compatibility
+    {IIDCCamera::SPD_100M, "S100"},	// 1
+    {IIDCCamera::SPD_200M, "S200"},	// 2
+    {IIDCCamera::SPD_400M, "S400"},	// 3 default
+    {IIDCCamera::SPD_800M, "S800"},	// 4 requires 1394.b
+    {IIDCCamera::SPD_1_6G, "S1600"},	// 5 requires 1394.b
+    {IIDCCamera::SPD_3_2G, "S3200"}	// 6 requires 1394.b
+};
+const u_int	nspeeds = sizeof(speed) / sizeof(speed[0]);
 
 /************************************************************************
 *  callback functions                                                   *
 ************************************************************************/
 //! リストの選択項目を上に1つ上げるコールバック関数．
 /*!
-  \param userdata       MyIIDCCameraArray (IIDCボード)
+  \param userdata	MyIIDCCameraArray (IIDCカメラ配列)
 */
 static void
 CBup(GtkWidget* widget, gpointer userdata)
@@ -346,7 +345,7 @@ CBup(GtkWidget* widget, gpointer userdata)
 
 //! リストの選択項目を下に1つ下げるコールバック関数．
 /*!
-  \param userdata       MyIIDCCameraArray (IIDCボード)
+  \param userdata	MyIIDCCameraArray (IIDCカメラ配列)
 */
 static void
 CBdown(GtkWidget* widget, gpointer userdata)
@@ -356,7 +355,7 @@ CBdown(GtkWidget* widget, gpointer userdata)
 
 //! カメラ画面を表示するためのコールバック関数．
 /*!
-  \param userdata       MyIIDCCameraArray (IIDCボード)
+  \param userdata	MyIIDCCameraArray (IIDCカメラ配列)
 */
 static void
 CBview(GtkWidget* widget, gpointer userdata)
@@ -390,7 +389,7 @@ CBspeedSelection(GtkWidget* widget, gpointer userdata)
 
 //! 選択されたファイルに設定内容をセーブするためのコールバック関数．
 /*!
-  \param userdata       MyIIDCCameraArray (IIDCボード)
+  \param userdataM	IIDCCameraArray (IIDCカメラ配列)
 */
 static void
 CBfileSelectionOK(GtkWidget* widget, gpointer userdata)
@@ -418,7 +417,7 @@ CBfileSelectionOK(GtkWidget* widget, gpointer userdata)
 
 //! 設定をセーブするファイルを選択するdialogを表示するためのコールバック関数．
 /*!
-  \param userdata       MyIIDCCameraArray (IIDCボード)
+  \param userdata	MyIIDCCameraArray (IIDCカメラ配列)
 */
 static void
 CBsave(GtkMenuItem*, gpointer userdata)
@@ -446,7 +445,7 @@ CBsave(GtkMenuItem*, gpointer userdata)
 
 //! アプリケーションを終了するためのコールバック関数．
 /*!
-  \param userdata       MyIIDCCameraArray (IIDCボード)
+  \param userdata	MyIIDCCameraArray (IIDCカメラ配列)
 */
 static void
 CBexit(gpointer userdata)
@@ -490,13 +489,13 @@ createIconBox(GtkWidget* window, gchar** xpmImage, gchar* labelText)
 }
 
 /************************************************************************
-*  global functions                                                     *
+*  global functions							*
 ************************************************************************/
 //! カメラのリストに対するコマンド群を生成する．
 /*!
   カメラのリストを操作するコマンドを生成する．
-  \param cameras          IIDCボード
-  \return               生成されたコマンド群が貼りつけられたテーブル
+  \param cameras	IIDCカメラの配列
+  \return		生成されたコマンド群が貼りつけられたテーブル
 */
 GtkWidget*
 createCameraArrayCommands(MyIIDCCameraArray& cameras, GtkWidget* window,
