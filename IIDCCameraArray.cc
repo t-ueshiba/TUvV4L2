@@ -7,7 +7,7 @@
 namespace TU
 {
 #ifndef TUIIDCPP_CONF_DIR
-#  define TUIIDCPP_CONF_DIR	"/usr/local/etc/cameras"
+#  define TUIIDCPP_CONF_DIR	"/usr/local/etc"
 #endif
     
 /************************************************************************

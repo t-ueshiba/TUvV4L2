@@ -25,7 +25,7 @@ namespace TU
 class IIDCCameraArray : public Array<IIDCCamera>
 {
   public:
-    static constexpr const char*	DEFAULT_CAMERA_NAME = "IIDCCamera";
+    static constexpr const char*	DEFAULT_CAMERA_NAME = "IIDCCameras";
     
   public:
     explicit		IIDCCameraArray(size_t ncameras=0)		;
