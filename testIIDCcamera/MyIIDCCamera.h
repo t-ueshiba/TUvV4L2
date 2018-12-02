@@ -22,6 +22,7 @@
  *  $Id: MyIIDCCamera.h,v 1.8 2012-08-29 19:35:49 ueshiba Exp $
  */
 #include <gtk/gtk.h>
+#include <vector>
 #include "TU/IIDC++.h"
 
 namespace TU
@@ -38,7 +39,6 @@ class MyIIDCCamera : public IIDCCamera
 {
   public:
     MyIIDCCamera(uint64_t uniqId)					;
-    ~MyIIDCCamera()							;
 
   //! 画像の表示領域となるキャンバスを返す．
     GtkWidget*		canvas()				const	;
@@ -47,11 +47,17 @@ class MyIIDCCamera : public IIDCCamera
     void		idle()						;
     void		draw()						;
     std::ostream&	save(std::ostream& out)			const	;
+    void		setCommands(GtkWidget* commands,
+				    GtkWidget* parent)			;
+    void		refreshCommands()				;
     
   private:
-    GtkWidget* const	_canvas;	// 画像を表示する領域
-    u_char*		_buf;		// 入力画像用バッファ
-    RGB*		_rgb;		// RGB カラー画像(表示用)バッファ
+    GtkWidget*			_canvas;	// 画像を表示する領域
+    mutable std::vector<u_char>	_buf;		// 入力画像用バッファ
+    std::vector<RGB>		_rgb;		// RGB カラー画像(表示用)バッファ
+
+    GtkWidget*			_commands;
+    GtkWidget*			_comParent;
 };
 
 inline GtkWidget*

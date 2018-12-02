@@ -21,9 +21,6 @@
  *
  *  $Id: createMenubar.cc,v 1.11 2012-08-29 19:35:49 ueshiba Exp $
  */
-#if HAVE_CONFIG_H
-#  include <config.h>
-#endif
 #include "MyIIDCCamera.h"
 #include "MyDialog.h"
 #include <iostream>
@@ -140,6 +137,16 @@ CBexit(GtkMenuItem*, gpointer userdata)
     gtk_main_quit();
 }
 
+//! 一時的にウィンドウを隠すためのコールバック関数．
+/*!
+  \param userdata	表示領域の親ウィジェット
+*/
+static void
+CBclose(GtkMenuItem*, gpointer userdata)
+{
+    gtk_widget_hide(GTK_WIDGET(userdata));
+}
+
 /************************************************************************
 *  global functions							*
 ************************************************************************/
@@ -148,10 +155,12 @@ CBexit(GtkMenuItem*, gpointer userdata)
   IIDCカメラがサポートしている画像フォーマットとフレームレートを調べて
   メニュー項目を決定する．
   \param camera		IIDCカメラ
+  \param showable	親ウィジェット．
+                        NULLでなければ終了(Quit)の代わりに隠す(Close)
   \return		生成されたメニューバー
 */
 GtkWidget*
-createMenubar(MyIIDCCamera& camera)
+createMenubar(MyIIDCCamera& camera, GtkWidget* showable)
 {
     const auto	menubar	= gtk_menu_bar_new();
 
@@ -161,10 +170,20 @@ createMenubar(MyIIDCCamera& camera)
     gtk_signal_connect(GTK_OBJECT(item), "activate",
 		       GTK_SIGNAL_FUNC(CBsave), &camera);
     gtk_menu_append(GTK_MENU(menu), item);
-    item = gtk_menu_item_new_with_label("Quit");
-    gtk_signal_connect(GTK_OBJECT(item), "activate",
-		       GTK_SIGNAL_FUNC(CBexit), &camera);
-    gtk_menu_append(GTK_MENU(menu), item);
+    if (showable == NULL)
+    {
+	item = gtk_menu_item_new_with_label("Quit");
+	gtk_signal_connect(GTK_OBJECT(item), "activate",
+			   GTK_SIGNAL_FUNC(CBexit), &camera);
+	gtk_menu_append(GTK_MENU(menu), item);
+    }
+    else
+    {
+	item = gtk_menu_item_new_with_label("Close");
+	gtk_signal_connect(GTK_OBJECT(item), "activate",
+			   GTK_SIGNAL_FUNC(CBclose), showable);
+	gtk_menu_append(GTK_MENU(menu), item);
+    }
     item = gtk_menu_item_new_with_label("File");
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(item), menu);
     gtk_menu_bar_append(GTK_MENU_BAR(menubar), item);

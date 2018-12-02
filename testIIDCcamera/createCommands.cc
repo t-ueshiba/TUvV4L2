@@ -21,9 +21,6 @@
  *
  *  $Id: createCommands.cc,v 1.9 2012-08-29 19:35:49 ueshiba Exp $
  */
-#if HAVE_CONFIG_H
-#  include <config.h>
-#endif
 #include "MyIIDCCamera.h"
 #include <cmath>		// for log10()
 #include <algorithm>		// for std::max()

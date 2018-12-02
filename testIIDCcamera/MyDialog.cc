@@ -21,9 +21,6 @@
  *
  *  $Id: MyDialog.cc,v 1.5 2012-08-29 19:35:49 ueshiba Exp $
  */
-#if HAVE_CONFIG_H
-#  include <config.h>
-#endif
 #include "MyDialog.h"
 
 namespace TU

@@ -21,9 +21,6 @@
  *
  *  $Id: MyIIDCCamera.cc,v 1.14 2012-08-29 19:35:49 ueshiba Exp $
  */
-#if HAVE_CONFIG_H
-#  include <config.h>
-#endif
 #include <sys/time.h>
 #include <stdexcept>
 #include <iostream>
@@ -31,6 +28,8 @@
 
 namespace TU
 {
+GtkWidget*	createCommands(MyIIDCCamera& camera)			;
+
 /************************************************************************
 *  static functions							*
 ************************************************************************/
@@ -77,11 +76,11 @@ CBexpose(GtkWidget* widget, GdkEventExpose* event, gpointer userdata)
 		複数のカメラが接続されている場合，これによって
 		同定を行う．
 */
-MyIIDCCamera::MyIIDCCamera(u_int64_t uniqId)
+MyIIDCCamera::MyIIDCCamera(uint64_t uniqId)
     :IIDCCamera(uniqId),
      _canvas(gtk_drawing_area_new()),
-     _buf(0),
-     _rgb(0)
+     _buf(),
+     _rgb()
 {
     gdk_rgb_init();
     gtk_signal_connect(GTK_OBJECT(_canvas), "expose_event",
@@ -89,13 +88,6 @@ MyIIDCCamera::MyIIDCCamera(u_int64_t uniqId)
     
   // 現在のカメラのフォーマットに合わせてバッファの確保を行う．
     setFormatAndFrameRate(getFormat(), getFrameRate());
-}
-
-//! IIDCカメラオブジェクトを破壊する
-MyIIDCCamera::~MyIIDCCamera()
-{
-    delete [] _rgb;
-    delete [] _buf;
 }
 
 //! 画像フォーマットとフレームレートを指定する．
@@ -136,10 +128,8 @@ MyIIDCCamera::setFormatAndFrameRate(Format format, FrameRate rate)
 	throw std::invalid_argument("Unsupported camera format!!");
 	break;
     }
-    delete [] _rgb;
-    delete [] _buf;
-    _buf = new u_char[buffSize];
-    _rgb = new RGB[width() * height()];
+    _buf.resize(buffSize);
+    _rgb.resize(width() * height());
 
   // 指定したフォーマットに合わせてcanvasの大きさを変更する．
     gtk_drawing_area_size(GTK_DRAWING_AREA(_canvas), width(), height());
@@ -163,9 +153,9 @@ MyIIDCCamera::idle()
     if (bayerTileMapping() != IIDCCamera::YYYY &&
 	((pixelFormat() == MONO_8)  ||
 	 (pixelFormat() == MONO_16) || (pixelFormat() == SIGNED_MONO_16)))
-	snap().captureBayerRaw(_rgb);
+	snap().captureBayerRaw(_rgb.data());
     else
-	snap().captureRaw(_buf);
+	snap().captureRaw(_buf.data());
     draw();			// canvasに表示する．
 }
 
@@ -181,8 +171,8 @@ MyIIDCCamera::draw()
     {
       case YUV_444:
       {
-	auto	p = reinterpret_cast<const YUV444*>(_buf);
-	auto	q = _rgb;
+	auto	p = reinterpret_cast<const YUV444*>(_buf.data());
+	auto	q = _rgb.data();
 	for (size_t y = 0; y < height(); ++y)
 	{
 	    std::copy(make_pixel_iterator(p), make_pixel_iterator(p + width()),
@@ -193,14 +183,14 @@ MyIIDCCamera::draw()
 	gdk_draw_rgb_image(_canvas->window,
 			   _canvas->style->fg_gc[GTK_WIDGET_STATE(_canvas)],
 			   0, 0, width(), height(), GDK_RGB_DITHER_NONE,
-			   reinterpret_cast<guchar*>(_rgb), 3*width());
+			   reinterpret_cast<guchar*>(_rgb.data()), 3*width());
       }
 	break;
 
       case YUV_422:
       {
-	auto	p = reinterpret_cast<const YUV422*>(_buf);
-	auto	q = _rgb;
+	auto	p = reinterpret_cast<const YUV422*>(_buf.data());
+	auto	q = _rgb.data();
 	for (size_t y = 0; y < height(); ++y)
 	{
 	    std::copy(make_pixel_iterator(p), make_pixel_iterator(p + width()),
@@ -211,14 +201,14 @@ MyIIDCCamera::draw()
 	gdk_draw_rgb_image(_canvas->window,
 			   _canvas->style->fg_gc[GTK_WIDGET_STATE(_canvas)],
 			   0, 0, width(), height(), GDK_RGB_DITHER_NONE,
-			   reinterpret_cast<guchar*>(_rgb), 3*width());
+			   reinterpret_cast<guchar*>(_rgb.data()), 3*width());
       }
 	break;
 
       case YUV_411:
       {
-	auto	p = reinterpret_cast<const YUV411*>(_buf);
-	auto	q = _rgb;
+	auto	p = reinterpret_cast<const YUV411*>(_buf.data());
+	auto	q = _rgb.data();
 	for (size_t y = 0; y < height(); ++y)
 	{
 	    std::copy(make_pixel_iterator(p),
@@ -230,7 +220,7 @@ MyIIDCCamera::draw()
 	gdk_draw_rgb_image(_canvas->window,
 			   _canvas->style->fg_gc[GTK_WIDGET_STATE(_canvas)],
 			   0, 0, width(), height(), GDK_RGB_DITHER_NONE,
-			   reinterpret_cast<guchar*>(_rgb), 3*width());
+			   reinterpret_cast<guchar*>(_rgb.data()), 3*width());
       }
 	break;
 
@@ -238,38 +228,42 @@ MyIIDCCamera::draw()
 	gdk_draw_rgb_image(_canvas->window,
 			   _canvas->style->fg_gc[GTK_WIDGET_STATE(_canvas)],
 			   0, 0, width(), height(), GDK_RGB_DITHER_NONE,
-			   _buf, 3*width());
+			   _buf.data(), 3*width());
 	break;
 
       case MONO_8:
       case RAW_8:
-	if ((bayerTileMapping() != IIDCCamera::YYYY) && (pixelFormat() != RAW_8))
+	if ((bayerTileMapping() != IIDCCamera::YYYY) &&
+	    (pixelFormat() != RAW_8))
 	    gdk_draw_rgb_image(_canvas->window,
 			       _canvas->style
 				      ->fg_gc[GTK_WIDGET_STATE(_canvas)],
 			       0, 0, width(), height(), GDK_RGB_DITHER_NONE,
-			       reinterpret_cast<guchar*>(_rgb), 3*width());
+			       reinterpret_cast<guchar*>(_rgb.data()),
+			       3*width());
 	else
 	    gdk_draw_gray_image(_canvas->window,
 				_canvas->style
 				       ->fg_gc[GTK_WIDGET_STATE(_canvas)],
 				0, 0, width(), height(), GDK_RGB_DITHER_NONE,
-				_buf, width());
+				_buf.data(), width());
 	break;
 
       case MONO_16:
       case SIGNED_MONO_16:
       case RAW_16:
-	if ((bayerTileMapping() != IIDCCamera::YYYY) && (pixelFormat() != RAW_16))
+	if ((bayerTileMapping() != IIDCCamera::YYYY) &&
+	    (pixelFormat() != RAW_16))
 	    gdk_draw_rgb_image(_canvas->window,
 			       _canvas->style
 				      ->fg_gc[GTK_WIDGET_STATE(_canvas)],
 			       0, 0, width(), height(), GDK_RGB_DITHER_NONE,
-			       reinterpret_cast<guchar*>(_rgb), 3*width());
+			       reinterpret_cast<guchar*>(_rgb.data()),
+			       3*width());
 	else
 	{
-	    auto	p = reinterpret_cast<const u_short*>(_buf);
-	    auto	q = _buf;
+	    auto	p = reinterpret_cast<const u_short*>(_buf.data());
+	    auto	q = _buf.data();
 	    if (isLittleEndian())
 		for (size_t y = 0; y < height(); ++y)
 		    for (size_t x = 0; x < width(); ++x)
@@ -282,7 +276,7 @@ MyIIDCCamera::draw()
 				_canvas->style
 				       ->fg_gc[GTK_WIDGET_STATE(_canvas)],
 				0, 0, width(), height(),
-				GDK_RGB_DITHER_NONE, _buf, width());
+				GDK_RGB_DITHER_NONE, _buf.data(), width());
 	}
 	break;
 
@@ -309,13 +303,15 @@ MyIIDCCamera::save(std::ostream& out) const
       case YUV_411:
 	out << "P6" << '\n' << width() << ' ' << height() << '\n' << 255
 	    << endl;
-	out.write((const char*)_rgb, 3*width()*height());
+	out.write(reinterpret_cast<const char*>(_rgb.data()),
+		  3*width()*height());
 	break;
 
       case RGB_24:
 	out << "P6" << '\n' << width() << ' ' << height() << '\n' << 255
 	    << endl;
-	out.write((const char*)_buf, 3*width()*height());
+	out.write(reinterpret_cast<const char*>(_buf.data()),
+		  3*width()*height());
 	break;
 
       case MONO_8:
@@ -328,7 +324,8 @@ MyIIDCCamera::save(std::ostream& out) const
 	{
 	    out << "P6" << '\n' << width() << ' ' << height() << '\n' << 255
 		<< endl;
-	    out.write((const char*)_rgb, 3*width()*height());
+	    out.write(reinterpret_cast<const char*>(_rgb.data()),
+		      3*width()*height());
 	}
 	else
 	{
@@ -336,8 +333,8 @@ MyIIDCCamera::save(std::ostream& out) const
 		(pixelFormat() == SIGNED_MONO_16) ||
 		(pixelFormat() == RAW_16))
 	    {
-		auto	p = reinterpret_cast<const u_short*>(_buf);
-		auto	q = _buf;
+		auto	p = reinterpret_cast<const u_short*>(_buf.data());
+		auto	q = _buf.data();
 		if (isLittleEndian())
 		    for (size_t y = 0; y < height(); ++y)
 			for (size_t x = 0; x < width(); ++x)
@@ -349,7 +346,8 @@ MyIIDCCamera::save(std::ostream& out) const
 	    }
 	    out << "P5" << '\n' << width() << ' ' << height() << '\n' << 255
 		<< endl;
-	    out.write((const char*)_buf, width()*height());
+	    out.write(reinterpret_cast<const char*>(_buf.data()),
+		      width()*height());
 	}
 	break;
 
@@ -360,4 +358,39 @@ MyIIDCCamera::save(std::ostream& out) const
     return out;
 }
  
+//! コマンドボタンのコンテナとその親ウィジェットを記録する
+/*!
+  フォーマット変更のコールバック用にコマンド類とその親ウィジェットを記録する．
+  カメラのフォーマットが変更されると，サポートされる機能も変わる可能性がある．
+  \param parent 親ウィジェット
+  \param commands コマンド類のコンテナウィジェット
+ */
+void
+MyIIDCCamera::setCommands(GtkWidget* commands, GtkWidget* parent)
+{
+    _commands  = commands;
+    _comParent = parent;
+    return;
+}
+
+//! 現在のカメラの状態に応じてコマンドのコンテナウィジェットを更新する
+/*!
+  カメラを制御するためのコマンドボタンを一新する．
+  カメラのフォーマットが変更されると，サポートされる機能も変わる可能性がある．
+ */
+void
+MyIIDCCamera::refreshCommands()
+{
+    const auto	table = _comParent;
+    const auto	dead  = _commands;
+    assert(table != 0 && (dead != 0));
+    _commands = createCommands(*this);
+    gtk_table_attach(GTK_TABLE(table), _commands,
+		     1, 2, 1, 2, GTK_SHRINK, GTK_SHRINK, 5, 0);
+  // commandsはGtkTableの1,2,1,2に配置する
+    gtk_widget_show_all(table);
+    gtk_widget_destroy(dead);
+    return;
+}
+
 }

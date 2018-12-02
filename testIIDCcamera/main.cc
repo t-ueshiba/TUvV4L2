@@ -42,19 +42,19 @@
 
   プログラム終了時に，カメラのglobal unique IDと設定値が標準出力に出力される．	
 */
-#if HAVE_CONFIG_H
-#  include <config.h>
-#endif
-#include <stdlib.h>
-#include <unistd.h>
+#include <cstdlib>
 #include <stdexcept>
 #include <iostream>
-#include "MyIIDCCamera.h"
+#include "MyIIDCCameraArray.h"
 
 namespace TU
 {
-GtkWidget*	createMenubar(MyIIDCCamera& camera)			;
-GtkWidget*	createCommands(MyIIDCCamera& camera)			;
+GtkWidget*      createMenubar(MyIIDCCamera& camera, GtkWidget* showable);
+GtkWidget*      createCommands(MyIIDCCamera& camera)			;
+GtkWidget*	createCameraArrayMenubar(MyIIDCCameraArray& cameras)	;
+GtkWidget*	createCameraArrayCommands(MyIIDCCameraArray& cameras,
+				    GtkWidget* window,
+				    IIDCCamera::Speed data_rate)	;
 
 /************************************************************************
 *  static functions							*
@@ -84,6 +84,70 @@ usage(const char* s)
          << endl;
 }
 
+//! 一つのカメラだけをテスト
+/*!
+  \param uniqId	カメラのGUID
+*/
+static void
+testIIDCcamera(const uint64_t uniqId, const MyIIDCCamera::Speed speed)
+{
+    MyIIDCCamera    camera(uniqId);	// カメラを開く．
+
+    camera.setSpeed(speed);
+    
+    const auto	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    gtk_window_set_title(GTK_WINDOW(window), "IIDC camera controller");
+    gtk_window_set_policy(GTK_WINDOW(window), FALSE, FALSE, TRUE);
+    gtk_signal_connect(GTK_OBJECT(window), "destroy",
+		       GTK_SIGNAL_FUNC(gtk_exit), NULL);
+    gtk_signal_connect(GTK_OBJECT(window), "delete_event",
+		       GTK_SIGNAL_FUNC(gtk_exit), NULL);
+    
+    const auto	table = gtk_table_new(2, 2, FALSE);
+    const auto	commands = createCommands(camera);
+    camera.setCommands(commands, table);	// コールバック用に記憶する．
+    gtk_container_add(GTK_CONTAINER(window), table);
+    gtk_table_attach(GTK_TABLE(table), createMenubar(camera, NULL),
+		     0, 2, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+    gtk_table_attach(GTK_TABLE(table), commands,
+		     1, 2, 1, 2, GTK_SHRINK, GTK_SHRINK, 5, 0);
+		     // 1,2,1,2に配置: MyIIDCCamera::refreshCommands()
+    gtk_table_attach(GTK_TABLE(table), camera.canvas(), 0, 1, 1, 2,
+		     GTK_SHRINK, GTK_SHRINK, 0, 0);
+    gtk_widget_show_all(window);
+    
+    gtk_main();
+}
+
+//! ポートに接続している全てのカメラをリストアップ
+/*!
+  \param port	1394ポート
+*/
+static void
+testIIDCcameras(MyIIDCCamera::Speed speed)
+{
+    MyIIDCCameraArray	cameras;
+    const auto	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    gtk_window_set_title(GTK_WINDOW(window), "IIDC camera controller");
+    gtk_widget_set_usize(GTK_WIDGET(window), 450, 280);
+    gtk_signal_connect(GTK_OBJECT(window), "destroy",
+		       GTK_SIGNAL_FUNC(gtk_exit), NULL);
+    gtk_signal_connect(GTK_OBJECT(window), "delete_event",
+		       GTK_SIGNAL_FUNC(gtk_exit), NULL);
+    
+    const auto	table = gtk_table_new(2, 2, FALSE);
+    gtk_container_add(GTK_CONTAINER(window), table);
+    gtk_table_attach_defaults(GTK_TABLE(table), cameras.canvas(),
+			      0, 1, 1, 2);
+    gtk_table_attach_defaults(GTK_TABLE(table),
+			      createCameraArrayCommands(cameras,
+							window, speed),
+			      1, 2, 1, 2);
+    gtk_widget_show_all(window);
+    
+    gtk_main();
+}
+
 }
 /************************************************************************
 *  global functions							*
@@ -96,16 +160,18 @@ usage(const char* s)
 int
 main(int argc, char* argv[])
 {
-    using namespace	std;
     using namespace	TU;
     
     gtk_init(&argc, &argv);	// GTK+ の初期化.
 
+    bool		single = false;
     IIDCCamera::Speed	speed = IIDCCamera::SPD_400M;
-    extern char*	optarg;
-    for (int c; (c = getopt(argc, argv, "1248h")) != EOF; )
+    for (int c; (c = getopt(argc, argv, "s1248h")) != EOF; )
 	switch (c)
 	{
+	  case 's':
+	    single = true;
+	    break;
 	  case '1':
 	    speed = IIDCCamera::SPD_100M;
 	    break;
@@ -130,36 +196,14 @@ main(int argc, char* argv[])
   // 本業を行う．
     try
     {
-
-	MyIIDCCamera	camera(uniqId);		// カメラを開く．
-
-	camera.setSpeed(speed);
-	
-	const auto	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-	gtk_window_set_title(GTK_WINDOW(window), "IIDC camera controller");
-	gtk_window_set_policy(GTK_WINDOW(window), FALSE, FALSE, TRUE);
-	gtk_signal_connect(GTK_OBJECT(window), "destroy",
-			   GTK_SIGNAL_FUNC(gtk_exit), NULL);
-	gtk_signal_connect(GTK_OBJECT(window), "delete_event",
-			   GTK_SIGNAL_FUNC(gtk_exit), NULL);
-
-	const auto	table = gtk_table_new(2, 2, FALSE);
-	gtk_container_add(GTK_CONTAINER(window), table);
-	gtk_table_attach(GTK_TABLE(table), createMenubar(camera),
-			 0, 2, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
-	gtk_table_attach(GTK_TABLE(table), createCommands(camera),
-			 1, 2, 1, 2, GTK_SHRINK, GTK_SHRINK, 5, 0);
-	gtk_table_attach(GTK_TABLE(table), camera.canvas(),
-			 0, 1, 1, 2, GTK_SHRINK, GTK_SHRINK, 0, 0);
-	gtk_widget_show_all(window);
-
-	gtk_main();
-    
-	cout << camera;
+	if (single)
+	    testIIDCcamera(uniqId, speed);
+	else
+	    testIIDCcameras(speed);
     }
-    catch (exception& err)
+    catch (const std::exception& err)
     {
-	cerr << err.what() << endl;
+	std::cerr << err.what() << std::endl;
 	return 1;
     }
 
