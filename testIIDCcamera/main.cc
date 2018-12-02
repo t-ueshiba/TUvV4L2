@@ -164,14 +164,10 @@ main(int argc, char* argv[])
     
     gtk_init(&argc, &argv);	// GTK+ の初期化.
 
-    bool		single = false;
     IIDCCamera::Speed	speed = IIDCCamera::SPD_400M;
-    for (int c; (c = getopt(argc, argv, "s1248h")) != EOF; )
+    for (int c; (c = getopt(argc, argv, "1248h")) != EOF; )
 	switch (c)
 	{
-	  case 's':
-	    single = true;
-	    break;
 	  case '1':
 	    speed = IIDCCamera::SPD_100M;
 	    break;
@@ -189,14 +185,14 @@ main(int argc, char* argv[])
 	    return 1;
 	}
     extern int	optind;
-    uint64_t	uniqId = 0;
+    uint64_t	uniqId = ~uint64_t(0);
     if (optind < argc)
 	uniqId = strtoull(argv[optind], 0, 0);
     
   // 本業を行う．
     try
     {
-	if (single)
+	if (uniqId != ~uint64_t(0))
 	    testIIDCcamera(uniqId, speed);
 	else
 	    testIIDCcameras(speed);
