@@ -6,8 +6,8 @@
 
 namespace TU
 {
-#ifndef IIDC_CONF_DIR
-#  define IIDC_CONF_DIR	"/usr/local/etc/cameras"
+#ifndef TUIIDCPP_CONF_DIR
+#  define TUIIDCPP_CONF_DIR	"/usr/local/etc/cameras"
 #endif
     
 /************************************************************************
@@ -30,7 +30,7 @@ IIDCCameraArray::IIDCCameraArray(size_t ncameras)
 void
 IIDCCameraArray::restore(const char* name, IIDCCamera::Speed speed)
 {
-    _name = std::string(IIDC_CONF_DIR) + '/' + name;
+    _name = std::string(TUIIDCPP_CONF_DIR) + '/' + name;
 
   // 設定ファイルをオープンする.
     std::ifstream	in(configFile().c_str());
