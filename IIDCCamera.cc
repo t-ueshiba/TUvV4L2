@@ -2695,6 +2695,7 @@ IIDCCamera::unlockAdvancedFeature(uint64_t featureId, u_int timeout) const
 /************************************************************************
 *  static member variables of IIDCCamera				*
 ************************************************************************/
+constexpr IIDCCamera::SpeedName		IIDCCamera::speedNames[];
 constexpr IIDCCamera::FormatName	IIDCCamera::formatNames[];
 constexpr IIDCCamera::FrameRateName	IIDCCamera::frameRateNames[];
 constexpr IIDCCamera::PixelFormatName	IIDCCamera::pixelFormatNames[];
