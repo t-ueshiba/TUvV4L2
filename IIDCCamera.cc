@@ -2733,6 +2733,15 @@ operator <<(YAML::Emitter& emitter, const IIDCCamera& camera)
     emitter << YAML::Key << "id"
 	    << YAML::Value << YAML::Hex << camera.globalUniqueId() << YAML::Dec;
 
+  // バス速度を書き出す
+    emitter << YAML::Key << "bus_speed" << YAML::Value
+	    << std::find_if(std::begin(IIDCCamera::speedNames),
+			    std::end(IIDCCamera::speedNames),
+			    [&](IIDCCamera::SpeedName speedName)
+			    {
+				return camera.getSpeed() == speedName.speed;
+			    })->name;
+	
   // フォーマットを書き出す
     emitter << YAML::Key << "format" << YAML::Value << YAML::BeginMap;
     emitter << YAML::Key << "name" << YAML::Value
@@ -2887,18 +2896,35 @@ operator >>(const YAML::Node& node, IIDCCamera& camera)
     else
 	throw std::runtime_error("operator >>(const YAML::Node&, IIDCCamera&): \"id\" entry not found!!");
     
+  // バス速度を読み込む
+    if (const auto& speed = node["bus_speed"])
+    {
+	auto		s = speed.as<std::string>();
+	const auto	b = std::find_if(std::begin(IIDCCamera::speedNames),
+					 std::end(IIDCCamera::speedNames),
+					 [&](const auto& speedName)
+					 {
+					     return s == speedName.name;
+					 });
+	if (b == std::end(IIDCCamera::speedNames))
+	    throw std::runtime_error("IIDCCamera: Unknown bus speed["
+				     + s + ']');
+	camera.setSpeed(b->speed);
+    }
+
   // formatを読み込む
     if (const auto& fmt = node["format"])
     {
 	auto		s = fmt["name"].as<std::string>();
-	const auto	format = std::find_if(
-					std::begin(IIDCCamera::formatNames),
-					std::end(IIDCCamera::formatNames),
-					[&](const auto& formatName)
-					{
-					    return s == formatName.name;
-					})->format;
-	switch (format)
+	const auto	f = std::find_if(std::begin(IIDCCamera::formatNames),
+					 std::end(IIDCCamera::formatNames),
+					 [&](const auto& formatName)
+					 {
+					     return s == formatName.name;
+					 });
+	if (f == std::end(IIDCCamera::formatNames))
+	    throw std::runtime_error("IIDCCamera: Unknown format[" + s + ']');
+	switch (f->format)
 	{
 	  case IIDCCamera::Format_7_0:
 	  case IIDCCamera::Format_7_1:
@@ -2915,16 +2941,19 @@ operator >>(const YAML::Node& node, IIDCCamera& camera)
 	    const auto	height	    = fmt["height"].as<size_t>();
 	    const auto	packetSize  = fmt["byte_per_packet"].as<size_t>();
 	    const auto	s	    = fmt["pixel_format"].as<std::string>();
-	    const auto	pixelFormat =
-			  std::find_if(std::begin(IIDCCamera::pixelFormatNames),
-				       std::end(IIDCCamera::pixelFormatNames),
-				       [&](const auto& pixelFormatName)
-				       {
-					   return s == pixelFormatName.name;
-				       })->pixelFormat;
-	    camera.setFormat_7_ROI(format, u0, v0, width, height)
-		  .setFormat_7_PixelFormat(format, pixelFormat)
-		  .setFormat_7_PacketSize(format, packetSize);
+	    const auto	p = std::find_if(
+				std::begin(IIDCCamera::pixelFormatNames),
+				std::end(IIDCCamera::pixelFormatNames),
+				[&](const auto& pixelFormatName)
+				{
+				    return s == pixelFormatName.name;
+				});
+	    if (p == std::end(IIDCCamera::pixelFormatNames))
+		throw std::runtime_error("IIDCCamera: Unknown pixel format["
+					 + s + ']');
+	    camera.setFormat_7_ROI(f->format, u0, v0, width, height)
+		  .setFormat_7_PixelFormat(f->format, p->pixelFormat)
+		  .setFormat_7_PacketSize(f->format, packetSize);
 	  }
 	    break;
 
@@ -2935,16 +2964,18 @@ operator >>(const YAML::Node& node, IIDCCamera& camera)
 
       // frame rateを読み込む
 	s = fmt["frame_rate"].as<std::string>();
-	const auto	frameRate = std::find_if(
-					std::begin(IIDCCamera::frameRateNames),
-					std::end(IIDCCamera::frameRateNames),
-					[&](const auto& frameRateName)
-					{
-					    return s == frameRateName.name;
-					})->frameRate;
+	const auto	r = std::find_if(std::begin(IIDCCamera::frameRateNames),
+					 std::end(IIDCCamera::frameRateNames),
+					 [&](const auto& frameRateName)
+					 {
+					     return s == frameRateName.name;
+					 });
+	if (r == std::end(IIDCCamera::frameRateNames))
+	    throw std::runtime_error("IIDCCamera: Unknown frame rate["
+				     + s + ']');
 
       // formatとframe rateをセットする
-	camera.setFormatAndFrameRate(format, frameRate);
+	camera.setFormatAndFrameRate(f->format, r->frameRate);
     }
 
   // featureを読み込んでセットする

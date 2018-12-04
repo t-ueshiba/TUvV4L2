@@ -337,6 +337,13 @@ class IIDCCamera
 	Format_7_7	 = 0x2fc,	//!< Format_7_7: カメラ機種に依存
     };
 
+  //! isochronous転送の速度とその名称
+    struct SpeedName
+    {
+	const Speed		speed;		//!< isochronous転送の速度
+	const char* const	name;		//!< 名称
+    };
+
   //! 画像の形式とその名称
     struct FormatName
     {
@@ -680,6 +687,19 @@ class IIDCCamera
     bool			_littleEndian;	//!<  MONO16 がlittle endian
 
   public:
+    static constexpr SpeedName
+    speedNames[] =
+    {
+	{SPD_100M,		"S100"},
+	{SPD_200M,		"S200"},
+	{SPD_400M,		"S400"},
+	{SPD_800M,		"S800"},
+	{SPD_1_6G,		"S1600"},
+	{SPD_3_2G,		"S3200"}
+    };
+    static constexpr size_t	NSPEEDS = sizeof(speedNames)
+					/ sizeof(speedNames[0]);
+    
     static constexpr FormatName
     formatNames[] =
     {
