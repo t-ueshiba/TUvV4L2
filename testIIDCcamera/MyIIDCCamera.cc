@@ -78,9 +78,11 @@ CBexpose(GtkWidget* widget, GdkEventExpose* event, gpointer userdata)
 */
 MyIIDCCamera::MyIIDCCamera(uint64_t uniqId)
     :IIDCCamera(uniqId),
-     _canvas(gtk_drawing_area_new()),
      _buf(),
-     _rgb()
+     _rgb(),
+     _canvas(gtk_drawing_area_new()),
+     _commands(nullptr),
+     _comParent(nullptr)
 {
     gdk_rgb_init();
     gtk_signal_connect(GTK_OBJECT(_canvas), "expose_event",
@@ -383,7 +385,7 @@ MyIIDCCamera::refreshCommands()
 {
     const auto	table = _comParent;
     const auto	dead  = _commands;
-    assert(table != 0 && (dead != 0));
+    assert((table != nullptr) && (dead != nullptr));
     _commands = createCommands(*this);
     gtk_table_attach(GTK_TABLE(table), _commands,
 		     1, 2, 1, 2, GTK_SHRINK, GTK_SHRINK, 5, 0);

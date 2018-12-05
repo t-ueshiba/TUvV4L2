@@ -319,22 +319,6 @@ static const char * camera_xpm[] = {
   カメラの転送速度の設定値と名前の対応表．
   （転送速度はカメラ個々の属性だが，運用上の利便性を考えてまとめて設定する）
 */
-static struct
-{
-    IIDCCamera::Speed	data_rate;
-    const char*		name;
-} speed[] =
-{
-    {IIDCCamera::SPD_400M, ""},	// 0 for backward compatibility
-    {IIDCCamera::SPD_100M, "S100"},	// 1
-    {IIDCCamera::SPD_200M, "S200"},	// 2
-    {IIDCCamera::SPD_400M, "S400"},	// 3 default
-    {IIDCCamera::SPD_800M, "S800"},	// 4 requires 1394.b
-    {IIDCCamera::SPD_1_6G, "S1600"},	// 5 requires 1394.b
-    {IIDCCamera::SPD_3_2G, "S3200"}	// 6 requires 1394.b
-};
-const u_int	nspeeds = sizeof(speed) / sizeof(speed[0]);
-
 /************************************************************************
 *  callback functions                                                   *
 ************************************************************************/
@@ -372,24 +356,18 @@ CBview(GtkWidget* widget, gpointer userdata)
 static void
 CBspeedSelection(GtkWidget* widget, gpointer userdata)
 {
-    using namespace     std;
-
-#if GTK_CHECK_VERSION(2,4,0)	// GTK+2.4.0 or later
     const auto	selection = gtk_combo_box_get_active_text(
 				GTK_COMBO_BOX(widget));
-#else
-    const auto	selection = gtk_entry_get_text(GTK_ENTRY(widget));
-#endif
-    auto	data_rate = IIDCCamera::SPD_400M;
-    for (const auto& spd : speed)
-        if (strcmp(spd.name, selection) == 0)
+    auto	speed = IIDCCamera::SPD_400M;
+    for (const auto& speedName : IIDCCamera::speedNames)
+        if (strcmp(speedName.name, selection) == 0)
 	{
-	    data_rate = spd.data_rate;
+	    speed = speedName.speed;
 	    break;
 	}
 
     for (auto& camera : *static_cast<MyIIDCCameraArray*>(userdata))
-	camera.setSpeed(data_rate);
+	camera.setSpeed(speed);
 }
 
 //! 選択されたファイルに設定内容をセーブするためのコールバック関数．
@@ -399,7 +377,7 @@ CBspeedSelection(GtkWidget* widget, gpointer userdata)
 static void
 CBfileSelectionOK(GtkWidget* widget, gpointer userdata)
 {
-    const auto	cameras   = static_cast<MyIIDCCameraArray*>(userdata);
+    const auto	cameras = static_cast<MyIIDCCameraArray*>(userdata);
     if (cameras->size() > 0)
     {
 	const auto	filesel = cameras->popFileSelection();
@@ -507,7 +485,7 @@ createIconBox(GtkWidget* window, gchar** xpmImage, gchar* labelText)
 */
 GtkWidget*
 createCameraArrayCommands(MyIIDCCameraArray& cameras, GtkWidget* window,
-			  IIDCCamera::Speed data_rate)
+			  IIDCCamera::Speed speed)
 {
     const auto	commands = gtk_table_new(2, 2, FALSE);
 
@@ -551,33 +529,18 @@ createCameraArrayCommands(MyIIDCCameraArray& cameras, GtkWidget* window,
 		       GTK_SIGNAL_FUNC(CBview), &cameras);
 
   // 転送速度選択コンボボックス
-    auto	dr = nspeeds;
-#if GTK_CHECK_VERSION(2,4,0)	// GTK+2.4.0 or later
     GtkWidget*	speedbox = gtk_combo_box_new_text();
-    for (u_int i = 0; i < nspeeds; i++)
+    int		speedidx = 0;
+    for (auto speedName = std::begin(IIDCCamera::speedNames);
+	 speedName != std::end(IIDCCamera::speedNames); ++speedName)
     {
-        gtk_combo_box_append_text(GTK_COMBO_BOX(speedbox), speed[i].name);
-	if (data_rate == speed[i].data_rate)
-	    dr = i;
+        gtk_combo_box_append_text(GTK_COMBO_BOX(speedbox), speedName->name);
+	if (speed == speedName->speed)
+	    speedidx = speedName - std::begin(IIDCCamera::speedNames);
     }
-    gtk_combo_box_set_active(GTK_COMBO_BOX(speedbox), dr); // default speed
+    gtk_combo_box_set_active(GTK_COMBO_BOX(speedbox), speedidx);
     gtk_signal_connect(GTK_OBJECT(speedbox), "changed",
 		       GTK_SIGNAL_FUNC(CBspeedSelection), &cameras);
-#else
-    GList*	items = nullptr;
-    for (int i = 0; i < nspeeds; i++)
-    {
-        items = g_list_append(items, (void*)speed[i].name);
-	if (data_rate == speed[i].data_rate)
-	    dr = i;
-    }
-    const auto	speedbox = gtk_combo_new();
-    gtk_combo_set_popdown_strings(GTK_COMBO(speedbox), items);
-    gtk_entry_set_editable(GTK_ENTRY(GTK_COMBO(speedbox)->entry), FALSE);
-    gtk_entry_set_text(GTK_ENTRY(GTK_COMBO(speedbox)->entry), speed[dr].name);
-    gtk_signal_connect(GTK_OBJECT(GTK_COMBO(speedbox)->entry), "changed",
-		       GTK_SIGNAL_FUNC(CBspeedSelection), &cameras);
-#endif
     gtk_box_pack_start(GTK_BOX(toolBox), speedbox, FALSE, TRUE, 5);
     cameras.setSpeedPreference(speedbox);
 
