@@ -198,6 +198,9 @@ IIDCCamera::globalUniqueId() const
 IIDCCamera&
 IIDCCamera::initialize(uint64_t uniqId, Type type)
 {
+    if (_node && (uniqId == 0 || globalUniqueId() == uniqId))
+	return *this;
+
     try
     {
 	_node.reset(new FireWireNode(type, uniqId));
@@ -207,15 +210,14 @@ IIDCCamera::initialize(uint64_t uniqId, Type type)
 	_node.reset(new USBNode(type, uniqId));
     }
     
-    _cmdRegBase  = _node->commandRegisterBase();
+    _cmdRegBase	    = _node->commandRegisterBase();
     const auto	inq = inquireBasicFunction();
-    _acRegBase   = (inq & Advanced_Feature_Inq ?
-		    CSR_REGISTER_BASE +
-		    4*readQuadletFromRegister(Advanced_Feature_Quadlet_Offset) :
-		    0);
-    _img	  = nullptr;
-    _bayer	  = YYYY;
-    _littleEndian = false;
+    _acRegBase	    = (inq & Advanced_Feature_Inq ?
+		       CSR_REGISTER_BASE + 4*readQuadletFromRegister(
+			   Advanced_Feature_Quadlet_Offset) : 0);
+    _img	    = nullptr;
+    _bayer	    = YYYY;
+    _littleEndian   = false;
 
   // Map video1394 buffer according to current format and frame rate.
     setFormatAndFrameRate(getFormat(), getFrameRate());
