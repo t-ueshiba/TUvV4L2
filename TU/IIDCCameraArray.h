@@ -28,12 +28,12 @@ class IIDCCameraArray : public Array<IIDCCamera>
     static constexpr const char*	DEFAULT_CAMERA_NAME = "IIDCCamera";
     
   public:
-    explicit		IIDCCameraArray(size_t ncameras=0)		;
+    explicit		IIDCCameraArray(const char* name
+					= DEFAULT_CAMERA_NAME)		;
     
-    void		restore(const char* name=DEFAULT_CAMERA_NAME,
-				IIDCCamera::Speed
-				speed=IIDCCamera::SPD_400M)		;
+    void		restore()					;
     void		save()					const	;
+    IIDCCameraArray&	setName(const char* name)			;
     const std::string&	name()					const	;
     std::string		configFile()				const	;
     std::string		calibFile()				const	;
@@ -41,6 +41,17 @@ class IIDCCameraArray : public Array<IIDCCamera>
   private:
     std::string		_name;	//!< カメラ名
 };
+
+//! カメラ名を設定する.
+/*!
+  \return	カメラ名
+*/
+inline IIDCCameraArray&
+IIDCCameraArray::setName(const char* name)
+{
+    _name = name;
+    return *this;
+}
 
 //! カメラ名を返す.
 /*!
@@ -52,26 +63,6 @@ IIDCCameraArray::name() const
     return _name;
 }
     
-//! カメラ設定ファイル名を返す.
-/*!
-  \return	カメラ設定ファイル名
-*/
-inline std::string
-IIDCCameraArray::configFile() const
-{
-    return _name + ".conf";
-}
-    
-//! キャリブレーションファイル名を返す.
-/*!
-  \return	キャリブレーションファイル名
-*/
-inline std::string
-IIDCCameraArray::calibFile() const
-{
-    return _name + ".calib";
-}
-
 /************************************************************************
 *  global data								*
 ************************************************************************/
