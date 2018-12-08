@@ -198,9 +198,9 @@ IIDCCamera::globalUniqueId() const
 IIDCCamera&
 IIDCCamera::initialize(uint64_t uniqId, Type type)
 {
-    if (_node && (uniqId == 0 || globalUniqueId() == uniqId))
+    if (_node && uniqId == globalUniqueId())
 	return *this;
-
+    
     try
     {
 	_node.reset(new FireWireNode(type, uniqId));
@@ -247,6 +247,7 @@ IIDCCamera::initialize(uint64_t uniqId, Type type)
 	if ((y16_data_format & 0x80000001) == 0x80000001)
 	    _littleEndian = true;
     }
+
     return *this;
 }
     
