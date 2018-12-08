@@ -2898,7 +2898,7 @@ operator >>(const YAML::Node& node, IIDCCamera& camera)
 	camera.initialize(id.as<uint64_t>());
     else
 	throw std::runtime_error("operator >>(const YAML::Node&, IIDCCamera&): \"id\" entry not found!!");
-    
+
   // バス速度を読み込む
     if (const auto& speed = node["bus_speed"])
     {
@@ -3038,7 +3038,7 @@ operator >>(const YAML::Node& node, IIDCCamera& camera)
 			break;
 		    }
 		}
-    
+
     return node;
 }
  
