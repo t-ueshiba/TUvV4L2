@@ -34,7 +34,8 @@ main(int argc, char* argv[])
     try
     {
 	extern int	optind;
-	IIDCCameraArray	cameras(argc - optind);
+	IIDCCameraArray	cameras;
+	cameras.resize(argc - optind);
 	for (auto& camera : cameras)
 	{
 	    camera.initialize(strtoull(argv[optind++], 0, 0));
