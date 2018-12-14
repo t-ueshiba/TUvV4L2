@@ -78,57 +78,52 @@ GtkWidget*
 MyIIDCCameraArray::view()
 {
     const auto	selection = GTK_CLIST(_list)->selection;
-    if (selection)
+
+    if (!selection)
+	return nullptr;
+
+    size_t	index = GPOINTER_TO_INT(selection->data);
+    const auto	userdata = gtk_clist_get_row_data(GTK_CLIST(_list), index);
+    GtkWidget*	subwindow;
+    if (userdata)
     {
-        size_t		index = GPOINTER_TO_INT(selection->data);
-	const auto	userdata = gtk_clist_get_row_data(GTK_CLIST(_list),
-							  index);
-        GtkWidget*	subwindow;
-	if (userdata)
-	{
-	    subwindow = GTK_WIDGET(userdata);
-	}
-	else
-	{
-	    auto&	camera = _cameras[index];
-	    
-	    // カメラ画面を作成し，選択中のリスト項目に付加する．
-#if (GTK_MAJOR_VERSION == 1)
-	    subwindow = gtk_window_new(GTK_WINDOW_DIALOG);
-#else
-	    subwindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-#endif
-	    gchar title[30];
-	    g_snprintf(title, 30, "Camera - 0x016%lx",
-		       camera.globalUniqueId());
-	    gtk_window_set_title(GTK_WINDOW(subwindow), title);
-	    gtk_window_set_policy(GTK_WINDOW(subwindow), FALSE, FALSE, TRUE);
-	    gtk_signal_connect(GTK_OBJECT(subwindow), "destroy",
-			       GTK_SIGNAL_FUNC(gtk_widget_hide_on_delete),
-			       GTK_OBJECT(subwindow));
-	    gtk_signal_connect(GTK_OBJECT(subwindow), "delete_event",
-			       GTK_SIGNAL_FUNC(gtk_widget_hide_on_delete),
-			       GTK_OBJECT(subwindow));
-	    
-	    auto	table = gtk_table_new(2, 2, FALSE);
-	    auto	commands = createCommands(camera);
-	    camera.setCommands(commands, table);
-	    gtk_container_add(GTK_CONTAINER(subwindow), table);
-	    gtk_table_attach(GTK_TABLE(table), createMenubar(camera, subwindow),
-			     0, 2, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
-	    gtk_table_attach(GTK_TABLE(table), commands,
-			     1, 2, 1, 2, GTK_SHRINK, GTK_SHRINK, 5, 0);
-	  // 1,2,1,2に配置: MyIIDCCamera::refreshCommands()
-	    gtk_table_attach(GTK_TABLE(table), camera.canvas(),
-			     0, 1, 1, 2, GTK_SHRINK, GTK_SHRINK, 0, 0);
-
-	    gtk_clist_set_row_data(GTK_CLIST(_list), index, subwindow);
-	}
-	gtk_widget_show_all(GTK_WIDGET(subwindow));
-
-	return GTK_WIDGET(subwindow);
+	subwindow = GTK_WIDGET(userdata);
     }
-    return nullptr;
+    else
+    {
+	auto&	camera = _cameras[index];
+	    
+      // カメラ画面を作成し，選択中のリスト項目に付加する．
+	subwindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+
+	gchar title[30];
+	g_snprintf(title, 30, "Camera - 0x016%lx", camera.globalUniqueId());
+	gtk_window_set_title(GTK_WINDOW(subwindow), title);
+	gtk_window_set_policy(GTK_WINDOW(subwindow), FALSE, FALSE, TRUE);
+	gtk_signal_connect(GTK_OBJECT(subwindow), "destroy",
+			   GTK_SIGNAL_FUNC(gtk_widget_hide_on_delete),
+			   GTK_OBJECT(subwindow));
+	gtk_signal_connect(GTK_OBJECT(subwindow), "delete_event",
+			   GTK_SIGNAL_FUNC(gtk_widget_hide_on_delete),
+			   GTK_OBJECT(subwindow));
+	
+	auto	table = gtk_table_new(2, 2, FALSE);
+	auto	commands = createCommands(camera);
+	camera.setCommands(commands, table);
+	gtk_container_add(GTK_CONTAINER(subwindow), table);
+	gtk_table_attach(GTK_TABLE(table), createMenubar(camera, subwindow),
+			 0, 2, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+	gtk_table_attach(GTK_TABLE(table), commands,
+			 1, 2, 1, 2, GTK_SHRINK, GTK_SHRINK, 5, 0);
+      // 1,2,1,2に配置: MyIIDCCamera::refreshCommands()
+	gtk_table_attach(GTK_TABLE(table), camera.canvas(),
+			 0, 1, 1, 2, GTK_SHRINK, GTK_SHRINK, 0, 0);
+
+	gtk_clist_set_row_data(GTK_CLIST(_list), index, subwindow);
+    }
+    gtk_widget_show_all(GTK_WIDGET(subwindow));
+
+    return GTK_WIDGET(subwindow);
 }
 
 void
@@ -155,8 +150,7 @@ MyIIDCCameraArray::scan()
     {
 	try
 	{
-	    MyIIDCCamera	camera(0);	// 次のIIDCカメラを獲得する．
-	    push_back(std::move(camera));
+	    emplace_back(0);
 	}
 	catch (std::exception& except)
 	{
@@ -246,25 +240,25 @@ MyIIDCCameraArray::swap(size_t i, size_t j)
 }
 
 void
-MyIIDCCameraArray::push_back(MyIIDCCamera&& camera)
+MyIIDCCameraArray::emplace_back(uint64_t uniqId)
 {
+  // カメラを追加
+    _cameras.push_back(uniqId);
+
   // リストに新しいカメラの通し番号とGUIDを追加．
-    const auto	cameraNumber = size();
+    const auto	index = size() - 1;
     gchar*	item[2];
     item[0] = new gchar[10];
     item[1] = new gchar[20];
-    g_snprintf(item[0], 10, "%lu", cameraNumber);
-    g_snprintf(item[1], 20, "0x%016lx", camera.globalUniqueId());
+    g_snprintf(item[0], 10, "%lu", index);
+    g_snprintf(item[1], 20, "0x%016lx", _cameras.back().globalUniqueId());
     gtk_clist_append(GTK_CLIST(_list), item);
     delete[] item[0];
     delete[] item[1];
 
   // カメラ画面は初期化に時間がかかるので，表示するときに遅延作成する．
     GtkWidget*	window = nullptr;
-    gtk_clist_set_row_data(GTK_CLIST(_list), cameraNumber, window);
-
-  // カメラを追加
-    _cameras.push_back(std::move(camera));
+    gtk_clist_set_row_data(GTK_CLIST(_list), index, window);
 }
 
 }

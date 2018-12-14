@@ -406,27 +406,28 @@ static void
 CBsave(GtkMenuItem*, gpointer userdata)
 {
     const auto	cameras = static_cast<MyIIDCCameraArray*>(userdata);
-    if (cameras->size() > 0)
-    {
-	const auto	filesel = gtk_file_selection_new("Save Preference");
-	gtk_signal_connect(GTK_OBJECT(filesel), "destroy",
-			   GTK_SIGNAL_FUNC(gtk_main_quit), filesel);
-	cameras->pushFileSelection(filesel);
-	gtk_signal_connect(GTK_OBJECT(GTK_FILE_SELECTION(filesel)->ok_button),
-			   "clicked", (GtkSignalFunc)CBfileSelectionOK, cameras);
-	gtk_signal_connect_object(GTK_OBJECT(GTK_FILE_SELECTION(filesel)
-					     ->cancel_button), "clicked",
-				  (GtkSignalFunc)gtk_widget_destroy,
-				  GTK_OBJECT(filesel));
 
-	const auto	filename = std::string(TUIIDCPP_CONF_DIR) + '/'
-				 + IIDCCameraArray::DEFAULT_CAMERA_NAME
-				 + ".conf";
-	gtk_file_selection_set_filename(GTK_FILE_SELECTION(filesel),
-					filename.c_str());
-	gtk_widget_show(filesel);
-	gtk_main();
-    }
+    if (cameras->size() == 0)
+	return;
+    
+    const auto	filesel = gtk_file_selection_new("Save Preference");
+    gtk_signal_connect(GTK_OBJECT(filesel), "destroy",
+		       GTK_SIGNAL_FUNC(gtk_main_quit), filesel);
+    cameras->pushFileSelection(filesel);
+    gtk_signal_connect(GTK_OBJECT(GTK_FILE_SELECTION(filesel)->ok_button),
+		       "clicked", (GtkSignalFunc)CBfileSelectionOK, cameras);
+    gtk_signal_connect_object(GTK_OBJECT(GTK_FILE_SELECTION(filesel)
+					 ->cancel_button), "clicked",
+			      (GtkSignalFunc)gtk_widget_destroy,
+			      GTK_OBJECT(filesel));
+
+    const auto	filename = std::string(TUIIDCPP_CONF_DIR) + '/'
+			 + IIDCCameraArray::DEFAULT_CAMERA_NAME
+			 + ".conf";
+    gtk_file_selection_set_filename(GTK_FILE_SELECTION(filesel),
+				    filename.c_str());
+    gtk_widget_show(filesel);
+    gtk_main();
 }
 
 //! アプリケーションを終了するためのコールバック関数．
