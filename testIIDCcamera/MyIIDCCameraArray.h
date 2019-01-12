@@ -87,7 +87,7 @@ class MyIIDCCameraArray
     void		swap(size_t i, size_t j)			;
 
   //! カメラを追加する
-    void		push_back(MyIIDCCamera&& camera)		;
+    void		emplace_back(uint64_t uniqId)			;
 
   private:
     std::vector<MyIIDCCamera>	_cameras;

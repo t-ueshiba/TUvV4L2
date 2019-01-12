@@ -51,10 +51,9 @@ namespace TU
 {
 GtkWidget*      createMenubar(MyIIDCCamera& camera, GtkWidget* showable);
 GtkWidget*      createCommands(MyIIDCCamera& camera)			;
-GtkWidget*	createCameraArrayMenubar(MyIIDCCameraArray& cameras)	;
 GtkWidget*	createCameraArrayCommands(MyIIDCCameraArray& cameras,
-				    GtkWidget* window,
-				    IIDCCamera::Speed data_rate)	;
+					  GtkWidget* window,
+					  IIDCCamera::Speed data_rate)	;
 
 /************************************************************************
 *  static functions							*

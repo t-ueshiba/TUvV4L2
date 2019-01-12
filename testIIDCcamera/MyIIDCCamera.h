@@ -38,7 +38,11 @@ namespace TU
 class MyIIDCCamera : public IIDCCamera
 {
   public:
-    MyIIDCCamera(uint64_t uniqId)					;
+			MyIIDCCamera(uint64_t uniqId)			;
+			MyIIDCCamera(const MyIIDCCamera& camera)= delete;
+    MyIIDCCamera&	operator =(const MyIIDCCamera&)		= delete;
+			MyIIDCCamera(MyIIDCCamera&& camera)	= default;
+    MyIIDCCamera&	operator =(MyIIDCCamera&&)		= default;
 
   //! 画像の表示領域となるキャンバスを返す．
     GtkWidget*		canvas()				const	;
@@ -52,10 +56,10 @@ class MyIIDCCamera : public IIDCCamera
     void		refreshCommands()				;
     
   private:
-    GtkWidget*			_canvas;	// 画像を表示する領域
     mutable std::vector<u_char>	_buf;		// 入力画像用バッファ
     std::vector<RGB>		_rgb;		// RGB カラー画像(表示用)バッファ
 
+    GtkWidget*			_canvas;	// 画像を表示する領域
     GtkWidget*			_commands;
     GtkWidget*			_comParent;
 };

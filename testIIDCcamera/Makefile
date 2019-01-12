@@ -39,6 +39,7 @@ INCDIR		= $(PREFIX)/include
 #########################
 SUFFIX		= .cc:sC .cpp:sC .cu:sC
 EXTHDRS		= ../TU/IIDC++.h \
+		../TU/IIDCCameraArray.h \
 		/usr/local/include/TU/Array++.h \
 		/usr/local/include/TU/Camera++.h \
 		/usr/local/include/TU/Geometry++.h \
@@ -53,19 +54,19 @@ EXTHDRS		= ../TU/IIDC++.h \
 		/usr/local/include/TU/tuple.h \
 		/usr/local/include/TU/type_traits.h
 HDRS		= MyDialog.h \
-		MyIIDCBoard.h \
-		MyIIDCCamera.h
+		MyIIDCCamera.h \
+		MyIIDCCameraArray.h
 SRCS		= MyDialog.cc \
-		MyIIDCBoard.cc \
 		MyIIDCCamera.cc \
-		createBoardCommands.cc \
+		MyIIDCCameraArray.cc \
+		createCameraArrayCommands.cc \
 		createCommands.cc \
 		createMenubar.cc \
 		main.cc
 OBJS		= MyDialog.o \
-		MyIIDCBoard.o \
 		MyIIDCCamera.o \
-		createBoardCommands.o \
+		MyIIDCCameraArray.o \
+		createCameraArrayCommands.o \
 		createCommands.o \
 		createMenubar.o \
 		main.o
@@ -83,14 +84,6 @@ MyDialog.o: MyDialog.h ../TU/IIDC++.h /usr/local/include/TU/Image++.h \
 	/usr/local/include/TU/Vector++.h /usr/local/include/TU/Array++.h \
 	/usr/local/include/TU/range.h /usr/local/include/TU/iterator.h \
 	/usr/local/include/TU/tuple.h /usr/local/include/TU/algorithm.h
-MyIIDCBoard.o: MyIIDCBoard.h MyIIDCCamera.h ../TU/IIDC++.h \
-	/usr/local/include/TU/Image++.h /usr/local/include/TU/pair.h \
-	/usr/local/include/TU/type_traits.h /usr/local/include/TU/Manip.h \
-	/usr/local/include/TU/Camera++.h /usr/local/include/TU/Geometry++.h \
-	/usr/local/include/TU/Minimize.h /usr/local/include/TU/Vector++.h \
-	/usr/local/include/TU/Array++.h /usr/local/include/TU/range.h \
-	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
-	/usr/local/include/TU/algorithm.h
 MyIIDCCamera.o: MyIIDCCamera.h ../TU/IIDC++.h \
 	/usr/local/include/TU/Image++.h /usr/local/include/TU/pair.h \
 	/usr/local/include/TU/type_traits.h /usr/local/include/TU/Manip.h \
@@ -99,7 +92,7 @@ MyIIDCCamera.o: MyIIDCCamera.h ../TU/IIDC++.h \
 	/usr/local/include/TU/Array++.h /usr/local/include/TU/range.h \
 	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
 	/usr/local/include/TU/algorithm.h
-createBoardCommands.o: MyIIDCBoard.h MyIIDCCamera.h ../TU/IIDC++.h \
+MyIIDCCameraArray.o: MyIIDCCameraArray.h MyIIDCCamera.h ../TU/IIDC++.h \
 	/usr/local/include/TU/Image++.h /usr/local/include/TU/pair.h \
 	/usr/local/include/TU/type_traits.h /usr/local/include/TU/Manip.h \
 	/usr/local/include/TU/Camera++.h /usr/local/include/TU/Geometry++.h \
@@ -107,6 +100,14 @@ createBoardCommands.o: MyIIDCBoard.h MyIIDCCamera.h ../TU/IIDC++.h \
 	/usr/local/include/TU/Array++.h /usr/local/include/TU/range.h \
 	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
 	/usr/local/include/TU/algorithm.h
+createCameraArrayCommands.o: ../TU/IIDCCameraArray.h ../TU/IIDC++.h \
+	/usr/local/include/TU/Image++.h /usr/local/include/TU/pair.h \
+	/usr/local/include/TU/type_traits.h /usr/local/include/TU/Manip.h \
+	/usr/local/include/TU/Camera++.h /usr/local/include/TU/Geometry++.h \
+	/usr/local/include/TU/Minimize.h /usr/local/include/TU/Vector++.h \
+	/usr/local/include/TU/Array++.h /usr/local/include/TU/range.h \
+	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
+	/usr/local/include/TU/algorithm.h MyIIDCCameraArray.h MyIIDCCamera.h
 createCommands.o: MyIIDCCamera.h ../TU/IIDC++.h \
 	/usr/local/include/TU/Image++.h /usr/local/include/TU/pair.h \
 	/usr/local/include/TU/type_traits.h /usr/local/include/TU/Manip.h \
@@ -123,7 +124,7 @@ createMenubar.o: MyIIDCCamera.h ../TU/IIDC++.h \
 	/usr/local/include/TU/Array++.h /usr/local/include/TU/range.h \
 	/usr/local/include/TU/iterator.h /usr/local/include/TU/tuple.h \
 	/usr/local/include/TU/algorithm.h MyDialog.h
-main.o: MyIIDCBoard.h MyIIDCCamera.h ../TU/IIDC++.h \
+main.o: MyIIDCCameraArray.h MyIIDCCamera.h ../TU/IIDC++.h \
 	/usr/local/include/TU/Image++.h /usr/local/include/TU/pair.h \
 	/usr/local/include/TU/type_traits.h /usr/local/include/TU/Manip.h \
 	/usr/local/include/TU/Camera++.h /usr/local/include/TU/Geometry++.h \

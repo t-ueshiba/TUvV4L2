@@ -16,30 +16,20 @@ namespace TU
 constexpr const char*	IIDCCameraArray::DEFAULT_CAMERA_NAME;
     
 //! IIDCデジタルカメラの配列を生成する.
-IIDCCameraArray::IIDCCameraArray(size_t ncameras)
-    :Array<IIDCCamera>(ncameras), _name()
+IIDCCameraArray::IIDCCameraArray(const char* name)
+    :Array<IIDCCamera>(), _name(name)
 {
 }
     
 //! 設定ファイルを読み込んでIIDCデジタルカメラの配列を初期化する.
-/*!
-  \param fullName	カメラ名
-  \param dirs		カメラ設定ファイルの探索ディレクトリ名の並び
-  \param speed		FireWireバスの速度
-*/
 void
-IIDCCameraArray::restore(const char* name, IIDCCamera::Speed speed)
+IIDCCameraArray::restore()
 {
-    _name = std::string(TUIIDCPP_CONF_DIR) + '/' + name;
-
-  // 設定ファイルをオープンする.
     std::ifstream	in(configFile().c_str());
     if (!in)
 	throw std::runtime_error("IIDCCameraArray::restore(): cannot open " +
 				 configFile());
     in >> *this;
-    for (auto& camera : *this)
-	camera.setSpeed(speed);
 }
 
 //! IIDCデジタルカメラの配列の設定を設定ファイルに書き込む.
@@ -51,6 +41,26 @@ IIDCCameraArray::save() const
 	throw std::runtime_error("IIDCCameraArray::save(): cannot open " +
 				 configFile());
     out << *this;
+}
+
+//! カメラ設定ファイル名を返す.
+/*!
+  \return	カメラ設定ファイル名
+*/
+std::string
+IIDCCameraArray::configFile() const
+{
+    return std::string(TUIIDCPP_CONF_DIR) + '/' + _name + ".conf";
+}
+    
+//! キャリブレーションファイル名を返す.
+/*!
+  \return	キャリブレーションファイル名
+*/
+std::string
+IIDCCameraArray::calibFile() const
+{
+    return std::string(TUIIDCPP_CONF_DIR) + '/' + _name + ".calib";
 }
 
 /************************************************************************
