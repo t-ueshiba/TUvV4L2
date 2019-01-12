@@ -92,7 +92,7 @@ MyIIDCCameraArray::view()
     else
     {
 	auto&	camera = _cameras[index];
-	    
+
       // カメラ画面を作成し，選択中のリスト項目に付加する．
 	subwindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
@@ -106,7 +106,7 @@ MyIIDCCameraArray::view()
 	gtk_signal_connect(GTK_OBJECT(subwindow), "delete_event",
 			   GTK_SIGNAL_FUNC(gtk_widget_hide_on_delete),
 			   GTK_OBJECT(subwindow));
-	
+
 	auto	table = gtk_table_new(2, 2, FALSE);
 	auto	commands = createCommands(camera);
 	camera.setCommands(commands, table);
@@ -243,7 +243,7 @@ void
 MyIIDCCameraArray::emplace_back(uint64_t uniqId)
 {
   // カメラを追加
-    _cameras.push_back(uniqId);
+    _cameras.emplace_back(uniqId);
 
   // リストに新しいカメラの通し番号とGUIDを追加．
     const auto	index = size() - 1;
