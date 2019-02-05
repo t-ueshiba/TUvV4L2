@@ -244,19 +244,25 @@ FireWireNode::setHandle(uint32_t unit_spec_ID, uint64_t uniqId)
 	{
 	    _nodeId = (j | 0xffc0);
 
-	    if ((_nodeId      != localId)		    &&
-		(unitSpecId() == unit_spec_ID)		    &&
-		(uniqId == 0 || globalUniqueId() == uniqId) &&
-		!inList())
+	    try
 	    {
-		for (int channel = 0; channel < 64; ++channel)
+		if ((_nodeId      != localId)			&&
+		    (unitSpecId() == unit_spec_ID)		&&
+		    (uniqId == 0 || globalUniqueId() == uniqId) &&
+		    !inList())
 		{
-		    if (raw1394_channel_modify(_handle, channel,
-					       RAW1394_MODIFY_ALLOC) == 0)
+		    for (int channel = 0; channel < 64; ++channel)
 		    {
-			return channel;
+			if (raw1394_channel_modify(_handle, channel,
+						   RAW1394_MODIFY_ALLOC) == 0)
+			{
+			    return channel;
+			}
 		    }
 		}
+	    }
+	    catch (const std::runtime_error& err)
+	    {	// unitSpecId() can throw runtime_error for FireWire hub node.
 	    }
 	}
 	raw1394_destroy_handle(_handle);
