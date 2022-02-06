@@ -6,7 +6,7 @@ if(COMMAND cmake_policy)
 endif()
 
 enable_language(CXX)
-set(CMAKE_CXX_STANDARD		14)
+set(CMAKE_CXX_STANDARD		17)
 set(CMAKE_CXX_STANDARD_REQUIRED	ON)
 set(CMAKE_CXX_EXTENSIONS	OFF)
 set(CMAKE_CXX_FLAGS_RELEASE	"-Wall -O3")
@@ -18,7 +18,7 @@ link_directories(${CMAKE_INSTALL_PREFIX}/lib)
 
 file(GLOB sources *.cc)
 add_library(${PROJECT_NAME} SHARED ${sources})
-target_link_libraries(${PROJECT_NAME} TUV4L2 TUv)
+target_link_libraries(${PROJECT_NAME} TUV4L2 TUv TUTools)
 
 install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION lib)
 
